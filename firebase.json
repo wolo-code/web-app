@@ -1,0 +1,26 @@
+{
+  "hosting": {
+    "public": "public",
+		"ignore": [
+			".htaccess"
+		],
+		"headers": [ {
+				"source" : "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+				"headers" : [ {
+						"key" : "Access-Control-Allow-Origin",
+						"value" : "*"
+					}
+				]
+			}, {
+				"source" : "**/*.@(jpg|jpeg|gif|png|svg)",
+				"headers" : [ {
+						"key" : "Cache-Control",
+						"value" : "max-age=7200"
+					}
+				]
+			}
+		],
+		"cleanUrls": true,
+		"trailingSlash": false
+  }
+}

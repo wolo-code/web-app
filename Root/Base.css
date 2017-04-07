@@ -1,0 +1,156 @@
+/*
+	Map css from Google Maps Javascript library documentaion under Apache 2.0 license
+*/
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+/* Always set the map height explicitly to define the size of the div
+ * element that contains the map. */
+#map {
+	height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+
+#description {
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+}
+
+#infowindow-content .title {
+	font-weight: bold;
+}
+
+#infowindow-content {
+	display: none;
+}
+
+#map #infowindow-content {
+	display: inline;
+}
+
+.pac-card {
+	margin: 10px 10px 0 0;
+	border-radius: 2px 0 0 2px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	outline: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	background-color: #fff;
+	font-family: Roboto;
+}
+
+#pac-container {
+	padding-bottom: 12px;
+	margin-right: 12px;
+}
+
+.pac-controls {
+	display: inline-block;
+	padding: 5px 11px;
+}
+
+.pac-controls label {
+	font-family: Roboto;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+#logo {
+	z-index: 1;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	background: rgba(241, 241, 241, 0.75);
+	border-radius: 6px;
+	padding: 2px;
+}
+
+#logo > .image > svg {
+	height: 50px;
+}
+
+#location_button {
+	z-index: 1;
+	position: absolute;
+	left: 18px;
+	top: 10px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+  background-color: rgb(255, 255, 255);
+	padding: 8px;
+	border: none;
+	border-radius: 2px;	
+}
+
+#pac-input {
+	left: 64px !important;
+	top: 10px !important;
+	height: 26px;
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 8px;
+	border: none;
+	text-overflow: ellipsis;
+	width: 400px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+}
+
+#decode_button {
+	z-index: 1;
+	position: absolute;
+	left: 492px;
+	top: 10px;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+  font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+  background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
+}
+
+#pac-input:focus {
+	border-color: #4d90fe;
+}
+
+#title {
+	color: #fff;
+	background-color: #4d90fe;
+	font-size: 25px;
+	font-weight: 500;
+	padding: 6px 12px;
+}
+
+#target {
+	width: 345px;
+}
+
+@media (max-width: 512px) {
+	
+	#pac-input {
+		top: 64px !important;
+		left: -8px !important;
+		width: 300px !important;
+	}
+	
+	#decode_button {
+		top: 64px !important;
+		left: auto !important;
+		right: 10px !important;
+	}
+
+	#logo > .image > svg {
+		height: 40px !important;
+	}
+	
+}

@@ -1,3 +1,7 @@
 Path	Name	Extension
-	root	
+	root
 	script	js
+	favicon	ico
+resource\	copy	svg
+resource\	link	svg
+resource\	map	svg

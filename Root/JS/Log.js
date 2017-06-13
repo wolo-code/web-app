@@ -1,4 +1,3 @@
-
 function logCode(code, values) {
 	console.log("Code:")
 	console.log(code);

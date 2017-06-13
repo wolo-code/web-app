@@ -12,6 +12,12 @@ rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)\.ico$ Resource/$1.ico [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)\.svg$ Resource/$1.svg [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*?)\.json$ $1/index.json [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -20,3 +26,6 @@ RewriteRule ^(.*?)\.jpg$ $1/index.jpg [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*?)$ $1.html [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ / [L]

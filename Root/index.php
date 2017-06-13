@@ -1,5 +1,5 @@
 <?php
-	if( isset($_GET['mode']) && ($_GET['mode'] === "publish") )
+	if( isset($_GET['mode']) && ($_GET['mode'] === 'publish') )
 		$bPublish = TRUE;
 	else
 		$bPublish = FALSE;
@@ -8,46 +8,62 @@
 <html>
 	<head>
 		<title>WCode location</title>
-		<meta name="robots" content="noindex" >
-		<meta name="author" content="ujjwalsingh@outlook.com" >
-		<meta name="viewport" content="initial-scale=1.0" >
-		<meta charset="utf-8" >
+		<meta name='robots' content='noindex' >
+		<meta name='author' content='ujjwalsingh@outlook.com' >
+		<meta name='viewport' content='initial-scale=1.0' >
+		<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' >
+		<meta charset='utf-8' >
+		<style>
+			/* latin */
+			@font-face {
+				font-family: 'Abel';
+				font-style: normal;
+				font-weight: 400;
+				src: local('Abel'), local('Abel-Regular'), url(//fonts.gstatic.com/s/abel/v6/brdGGFwqYJxjg2CD1E9o7g.woff2) format('woff2');
+				unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+			}
+		</style>
 		<?php
 			if($bPublish) {
 		?>
 				<style type='text/css'>
 		<?php
-					require 'base.css';
+					require 'css\base.css';
 		?>
 				</style>
 				<script>
-					(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-						(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-						m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-					})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-					ga('create', 'UA-96994409-1', 'auto');
-					ga('send', 'pageview');
+					<?php require 'js/fragment/ga_header.js' ?>
 				</script>
 		<?php
 			}
 			else {
 		?>
-				<link rel='stylesheet' type='text/css' href='base.css' >
+				<link rel='stylesheet' type='text/css' href='css\base.css' >
 		<?php
 			}
 		?>
+		<script>
+			<?php require 'js/fragment/base.js' ?>
+		</script>
 	</head>
 	<body>
-		<a id=logo href="https://wcodes.org">
+		<?php
+			require 'Overlay.php'
+		?>
+		<div id='map'></div>
+		<a id=logo href='https://wcodes.org' tabindex='1'>
 			<span class='image'><?php echo file_get_contents('resource\logo.svg'); ?></span>
 		</a>
-		<div id="location_button">
+		<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='2' >
+		<div id='result'></div>
+		<input id='decode_button' class='control' type='button' value='Decode' tabindex='3' >
+		<div id='location_button' class='control' tabindex='4'>
 			<span class='image'><?php echo file_get_contents('resource\location.svg'); ?></span>
 		</div>
-		<input id="pac-input" class="controls" type="text" placeholder="Search" >
-		<input id="decode_button" type="button" value="Decode" >
-		<div id="map"></div>
+		<div id='info' class='control' tabindex='5'>
+			<span class='image'><?php echo file_get_contents('resource\info.svg'); ?></span>
+		</div>
+		<div id='notification' class='hide'></div>
 		<?php
 			if($bPublish) {
 		?>
@@ -56,15 +72,16 @@
 			}
 			else {
 		?>
-				<script src='wordlist.js'></script>
-				<script src='city.js'></script>
-				<script src='core.js'></script>
-				<script src='code.js'></script>
-				<script src='map.js'></script>
-				<script src='log.js'></script>
+				<script src='js/wordlist.js'></script>
+				<script src='js/city.js'></script>
+				<script src='js/core.js'></script>
+				<script src='js/code.js'></script>
+				<script src='js/map.js'></script>
+				<script src='js/log.js'></script>
+				<script src='js/script.js'></script>
 		<?php
 			}
 		?>
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap" async defer></script>
+		<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>
 	</body>
 </html>

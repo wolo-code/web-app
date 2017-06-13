@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Test
+	</title>
+	<script src="js/Core.js"></script>
+	<script src="GeoHash.js"></script>
+	<script src="js/WordList.js"></script>
+	<script src="js/city.js"></script>
+	<script src="js/code_2.js"></script>
+	<script src="js/log.js"></script>
+	<script src="Test.js"></script>
+</head>
+<body>
+	<input id="pac-input" class="controls" type="text" placeholder="Search" tabindex="2" autocomplete="off" style="z-index: 0; position: absolute; left: 0px; top: 0px;">
+	<div id='result'></div>
+		<script>
+		document.getElementById('pac-input').addEventListener('input', fun);
+	function fun(event) {
+		changeInput(document.getElementById('pac-input').value);
+	};
+	
+	var people = ['Steven', 'Sean', 'Stefan', 'Sam', 'Nathan'];
+
+function matchPeople(input) {
+  var reg = new RegExp(input.split('').join('\\w*').replace(/\W/, ""), 'i');
+  return people.filter(function(person) {
+    if (person.match(reg)) {
+      return person;
+    }
+  });
+}
+
+function changeInput(val) {
+  var autoCompleteResult = matchPeople(val);
+  document.getElementById("result").innerHTML = autoCompleteResult;
+}
+
+	</script>
+</body>

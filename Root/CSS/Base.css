@@ -1,0 +1,327 @@
+/*
+	Map css from Google Maps Javascript library documentaion under Apache 2.0 license
+*/
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#overlay {
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	z-index: 2;
+	color: rgba(100, 100, 100);
+	background-color: rgba(100, 100, 100, 0.75);
+	position: absolute;
+	margin: auto;
+	text-align: center;
+}
+
+#overlay_message {
+	position: relative;
+	font-family: Abel;
+	margin: 0 auto;
+	border: transparent solid 20px;
+	padding: 2px 20px 8px;
+	text-align: left;
+	background-color: #FFFFFF;
+	color: #999999;
+	max-width: 400px;
+}
+
+#overlay_message h1 {
+	text-align: center;
+	color: #676767;
+}
+
+/* Always set the map height explicitly to define the size of the div
+ * element that contains the map. */
+#map {
+	height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+
+#description {
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+}
+
+#infowindow-content .title {
+	font-weight: bold;
+}
+
+#infowindow-content {
+	display: none;
+}
+
+#map #infowindow-content {
+	display: inline;
+}
+
+.pac-card {
+	margin: 10px 10px 0 0;
+	border-radius: 2px 0 0 2px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	outline: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	background-color: #fff;
+	font-family: Roboto;
+}
+
+#pac-container {
+	padding-bottom: 12px;
+	margin-right: 12px;
+}
+
+.pac-controls {
+	display: inline-block;
+	padding: 5px 11px;
+}
+
+.pac-controls label {
+	font-family: Roboto;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+#logo {
+	z-index: 1;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	background: rgba(241, 241, 241, 0.75);
+	border-radius: 6px;
+	border-width: thin;
+	border-color: #e8e8e8;
+	border-style: solid;
+	padding: 2px;
+}
+
+#logo > .image > svg {
+	height: 50px;
+}
+
+#location_button {
+	z-index: 1;
+	position: absolute;
+	right: 46px;
+	bottom: 24px;
+	height: 24px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+  background-color: rgb(255, 255, 255);
+	padding: 6px;
+	border: none;
+	border-radius: 2px;
+}
+
+#pac-input {
+	left: 0px !important;
+	top: 36px !important;
+	height: 26px;
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 8px;
+	border: none;
+	text-overflow: ellipsis;
+	width: 400px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+}
+
+#decode_button {
+	z-index: 1;
+	position: absolute;
+	left: 428px;
+	top: 36px;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+  font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+  background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
+}
+
+#pac-input:focus {
+	border-color: #4d90fe;
+}
+
+#title {
+	color: #fff;
+	background-color: #4d90fe;
+	font-size: 25px;
+	font-weight: 500;
+	padding: 6px 12px;
+}
+
+#target {
+	width: 345px;
+}
+
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 86px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#decode_button {
+		top: 86px !important;
+		left: auto !important;
+		right: 10px !important;
+	}
+
+	#logo > .image > svg {
+		height: 40px !important;
+	}
+
+	#result {
+		top: 60px !important;
+	}
+	/*#logo {
+		left: 0;
+		right: 0;
+		margin-left: auto;
+		margin-right: auto;
+		width: 126px;
+	}*/
+
+}
+
+#overlay_message_info {
+	position: absolute;
+	top: 2px;
+	left: 10px;
+}
+
+#overlay_message_close {
+	position: absolute;
+	top: 2px;
+	right: 10px;
+}
+
+.link {
+	color: #69B7CF;
+	text-decoration: none;
+}
+
+.hide {
+	display: none;
+}
+
+#info {
+	z-index: 1;
+	position: absolute;
+	bottom: 30px;
+	left: 10px;
+}
+
+.control {
+	cursor: pointer;
+}
+
+.infowindow-content {
+	color: #666666;
+}
+
+.slash {
+	color: #DDDDDD;
+	font-size: large;
+}
+
+#copy_button {
+	padding-left: 20px;
+	vertical-align: bottom;
+}
+
+#copy_link_button {
+	padding-left: 20px;
+	vertical-align: bottom;
+}
+
+#result {
+	position: absolute;
+	top: 8px;
+	left: 12px;
+}
+
+#result > div {
+	display: inline-block;
+	background-color: #FFFFFF;
+	border-radius: 20px;
+	color: #69B7CF;
+	padding: 2px 8px;
+	margin: 0 4px;
+	cursor: pointer;
+}
+
+#notification {
+	text-align: center;
+	position: absolute;
+	bottom: 134px;
+	background-color: #FFFFFF;
+	padding: 4px 8px;
+	border-radius: 18px;
+	color: #69B7CF;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 350px;
+}
+
+.center {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+#overlay_enter {
+	font-size: larger;
+	margin-bottom: 10px;
+	color: #69B7CF;
+}
+
+#infowindow-code {
+	padding: 10px 0px;
+}
+
+#infowindow_code_left {
+	padding-top: 4px;
+}
+
+#infowindow_code_right {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#infowindow_code_right_code {
+	font-size: x-large;
+	padding-left: 10px;
+}
+
+.gm-style-iw + div {display: none;}
+
+.gm-style-iw {
+	left: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#updated {
+	font-size: smaller;
+	text-align: right;
+	padding-top: 20px;
+}

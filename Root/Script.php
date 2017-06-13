@@ -1,7 +1,8 @@
-<?php 
-	require 'Code.js';
-	require 'Core.js';
-	require 'City.js';
-	require 'Map.js';
-	require 'WordList.js';
+<?php
+	require 'js/script.js';
+	require 'js/code.js';
+	require 'js/core.js';
+	require 'js/city.js';
+	require 'js/map.js';
+	require 'js/wordList.js';
  ?>

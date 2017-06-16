@@ -1,4 +1,6 @@
-DirectoryIndex index.php
+DirectoryIndex Framework/HTML/Page.php
+
+RewriteRule ^404$ /Framework/HTML/404.php [L]
 
 RewriteBase /
 RewriteEngine On
@@ -6,7 +8,8 @@ DirectorySlash Off
 
 RewriteRule ^(.+)/$ $1 [R=301]
 
-RewriteRule ^script.js$ Script.php [L]
+RewriteRule ^style.css$ Framework/CSS/Style.php [L]
+RewriteRule ^script.js$ Framework/JS/Script.php [L]
 
 rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]

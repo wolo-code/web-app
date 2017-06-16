@@ -1,10 +1,10 @@
 <div id='overlay'>
 	<div id='overlay_message'>
 		<div id='overlay_message_info'>
-			<span class='image'><?php echo file_get_contents('resource\info.svg'); ?></span>
+			<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
 		</div>
 		<div id='overlay_message_close' class="control">
-			<span class='image'><?php echo file_get_contents('resource\close.svg'); ?></span>
+			<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 		</div>
 		<h1>
 			Note
@@ -38,7 +38,7 @@
 		</ol>
 		<div class="center"><button id='overlay_enter' type='button'>Enter</button></div>
 		<div id='contact'>
-			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a> at: <a class="link" href="mailto:ujjwalsingh@outlook.com?Subject=WAddress">ujjwalsingh@outlook.com</a>
+			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a> at: <a class="link" href="mailto:ujjwalsingh@outlook.com?subject=WCode-location">ujjwalsingh@outlook.com</a>
 		</div>
 		<div id='updated'>Updated:
 <?php

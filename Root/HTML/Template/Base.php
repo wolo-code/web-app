@@ -13,7 +13,7 @@
 		if($bPublish) {
 	?>
 			<script>
-				<?php require '../JS/Fragment/GA_header.js' ?>
+				<?php require '../../JS/Fragment/GA_header.js' ?>
 			</script>
 	<?php
 		}

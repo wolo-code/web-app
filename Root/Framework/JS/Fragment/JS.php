@@ -8,7 +8,7 @@
 		includeDir('../../JS/Base/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, '');
 ?>
 	</script>
-	<script async src='/script.js' defer></script>
+	<script src='/script.js'></script>
 <?php
 	}
 	else {

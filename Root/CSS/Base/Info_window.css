@@ -1,0 +1,52 @@
+
+#infowindow-content .title {
+	font-weight: bold;
+}
+
+#infowindow-content {
+	display: none;
+}
+
+#map #infowindow-content {
+	display: inline;
+}
+
+.infowindow-content {
+	color: #666666;
+}
+
+#infowindow-code {
+	padding: 10px 0px;
+}
+
+#infowindow_code_left {
+	padding-top: 4px;
+}
+
+#infowindow_code_right {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#infowindow_code_right_code {
+	font-size: x-large;
+	padding-left: 10px;
+}
+
+.gm-style-iw + div {display: none;}
+
+.gm-style-iw {
+	left: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#copy_button {
+	padding-left: 20px;
+	vertical-align: bottom;
+}
+
+#copy_link_button {
+	padding-left: 20px;
+	vertical-align: bottom;
+}

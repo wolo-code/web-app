@@ -1,0 +1,53 @@
+#overlay {
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	z-index: 2;
+	color: rgba(100, 100, 100);
+	background-color: rgba(100, 100, 100, 0.75);
+	position: absolute;
+	margin: auto;
+	text-align: center;
+}
+
+#overlay_message {
+	position: relative;
+	font-family: Abel;
+	margin: 0 auto;
+	border: transparent solid 20px;
+	padding: 2px 20px 8px;
+	text-align: left;
+	background-color: #FFFFFF;
+	color: #999999;
+	max-width: 400px;
+}
+
+#overlay_message h1 {
+	text-align: center;
+	color: #676767;
+}
+
+#overlay_enter {
+	font-size: larger;
+	margin-bottom: 10px;
+	color: #69B7CF;
+}
+
+#updated {
+	font-size: smaller;
+	text-align: right;
+	padding-top: 20px;
+}
+
+#overlay_message_info {
+	position: absolute;
+	top: 2px;
+	left: 10px;
+}
+
+#overlay_message_close {
+	position: absolute;
+	top: 2px;
+	right: 10px;
+}

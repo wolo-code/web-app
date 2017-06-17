@@ -13,36 +13,6 @@ body {
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
 
-#overlay {
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
-	z-index: 2;
-	color: rgba(100, 100, 100);
-	background-color: rgba(100, 100, 100, 0.75);
-	position: absolute;
-	margin: auto;
-	text-align: center;
-}
-
-#overlay_message {
-	position: relative;
-	font-family: Abel;
-	margin: 0 auto;
-	border: transparent solid 20px;
-	padding: 2px 20px 8px;
-	text-align: left;
-	background-color: #FFFFFF;
-	color: #999999;
-	max-width: 400px;
-}
-
-#overlay_message h1 {
-	text-align: center;
-	color: #676767;
-}
-
 /* Always set the map height explicitly to define the size of the div
  * element that contains the map. */
 #map {
@@ -54,18 +24,6 @@ body {
 	font-family: Roboto;
 	font-size: 15px;
 	font-weight: 300;
-}
-
-#infowindow-content .title {
-	font-weight: bold;
-}
-
-#infowindow-content {
-	display: none;
-}
-
-#map #infowindow-content {
-	display: inline;
 }
 
 .pac-card {
@@ -204,18 +162,6 @@ body {
 
 }
 
-#overlay_message_info {
-	position: absolute;
-	top: 2px;
-	left: 10px;
-}
-
-#overlay_message_close {
-	position: absolute;
-	top: 2px;
-	right: 10px;
-}
-
 .link {
 	color: #69B7CF;
 	text-decoration: none;
@@ -236,23 +182,9 @@ body {
 	cursor: pointer;
 }
 
-.infowindow-content {
-	color: #666666;
-}
-
 .slash {
 	color: #DDDDDD;
 	font-size: large;
-}
-
-#copy_button {
-	padding-left: 20px;
-	vertical-align: bottom;
-}
-
-#copy_link_button {
-	padding-left: 20px;
-	vertical-align: bottom;
 }
 
 #result {
@@ -292,40 +224,3 @@ body {
 	text-align: center;
 }
 
-#overlay_enter {
-	font-size: larger;
-	margin-bottom: 10px;
-	color: #69B7CF;
-}
-
-#infowindow-code {
-	padding: 10px 0px;
-}
-
-#infowindow_code_left {
-	padding-top: 4px;
-}
-
-#infowindow_code_right {
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-#infowindow_code_right_code {
-	font-size: x-large;
-	padding-left: 10px;
-}
-
-.gm-style-iw + div {display: none;}
-
-.gm-style-iw {
-	left: 0;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#updated {
-	font-size: smaller;
-	text-align: right;
-	padding-top: 20px;
-}

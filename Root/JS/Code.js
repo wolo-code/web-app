@@ -1,14 +1,15 @@
+var urlFunctions = 'https://us-central1-waddress-5f30b.cloudfunctions.net/';
+//http://localhost:5003/waddress-5f30b/us-central1;
+
 function encode_(city_begin, position) {
 	var http = new XMLHttpRequest();
-	//var url = 'http://localhost:8010/WCodes-code/us-central1/encode';
-	var url = 'https://us-central1-wcode-0.cloudfunctions.net/encode';//
-	http.open('POST', url, true);
+	http.open('POST', urlFunctions+'encode', true);
 
-//	http.setRequestHeaders('Content-type', 'version');
+	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
 
-	http.onreadystatechange = function() {//Call a function when the state changes.
+	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			setCodeWords(http.responseText, position);
 		}
@@ -44,15 +45,13 @@ function stringifyEncodeData(city_begin, position) {
 function decode_(city_begin, code) {
 
 	var http = new XMLHttpRequest();
-	// var url = 'http://localhost:8010/WCodes-code/us-central1/decode';
-	var url = 'https://us-central1-wcode-0.cloudfunctions.net/decode';
-	http.open('POST', url, true);
+	http.open('POST', urlFunctions+'decode', true);
 
-//	http.setRequestHeaders('Content-type', 'version');
+	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
 
-	http.onreadystatechange = function() {//Call a function when the state changes.
+	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			setCodeCoord(http.responseText, code);
 		}

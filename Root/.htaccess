@@ -11,11 +11,19 @@ RewriteRule ^(.+)/$ $1 [R=301]
 RewriteRule ^style.css$ Framework/CSS/Style.php [L]
 RewriteRule ^script.js$ Framework/JS/Script.php [L]
 
+RewriteRule ^manifest\.json$ /Framework/Files/Manifest.json.php [L]
+
 rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)\.ico$ Resource/$1.ico [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)\.jpg$ Resource/$1.jpg [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)\.png$ Resource/$1.png [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)\.svg$ Resource/$1.svg [L]

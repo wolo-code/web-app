@@ -11,17 +11,22 @@
 	<meta name='viewport' content='initial-scale=1.0' >
 	<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' >
 	<link rel='manifest' href='/manifest.json' >
-	<link href="<?php echo $config['base_url']; if($id != 'root') echo '/'.$id ?>" rel='canonical' >
-	<?php
-		if($bPublish) {
-	?>
-			<script>
-				<?php require '../../JS/Fragment/GA_header.js' ?>
-			</script>
-	<?php
-		}
-		require '../CSS/Fragment/CSS.php';
-	?>
+	<link href="<?php echo $config['base_url']; ?>" rel='canonical' >
+	<title>
+<?php
+		echo $config['project_description'].' - '.$config['project_title'];
+?>
+	</title>
+<?php
+	if($bPublish) {
+?>
+	<script>
+		<?php require '../../JS/Fragment/GA_header.js' ?>
+	</script>
+<?php
+	}
+	require '../CSS/Fragment/CSS.php';
+?>
 </head>
 <body>
 <?php

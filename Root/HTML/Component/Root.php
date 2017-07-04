@@ -15,4 +15,3 @@
 	<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
 </div>
 <div id='notification' class='hide'></div>
-<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>

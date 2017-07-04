@@ -25,8 +25,15 @@
 </head>
 <body>
 <?php
-	require '../JS/Fragment/JS.php';
 	require '../../HTML/Component/Root.php';
+	if($bPublish) {
 ?>
+		<script src="https://cdn.ravenjs.com/3.16.1/raven.min.js" crossorigin="anonymous"></script>
+		<script><?php require '../JS/Fragment/Sentry.php' ?></script>
+<?php
+	}
+	require '../JS/Fragment/JS.php';
+?>
+	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>
 </body>
 </html>

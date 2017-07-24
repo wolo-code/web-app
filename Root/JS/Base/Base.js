@@ -5,6 +5,7 @@ function domInit() {
 	versionCheck();
 	urlDecode();
 }
+
 function versionCheck() {
 	var cur_version = 1;
 	if (typeof(Storage) !== 'undefined') {

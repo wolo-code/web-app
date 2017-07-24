@@ -15,10 +15,9 @@
 		<ol>
 			<li>This is a beta demo of word based geo addressing</li>
 			<li>The first word specifies the city, the other three words are from a limited dictionary of 1024 easy common nouns</li>
-			<li>At present this runs on a temporary algorithm</li>
 			<li>Limited to 'Bangalore', 'India'</li>
 			<li>Your precise location will NOT be recorded</li>
-			<li>Tested with Google Chrome (v59)</li>
+			<li>Tested with Google Chrome</li>
 		</ol>
 		<h2>
 			Steps
@@ -31,10 +30,7 @@
 			Known issues
 		</h2>
 		<ol>
-			<li>Word list will be further refined</li>
-			<li>The accuracy is not *exact* but _close enough_</li>
-			<li>Thus nearby places will generate same code</li>
-			<li>The server roundtrip induces a delay. Please wait a few seconds for the result to show up</li>
+			<li>The server roundtrip induces a delay. You may have to wait a few seconds for the result to show up</li>
 		</ol>
 		<div class="center"><button id='overlay_enter' type='button'>Enter</button></div>
 		<div id='contact'>

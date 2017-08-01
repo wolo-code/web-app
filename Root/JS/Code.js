@@ -1,5 +1,5 @@
 var urlFunctions = 'https://us-central1-waddress-5f30b.cloudfunctions.net/';
-//http://localhost:5003/waddress-5f30b/us-central1;
+//'http://localhost:5002/waddress-5f30b/us-central1/';
 
 function encode_(city_begin, position) {
 	var http = new XMLHttpRequest();

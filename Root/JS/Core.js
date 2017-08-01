@@ -8,13 +8,19 @@ function getCityFromName(cityName) {
 	return BANGALORE;
 }
 
+function getCityBegin(cityCenter) {
+	var CITY_SPAN_PERIMETER = 0.5/2;
+	var lat = cityCenter.lat - CITY_SPAN_PERIMETER;
+	var lng = cityCenter.lng - CITY_SPAN_PERIMETER;
+	return {'lat': lat, 'lng': lng};
+}
+
 function encode(position) {
 	var city = getCityFromLocation(position);
-	var code_ = encode_(city.begin, position)
-	return city.name + " " + code_;
+	return city.name + " " + encode_(getCityBegin(city.center), position);
 }
 
 function decode(words) {
 	var city = getCityFromName(words[0]);
-	return decode_(city.begin, words.splice(1, words.length-1))
+	return decode_(getCityBegin(city.center), words.splice(1, words.length-1))
 }

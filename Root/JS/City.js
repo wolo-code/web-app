@@ -1,15 +1,15 @@
 var CHENNAI = {
-	begin: {
-		lat: 12.831878,
-		lng: 80.062018
+	center: {
+		lat: 12.981878,
+		lng: 80.312018
 	},
 	name: "Chennai"
 }
 
 var BANGALORE = {
-	begin: {
-		lat: 12.851662,
-		lng: 77.430731
+	center: {
+		lat: 13.101662,
+		lng: 77.680731
 	},
 	name: "Bangalore"
 }

@@ -30,6 +30,7 @@
 
 #overlay_enter {
 	font-size: larger;
+	padding: 8px 14px;
 	margin-bottom: 10px;
 	color: #69B7CF;
 }

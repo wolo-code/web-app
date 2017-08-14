@@ -53,7 +53,7 @@ body {
 	font-weight: 300;
 }
 
-#logo {
+#logo_wcode {
 	z-index: 1;
 	position: absolute;
 	right: 10px;
@@ -66,8 +66,26 @@ body {
 	padding: 2px;
 }
 
-#logo > .image > svg {
+#logo_wcode > .image > svg {
 	height: 50px;
+}
+
+#logo_location {
+	z-index: 1;
+	position: absolute;
+	right: 10px;
+	top: 68px;
+	background: rgba(241, 241, 241, 0.75);
+	border-radius: 6px;
+	border-width: thin;
+	border-color: #e8e8e8;
+	border-style: solid;
+	padding: 2px;
+}
+
+#logo_location > .image > svg {
+	height: 10px;
+	width: 152px;
 }
 
 #location_button {
@@ -134,13 +152,13 @@ body {
 @media (max-width: 512px) {
 
 	#pac-input {
-		top: 86px !important;
+		top: 96px !important;
 		left: -4px !important;
 		width: 310px !important;
 	}
 
 	#decode_button {
-		top: 86px !important;
+		top: 96px !important;
 		left: auto !important;
 		right: 10px !important;
 	}

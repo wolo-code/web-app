@@ -2,8 +2,11 @@
 	require '../../HTML/Fragment/Overlay.php'
 ?>
 <div id='map'></div>
-<a id=logo href='https://wcodes.org' tabindex='1'>
-	<span class='image'><?php echo file_get_contents('../../Resource/Logo.svg'); ?></span>
+<a id=logo_wcode href='https://wcodes.org' tabindex='1'>
+	<span class='image'><?php echo file_get_contents('../../Resource/Logo_WCode.svg'); ?></span>
+</a>
+<a id=logo_location href='https://location.wcodes.org' tabindex='1'>
+	<span class='image'><?php echo file_get_contents('../../Resource/Logo_location.svg'); ?></span>
 </a>
 <input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='2' >
 <div id='result'></div>

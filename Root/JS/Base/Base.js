@@ -13,14 +13,15 @@ function versionCheck() {
 			hideOverlay();
 		else {
 			localStorage.note_version = cur_version;
+			initWCode = true;
 		}
 	}
 }
 
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
-		var words = window.location.pathname.substr(1).split('.');
-		decode(words);
+		var code = window.location.pathname.substr(1).toLowerCase();
+		execDecode(code);
 		initWCode = true;
 	}
 }

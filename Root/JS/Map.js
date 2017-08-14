@@ -7,8 +7,13 @@ var marker;
 var infoWindow;
 var accuCircle;
 var myLocDot;
+var city_plus_wordList = [];
 
 function initMap() {
+	for(var i = 0; i < CityList.length; i++) {
+		city_plus_wordList.push(CityList[i].name);
+	}
+	city_plus_wordList = city_plus_wordList.concat(wordList);
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: -34.397, lng: 150.644},
@@ -22,6 +27,7 @@ function initMap() {
 	});
 
 	infoWindow = new google.maps.InfoWindow({map: map});
+	infoWindow.setContent("Waiting for location access right");
 	locate();
 
 	var input = document.getElementById('pac-input');
@@ -54,7 +60,7 @@ function initMap() {
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
 			focus_(places[0].geometry.location);
-			encode(places[0].geometry.location);
+			encode(resolveLatLng(places[0].geometry.location));
 		}
 		else {
 			places.forEach(function(place) {
@@ -94,8 +100,8 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
-		encode(event.latLng);
 		focus_(event.latLng);
+		encode(resolveLatLng(event.latLng));
   });
 
 	location_button.addEventListener('click', function() {
@@ -105,51 +111,69 @@ function initMap() {
 	decode_button.addEventListener('click', function() {
 		clearMap();
 		result.setInnerText = '';
-		var valid = false;
-
 		var code = document.getElementById('pac-input').value.replace(/(\\|\/)/gm, '').trim().toLowerCase();
-		if(code.length > 0) {
-			var splitChar;
-			if(code.indexOf(' ') != -1)
-				splitChar = ' ';
-			else {
-				splitChar = '.';
-			}
-			var words = code.split(splitChar);
-				if(words.length == 4) {
-					if(words[0] == 'bangalore') {
-						for (i = 1; i < words.length; i++) {
-							if (wordList.includes(words[i]) == true) {
-								valid = true;
-							}
-							else {
-								valid = false;
-								break;
-							}
-						}
-					}
-				}
-		}
-
-		if(valid) {
-			decode(words);
-		}
-		else {
-			alert('Incorrect input. Should be 4 words beginning with Bangalore which is followed by 3 WCodes. E.g: "Bangalore cat apple tomato"');
-		}
+		execDecode(code);
 	});
-
-	var clickHandler = new ClickEventHandler(map);
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
 }
 
-var city_list = ['Bangalore'];
+function resolveLatLng(latLng) {
+	return {'lat':latLng.lat(), 'lng':latLng.lng()};
+}
+
+function execDecode(code) {
+	
+	var valid = true;
+	if(code.length > 0) {
+		var splitChar;
+		if(code.indexOf(' ') != -1)
+			splitChar = ' ';
+		else {
+			splitChar = '.';
+		}
+		var words = code.split(splitChar);
+		var city;
+		if(words.length < 3)
+			valid = false;
+		else {
+			
+			if(words.length > 3) {
+				var ipCityName = words.splice(0, words.length-3).join(' ');
+				city = getCityFromName(ipCityName);
+			}
+			else {
+				city = getCityFromPosition(resolveLatLng(myLocDot.position));
+			}
+			
+			if(city == null) {
+				valid = false;
+			}
+			else {
+				for (var i = 0; i < 3; i++) {
+					if (wordList.includes(words[i]) != true) {
+						valid = false;
+						break;
+					}
+				}
+			}
+			
+		}
+	}
+
+	if(valid) {
+		decode_(city, words);
+	}
+	else {
+		alert('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
+	}
+	
+}
 
 function suggestComplete(event) {
 	var input = document.getElementById('pac-input').value;
 	if(!input.includes(' ')) {
-		changeInput(city_list, input);
+		changeInput(city_plus_wordList, input);
 	}
 	else {
 		var cur_word = input.split(' ');
@@ -165,7 +189,7 @@ function matchWord(list, input) {
 	var reg = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
 	return list.filter(function(word) {
 		if (word.match(reg)) {
-			if(word.startsWith(input))
+			if(word.toLowerCase().startsWith(input.toLowerCase()))
 				return word;
 		}
 	});
@@ -216,19 +240,6 @@ var ClickEventHandler = function(map) {
 	this.map.addListener('click', this.handleClick.bind(this));
 };
 
-ClickEventHandler.prototype.handleClick = function(event) {
-	focus_(event.latLng);
-	encode(event.latLng);
-	// If the event has a placeId, use it.
-	if (event.placeId) {
-		// Calling e.stop() on the event prevents the default info window from
-		// showing.
-		// If you call stop here when there is no placeId you will prevent some
-		// other map click event handlers from receiving the event.
-		event.stop();
-	}
-};
-
 function focus_(pos, bounds) {
 	map.setCenter(pos);
 	if(typeof marker === 'undefined') {
@@ -248,15 +259,24 @@ function focus_(pos, bounds) {
 	if(marker.getMap() == null)
 		marker.setMap(map);
 
-	if(typeof bounds !== 'undefined')
-		map.fitBounds(bounds);
+	if(typeof bounds !== 'undefined') {
+		map.fitBounds(bounds, 26);
+		var offsetY = 0.06;
+		var span = map.getBounds().toSpan(); // a latLng - # of deg map span
+		var newCenter = { 
+			lat: pos.lat + span.lat()*offsetY,
+			lng: pos.lng
+		};
+
+		map.panTo(newCenter);
+
+	}
 	else if (typeof accuCircle !== 'undefined')
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
 	infoWindow.setContent('(loading..)');
 	infoWindow.open(map, marker);
-
 }
 
 function locate() {
@@ -322,26 +342,24 @@ function locate() {
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 	infoWindow.setPosition(pos);
 	infoWindow.setContent(browserHasGeolocation ?
-												'Error: The Geolocation service failed.' :
-												'Error: Your browser doesn\'t support geolocation.');
-	focusDefault();
+												'Error: The Geolocation service failed' :
+												'Error: Your browser doesn\'t support geolocation');
+	//focusDefault();
 }
 
 function setInfoWindowText(code, latLng) {
-	infoWindow.setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='copy_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng) + "'><img id='copy_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
+	infoWindow.setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
-function getIntentURL(latLng) {
+function getIntentURL(latLng, code) {
 	if((navigator.userAgent.match(/android/i)))
-		return "geo:"+latLng.lat+","+latLng.lng;
+		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
 	else
-		//return "https://maps.google.com?q=Point@"+latLng.lat+","+latLng.lng;
-		return "https://www.google.com/maps/place/"+latLngToDms(latLng)+"/@"+latLng.lat+","+latLng.lng+",12z";
-		//return "http://maps.google.com/maps?&z=10&q="+latLng.lat+"+"+latLng.lng+"&ll="+latLng.lat+"+"+latLng.lng;
+		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
 }
 
 function focusDefault() {
-	alert("This is a POC demo. For now, please select a place in Bangalore India.");
+	setTimeout(function() { alert("This city appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
 	setTimeout(function() { focusDefault_(); }, 1000);
 }
 
@@ -354,36 +372,4 @@ function focusDefault_() {
 
 function clearMap() {
 	marker.setMap(null);
-}
-
-function latLngToDms(latLng) {
-	var lat_dir, lng_dir;
-	if(latLng.lat > 90)
-		lat_dir = 'S';
-	else
-		lat_dir = 'N';
-	if(latLng.lng > 90)
-		lng_dir = 'W';
-	else
-		lng_dir = 'E';
-	return deg_to_dms(latLng.lat)+lat_dir+"+"+deg_to_dms(latLng.lng)+lng_dir+"+"+"label";
-}
-
-function deg_to_dms (deg) {
-	var d = Math.floor (deg);
-	var minfloat = (deg-d)*60;
-	var m = Math.floor(minfloat);
-	var secfloat = (minfloat-m)*60;
-	var s = Math.round(secfloat);
-	// After rounding, the seconds might become 60. These two
-	// if-tests are not necessary if no rounding is done.
-	if (s==60) {
-		m++;
-		s=0;
-	}
-	if (m==60) {
-		d++;
-		m=0;
-	}
-	return ("" + d + '°' + m + '&#39;' + s + '&#34;');
 }

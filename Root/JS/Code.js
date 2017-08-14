@@ -1,7 +1,7 @@
 var urlFunctions = 'https://us-central1-waddress-5f30b.cloudfunctions.net/';
 //'http://localhost:5002/waddress-5f30b/us-central1/';
 
-function encode_(city_begin, position) {
+function encode_(city, position) {
 	var http = new XMLHttpRequest();
 	http.open('POST', urlFunctions+'encode', true);
 
@@ -11,17 +11,17 @@ function encode_(city_begin, position) {
 
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
-			setCodeWords(http.responseText, position);
+			setCodeWords(http.responseText, city, position);
 		}
 	}
 
-	http.send( stringifyEncodeData(city_begin, position) );
+	http.send( stringifyEncodeData(getCityBegin(city.center), position) );
 	return '';
 }
 
-function setCodeWords(code, position) {
+function setCodeWords(code, city, position) {
 	var message = [];
-	message.push('Bangalore');
+	message.push(city.name);
 	var object = JSON.parse(code).code;
 
 	for(i of object) {
@@ -42,7 +42,7 @@ function stringifyEncodeData(city_begin, position) {
 	return JSON.stringify(object);
 }
 
-function decode_(city_begin, code) {
+function decode_(city, code) {
 
 	var http = new XMLHttpRequest();
 	http.open('POST', urlFunctions+'decode', true);
@@ -53,6 +53,7 @@ function decode_(city_begin, code) {
 
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
+			code.splice(0, 0, city.name);
 			setCodeCoord(http.responseText, code);
 		}
 	}
@@ -61,18 +62,18 @@ function decode_(city_begin, code) {
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);
 	data[2] = wordList.indexOf(code[2]);
-	http.send( stringifyDecodeData(city_begin, data) );
+	http.send( stringifyDecodeData(getCityBegin(city.center), data) );
 
-	lat = city_begin.lat;
-	lng = city_begin.lng;
-	return {
-		lat: (function() {
-			return lat
-		})(),
-		lng: (function() {
-			return lng
-		})()
-	};
+	// lat = city_begin.lat;
+	// lng = city_begin.lng;
+	// return {
+	// 	lat: (function() {
+	// 		return lat
+	// 	})(),
+	// 	lng: (function() {
+	// 		return lng
+	// 	})()
+	// };
 }
 
 function stringifyDecodeData(city_begin, code) {
@@ -84,6 +85,5 @@ function stringifyDecodeData(city_begin, code) {
 
 function setCodeCoord(codeIndex, code) {
 	var object = JSON.parse(codeIndex);
-	code.unshift('Bangalore');
 	focus__(object, code);
 }

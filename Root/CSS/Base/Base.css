@@ -5,6 +5,10 @@ body {
 	padding: 0;
 }
 
+input {
+	-webkit-appearance: none;
+}
+
 @font-face {
 	font-family: 'Abel';
 	font-style: normal;
@@ -242,4 +246,3 @@ body {
 	margin-right: auto;
 	text-align: center;
 }
-

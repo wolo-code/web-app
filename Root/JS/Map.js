@@ -9,6 +9,8 @@ var accuCircle;
 var myLocDot;
 var city_plus_wordList = [];
 
+var poiPlace;
+
 function initMap() {
 	for(var i = 0; i < CityList.length; i++) {
 		city_plus_wordList.push(CityList[i].name);
@@ -100,6 +102,7 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
+		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));
   });
@@ -116,6 +119,7 @@ function initMap() {
 	});
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
+	var clickHandler = new ClickEventHandler(map);
 }
 
 function resolveLatLng(latLng) {
@@ -235,9 +239,35 @@ function focus__(pos, code) {
 
 var ClickEventHandler = function(map) {
 	this.map = map;
-
-	// Listen for clicks on the map.
+	this.placesService = new google.maps.places.PlacesService(map);
+	
 	this.map.addListener('click', this.handleClick.bind(this));
+};
+
+ClickEventHandler.prototype.handleClick = function(event) {
+
+	if (event.placeId) {
+		// Calling e.stop() on the event prevents the default info window from
+		// showing.
+		// If you call stop here when there is no placeId you will prevent some
+		// other map click event handlers from receiving the event.
+		event.stop();
+		this.getPlaceInformation(event.placeId);
+	}
+	else {
+		getAddress(event.latLng);
+	}
+};
+
+ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
+	var me = this;
+	this.placesService.getDetails({placeId: placeId}, function(place, status) {
+		if (status === 'OK') {
+			poiPlace = place;
+			address = place.formatted_address;
+			refreshAddress();
+		}
+	});
 };
 
 function focus_(pos, bounds) {
@@ -262,14 +292,15 @@ function focus_(pos, bounds) {
 	if(typeof bounds !== 'undefined') {
 		map.fitBounds(bounds, 26);
 		var offsetY = 0.06;
-		var span = map.getBounds().toSpan(); // a latLng - # of deg map span
-		var newCenter = { 
-			lat: pos.lat + span.lat()*offsetY,
-			lng: pos.lng
-		};
+		if(map.getBounds() != null) {
+			var span = map.getBounds().toSpan(); // a latLng - # of deg map span
+			var newCenter = { 
+				lat: pos.lat + span.lat()*offsetY,
+				lng: pos.lng
+			};
 
-		map.panTo(newCenter);
-
+			map.panTo(newCenter);
+		}
 	}
 	else if (typeof accuCircle !== 'undefined')
 		//map.setZoom(15);
@@ -325,6 +356,7 @@ function locate() {
 			if(initWCode == false) {
 				focus_(pos, accuCircle.getBounds());
 				encode(pos);
+				getAddress(pos);
 			}
 			else {
 				initWCode = false;
@@ -348,7 +380,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 function setInfoWindowText(code, latLng) {
-	infoWindow.setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
+	infoWindow.setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {

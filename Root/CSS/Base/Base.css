@@ -246,3 +246,54 @@ input {
 	margin-right: auto;
 	text-align: center;
 }
+
+#address_text {
+	position: absolute;
+	text-align: center;
+	bottom: 134px;
+	background-color: #FFFFFF;
+	padding: 4px 8px;
+	border-radius: 18px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 350px;
+}
+
+#address_text_main {
+	display: inline-block;
+	float: left;
+}
+
+#address_text_label {
+	font-family: 'Abel';
+	padding-top: 4px;
+	color: #69B7CF;
+}
+
+#address_text_content {
+	font-family: 'Roboto';
+	width: 306px;
+	text-align: left;
+	padding: 6px 0 6px 6px;
+}
+
+#address_text_buttons {
+	width: 100px;
+}
+
+#address_text_close {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#address_text_close svg {
+	width: 30px;
+}
+
+#address_text_copy {
+	padding-top: 6px;
+	margin-left: auto;
+	margin-right: auto;
+}

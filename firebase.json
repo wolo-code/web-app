@@ -26,6 +26,14 @@
     ],
     "rewrites": [
       {
+        "source": "/api/encode",
+        "function": "encode"
+      },
+      {
+        "source": "/api/decode",
+        "function": "decode"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

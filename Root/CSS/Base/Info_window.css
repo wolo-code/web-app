@@ -40,9 +40,16 @@
 	margin-right: auto;
 }
 
+#show_address_button {
+	width: 26px;
+	padding-left: 20px;
+	padding-right: 20px;
+	vertical-align: bottom;
+}
+
 #copy_code_button {
 	padding-left: 20px;
-	width: 26px;
+	width: 24px;
 	vertical-align: bottom;
 }
 

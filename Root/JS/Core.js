@@ -1,3 +1,7 @@
+var CityList = [];
+var pendingPosition;
+var pendingWords;
+
 function getCityFromPosition(latLng) {
 	var nearCityList = [];
 	CityList.forEach (function(city) {
@@ -43,14 +47,22 @@ function getCityBegin(cityCenter) {
 }
 
 function encode(position) {
-	var city = getCityFromPosition(position);
-	if(city == null)
-		focusDefault();
+	if(CityList.length > 0) {
+		var city = getCityFromPosition(position);
+		if(city == null)
+			focusDefault();
+		else
+			encode_(city, position);
+	}
 	else
-		encode_(city, position);
+		pendingPosition = position;
 }
 
 function decode(words) {
-	var city = getCityFromName(words[0]);
-	decode_(city, words.splice(1, words.length-1))
+	if(CityList.length > 0) {
+		var city = getCityFromName(words[0]);
+		decode_(city, words.splice(1, words.length-1))
+	}
+	else
+		pendingWords = wrods;
 }

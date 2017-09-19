@@ -27,8 +27,14 @@
 	}
 	require '../CSS/Fragment/CSS.php';
 ?>
+	<link rel='preload' as='image' href='resource/address.svg'>
+	<link rel='preload' as='image' href='resource/copy.svg'>
+	<link rel='preload' as='image' href='resource/link.svg'>
+	<link rel='preload' as='image' href='resource/map.svg'>
 </head>
 <body>
+	<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase-database.js"></script>
 <?php
 	require '../../HTML/Component/Root.php';
 	if($bPublish) {

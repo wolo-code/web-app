@@ -1,4 +1,4 @@
-var urlFunctions = 'https://us-central1-waddress-5f30b.cloudfunctions.net/';
+var urlFunctions = 'https://location.wcodes.org/api/';
 //'http://localhost:5002/waddress-5f30b/us-central1/';
 
 function encode_(city, position) {

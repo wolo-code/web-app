@@ -1,5 +1,6 @@
 <?php
-	require '../../HTML/Fragment/Overlay.php'
+	require '../../HTML/Fragment/Overlay.php';
+	require '../../HTML/Fragment/NoCity.php';
 ?>
 <div id='map'></div>
 <a id=logo_wcode href='https://wcodes.org' tabindex='1'>

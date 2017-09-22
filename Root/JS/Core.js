@@ -50,7 +50,7 @@ function encode(position) {
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
 		if(city == null)
-			focusDefault();
+			noCity(position);
 		else
 			encode_(city, position);
 	}

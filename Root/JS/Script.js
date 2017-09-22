@@ -19,6 +19,7 @@ function copyNodeText(node) {
 	document.execCommand('copy');
 	window.getSelection().removeAllRanges();
 }
+
 function showNotification(message) {
 	notification.innerText = message;
 	notification.classList.remove('hide');

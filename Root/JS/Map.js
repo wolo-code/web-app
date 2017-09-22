@@ -390,6 +390,19 @@ function getIntentURL(latLng, code) {
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
 }
 
+function noCity(position) {
+	getAddress(position);
+	showAddress();
+	document.getElementById('overlay').classList.add('hide');
+}
+
+function submitCity() {
+	var newPostKey = firebase.database().ref().child('CityRequest').push().key;
+	var updates = {};
+	updates['/CityRequest/' + newPostKey] = address;
+	firebase.database().ref().update(updates);
+}
+
 function focusDefault() {
 	setTimeout(function() { alert("This city appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
 	setTimeout(function() { focusDefault_(); }, 1000);

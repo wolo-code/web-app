@@ -1,19 +1,22 @@
-#no_city {
+h2.message_dialog_label {
+	margin: 0.5em;
+}
+
+#no_city_message {
 	top: 200px;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;
 	right: 0;
-	text-align: center;
-	max-width: 200px;
+	max-width: 360px;
 	position: absolute;
 	font-family: 'Abel';
-	width: 200px;
+	width: 360px;
 	background-color: #FFFFFF;
 	z-index: 1;
 	padding: 20px;
 }
 
-#no_city .label {
-	color: #69B7CF;
+#no_city_message p {
+	font-size: larger;
 }

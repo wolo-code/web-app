@@ -1,8 +1,12 @@
 Path	Name	Extension
 	root	
+	console	
 	script	js
+	root	js
+	console	js
 	favicon	ico
 	manifest	json
+	robots	txt
 	launcher-icon-0-75x	png
 	launcher-icon-1x	png
 	launcher-icon-1-5x	png

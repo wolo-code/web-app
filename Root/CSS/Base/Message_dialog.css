@@ -1,0 +1,40 @@
+.message_dialog {
+	top: 200px;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	max-width: 200px;
+	position: absolute;
+	font-family: 'Abel';
+	width: 200px;
+	background-color: #FFFFFF;
+	z-index: 1;
+	padding: 20px;
+}
+
+.message_dialog_close {
+	position: absolute;
+	top: 2px;
+	right: 10px;
+}
+
+.message_dialog_label {
+	color: #69B7CF;
+	text-align: center;
+}
+
+.message_dialog_control {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.message_dialog_control button {
+	min-width: 80px;
+	font-size: larger;
+	padding: 8px 14px;
+	margin-bottom: 10px;
+	margin-left: 14px;
+	color: #69B7CF;
+}

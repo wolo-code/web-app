@@ -1,5 +1,6 @@
 <?php
 	require '../../HTML/Fragment/Overlay.php';
+	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/NoCity.php';
 ?>
 <div id='map'></div>

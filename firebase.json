@@ -34,6 +34,10 @@
 				"function": "decode"
 			},
 			{
+				"source": "console",
+				"destination": "/console.html"
+			},
+			{
 				"source": "**",
 				"destination": "/index.html"
 			}

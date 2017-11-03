@@ -1,13 +1,16 @@
-<div id='no_city'>
-	<h3 class='label'>
+<div id='no_city_message' class="message_dialog hide">
+	<h2 class='message_dialog_label'>
 		Add city
-	</h3>
+	</h2>
+	<div id='no_city_message_close' class="message_dialog_close control">
+		<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
+	</div>
 	<p>
 		This city appears to not be in the database.<br>
 		Do you want this city to be added?
 	</p>
-	<div class="center">
-		<button id='no_city_submit' type='button' onclick="submitCity();">Yes</button>
-		<button id='no_city_submit' type='button' onclick="submitCity();">No</button>
+	<div class="center message_dialog_control">
+		<button id='no_city_submit_yes' type='button'>Yes</button>
+		<button id='no_city_submit_no' type='button'>No</button>
 	</div>
 </div>

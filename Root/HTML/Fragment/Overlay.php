@@ -1,9 +1,9 @@
-<div id='overlay'>
+<div id='overlay' class='hide'>
 	<div id='overlay_message'>
 		<div id='overlay_message_info'>
 			<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
 		</div>
-		<div id='overlay_message_close' class="control">
+		<div id='overlay_message_close' class="message_dialog_close control">
 			<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 		</div>
 		<h1>
@@ -20,7 +20,7 @@
 			<li>Tested with Google Chrome</li>
 		</ol>
 		<br>
-		<div class="center"><button id='overlay_enter' type='button'>Start &#x25B7;</button></div>
+		<div class="message_dialog_control"><button id='overlay_enter' type='button'>Start &#x25B7;</button></div>
 		<h2>
 			Steps
 		</h2>
@@ -32,10 +32,11 @@
 			Known issues
 		</h2>
 		<ol>
-			<li>The server roundtrip induces a delay. You may have to wait a few seconds for the result to show up</li>
+			<li>The wordlist may change and thus your previous wcode may no longer work or point to a different location</li>
+			<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
 		</ol>
 		<div id='contact'>
-			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a> at: <a class="link" href="mailto:ujjwalsingh@outlook.com?subject=WCode-location">ujjwalsingh@outlook.com</a>
+			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
 <?php

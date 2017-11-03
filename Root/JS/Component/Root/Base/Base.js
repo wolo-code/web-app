@@ -1,19 +1,28 @@
 document.addEventListener('DOMContentLoaded', domInit);
 var initWCode = false;
+var locationAccess = false;
 
 function domInit() {
 	versionCheck();
 	urlDecode();
+	if (typeof(Storage) !== 'undefined') {
+		locationAccess = JSON.parse(localStorage.location_access);
+	}
+}
+
+function setLocationAccess() {
+	if (typeof(Storage) !== 'undefined') {
+		localStorage.location_access = true;
+	}
 }
 
 function versionCheck() {
 	var cur_version = 1;
 	if (typeof(Storage) !== 'undefined') {
-		if(localStorage.note_version == cur_version)
-			hideOverlay();
-		else {
+		if(localStorage.note_version != cur_version) {
 			localStorage.note_version = cur_version;
 			initWCode = true;
+			showOverlay();
 		}
 	}
 }
@@ -24,12 +33,4 @@ function urlDecode() {
 		execDecode(code);
 		initWCode = true;
 	}
-}
-
-function hideOverlay() {
-	document.getElementById('overlay').classList.add('hide');
-}
-
-function showOverlay() {
-	document.getElementById('overlay').classList.remove('hide');
 }

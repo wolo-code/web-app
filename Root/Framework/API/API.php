@@ -9,6 +9,16 @@
 		}
 	}
 
+	function getOrigCallComponent() {
+		if(strlen($_SERVER['QUERY_STRING']) == 0)
+			$component_id = (substr($_SERVER['REQUEST_URI'], 1));
+		else {
+			$pos = strpos($_SERVER['REQUEST_URI'], $_SERVER['QUERY_STRING']);
+			$component_id = (substr($_SERVER['REQUEST_URI'], 1, $pos - 2));
+		}
+		return substr($component_id, 0, strpos($component_id, '.'));
+	}
+
 	function addAttribute(DOMElement $e, $name, $value) {
 		$a = $e->getAttribute($name);
 		$e->setAttribute($name, $a." ".$value);
@@ -29,7 +39,7 @@
 		else
 			return (substr($haystack, -strlen($needle)) == $needle);
 	}
-	
+
 	function loadFiles($dir) {
 		$files = scandir($dir);
 		array_shift($files);

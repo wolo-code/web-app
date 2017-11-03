@@ -14,7 +14,7 @@
 
 		$files = loadFiles($fileRoot);
 		foreach ($files as $file) {
-			if(!in_array(strtolower($file), [$exclude, 'link', 'fragment'])) {
+			if(!in_array(strtolower($file), [$exclude, 'link', 'fragment', 'component'])) {
 				if(is_dir($fileRoot.$file) == 1) {
 					includeDir($fileRoot.$file.'/', $type, $mode, $exclude);
 				}
@@ -31,7 +31,7 @@
 						}
 						else if ($type == $INCLUDE_TYPE_JS) {
 ?>
-	<script async src='<?php echo $filePathRoot.$file ?>'></script>
+	<script <?php if($file != 'Base.js') echo 'async' ?> src='<?php echo $filePathRoot.$file ?>'></script>
 <?php
 						}
 						else {
@@ -48,7 +48,7 @@
 
 	function hasLink($type, ...$dirList) {
 		global $INCLUDE_TYPE_EXT;
-		
+
 		foreach ($dirList as $dir) {
 			$files = loadFiles($dir);
 			foreach ($files as $file) {

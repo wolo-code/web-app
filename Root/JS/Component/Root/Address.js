@@ -1,4 +1,5 @@
 var address = "";
+var gpId = "";
 
 function getAddress(latLng) {
 	var geocoder = new google.maps.Geocoder;
@@ -6,9 +7,18 @@ function getAddress(latLng) {
 			if (status === 'OK') {
 				if (results[0]) {
 					address = results[0].formatted_address;
+					gpId = results[0].place_id;
 					refreshAddress();
+					if(pendingCitySubmit) {
+						execSubmitCity();
+						pendingCitySubmit = false;
+					}
 				} else {
-					//window.alert('No results found');
+					console.log('No geoCoding results found');
+					if(pendingCitySubmit) {
+						console.log('City submit failed');
+						pendingCitySubmit = false;
+					}
 				}
 			} else {
 				window.alert('Geocoder failed due to: ' + status);
@@ -34,7 +44,8 @@ function hideAddress() {
 }
 
 function clearAddress() {
-	address = null;
+	address = '';
+	gpId = '';
 	address_text_content.innerText = '';
 }
 

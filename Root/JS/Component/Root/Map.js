@@ -8,8 +8,9 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var city_plus_wordList = [];
-
 var poiPlace;
+var pendingLocate = false;
+var pendingCitySubmit = false;
 
 function initMap() {
 	for(var i = 0; i < CityList.length; i++) {
@@ -28,8 +29,8 @@ function initMap() {
 		fullscreenControl: false
 	});
 
-	infoWindow = new google.maps.InfoWindow({map: map});
-	infoWindow.setContent("Waiting for location access right");
+//	infoWindow = new google.maps.InfoWindow({map: map});
+//	infoWindow.setContent("Waiting for location access right");
 	locate();
 
 	var input = document.getElementById('pac-input');
@@ -105,7 +106,7 @@ function initMap() {
 		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));
-  });
+	});
 
 	location_button.addEventListener('click', function() {
 		locate();
@@ -127,7 +128,7 @@ function resolveLatLng(latLng) {
 }
 
 function execDecode(code) {
-	
+
 	var valid = true;
 	if(code.length > 0) {
 		var splitChar;
@@ -141,7 +142,7 @@ function execDecode(code) {
 		if(words.length < 3)
 			valid = false;
 		else {
-			
+
 			if(words.length > 3) {
 				var ipCityName = words.splice(0, words.length-3).join(' ');
 				city = getCityFromName(ipCityName);
@@ -149,7 +150,7 @@ function execDecode(code) {
 			else {
 				city = getCityFromPosition(resolveLatLng(myLocDot.position));
 			}
-			
+
 			if(city == null) {
 				valid = false;
 			}
@@ -161,7 +162,7 @@ function execDecode(code) {
 					}
 				}
 			}
-			
+
 		}
 	}
 
@@ -171,7 +172,7 @@ function execDecode(code) {
 	else {
 		alert('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
 	}
-	
+
 }
 
 function suggestComplete(event) {
@@ -228,7 +229,7 @@ function load(marker) {
 	infoWindow.open(map, window.marker);
 	marker.setVisible(false);
 	lastMarker = marker;
-	infoWindow.setContent('Loading');
+	infoWindow_setContent('Loading ..');
 	encode(marker.position);
 }
 
@@ -240,12 +241,11 @@ function focus__(pos, code) {
 var ClickEventHandler = function(map) {
 	this.map = map;
 	this.placesService = new google.maps.places.PlacesService(map);
-	
+
 	this.map.addListener('click', this.handleClick.bind(this));
 };
 
 ClickEventHandler.prototype.handleClick = function(event) {
-
 	if (event.placeId) {
 		// Calling e.stop() on the event prevents the default info window from
 		// showing.
@@ -294,7 +294,7 @@ function focus_(pos, bounds) {
 		var offsetY = 0.06;
 		if(map.getBounds() != null) {
 			var span = map.getBounds().toSpan(); // a latLng - # of deg map span
-			var newCenter = { 
+			var newCenter = {
 				lat: pos.lat + span.lat()*offsetY,
 				lng: pos.lng
 			};
@@ -306,14 +306,26 @@ function focus_(pos, bounds) {
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
-	infoWindow.setContent('(loading..)');
+	infoWindow_setContent('Loading ..');
 	infoWindow.open(map, marker);
 }
 
 function locate() {
 	// Try HTML5 geolocation.
+	if(!locationAccess) {
+		pendingLocate = true;
+		showLocateRightMessage();
+	}
+	else {
+		pendingLocate = false;
+		locateExec();
+	}
+}
+
+function locateExec() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(function(position) {
+			locationAccess = true;
 			var pos = {
 				lat: position.coords.latitude,
 				lng: position.coords.longitude
@@ -362,8 +374,11 @@ function locate() {
 				initWCode = false;
 				map.setZoom(12);
 			}
-		}, function() {
-			handleLocationError(true, infoWindow, map.getCenter());
+		}, function(error) {
+			if(error.code = error.PERMISSION_DENIED)
+				showNotification("Location permission was denied. Click to point");
+			else
+				handleLocationError(true, infoWindow, map.getCenter());
 		});
 	} else {
 		// Browser doesn't support Geolocation
@@ -372,15 +387,15 @@ function locate() {
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-	infoWindow.setPosition(pos);
-	infoWindow.setContent(browserHasGeolocation ?
+	infoWindow_setContent(browserHasGeolocation ?
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
+	infoWindow.setPosition(pos);
 	//focusDefault();
 }
 
 function setInfoWindowText(code, latLng) {
-	infoWindow.setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
+	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {
@@ -388,19 +403,6 @@ function getIntentURL(latLng, code) {
 		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
 	else
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
-}
-
-function noCity(position) {
-	getAddress(position);
-	showAddress();
-	document.getElementById('overlay').classList.add('hide');
-}
-
-function submitCity() {
-	var newPostKey = firebase.database().ref().child('CityRequest').push().key;
-	var updates = {};
-	updates['/CityRequest/' + newPostKey] = address;
-	firebase.database().ref().update(updates);
 }
 
 function focusDefault() {
@@ -417,4 +419,10 @@ function focusDefault_() {
 
 function clearMap() {
 	marker.setMap(null);
+}
+
+function infoWindow_setContent(string) {
+	if(typeof infoWindow == "undefined")
+		infoWindow = new google.maps.InfoWindow({map: map});
+	infoWindow.setContent(string);
 }

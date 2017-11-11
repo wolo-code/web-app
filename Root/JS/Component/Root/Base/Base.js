@@ -6,7 +6,8 @@ function domInit() {
 	versionCheck();
 	urlDecode();
 	if (typeof(Storage) !== 'undefined') {
-		locationAccess = JSON.parse(localStorage.location_access);
+		if (typeof(localStorage.location_access) !== 'undefined')
+			locationAccess = JSON.parse(localStorage.location_access);
 	}
 }
 

@@ -6,6 +6,7 @@
 	right: 0;
 	max-width: 200px;
 	position: absolute;
+	border: 1px solid #ddd;
 	font-family: 'Abel';
 	width: 200px;
 	background-color: #FFFFFF;

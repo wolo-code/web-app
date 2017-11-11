@@ -254,6 +254,7 @@ input {
 	bottom: 134px;
 	background-color: #FFFFFF;
 	padding: 4px 8px;
+	border: 1px solid #ddd;
 	border-radius: 18px;
 	left: 0;
 	right: 0;

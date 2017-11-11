@@ -255,7 +255,7 @@ ClickEventHandler.prototype.handleClick = function(event) {
 		this.getPlaceInformation(event.placeId);
 	}
 	else {
-		getAddress(event.latLng);
+		getAddress(resolveLatLng(event.latLng));
 	}
 };
 

@@ -1,5 +1,4 @@
 function noCity(position) {
-	getAddress(position);
 	showAddress();
 	showNoCityMessage();
 	infoWindow.setContent("Location not in database");
@@ -17,6 +16,7 @@ function execSubmitCity() {
 	var updates = {};
 	var data = {
 			"time": firebase.database.ServerValue.TIMESTAMP,
+			"lat_lng": latLng_p,
 			"gp_id": gpId,
 			"address": address,
 			"processed": false

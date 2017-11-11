@@ -1,9 +1,11 @@
+var latLng_p = "";
 var address = "";
 var gpId = "";
 
 function getAddress(latLng) {
 	var geocoder = new google.maps.Geocoder;
 	geocoder.geocode({'location': latLng}, function(results, status) {
+			latLng_p = latLng;
 			if (status === 'OK') {
 				if (results[0]) {
 					address = results[0].formatted_address;

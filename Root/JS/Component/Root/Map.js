@@ -406,7 +406,7 @@ function getIntentURL(latLng, code) {
 }
 
 function focusDefault() {
-	setTimeout(function() { alert("This city appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
+	setTimeout(function() { alert("This location appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
 	setTimeout(function() { focusDefault_(); }, 1000);
 }
 

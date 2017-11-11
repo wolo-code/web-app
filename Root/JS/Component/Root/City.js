@@ -2,7 +2,7 @@ function noCity(position) {
 	getAddress(position);
 	showAddress();
 	showNoCityMessage();
-	infoWindow.setContent("City not in database");
+	infoWindow.setContent("Location not in database");
 }
 
 function submitCity() {

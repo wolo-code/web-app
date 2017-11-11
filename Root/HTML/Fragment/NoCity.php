@@ -6,8 +6,8 @@
 		<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 	</div>
 	<p>
-		This city appears to not be in the database.<br>
-		Do you want this city to be added?
+		This location appears to not be in the database.<br>
+		Do you want it to be added?
 	</p>
 	<div class="center message_dialog_control">
 		<button id='no_city_submit_yes' type='button'>Yes</button>

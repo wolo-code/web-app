@@ -1,0 +1,1 @@
+function initApp(){firebase.auth().getRedirectResult().then(function(a){})["catch"](function(a){})}function getPendingRequests(){}function initMap(){}window.onload=function(){initApp();if(!firebase.auth().currentUser){var a=new firebase.auth.GoogleAuthProvider;firebase.auth().signInWithRedirect(a)}};

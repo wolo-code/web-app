@@ -280,6 +280,7 @@ input {
 	bottom: 134px;
 	background-color: #FFFFFF;
 	padding: 4px 8px;
+	border: 1px solid #ddd;
 	border-radius: 18px;
 	left: 0;
 	right: 0;
@@ -394,13 +395,14 @@ input {
 	vertical-align: bottom;
 }
 .message_dialog {
-	top: 200px;
+	top: 220px;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;
 	right: 0;
 	max-width: 200px;
 	position: absolute;
+	border: 1px solid #ddd;
 	font-family: 'Abel';
 	width: 200px;
 	background-color: #FFFFFF;
@@ -438,7 +440,6 @@ h2.message_dialog_label {
 }
 
 #no_city_message {
-	top: 200px;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;
@@ -552,7 +553,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
-2017-Oct-31 08:08:21		</div>
+2017-Nov-11 06:41:05		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -584,8 +585,8 @@ h2.message_dialog_label {
 </svg></span>
 	</div>
 	<p>
-		This city appears to not be in the database.<br>
-		Do you want this city to be added?
+		This location appears to not be in the database.<br>
+		Do you want it to be added?
 	</p>
 	<div class="center message_dialog_control">
 		<button id='no_city_submit_yes' type='button'>Yes</button>
@@ -698,7 +699,8 @@ function domInit() {
 	versionCheck();
 	urlDecode();
 	if (typeof(Storage) !== 'undefined') {
-		locationAccess = JSON.parse(localStorage.location_access);
+		if (typeof(localStorage.location_access) !== 'undefined')
+			locationAccess = JSON.parse(localStorage.location_access);
 	}
 }
 

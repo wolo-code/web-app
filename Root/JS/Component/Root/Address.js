@@ -11,19 +11,16 @@ function getAddress(latLng) {
 					address = results[0].formatted_address;
 					gpId = results[0].place_id;
 					refreshAddress();
-					if(pendingCitySubmit) {
-						execSubmitCity();
-						pendingCitySubmit = false;
-					}
+
 				} else {
 					console.log('No geoCoding results found');
-					if(pendingCitySubmit) {
-						console.log('City submit failed');
-						pendingCitySubmit = false;
-					}
 				}
 			} else {
-				window.alert('Geocoder failed due to: ' + status);
+				console.log('Geocoder failed due to: ' + status);
+			}
+			if(pendingCitySubmit) {
+				execSubmitCity();
+				pendingCitySubmit = false;
 			}
 		});
 }

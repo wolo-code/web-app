@@ -1,7 +1,10 @@
 const functions = require('firebase-functions');
 
+// limits, this is dependent on given lat-long
 var span = 0.5;
+// 2^(10+5)
 var n = 32768;
+// resolution of addressable divisions
 var d = span/n;
 
 function encodeData(value) {

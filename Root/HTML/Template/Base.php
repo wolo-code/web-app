@@ -25,6 +25,9 @@
 	</script>
 <?php
 	}
+	$component = "";
+	require '../CSS/Fragment/CSS.php';
+	$component = $id;
 	require '../CSS/Fragment/CSS.php';
 ?>
 	<link rel='preload' as='image' href='resource/address.svg'>

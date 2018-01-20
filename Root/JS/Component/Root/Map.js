@@ -62,8 +62,11 @@ function initMap() {
 		// For each place, get the icon, name and location.
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
+			clearAddress();
 			focus_(places[0].geometry.location);
-			encode(resolveLatLng(places[0].geometry.location));
+			var pos = resolveLatLng(places[0].geometry.location);
+			encode(pos);
+			getAddress(pos);
 		}
 		else {
 			places.forEach(function(place) {
@@ -103,6 +106,7 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
+		pendingPosition = null;
 		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));
@@ -271,7 +275,8 @@ ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 };
 
 function focus_(pos, bounds) {
-	map.setCenter(pos);
+	hideNoCityMessage();
+	map.panTo(pos);
 	if(typeof marker === 'undefined') {
 		marker = new google.maps.Marker({
 			position: pos,

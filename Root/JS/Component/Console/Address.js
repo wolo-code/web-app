@@ -18,6 +18,10 @@ function getAddress(latLng) {
 			} else {
 				console.log('Geocoder failed due to: ' + status);
 			}
+			if(pendingCitySubmit) {
+				execSubmitCity();
+				pendingCitySubmit = false;
+			}
 		});
 }
 

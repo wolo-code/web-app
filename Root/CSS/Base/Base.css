@@ -53,11 +53,16 @@ body {
 	font-weight: 300;
 }
 
-#logo_wcode {
+#logo {
 	z-index: 1;
 	position: absolute;
 	right: 10px;
 	top: 10px;
+	width: 153px;
+}
+
+#logo a {
+	display: inline-block;
 	background: rgba(241, 241, 241, 0.75);
 	border-radius: 6px;
 	border-width: thin;
@@ -68,19 +73,6 @@ body {
 
 #logo_wcode > .image > svg {
 	height: 50px;
-}
-
-#logo_location {
-	z-index: 1;
-	position: absolute;
-	right: 10px;
-	top: 68px;
-	background: rgba(241, 241, 241, 0.75);
-	border-radius: 6px;
-	border-width: thin;
-	border-color: #e8e8e8;
-	border-style: solid;
-	padding: 2px;
 }
 
 #logo_location > .image > svg {
@@ -135,20 +127,13 @@ body {
 		right: 10px !important;
 	}
 
-	#logo > .image > svg {
-		height: 40px !important;
+	#logo {
+		width: auto;
 	}
 
 	#result {
 		top: 60px !important;
 	}
-	/*#logo {
-		left: 0;
-		right: 0;
-		margin-left: auto;
-		margin-right: auto;
-		width: 126px;
-	}*/
 
 }
 

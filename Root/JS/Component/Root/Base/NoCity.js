@@ -8,9 +8,24 @@ function hideNoCityMessage() {
 
 function noCity_add() {
 	submitCity();
-	hideNoCityMessage();
+	noCity_showLoader();
+}
+
+function noCity_showLoader() {
+	no_city_message_prompt.classList.add('hide');
+	no_city_message_wait.classList.remove('hide');
 }
 
 function noCity_cancel() {
 	hideNoCityMessage();
+}
+
+function noCityWait_continue() {
+	infoWindow_setContent("Waiting for update");
+	hideNoCityMessage();
+}
+
+function noCityWait_stop() {
+	pendingPosition = null;
+	hideNoCityMessage();	
 }

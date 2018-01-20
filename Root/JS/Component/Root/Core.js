@@ -49,8 +49,10 @@ function getCityBegin(cityCenter) {
 function encode(position) {
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
-		if(city == null)
+		if(city == null) {
+			pendingPosition = position;
 			noCity(position);
+		}
 		else
 			encode_(city, position);
 	}

@@ -1,0 +1,13 @@
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#logo {
+		width: auto;
+	}
+
+}

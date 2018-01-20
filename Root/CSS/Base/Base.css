@@ -113,30 +113,6 @@ body {
 	width: 345px;
 }
 
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#decode_button {
-		top: 96px !important;
-		left: auto !important;
-		right: 10px !important;
-	}
-
-	#logo {
-		width: auto;
-	}
-
-	#result {
-		top: 60px !important;
-	}
-
-}
-
 .link {
 	color: #69B7CF;
 	text-decoration: none;

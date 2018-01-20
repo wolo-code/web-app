@@ -64,5 +64,5 @@ function decode(words) {
 		decode_(city, words.splice(1, words.length-1))
 	}
 	else
-		pendingWords = wrods;
+		pendingWords = words;
 }

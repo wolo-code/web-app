@@ -1,17 +1,23 @@
 const functions = require('firebase-functions');
 
-// limits, this is dependent on given lat-long
-var span = 0.5;
 // 2^(10+5)
-var n = 32768;
-// resolution of addressable divisions
-var d = span/n;
+var N = 32768;
 
-function encodeData(value) {
+// LatLng limit
+var SPAN = 0.5;
+
+var SPAN_D = SPAN/N;
+
+// resolution of addressable divisions
+function ang_span_d(ang) {
+	return Math.abs(Math.cos(ang * Math.PI / 180)/SPAN)/N;
+}
+
+function encodeData(value, d) {
 	return Math.floor(value/d);
 }
 
-function decodeData(data) {
+function decodeData(data, d) {
 	return data*d+d/2;
 }
 
@@ -52,8 +58,8 @@ exports.decode = functions.https.onRequest((req, res) => {
 });
 
 function encode(city_begin, position) {
-	lat_diff = encodeData(position.lat - city_begin.lat);
-	lng_diff = encodeData(position.lng - city_begin.lng);
+	lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
+	lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
 	word_index_1 = lat_diff >> 5
 	word_index_2 = lng_diff >> 5;
 	word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
@@ -69,8 +75,8 @@ function decode(city_begin, code) {
 	word_index_3 = code[2];
 	lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
 	lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
-	var lat_diff = decodeData(lat_diff_bin);
-	var lng_diff = decodeData(lng_diff_bin);
+	var lat_diff = decodeData(lat_diff_bin, SPAN_D);
+	var lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
 	lat = lat_diff + city_begin.lat;
 	lng = lng_diff + city_begin.lng;
 

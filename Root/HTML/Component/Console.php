@@ -50,14 +50,14 @@
 					<div id='address_text_content'></div>
 				</span>
 			</div>
-			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='2' >
+			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 			<form id='city_submit_panel'>
-				<input id='city_lat' type='number' step='any' placeholder='Lat' required tabindex='' >
-				<input id='city_lng' type='number' step='any' placeholder='Long' required tabindex='' >
-				<input id='city_name' type='text' placeholder='Name' required tabindex='5' >
-				<input id='city_group' type='text' placeholder='Group' required tabindex='6' >
-				<input id='city_country' type='text' placeholder='Country' required tabindex='4' >
-				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='3'>Submit</button>
+				<input id='city_lat' type='number' step='any' placeholder='Lat' required tabindex='4' >
+				<input id='city_lng' type='number' step='any' placeholder='Long' required tabindex='5' >
+				<input id='city_name' type='text' placeholder='Name' required tabindex='6' >
+				<input id='city_group' type='text' placeholder='Group' required tabindex='7' >
+				<input id='city_country' type='text' placeholder='Country' required tabindex='8' >
+				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='9'>Submit</button>
 			</form>
 		<!-- </div> -->
 	</div>

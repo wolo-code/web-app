@@ -13,11 +13,11 @@
 </div>
 <input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 <div id='result'></div>
-<input id='decode_button' class='control' type='button' value='Decode' tabindex='3' >
-<div id='location_button' class='control' tabindex='4'>
+<input id='decode_button' class='control' type='button' value='Decode' tabindex='4' >
+<div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php echo file_get_contents('../../Resource/Location.svg'); ?></span>
 </div>
-<div id='info' class='control' tabindex='5'>
+<div id='info' class='control' tabindex='6'>
 	<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
 </div>
 <div id='notification' class='hide'></div>

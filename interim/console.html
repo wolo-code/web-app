@@ -30,10 +30,6 @@ body {
 	margin: 0;
 	padding: 0;
 }
-/*
-input {
-	-webkit-appearance: none;
-}*/
 
 @font-face {
 	font-family: 'Abel';
@@ -83,11 +79,16 @@ input {
 	font-weight: 300;
 }
 
-#logo_wcode {
+#logo {
 	z-index: 1;
 	position: absolute;
 	right: 10px;
 	top: 10px;
+	width: 153px;
+}
+
+#logo a {
+	display: inline-block;
 	background: rgba(241, 241, 241, 0.75);
 	border-radius: 6px;
 	border-width: thin;
@@ -100,36 +101,10 @@ input {
 	height: 50px;
 }
 
-#logo_location {
-	z-index: 1;
-	position: absolute;
-	right: 10px;
-	top: 68px;
-	background: rgba(241, 241, 241, 0.75);
-	border-radius: 6px;
-	border-width: thin;
-	border-color: #e8e8e8;
-	border-style: solid;
-	padding: 2px;
-}
-
 #logo_location > .image > svg {
 	padding-top: 4px;
 	height: 14px;
 	width: 152px;
-}
-
-#location_button {
-	z-index: 1;
-	position: absolute;
-	right: 46px;
-	bottom: 24px;
-	height: 24px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-  background-color: rgb(255, 255, 255);
-	padding: 6px;
-	border: none;
-	border-radius: 2px;
 }
 
 #pac-input {
@@ -148,22 +123,6 @@ input {
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 }
 
-#decode_button {
-	z-index: 1;
-	position: absolute;
-	left: 428px;
-	top: 36px;
-	height: 42px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
-  font-family: Roboto, Arial, sans-serif;
-	font-size: 15px;
-  background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
-	border: none;
-	border-radius: 2px;
-}
-
 #pac-input:focus {
 	border-color: #4d90fe;
 }
@@ -178,37 +137,6 @@ input {
 
 #target {
 	width: 345px;
-}
-
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#decode_button {
-		top: 96px !important;
-		left: auto !important;
-		right: 10px !important;
-	}
-
-	#logo > .image > svg {
-		height: 40px !important;
-	}
-
-	#result {
-		top: 60px !important;
-	}
-	/*#logo {
-		left: 0;
-		right: 0;
-		margin-left: auto;
-		margin-right: auto;
-		width: 126px;
-	}*/
-
 }
 
 .link {
@@ -331,6 +259,88 @@ input {
 	margin-left: auto;
 	margin-right: auto;
 }
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#logo {
+		width: auto;
+	}
+
+}
+#infowindow-content .title {
+	font-weight: bold;
+}
+
+#infowindow-content {
+	display: none;
+}
+
+#map #infowindow-content {
+	display: inline;
+}
+
+.infowindow-content {
+	color: #666666;
+}
+
+#infowindow-code {
+	padding: 10px 0px;
+}
+
+#infowindow_code_left {
+	padding-top: 4px;
+}
+
+#infowindow_code_right {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#infowindow_code_right_code {
+	font-size: x-large;
+	padding-left: 10px;
+}
+
+.gm-style-iw + div {display: none;}
+
+.gm-style-iw {
+	left: 0;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#show_address_button {
+	width: 26px;
+	padding-left: 20px;
+	padding-right: 20px;
+	vertical-align: bottom;
+}
+
+#copy_code_button {
+	padding-left: 20px;
+	width: 24px;
+	vertical-align: bottom;
+}
+
+#copy_link_button {
+	padding-left: 42px;
+	padding-right: 20px;
+  width: 38px;
+	vertical-align: bottom;
+}
+
+#external_map_button {
+	padding-left: 20px;
+	width: 28px;
+	vertical-align: bottom;
+}
+	</style>
+	<style type='text/css'>
 .address {
 	width: 200px;
 }
@@ -358,22 +368,6 @@ input {
 .data_control:hover {
 	cursor: pointer;
 	color: #69B7CF;
-}
-
-#pac-input {
-	left: 0px !important;
-	top: 36px !important;
-	height: 26px;
-	background-color: #fff;
-	font-family: Roboto;
-	font-size: 15px;
-	font-weight: 300;
-	margin-left: 12px;
-	padding: 8px;
-	border: none;
-	text-overflow: ellipsis;
-	width: 400px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 }
 
 #console_title {
@@ -443,190 +437,6 @@ input:valid {
 #location_request_list th {
 	color: #69B7CF;
 }
-#infowindow-content .title {
-	font-weight: bold;
-}
-
-#infowindow-content {
-	display: none;
-}
-
-#map #infowindow-content {
-	display: inline;
-}
-
-.infowindow-content {
-	color: #666666;
-}
-
-#infowindow-code {
-	padding: 10px 0px;
-}
-
-#infowindow_code_left {
-	padding-top: 4px;
-}
-
-#infowindow_code_right {
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-#infowindow_code_right_code {
-	font-size: x-large;
-	padding-left: 10px;
-}
-
-.gm-style-iw + div {display: none;}
-
-.gm-style-iw {
-	left: 0;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#show_address_button {
-	width: 26px;
-	padding-left: 20px;
-	padding-right: 20px;
-	vertical-align: bottom;
-}
-
-#copy_code_button {
-	padding-left: 20px;
-	width: 24px;
-	vertical-align: bottom;
-}
-
-#copy_link_button {
-	padding-left: 42px;
-	padding-right: 20px;
-  width: 38px;
-	vertical-align: bottom;
-}
-
-#external_map_button {
-	padding-left: 20px;
-	width: 28px;
-	vertical-align: bottom;
-}
-.message_dialog {
-	top: 220px;
-	margin-left: auto;
-	margin-right: auto;
-	left: 0;
-	right: 0;
-	max-width: 200px;
-	position: absolute;
-	border: 1px solid #ddd;
-	font-family: 'Abel';
-	width: 200px;
-	background-color: #FFFFFF;
-	z-index: 1;
-	padding: 20px;
-}
-
-.message_dialog_close {
-	position: absolute;
-	top: 2px;
-	right: 10px;
-}
-
-.message_dialog_label {
-	color: #69B7CF;
-	text-align: center;
-}
-
-.message_dialog_control {
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-}
-
-.message_dialog_control button {
-	min-width: 80px;
-	font-size: larger;
-	padding: 8px 14px;
-	margin-bottom: 10px;
-	margin-left: 14px;
-	color: #69B7CF;
-}
-h2.message_dialog_label {
-	margin: 0.5em;
-}
-
-#no_city_message {
-	margin-left: auto;
-	margin-right: auto;
-	left: 0;
-	right: 0;
-	max-width: 360px;
-	position: absolute;
-	font-family: 'Abel';
-	width: 360px;
-	background-color: #FFFFFF;
-	z-index: 1;
-	padding: 20px;
-}
-
-#no_city_message p {
-	font-size: larger;
-}
-
-.loader {
-	border: 15px solid #F0F0F0;
-	border-top: 15px solid #69B7CF;
-	border-radius: 50%;
-	width: 80px;
-	height: 80px;
-	animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
-}
-#overlay {
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
-	z-index: 2;
-	color: rgba(100, 100, 100);
-	background-color: rgba(100, 100, 100, 0.75);
-	position: absolute;
-	margin: auto;
-	text-align: center;
-}
-
-#overlay_message {
-	position: relative;
-	font-family: Abel;
-	margin: 0 auto;
-	border: transparent solid 20px;
-	padding: 2px 20px 8px;
-	text-align: left;
-	background-color: #FFFFFF;
-	color: #999999;
-	max-width: 400px;
-}
-
-#overlay_message h1 {
-	text-align: center;
-	color: #69B7CF;
-}
-
-#updated {
-	font-size: smaller;
-	text-align: right;
-	padding-top: 20px;
-}
-
-#overlay_message_info {
-	position: absolute;
-	top: 2px;
-	left: 10px;
-}
 	</style>
 	<link rel='preload' as='image' href='resource/address.svg'>
 	<link rel='preload' as='image' href='resource/copy.svg'>
@@ -673,8 +483,9 @@ h2.message_dialog_label {
 				</tr>
 			</tbody>
 		</table>
-		<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
-			<span class='image'><svg version="1.1"
+		<div id='logo'>
+			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
+				<span class='image'><svg version="1.1"
 	 xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-55 -18 306 100">
 <g id="flowRoot2982" transform="matrix(0.2476154,0,0,0.2476154,3.0703645,-26.736306)">
 	<path fill="#69B7CF" d="M549.9,282.2h-19.4c-0.3-4.5-1.5-8.6-3.5-12.2
@@ -719,9 +530,8 @@ h2.message_dialog_label {
 </g>
 </svg>
 </span>
-		</a>
-		<a id='logo_location' href='https://location.wcodes.org' tabindex='1'>
-			<span class='image'><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+			</a><a id='logo_location' href='https://location.wcodes.org' tabindex='2'>
+				<span class='image'><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 152 8" xml:space="preserve" font-family="Abel" font-size="16px">
 	<g>
 		<text text-anchor="middle" transform="matrix(1 0 0 1 78 8)">
@@ -731,7 +541,8 @@ h2.message_dialog_label {
 	</g>
 </svg>
 </span>
-		</a>
+			</a>
+		</div>
 		<!-- <div id="map_container"> -->
 			<div id="map_canvas"></div>
 			<div id='address_text'>
@@ -740,14 +551,14 @@ h2.message_dialog_label {
 					<div id='address_text_content'></div>
 				</span>
 			</div>
-			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='2' >
+			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 			<form id='city_submit_panel'>
-				<input id='city_lat' type='number' step='any' placeholder='Lat' required tabindex='' >
-				<input id='city_lng' type='number' step='any' placeholder='Long' required tabindex='' >
-				<input id='city_name' type='text' placeholder='Name' required tabindex='5' >
-				<input id='city_group' type='text' placeholder='Group' required tabindex='6' >
-				<input id='city_country' type='text' placeholder='Country' required tabindex='4' >
-				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='3'>Submit</button>
+				<input id='city_lat' type='number' step='any' placeholder='Lat' required tabindex='4' >
+				<input id='city_lng' type='number' step='any' placeholder='Long' required tabindex='5' >
+				<input id='city_name' type='text' placeholder='Name' required tabindex='6' >
+				<input id='city_group' type='text' placeholder='Group' required tabindex='7' >
+				<input id='city_country' type='text' placeholder='Country' required tabindex='8' >
+				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='9'>Submit</button>
 			</form>
 		<!-- </div> -->
 	</div>

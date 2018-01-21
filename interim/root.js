@@ -231,7 +231,8 @@ function encode(position) {
 		else
 			encode_(city, position);
 	}
-	pendingPosition = position;
+	else
+		pendingPosition = position;
 }
 
 function decode(words) {
@@ -319,7 +320,9 @@ function initMap() {
 			position: google.maps.ControlPosition.BOTTOM_CENTER
 		},
 		zoom: 8,
-		fullscreenControl: false
+		fullscreenControl: false,
+		streetViewControl: false,
+		zoomControl: false
 	});
 
 //	infoWindow = new google.maps.InfoWindow({map: map});

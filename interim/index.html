@@ -30,10 +30,6 @@ body {
 	margin: 0;
 	padding: 0;
 }
-/*
-input {
-	-webkit-appearance: none;
-}*/
 
 @font-face {
 	font-family: 'Abel';
@@ -83,11 +79,16 @@ input {
 	font-weight: 300;
 }
 
-#logo_wcode {
+#logo {
 	z-index: 1;
 	position: absolute;
 	right: 10px;
 	top: 10px;
+	width: 153px;
+}
+
+#logo a {
+	display: inline-block;
 	background: rgba(241, 241, 241, 0.75);
 	border-radius: 6px;
 	border-width: thin;
@@ -100,36 +101,10 @@ input {
 	height: 50px;
 }
 
-#logo_location {
-	z-index: 1;
-	position: absolute;
-	right: 10px;
-	top: 68px;
-	background: rgba(241, 241, 241, 0.75);
-	border-radius: 6px;
-	border-width: thin;
-	border-color: #e8e8e8;
-	border-style: solid;
-	padding: 2px;
-}
-
 #logo_location > .image > svg {
 	padding-top: 4px;
 	height: 14px;
 	width: 152px;
-}
-
-#location_button {
-	z-index: 1;
-	position: absolute;
-	right: 46px;
-	bottom: 24px;
-	height: 24px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-  background-color: rgb(255, 255, 255);
-	padding: 6px;
-	border: none;
-	border-radius: 2px;
 }
 
 #pac-input {
@@ -148,22 +123,6 @@ input {
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 }
 
-#decode_button {
-	z-index: 1;
-	position: absolute;
-	left: 428px;
-	top: 36px;
-	height: 42px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
-  font-family: Roboto, Arial, sans-serif;
-	font-size: 15px;
-  background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
-	border: none;
-	border-radius: 2px;
-}
-
 #pac-input:focus {
 	border-color: #4d90fe;
 }
@@ -178,37 +137,6 @@ input {
 
 #target {
 	width: 345px;
-}
-
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#decode_button {
-		top: 96px !important;
-		left: auto !important;
-		right: 10px !important;
-	}
-
-	#logo > .image > svg {
-		height: 40px !important;
-	}
-
-	#result {
-		top: 60px !important;
-	}
-	/*#logo {
-		left: 0;
-		right: 0;
-		margin-left: auto;
-		margin-right: auto;
-		width: 126px;
-	}*/
-
 }
 
 .link {
@@ -331,117 +259,18 @@ input {
 	margin-left: auto;
 	margin-right: auto;
 }
-.address {
-	width: 200px;
-}
+@media (max-width: 512px) {
 
-.gp_id {
-	width: 200px;
-}
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
 
-.lat {
-	width: 100px;
-}
+	#logo {
+		width: auto;
+	}
 
-.lng {
-	width: 100px;
-}
-
-.time {
-	width: 100px;
-}
-
-.process {
-	width: 100px;
-}
-
-.data_control:hover {
-	cursor: pointer;
-	color: #69B7CF;
-}
-
-#pac-input {
-	left: 0px !important;
-	top: 36px !important;
-	height: 26px;
-	background-color: #fff;
-	font-family: Roboto;
-	font-size: 15px;
-	font-weight: 300;
-	margin-left: 12px;
-	padding: 8px;
-	border: none;
-	text-overflow: ellipsis;
-	width: 400px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-}
-
-#console_title {
-	font-family: Abel;
-	color: #69B7CF;
-	font-size: x-large;
-}
-
-#city_submit_panel {
-	position: absolute;
-	bottom: 20px;
-	z-index: 1;
-	left: 10px;
-}
-
-#submit_city_button {
-	z-index: 1;
-	height: 42px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
-	font-family: Roboto, Arial, sans-serif;
-	font-size: 15px;
-	background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
-	border: none;
-	border-radius: 2px;
-}
-
-#container {
-	height: 100%;
-}
-
-#restrict_block {
-	height: 100%;
-}
-
-#restrict_block h3 {
-	padding-left: 20px;
-}
-
-#console_block {
-	height: 100%;
-}
-
-#map_canvas {
-	height: 80%;
-}
-
-#city_submit_panel input {
-	border-top: none;
-	border-left: none;
-	border-right: none;
-}
-
-input:invalid {
-	border: 2px solid red;
-}
-
-input:valid {
-	border: 2px solid #69B7CF;
-}
-
-#location_request_list th {
-	font-family: Abel;
-}
-
-#location_request_list th {
-	color: #69B7CF;
 }
 #infowindow-content .title {
 	font-weight: bold;
@@ -510,6 +339,8 @@ input:valid {
 	width: 28px;
 	vertical-align: bottom;
 }
+	</style>
+	<style type='text/css'>
 .message_dialog {
 	top: 220px;
 	margin-left: auto;
@@ -627,6 +458,47 @@ h2.message_dialog_label {
 	top: 2px;
 	left: 10px;
 }
+#location_button {
+	z-index: 1;
+	position: absolute;
+	right: 24px;
+	bottom: 24px;
+	height: 24px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+  background-color: rgb(255, 255, 255);
+	padding: 6px;
+	border: none;
+	border-radius: 2px;
+}
+
+#decode_button {
+	z-index: 1;
+	position: absolute;
+	left: 428px;
+	top: 36px;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
+}
+@media (max-width: 512px) {
+	
+	#decode_button {
+		top: 96px !important;
+		left: auto !important;
+		right: 10px !important;
+	}
+	
+	#result {
+		top: 60px !important;
+	}
+
+}
 	</style>
 	<link rel='preload' as='image' href='resource/address.svg'>
 	<link rel='preload' as='image' href='resource/copy.svg'>
@@ -683,7 +555,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
-2018-Jan-18 23:50:48		</div>
+2018-Jan-21 00:58:59		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -737,8 +609,9 @@ h2.message_dialog_label {
 	</div>
 </div>
 <div id='map'></div>
-<a id=logo_wcode href='https://wcodes.org' tabindex='1'>
-	<span class='image'><svg version="1.1"
+<div id='logo'>
+	<a id=logo_wcode href='https://wcodes.org' tabindex='1'>
+		<span class='image'><svg version="1.1"
 	 xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-55 -18 306 100">
 <g id="flowRoot2982" transform="matrix(0.2476154,0,0,0.2476154,3.0703645,-26.736306)">
 	<path fill="#69B7CF" d="M549.9,282.2h-19.4c-0.3-4.5-1.5-8.6-3.5-12.2
@@ -783,9 +656,8 @@ h2.message_dialog_label {
 </g>
 </svg>
 </span>
-</a>
-<a id=logo_location href='https://location.wcodes.org' tabindex='1'>
-	<span class='image'><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	</a><a id=logo_location href='https://location.wcodes.org' tabindex='2'>
+		<span class='image'><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 152 8" xml:space="preserve" font-family="Abel" font-size="16px">
 	<g>
 		<text text-anchor="middle" transform="matrix(1 0 0 1 78 8)">
@@ -795,17 +667,18 @@ h2.message_dialog_label {
 	</g>
 </svg>
 </span>
-</a>
-<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='2' >
+	</a>
+</div>
+<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 <div id='result'></div>
-<input id='decode_button' class='control' type='button' value='Decode' tabindex='3' >
-<div id='location_button' class='control' tabindex='4'>
+<input id='decode_button' class='control' type='button' value='Decode' tabindex='4' >
+<div id='location_button' class='control' tabindex='5'>
 	<span class='image'><svg fill="#69B7CF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 	<path d="M0 0h24v24H0z" fill="none"/>
 	<path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
 </svg></span>
 </div>
-<div id='info' class='control' tabindex='5'>
+<div id='info' class='control' tabindex='6'>
 	<span class='image'><svg fill="#69B7CF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 0h24v24H0z" fill="none"/>
     <path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/>

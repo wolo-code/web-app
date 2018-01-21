@@ -15,7 +15,8 @@ function initialize() {
 			position: google.maps.ControlPosition.BOTTOM_CENTER
 		},
 		fullscreenControl: false,
-		streetViewControl: false
+		streetViewControl: false,
+		zoomControl: false
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);

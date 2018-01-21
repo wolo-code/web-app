@@ -30,10 +30,10 @@ body {
 	margin: 0;
 	padding: 0;
 }
-
+/*
 input {
 	-webkit-appearance: none;
-}
+}*/
 
 @font-face {
 	font-family: 'Abel';
@@ -220,6 +220,10 @@ input {
 	display: none;
 }
 
+.invisible {
+	visibility: hidden;
+}
+
 #info {
 	z-index: 1;
 	position: absolute;
@@ -326,6 +330,118 @@ input {
 	padding-top: 6px;
 	margin-left: auto;
 	margin-right: auto;
+}
+.address {
+	width: 200px;
+}
+
+.gp_id {
+	width: 200px;
+}
+
+.lat {
+	width: 100px;
+}
+
+.lng {
+	width: 100px;
+}
+
+.time {
+	width: 100px;
+}
+
+.process {
+	width: 100px;
+}
+
+.data_control:hover {
+	cursor: pointer;
+	color: #69B7CF;
+}
+
+#pac-input {
+	left: 0px !important;
+	top: 36px !important;
+	height: 26px;
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 8px;
+	border: none;
+	text-overflow: ellipsis;
+	width: 400px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+}
+
+#console_title {
+	font-family: Abel;
+	color: #69B7CF;
+	font-size: x-large;
+}
+
+#city_submit_panel {
+	position: absolute;
+	bottom: 20px;
+	z-index: 1;
+	left: 10px;
+}
+
+#submit_city_button {
+	z-index: 1;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
+}
+
+#container {
+	height: 100%;
+}
+
+#restrict_block {
+	height: 100%;
+}
+
+#restrict_block h3 {
+	padding-left: 20px;
+}
+
+#console_block {
+	height: 100%;
+}
+
+#map_canvas {
+	height: 80%;
+}
+
+#city_submit_panel input {
+	border-top: none;
+	border-left: none;
+	border-right: none;
+}
+
+input:invalid {
+	border: 2px solid red;
+}
+
+input:valid {
+	border: 2px solid #69B7CF;
+}
+
+#location_request_list th {
+	font-family: Abel;
+}
+
+#location_request_list th {
+	color: #69B7CF;
 }
 #infowindow-content .title {
 	font-weight: bold;
@@ -456,6 +572,20 @@ h2.message_dialog_label {
 #no_city_message p {
 	font-size: larger;
 }
+
+.loader {
+	border: 15px solid #F0F0F0;
+	border-top: 15px solid #69B7CF;
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
 #overlay {
 	left: 0px;
 	right: 0px;
@@ -553,7 +683,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
-2017-Nov-11 06:41:05		</div>
+2018-Jan-18 23:50:48		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -584,13 +714,26 @@ h2.message_dialog_label {
     <path d="M0 0h24v24H0z" fill="none"/>
 </svg></span>
 	</div>
-	<p>
-		This location appears to not be in the database.<br>
-		Do you want it to be added?
-	</p>
-	<div class="center message_dialog_control">
-		<button id='no_city_submit_yes' type='button'>Yes</button>
-		<button id='no_city_submit_no' type='button'>No</button>
+	<div id='no_city_message_prompt'>
+		<p>
+			This location appears to not be in the database.<br>
+			Do you want it to be added?
+		</p>
+		<div class="center message_dialog_control">
+			<button id='no_city_submit_yes' type='button'>Yes</button>
+			<button id='no_city_submit_no' type='button'>No</button>
+		</div>
+	</div>
+	<div id='no_city_message_wait' class="hide">
+		<div class="loader center"></div>
+		<p>
+			Waiting for city add request to be processed.<br>
+			Since this involves manual intervention, it may take hours.
+		</p>
+		<div class="center message_dialog_control">
+			<button id='no_city_submit_wait_continue' type='button'>Continue</button>
+			<button id='no_city_submit_wait_stop' type='button'>Stop</button>
+		</div>
 	</div>
 </div>
 <div id='map'></div>
@@ -757,11 +900,26 @@ function hideNoCityMessage() {
 
 function noCity_add() {
 	submitCity();
-	hideNoCityMessage();
+	noCity_showLoader();
+}
+
+function noCity_showLoader() {
+	no_city_message_prompt.classList.add('hide');
+	no_city_message_wait.classList.remove('hide');
 }
 
 function noCity_cancel() {
 	hideNoCityMessage();
+}
+
+function noCityWait_continue() {
+	infoWindow_setContent("Waiting for update");
+	hideNoCityMessage();
+}
+
+function noCityWait_stop() {
+	pendingPosition = null;
+	hideNoCityMessage();	
 }
 function hideOverlay() {
 	document.getElementById('overlay').classList.add('hide');

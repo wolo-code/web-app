@@ -224,13 +224,14 @@ function getCityBegin(cityCenter) {
 function encode(position) {
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
-		if(city == null)
+		if(city == null) {
+			pendingPosition = position;
 			noCity(position);
+		}
 		else
 			encode_(city, position);
 	}
-	else
-		pendingPosition = position;
+	pendingPosition = position;
 }
 
 function decode(words) {
@@ -239,7 +240,7 @@ function decode(words) {
 		decode_(city, words.splice(1, words.length-1))
 	}
 	else
-		pendingWords = wrods;
+		pendingWords = words;
 }
 firebase.database().ref('CityList').on('value', function(snapshot) {
 	CityList = snapshot.val();
@@ -354,8 +355,11 @@ function initMap() {
 		// For each place, get the icon, name and location.
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
+			clearAddress();
 			focus_(places[0].geometry.location);
-			encode(resolveLatLng(places[0].geometry.location));
+			var pos = resolveLatLng(places[0].geometry.location);
+			encode(pos);
+			getAddress(pos);
 		}
 		else {
 			places.forEach(function(place) {
@@ -395,6 +399,7 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
+		pendingPosition = null;
 		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));
@@ -563,7 +568,8 @@ ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 };
 
 function focus_(pos, bounds) {
-	map.setCenter(pos);
+	hideNoCityMessage();
+	map.panTo(pos);
 	if(typeof marker === 'undefined') {
 		marker = new google.maps.Marker({
 			position: pos,
@@ -730,6 +736,8 @@ function init() {
 	locate_right_message_no.addEventListener('click', locateRight_deny);
 	no_city_submit_yes.addEventListener('click', noCity_add);
 	no_city_submit_no.addEventListener('click', noCity_cancel);
+	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
+	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
 }
 
 function showAndCopy(message) {

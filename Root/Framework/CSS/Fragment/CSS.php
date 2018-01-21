@@ -13,7 +13,7 @@
 	<style type='text/css'>
 <?php
 		includeDir('../CSS/Base/', $INCLUDE_TYPE_CSS, $INCLUDE_MODE_EMBED, '');
-		includeDir('../../CSS/', $component_dir.'Base/', $INCLUDE_TYPE_CSS, $INCLUDE_MODE_EMBED, '');
+		includeDir('../../CSS/'.$component_dir.'Base/', $INCLUDE_TYPE_CSS, $INCLUDE_MODE_EMBED, '');
 ?>
 	</style>
 <?php

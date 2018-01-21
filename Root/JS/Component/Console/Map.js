@@ -14,7 +14,8 @@ function initialize() {
 			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
 			position: google.maps.ControlPosition.BOTTOM_CENTER
 		},
-		fullscreenControl: false
+		fullscreenControl: false,
+		streetViewControl: false
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);

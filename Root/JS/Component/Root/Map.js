@@ -26,7 +26,8 @@ function initMap() {
 			position: google.maps.ControlPosition.BOTTOM_CENTER
 		},
 		zoom: 8,
-		fullscreenControl: false
+		fullscreenControl: false,
+		streetViewControl: false
 	});
 
 //	infoWindow = new google.maps.InfoWindow({map: map});

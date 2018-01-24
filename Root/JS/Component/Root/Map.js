@@ -121,7 +121,7 @@ function initMap() {
 	decode_button.addEventListener('click', function() {
 		clearMap();
 		result.setInnerText = '';
-		var code = document.getElementById('pac-input').value.replace(/(\\|\/)/gm, '').trim().toLowerCase();
+		var code = document.getElementById('pac-input').value;
 		execDecode(code);
 	});
 
@@ -135,6 +135,7 @@ function resolveLatLng(latLng) {
 
 function execDecode(code) {
 
+	code = code.replace(/(\\|\/)/gm, '').trim().toLowerCase();
 	var valid = true;
 	if(code.length > 0) {
 		var splitChar;

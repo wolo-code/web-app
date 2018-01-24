@@ -20,7 +20,8 @@
 <div id='info' class='control' tabindex='6'>
 	<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
 </div>
-<div id='notification' class='hide'></div>
+<div id='notification_top' class='hide'>Try: Bangalore, India</div>
+<div id='notification_bottom' class='hide'></div>
 <div id='address_text' class='hide'>
 	<span id='address_text_main'>
 		<div id='address_text_label'>Address</div>

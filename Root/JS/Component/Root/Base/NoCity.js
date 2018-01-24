@@ -18,6 +18,7 @@ function noCity_showLoader() {
 
 function noCity_cancel() {
 	hideNoCityMessage();
+	notification_top.classList.remove('hide');
 }
 
 function noCityWait_continue() {
@@ -27,5 +28,6 @@ function noCityWait_continue() {
 
 function noCityWait_stop() {
 	pendingPosition = null;
-	hideNoCityMessage();	
+	hideNoCityMessage();
+	notification_top.classList.remove('hide');
 }

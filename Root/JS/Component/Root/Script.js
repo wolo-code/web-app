@@ -12,11 +12,12 @@ function init() {
 	no_city_submit_no.addEventListener('click', noCity_cancel);
 	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
 	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
+	notification_top.addEventListener('click', tryDefaultCity);
 }
 
 function showAndCopy(message) {
 	showNotification(message);
-	copyNodeText(notification);
+	copyNodeText(notification_bottom);
 }
 
 function copyNodeText(node) {

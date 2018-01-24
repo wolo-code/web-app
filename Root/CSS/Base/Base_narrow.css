@@ -7,7 +7,11 @@
 	}
 
 	#logo {
-		width: auto;
+		width: auto !important;
 	}
 
+	#notification_top {
+		top: 168px !important;
+	}
+	
 }

@@ -25,3 +25,8 @@ function execSubmitCity() {
 	firebase.database().ref().update(updates);
 	showNotification("Request submitted. Check back later");
 }
+
+function tryDefaultCity() {
+	execDecode("Bangalore Diesel Hall Planet");
+	notification_top.classList.add('hide');
+}

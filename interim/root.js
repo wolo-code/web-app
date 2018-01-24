@@ -84,6 +84,11 @@ function execSubmitCity() {
 	firebase.database().ref().update(updates);
 	showNotification("Request submitted. Check back later");
 }
+
+function tryDefaultCity() {
+	execDecode("Bangalore Diesel Hall Planet");
+	notification_top.classList.add('hide');
+}
 var urlFunctions = 'https://location.wcodes.org/api/';
 //'http://localhost:5002/waddress-5f30b/us-central1/';
 
@@ -415,7 +420,7 @@ function initMap() {
 	decode_button.addEventListener('click', function() {
 		clearMap();
 		result.setInnerText = '';
-		var code = document.getElementById('pac-input').value.replace(/(\\|\/)/gm, '').trim().toLowerCase();
+		var code = document.getElementById('pac-input').value;
 		execDecode(code);
 	});
 
@@ -429,6 +434,7 @@ function resolveLatLng(latLng) {
 
 function execDecode(code) {
 
+	code = code.replace(/(\\|\/)/gm, '').trim().toLowerCase();
 	var valid = true;
 	if(code.length > 0) {
 		var splitChar;
@@ -741,11 +747,12 @@ function init() {
 	no_city_submit_no.addEventListener('click', noCity_cancel);
 	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
 	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
+	notification_top.addEventListener('click', tryDefaultCity);
 }
 
 function showAndCopy(message) {
 	showNotification(message);
-	copyNodeText(notification);
+	copyNodeText(notification_bottom);
 }
 
 function copyNodeText(node) {

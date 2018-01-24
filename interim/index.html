@@ -31,6 +31,11 @@ body {
 	padding: 0;
 }
 
+input {
+	border-radius:0;
+	-webkit-appearance: none;
+}
+
 @font-face {
 	font-family: 'Abel';
 	font-style: normal;
@@ -184,7 +189,27 @@ body {
 	cursor: pointer;
 }
 
-#notification {
+#notification_top {
+	text-align: center;
+	position: absolute;
+	top: 118px;
+	background-color: #FFFFFF;
+	padding: 4px 8px;
+	border-radius: 18px;
+	color: #69B7CF;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 182px;
+	z-index: 1;
+	cursor: pointer;
+	border-color: #69B7CF;
+	border-style: solid;
+	border-width: 1px;
+}
+
+#notification_bottom {
 	text-align: center;
 	position: absolute;
 	bottom: 80px;
@@ -268,9 +293,13 @@ body {
 	}
 
 	#logo {
-		width: auto;
+		width: auto !important;
 	}
 
+	#notification_top {
+		top: 168px !important;
+	}
+	
 }
 #infowindow-content .title {
 	font-weight: bold;
@@ -555,7 +584,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
-2018-Jan-21 00:58:59		</div>
+2018-Jan-24 23:51:48		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -684,7 +713,8 @@ h2.message_dialog_label {
     <path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/>
 </svg></span>
 </div>
-<div id='notification' class='hide'></div>
+<div id='notification_top' class='hide'>Try: Bangalore, India</div>
+<div id='notification_bottom' class='hide'></div>
 <div id='address_text' class='hide'>
 	<span id='address_text_main'>
 		<div id='address_text_label'>Address</div>
@@ -783,6 +813,7 @@ function noCity_showLoader() {
 
 function noCity_cancel() {
 	hideNoCityMessage();
+	notification_top.classList.remove('hide');
 }
 
 function noCityWait_continue() {
@@ -792,7 +823,8 @@ function noCityWait_continue() {
 
 function noCityWait_stop() {
 	pendingPosition = null;
-	hideNoCityMessage();	
+	hideNoCityMessage();
+	notification_top.classList.remove('hide');
 }
 function hideOverlay() {
 	document.getElementById('overlay').classList.add('hide');

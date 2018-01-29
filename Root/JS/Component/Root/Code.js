@@ -9,9 +9,11 @@ function encode_(city, position) {
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
 
+	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			setCodeWords(http.responseText, city, position);
+			wait_loader.classList.add('hide');
 		}
 	}
 
@@ -50,11 +52,13 @@ function decode_(city, code) {
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
-
+	
+	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			code.splice(0, 0, city.name);
 			setCodeCoord(http.responseText, code);
+			wait_loader.classList.add('hide');
 		}
 	}
 

@@ -22,6 +22,7 @@
 </div>
 <div id='notification_top' class='hide'>Try: Bangalore, India</div>
 <div id='notification_bottom' class='hide'></div>
+<div id='wait_loader'></div>
 <div id='address_text' class='hide'>
 	<span id='address_text_main'>
 		<div id='address_text_label'>Address</div>

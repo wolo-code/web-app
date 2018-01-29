@@ -134,8 +134,14 @@ input {
 #info {
 	z-index: 1;
 	position: absolute;
-	bottom: 30px;
+	bottom: 26px;
 	left: 10px;
+}
+
+#info svg {
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	background-color: rgb(255, 255, 255);
+	border-radius: 25px;
 }
 
 .control {

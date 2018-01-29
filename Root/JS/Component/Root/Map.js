@@ -109,6 +109,7 @@ function initMap() {
 
 	map.addListener('click', function(event) {
 		pendingPosition = null;
+		notification_top.classList.add('hide');
 		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));

@@ -29,4 +29,5 @@ function execSubmitCity() {
 function tryDefaultCity() {
 	execDecode("Bangalore Diesel Hall Planet");
 	notification_top.classList.add('hide');
+	infoWindow.close();
 }

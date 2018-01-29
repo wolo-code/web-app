@@ -94,3 +94,9 @@ input:valid {
 #location_request_list th {
 	color: #69B7CF;
 }
+
+#data_process_checkbox {
+	width: 24px;
+	height: 24px;
+	-webkit-appearance: checkbox !important;
+}

@@ -1,8 +1,5 @@
 <div id='overlay' class='hide'>
 	<div id='overlay_message'>
-		<div id='overlay_message_info'>
-			<span class='image'><?php echo file_get_contents('../../Resource/Info.svg'); ?></span>
-		</div>
 		<div id='overlay_message_close' class="message_dialog_close control">
 			<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 		</div>

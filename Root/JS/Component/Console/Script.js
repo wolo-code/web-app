@@ -131,7 +131,7 @@ function setupControls() {
 	
 	submit_city_button.addEventListener('click', function() {
 		if(city_submit_panel.checkValidity()) {
-			submit_city(city_lat.value, city_lng.value, city_country.value, city_name.value, city_group.value);
+			submit_city(city_lat.value, city_lng.value, city_country.value, city_group.value, city_name.value);
 			if(data_process_checkbox.checked) {
 				process_entry(data[data_index].id);
 			}

@@ -185,8 +185,12 @@ function suggestComplete(event) {
 	}
 	else {
 		var cur_word = input.split(' ');
-		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '')
-			changeInput(wordList, cur_word[cur_word.length-1]);
+		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '') {
+			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
+				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
+			else
+				result.innerText = '';
+		}
 		else {
 			result.innerText = '';
 		}
@@ -429,4 +433,10 @@ function infoWindow_setContent(string) {
 	if(typeof infoWindow == "undefined")
 		infoWindow = new google.maps.InfoWindow({map: map});
 	infoWindow.setContent(string);
+}
+
+function arrayContainsArray(superset, subset) {
+	return subset.every(function (value) {
+		return (superset.indexOf(value.toLowerCase()) >= 0);
+	});
 }

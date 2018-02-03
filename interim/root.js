@@ -88,6 +88,7 @@ function execSubmitCity() {
 function tryDefaultCity() {
 	execDecode("Bangalore Diesel Hall Planet");
 	notification_top.classList.add('hide');
+	infoWindow.close();
 }
 var urlFunctions = 'https://location.wcodes.org/api/';
 //'http://localhost:5002/waddress-5f30b/us-central1/';
@@ -100,9 +101,11 @@ function encode_(city, position) {
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
 
+	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			setCodeWords(http.responseText, city, position);
+			wait_loader.classList.add('hide');
 		}
 	}
 
@@ -141,11 +144,13 @@ function decode_(city, code) {
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', 1);
-
+	
+	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			code.splice(0, 0, city.name);
 			setCodeCoord(http.responseText, code);
+			wait_loader.classList.add('hide');
 		}
 	}
 
@@ -179,6 +184,7 @@ function setCodeCoord(codeIndex, code) {
 	focus__(object, code);
 }
 var CityList = [];
+var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
 
@@ -249,7 +255,14 @@ function decode(words) {
 		pendingWords = words;
 }
 firebase.database().ref('CityList').on('value', function(snapshot) {
+	
 	CityList = snapshot.val();
+	
+	CityList.forEach (function(city){
+		city_plus_wordList.push(city.name.toLowerCase());
+	});
+	city_plus_wordList = city_plus_wordList.concat(wordList);
+	
 	if(pendingPosition != null) {
 		encode(pendingPosition);
 		pendingPosition = null;
@@ -258,6 +271,7 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 		decode(pendingWords);
 		pendingWords = null;
 	}
+	
 });
 function copyWCode() {
 	showAndCopy(getWCodeFullFromInfoWindow().join(' '));
@@ -306,16 +320,11 @@ var marker;
 var infoWindow;
 var accuCircle;
 var myLocDot;
-var city_plus_wordList = [];
 var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
 
 function initMap() {
-	for(var i = 0; i < CityList.length; i++) {
-		city_plus_wordList.push(CityList[i].name);
-	}
-	city_plus_wordList = city_plus_wordList.concat(wordList);
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: -34.397, lng: 150.644},
@@ -408,6 +417,7 @@ function initMap() {
 
 	map.addListener('click', function(event) {
 		pendingPosition = null;
+		notification_top.classList.add('hide');
 		clearAddress();
 		focus_(event.latLng);
 		encode(resolveLatLng(event.latLng));
@@ -476,7 +486,7 @@ function execDecode(code) {
 		decode_(city, words);
 	}
 	else {
-		alert('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
+		showNotification('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
 	}
 
 }
@@ -488,8 +498,12 @@ function suggestComplete(event) {
 	}
 	else {
 		var cur_word = input.split(' ');
-		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '')
-			changeInput(wordList, cur_word[cur_word.length-1]);
+		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '') {
+			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
+				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
+			else
+				result.innerText = '';
+		}
 		else {
 			result.innerText = '';
 		}
@@ -732,6 +746,12 @@ function infoWindow_setContent(string) {
 	if(typeof infoWindow == "undefined")
 		infoWindow = new google.maps.InfoWindow({map: map});
 	infoWindow.setContent(string);
+}
+
+function arrayContainsArray(superset, subset) {
+	return subset.every(function (value) {
+		return (superset.indexOf(value.toLowerCase()) >= 0);
+	});
 }
 window.onload = init;
 

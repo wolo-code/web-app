@@ -36,6 +36,13 @@ input {
 	-webkit-appearance: none;
 }
 
+button {
+	-webkit-appearance: none;
+	background: white;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	border: 1px solid;
+}
+
 @font-face {
 	font-family: 'Abel';
 	font-style: normal;
@@ -160,8 +167,15 @@ input {
 #info {
 	z-index: 1;
 	position: absolute;
-	bottom: 30px;
+	bottom: 26px;
 	left: 10px;
+}
+
+#info svg {
+	padding: 1px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	background-color: rgb(255, 255, 255);
+	border-radius: 25px;
 }
 
 .control {
@@ -223,6 +237,13 @@ input {
 	margin-right: auto;
 	width: 350px;
 	z-index: 1;
+}
+
+#wait_loader {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 4px;
 }
 
 .center {
@@ -368,6 +389,49 @@ input {
 	width: 28px;
 	vertical-align: bottom;
 }
+#wait_loader {
+	background: linear-gradient(90deg, #69B7CF, #ddf2f9);
+	background-size: 400% 400%;
+	-webkit-animation: Gradient 2s ease infinite;
+	-moz-animation: Gradient 2s ease infinite;
+	animation: Gradient 2s ease infinite;
+}
+
+@-webkit-keyframes Gradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
+
+@-moz-keyframes Gradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
+
+@keyframes Gradient {
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
+}
 	</style>
 	<style type='text/css'>
 .message_dialog {
@@ -481,12 +545,6 @@ h2.message_dialog_label {
 	text-align: right;
 	padding-top: 20px;
 }
-
-#overlay_message_info {
-	position: absolute;
-	top: 2px;
-	left: 10px;
-}
 #location_button {
 	z-index: 1;
 	position: absolute;
@@ -494,7 +552,7 @@ h2.message_dialog_label {
 	bottom: 24px;
 	height: 24px;
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-  background-color: rgb(255, 255, 255);
+	background-color: rgb(255, 255, 255);
 	padding: 6px;
 	border: none;
 	border-radius: 2px;
@@ -539,12 +597,6 @@ h2.message_dialog_label {
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-database.js'></script>
 <div id='overlay' class='hide'>
 	<div id='overlay_message'>
-		<div id='overlay_message_info'>
-			<span class='image'><svg fill="#69B7CF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 0h24v24H0z" fill="none"/>
-    <path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 9h2V7h-2v2z"/>
-</svg></span>
-		</div>
 		<div id='overlay_message_close' class="message_dialog_close control">
 			<span class='image'><svg fill="#BEBEBE" height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg">
     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -584,7 +636,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>.
 		</div>
 		<div id='updated'>Updated:
-2018-Jan-24 23:51:48		</div>
+2018-Feb-03 21:30:42		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -715,6 +767,7 @@ h2.message_dialog_label {
 </div>
 <div id='notification_top' class='hide'>Try: Bangalore, India</div>
 <div id='notification_bottom' class='hide'></div>
+<div id='wait_loader'></div>
 <div id='address_text' class='hide'>
 	<span id='address_text_main'>
 		<div id='address_text_label'>Address</div>

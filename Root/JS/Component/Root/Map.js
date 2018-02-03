@@ -7,16 +7,11 @@ var marker;
 var infoWindow;
 var accuCircle;
 var myLocDot;
-var city_plus_wordList = [];
 var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
 
 function initMap() {
-	for(var i = 0; i < CityList.length; i++) {
-		city_plus_wordList.push(CityList[i].name);
-	}
-	city_plus_wordList = city_plus_wordList.concat(wordList);
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: {lat: -34.397, lng: 150.644},

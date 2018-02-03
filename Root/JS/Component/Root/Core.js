@@ -1,4 +1,5 @@
 var CityList = [];
+var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
 

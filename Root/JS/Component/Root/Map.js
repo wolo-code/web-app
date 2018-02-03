@@ -173,7 +173,7 @@ function execDecode(code) {
 		decode_(city, words);
 	}
 	else {
-		alert('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
+		showNotification('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
 	}
 
 }

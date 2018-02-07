@@ -103,13 +103,20 @@ function encode_(city, position) {
 
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
-		if(http.readyState == 4 && http.status == 200) {
-			setCodeWords(http.responseText, city, position);
-			wait_loader.classList.add('hide');
+		if(http.readyState == 4) {
+			if(http.status == 200) {
+				setCodeWords(http.responseText, city, position);
+				wait_loader.classList.add('hide');
+			}
+			else if(http.status == 204) {
+				noCity(position);
+				notification_top.classList.remove('hide');
+				wait_loader.classList.add('hide');
+			}
 		}
 	}
 
-	http.send( stringifyEncodeData(getCityBegin(city.center), position) );
+	http.send( stringifyEncodeData(city.center, position) );
 	return '';
 }
 
@@ -118,20 +125,15 @@ function setCodeWords(code, city, position) {
 	message.push(city.name);
 	var object = JSON.parse(code).code;
 
-	for(i of object) {
-		if(i < 0 || i > 1023) {
-			focusDefault();
-			return;
-		}
-		else
-			message.push(wordList[i]);
-	}
+	for(i of object)
+		message.push(wordList[i]);
+
 	setInfoWindowText(message, position);
 }
 
-function stringifyEncodeData(city_begin, position) {
+function stringifyEncodeData(city_center, position) {
 	var object = {};
-	object['city_begin'] = city_begin;
+	object['city_center'] = city_center;
 	object['position'] = position;
 	return JSON.stringify(object);
 }
@@ -150,6 +152,7 @@ function decode_(city, code) {
 		if(http.readyState == 4 && http.status == 200) {
 			code.splice(0, 0, city.name);
 			setCodeCoord(http.responseText, code);
+			notification_top.classList.add('hide');
 			wait_loader.classList.add('hide');
 		}
 	}
@@ -158,23 +161,13 @@ function decode_(city, code) {
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);
 	data[2] = wordList.indexOf(code[2]);
-	http.send( stringifyDecodeData(getCityBegin(city.center), data) );
+	http.send( stringifyDecodeData(city.center, data) );
 
-	// lat = city_begin.lat;
-	// lng = city_begin.lng;
-	// return {
-	// 	lat: (function() {
-	// 		return lat
-	// 	})(),
-	// 	lng: (function() {
-	// 		return lng
-	// 	})()
-	// };
 }
 
-function stringifyDecodeData(city_begin, code) {
+function stringifyDecodeData(city_center, code) {
 	var object = {};
-	object['city_begin'] = city_begin;
+	object['city_center'] = city_center;
 	object['code'] = code;
 	return JSON.stringify(object);
 }
@@ -223,13 +216,6 @@ function getCityFromName(cityName) {
 		if(CityList[i].name.toLowerCase().localeCompare(cityName) == 0)
 			return CityList[i];
 	}
-}
-
-function getCityBegin(cityCenter) {
-	var CITY_SPAN_PERIMETER = 0.5/2;
-	var lat = cityCenter.lat - CITY_SPAN_PERIMETER;
-	var lng = cityCenter.lng - CITY_SPAN_PERIMETER;
-	return {'lat': lat, 'lng': lng};
 }
 
 function encode(position) {
@@ -712,7 +698,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
 	infoWindow.setPosition(pos);
-	//focusDefault();
+	notification_top.classList.remove('hide');
 }
 
 function setInfoWindowText(code, latLng) {
@@ -724,11 +710,6 @@ function getIntentURL(latLng, code) {
 		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
 	else
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
-}
-
-function focusDefault() {
-	setTimeout(function() { alert("This location appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
-	setTimeout(function() { focusDefault_(); }, 1000);
 }
 
 function focusDefault_() {

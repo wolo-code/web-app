@@ -214,7 +214,8 @@ function reverseGeoCode(latLng) {
 				city_lng.innerText = Lng;
 				map.setCenter(results[0].geometry.location);
 			} else {
-				alert("Something got wrong " + status);
+				console.log("Geocode error: "+status);
+				showNotification("Oops something got wrong!");
 			}
 		}
 	);	

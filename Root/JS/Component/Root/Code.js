@@ -68,16 +68,6 @@ function decode_(city, code) {
 	data[2] = wordList.indexOf(code[2]);
 	http.send( stringifyDecodeData(getCityBegin(city.center), data) );
 
-	// lat = city_begin.lat;
-	// lng = city_begin.lng;
-	// return {
-	// 	lat: (function() {
-	// 		return lat
-	// 	})(),
-	// 	lng: (function() {
-	// 		return lng
-	// 	})()
-	// };
 }
 
 function stringifyDecodeData(city_begin, code) {

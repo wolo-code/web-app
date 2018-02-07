@@ -42,6 +42,14 @@ exports.encode = functions.https.onRequest((req, res) => {
 		res.send({"error" : "Version mismatch"});
 	else {
 		code = encode(getCityBegin(req.body.city_center), req.body.position);
+		for(i of code)
+			if(i < 0 || i > 1023) {
+				console.log("Error: Out of WCode index limit");
+				console.log(req.body.city_center);
+				console.log(req.body.position);
+				res.status(500).send('');
+				return;
+			}
 		res.send({"code" : code});
 	}
 	

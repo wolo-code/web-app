@@ -26,14 +26,9 @@ function setCodeWords(code, city, position) {
 	message.push(city.name);
 	var object = JSON.parse(code).code;
 
-	for(i of object) {
-		if(i < 0 || i > 1023) {
-			focusDefault();
-			return;
-		}
-		else
-			message.push(wordList[i]);
-	}
+	for(i of object)
+		message.push(wordList[i]);
+
 	setInfoWindowText(message, position);
 }
 
@@ -55,10 +50,17 @@ function decode_(city, code) {
 	
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
-		if(http.readyState == 4 && http.status == 200) {
-			code.splice(0, 0, city.name);
-			setCodeCoord(http.responseText, code);
-			wait_loader.classList.add('hide');
+		if(http.readyState == 4) {
+			if(http.status == 200) {
+				code.splice(0, 0, city.name);
+				setCodeCoord(http.responseText, code);
+				wait_loader.classList.add('hide');
+			}
+			else if(http.status == 500) {
+				console.log("Decode error at server");
+				showNotification("Oops something went wrong!");
+				notification_top.classList.remove('hide');
+			}
 		}
 	}
 

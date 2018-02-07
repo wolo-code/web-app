@@ -399,7 +399,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
 	infoWindow.setPosition(pos);
-	//focusDefault();
+	notification_top.classList.remove('hide');
 }
 
 function setInfoWindowText(code, latLng) {
@@ -411,11 +411,6 @@ function getIntentURL(latLng, code) {
 		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
 	else
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
-}
-
-function focusDefault() {
-	setTimeout(function() { alert("This location appears to not be in the database. Please submit a request to add at support@wcodes.org") }, 100);
-	setTimeout(function() { focusDefault_(); }, 1000);
 }
 
 function focusDefault_() {

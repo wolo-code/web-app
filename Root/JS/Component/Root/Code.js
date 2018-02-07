@@ -17,7 +17,7 @@ function encode_(city, position) {
 		}
 	}
 
-	http.send( stringifyEncodeData(getCityBegin(city.center), position) );
+	http.send( stringifyEncodeData(city.center, position) );
 	return '';
 }
 
@@ -37,9 +37,9 @@ function setCodeWords(code, city, position) {
 	setInfoWindowText(message, position);
 }
 
-function stringifyEncodeData(city_begin, position) {
+function stringifyEncodeData(city_center, position) {
 	var object = {};
-	object['city_begin'] = city_begin;
+	object['city_center'] = city_center;
 	object['position'] = position;
 	return JSON.stringify(object);
 }
@@ -66,13 +66,13 @@ function decode_(city, code) {
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);
 	data[2] = wordList.indexOf(code[2]);
-	http.send( stringifyDecodeData(getCityBegin(city.center), data) );
+	http.send( stringifyDecodeData(city.center, data) );
 
 }
 
-function stringifyDecodeData(city_begin, code) {
+function stringifyDecodeData(city_center, code) {
 	var object = {};
-	object['city_begin'] = city_begin;
+	object['city_center'] = city_center;
 	object['code'] = code;
 	return JSON.stringify(object);
 }

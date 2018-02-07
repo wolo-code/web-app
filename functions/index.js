@@ -21,6 +21,12 @@ function decodeData(data, d) {
 	return data*d+d/2;
 }
 
+function getCityBegin(cityCenter) {
+	var lat = cityCenter.lat - ang_span_d(city_begin.lng)/2;
+	var lng = cityCenter.lng - SPAN/2;
+	return {'lat': lat, 'lng': lng};
+}
+
 exports.encode = functions.https.onRequest((req, res) => {
 	
 	res.header('Access-Control-Allow-Origin', '*');
@@ -34,8 +40,10 @@ exports.encode = functions.https.onRequest((req, res) => {
 
 	if(req.headers.version != 1)
 		res.send({"error" : "Version mismatch"});
-	else
-		res.send({"code" : encode(req.body.city_begin, req.body.position)});
+	else {
+		code = encode(getCityBegin(req.body.city_center), req.body.position);
+		res.send({"code" : code});
+	}
 	
 });
 
@@ -53,7 +61,7 @@ exports.decode = functions.https.onRequest((req, res) => {
 	if(req.headers.version != 1)
 		res.send({"error" : "Version mismatch"});
 	else		
-		res.send(decode(req.body.city_begin, req.body.code));
+		res.send(decode(getCityBegin(req.body.city_center), req.body.code));
 	
 });
 

@@ -40,13 +40,6 @@ function getCityFromName(cityName) {
 	}
 }
 
-function getCityBegin(cityCenter) {
-	var CITY_SPAN_PERIMETER = 0.5/2;
-	var lat = cityCenter.lat - CITY_SPAN_PERIMETER;
-	var lng = cityCenter.lng - CITY_SPAN_PERIMETER;
-	return {'lat': lat, 'lng': lng};
-}
-
 function encode(position) {
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);

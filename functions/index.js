@@ -22,8 +22,8 @@ function decodeData(data, d) {
 }
 
 function getCityBegin(cityCenter) {
-	var lat = cityCenter.lat - ang_span_d(city_begin.lng)/2;
-	var lng = cityCenter.lng - SPAN/2;
+	var lat = cityCenter.lat - SPAN/2;
+	var lng = cityCenter.lng - ang_span_d(cityCenter.lng)*N/2;
 	return {'lat': lat, 'lng': lng};
 }
 

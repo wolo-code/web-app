@@ -11,9 +11,16 @@ function encode_(city, position) {
 
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
-		if(http.readyState == 4 && http.status == 200) {
-			setCodeWords(http.responseText, city, position);
-			wait_loader.classList.add('hide');
+		if(http.readyState == 4) {
+			if(http.status == 200) {
+				setCodeWords(http.responseText, city, position);
+				wait_loader.classList.add('hide');
+			}
+			else if(http.status == 204) {
+				noCity(position);
+				notification_top.classList.remove('hide');
+				wait_loader.classList.add('hide');
+			}
 		}
 	}
 
@@ -50,17 +57,11 @@ function decode_(city, code) {
 	
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
-		if(http.readyState == 4) {
-			if(http.status == 200) {
-				code.splice(0, 0, city.name);
-				setCodeCoord(http.responseText, code);
-				wait_loader.classList.add('hide');
-			}
-			else if(http.status == 500) {
-				console.log("Decode error at server");
-				showNotification("Oops something went wrong!");
-				notification_top.classList.remove('hide');
-			}
+		if(http.readyState == 4 && http.status == 200) {
+			code.splice(0, 0, city.name);
+			setCodeCoord(http.responseText, code);
+			notification_top.classList.add('hide');
+			wait_loader.classList.add('hide');
 		}
 	}
 

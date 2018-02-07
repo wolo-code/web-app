@@ -47,7 +47,7 @@ exports.encode = functions.https.onRequest((req, res) => {
 				console.log("Error: Out of WCode index limit");
 				console.log(req.body.city_center);
 				console.log(req.body.position);
-				res.status(500).send('');
+				res.status(204).send('');
 				return;
 			}
 		res.send({"code" : code});

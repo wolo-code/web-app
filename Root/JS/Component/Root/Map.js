@@ -145,7 +145,7 @@ function execDecode(code) {
 		if(words.length < 3)
 			valid = false;
 		else
-			pendingWords = words;
+			decode(words);
 	}
 
 	if(!valid)

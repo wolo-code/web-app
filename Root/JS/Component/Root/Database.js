@@ -9,11 +9,9 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 	
 	if(pendingPosition != null) {
 		encode(pendingPosition);
-		pendingPosition = null;
 	}
 	else if(pendingWords != null) {
 		decode(pendingWords);
-		pendingWords = null;
 	}
 	
 });

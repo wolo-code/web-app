@@ -56,8 +56,36 @@ function encode(position) {
 
 function decode(words) {
 	if(CityList.length > 0) {
-		var city = getCityFromName(words[0]);
-		decode_(city, words.splice(1, words.length-1))
+		var city;
+		var valid = false;
+		
+		var city_words_length = words.length-3;
+		if(words.length > 3) {
+			var ipCityName = words.slice(0, city_words_length).join(' ');
+			city = getCityFromName(ipCityName);
+			valid = true;
+		}
+		else if (words.length == 3) {
+			city = getCityFromPosition(resolveLatLng(myLocDot.position));
+			if(city != null)
+				valid = true;
+		}
+
+		if(valid) {
+			for (var i = 0; i < 3; i++) {
+				if (wordList.includes(words[city_words_length+i]) != true) {
+					valid = false;
+					break;
+				}
+			}
+		}
+		
+		if(valid) {
+			decode_(city, words.splice(city_words_length, words.length-city_words_length));
+		}
+		else {
+			showNotification(INCORRECT_WCODE);
+		}			
 	}
 	else
 		pendingWords = words;

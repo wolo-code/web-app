@@ -10,6 +10,7 @@ var myLocDot;
 var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
+var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 
 function initMap() {
 
@@ -144,37 +145,12 @@ function execDecode(code) {
 		var city;
 		if(words.length < 3)
 			valid = false;
-		else {
-
-			if(words.length > 3) {
-				var ipCityName = words.splice(0, words.length-3).join(' ');
-				city = getCityFromName(ipCityName);
-			}
-			else {
-				city = getCityFromPosition(resolveLatLng(myLocDot.position));
-			}
-
-			if(city == null) {
-				valid = false;
-			}
-			else {
-				for (var i = 0; i < 3; i++) {
-					if (wordList.includes(words[i]) != true) {
-						valid = false;
-						break;
-					}
-				}
-			}
-
-		}
+		else
+			pendingWords = words;
 	}
 
-	if(valid) {
-		decode_(city, words);
-	}
-	else {
-		showNotification('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
-	}
+	if(!valid)
+		showNotification(INCORRECT_WCODE);
 
 }
 

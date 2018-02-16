@@ -31,7 +31,7 @@ function versionCheck() {
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
 		var code = window.location.pathname.substr(1).toLowerCase();
-		execDecode(code);
+		pendingWords = code.split('.');
 		initWCode = true;
 	}
 }

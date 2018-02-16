@@ -81,7 +81,7 @@ function decode(words) {
 		}
 		
 		if(valid) {
-			decode_(city, words.splice(city_words_length, words.length-city_words_length));
+			decode_(city, words.slice(city_words_length, words.length));
 		}
 		else {
 			showNotification(INCORRECT_WCODE);

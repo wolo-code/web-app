@@ -142,7 +142,6 @@ function execDecode(code) {
 			splitChar = '.';
 		}
 		var words = code.split(splitChar);
-		var city;
 		if(words.length < 3)
 			valid = false;
 		else

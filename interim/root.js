@@ -234,8 +234,36 @@ function encode(position) {
 
 function decode(words) {
 	if(CityList.length > 0) {
-		var city = getCityFromName(words[0]);
-		decode_(city, words.splice(1, words.length-1))
+		var city;
+		var valid = false;
+		
+		var city_words_length = words.length-3;
+		if(words.length > 3) {
+			var ipCityName = words.slice(0, city_words_length).join(' ');
+			city = getCityFromName(ipCityName);
+			valid = true;
+		}
+		else if (words.length == 3) {
+			city = getCityFromPosition(resolveLatLng(myLocDot.position));
+			if(city != null)
+				valid = true;
+		}
+
+		if(valid) {
+			for (var i = 0; i < 3; i++) {
+				if (wordList.includes(words[city_words_length+i]) != true) {
+					valid = false;
+					break;
+				}
+			}
+		}
+		
+		if(valid) {
+			decode_(city, words.splice(city_words_length, words.length-city_words_length));
+		}
+		else {
+			showNotification(INCORRECT_WCODE);
+		}			
 	}
 	else
 		pendingWords = words;
@@ -251,11 +279,9 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 	
 	if(pendingPosition != null) {
 		encode(pendingPosition);
-		pendingPosition = null;
 	}
 	else if(pendingWords != null) {
 		decode(pendingWords);
-		pendingWords = null;
 	}
 	
 });
@@ -309,6 +335,7 @@ var myLocDot;
 var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
+var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 
 function initMap() {
 
@@ -443,37 +470,12 @@ function execDecode(code) {
 		var city;
 		if(words.length < 3)
 			valid = false;
-		else {
-
-			if(words.length > 3) {
-				var ipCityName = words.splice(0, words.length-3).join(' ');
-				city = getCityFromName(ipCityName);
-			}
-			else {
-				city = getCityFromPosition(resolveLatLng(myLocDot.position));
-			}
-
-			if(city == null) {
-				valid = false;
-			}
-			else {
-				for (var i = 0; i < 3; i++) {
-					if (wordList.includes(words[i]) != true) {
-						valid = false;
-						break;
-					}
-				}
-			}
-
-		}
+		else
+			pendingWords = words;
 	}
 
-	if(valid) {
-		decode_(city, words);
-	}
-	else {
-		showNotification('Incorrect input! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"');
-	}
+	if(!valid)
+		showNotification(INCORRECT_WCODE);
 
 }
 

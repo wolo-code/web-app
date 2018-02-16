@@ -1,3 +1,5 @@
+var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
+
 function noCity(position) {
 	showAddress();
 	showNoCityMessage();
@@ -27,7 +29,7 @@ function execSubmitCity() {
 }
 
 function tryDefaultCity() {
-	execDecode("Bangalore Diesel Hall Planet");
+	decode(DEFAULT_WCODE);
 	notification_top.classList.add('hide');
 	infoWindow.close();
 }

@@ -5,5 +5,5 @@
 	header('Content-Type: text/javascript');
 
 	$component_id = getOrigCallComponent();
-	includeDir('../../JS/Component/'.$component_id.'/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, 'base');
+	includeDir('../../CSS/Component/'.$component_id.'/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, 'base');
 ?>

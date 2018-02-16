@@ -9,7 +9,7 @@
 	else
 		$bPublish = FALSE;
 
-	$id = getOrigCall();
+	$id = getComponent();
 	if(strlen($id) == 0)
 		$id = "root";
 

@@ -19,6 +19,16 @@
 		return substr($component_id, 0, strpos($component_id, '.'));
 	}
 
+	function getComponent() {
+		$component = getOrigCallComponent();
+		while(true) {
+			if( $component == '' || is_dir($component) == 1 || is_file($component.'.php') == 1 || is_file($component.'.html') == 1 )
+				return $component;
+			else
+				$component = substr($component, 0, strpos('\\', $component));
+		}
+	}
+	
 	function addAttribute(DOMElement $e, $name, $value) {
 		$a = $e->getAttribute($name);
 		$e->setAttribute($name, $a." ".$value);

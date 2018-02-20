@@ -57,6 +57,8 @@ function refreshAddress() {
 function copyAddress() {
 	copyNodeText(address_text_content);
 }
+var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
+
 function noCity(position) {
 	showAddress();
 	showNoCityMessage();
@@ -86,7 +88,7 @@ function execSubmitCity() {
 }
 
 function tryDefaultCity() {
-	execDecode("Bangalore Diesel Hall Planet");
+	decode(DEFAULT_WCODE);
 	notification_top.classList.add('hide');
 	infoWindow.close();
 }
@@ -150,8 +152,7 @@ function decode_(city, code) {
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
-			code.splice(0, 0, city.name);
-			setCodeCoord(http.responseText, code);
+			setCodeCoord(http.responseText, new Array(city.name).concat(code));
 			notification_top.classList.add('hide');
 			wait_loader.classList.add('hide');
 		}
@@ -259,7 +260,7 @@ function decode(words) {
 		}
 		
 		if(valid) {
-			decode_(city, words.splice(city_words_length, words.length-city_words_length));
+			decode_(city, words.slice(city_words_length, words.length));
 		}
 		else {
 			showNotification(INCORRECT_WCODE);
@@ -467,11 +468,10 @@ function execDecode(code) {
 			splitChar = '.';
 		}
 		var words = code.split(splitChar);
-		var city;
 		if(words.length < 3)
 			valid = false;
 		else
-			pendingWords = words;
+			decode(words);
 	}
 
 	if(!valid)
@@ -711,7 +711,7 @@ function getIntentURL(latLng, code) {
 	if((navigator.userAgent.match(/android/i)))
 		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
 	else
-		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng;
+		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng+'&t=h';
 }
 
 function focusDefault_() {

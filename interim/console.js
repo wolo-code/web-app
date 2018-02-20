@@ -18,10 +18,6 @@ function getAddress(latLng) {
 			} else {
 				console.log('Geocoder failed due to: ' + status);
 			}
-			if(pendingCitySubmit) {
-				execSubmitCity();
-				pendingCitySubmit = false;
-			}
 		});
 }
 
@@ -56,6 +52,12 @@ function refreshAddress() {
 
 function copyAddress() {
 	copyNodeText(address_text_content);
+}
+
+function setAddress(a, g) {
+	address = a;
+	gpId = g;
+	refreshAddress();
 }
 var data
 var data_index;
@@ -439,20 +441,23 @@ function deleteRow() {
 }
 
 function previousRow() {
-	if(data_index > 0) {
+	if(data_index == 0) {
+		if(data.length > 0) {
+			data_index = data.length-1;
+			updateList();
+		}
+	}
+	else {
 		data_index--;
 		updateList();
-	}	
+	}
 }
 
 function updateList() {
 	if(data.length > 0) {
 		view_data_index.innerText = data_index+1;
 		var entry = data[data_index];
-		data_address.innerText = entry.address;
-		data_gp_id.innerText = entry.gp_id;
-		data_lat.innerText = entry.lat_lng.lat;
-		data_lng.innerText = entry.lat_lng.lng;
+		setAddress(entry.address, entry.gp_id);
 		data_time.innerText = formatDate(new Date(entry.time));
 		location_request_list.classList.remove('invisible');
 		map.panTo(entry.lat_lng);
@@ -502,10 +507,10 @@ function setupControls() {
 
 function formatDate(date) {
 	var monthNames = [
-		"January", "February", "March",
-		"April", "May", "June", "July",
-		"August", "September", "October",
-		"November", "December"
+		"Jan", "Feb", "Mar",
+		"Apr", "May", "Jun", "Jul",
+		"Aug", "Sep", "Oct",
+		"Nov", "Dec"
 	];
 
 	var day = date.getDate();

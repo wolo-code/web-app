@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv='X-UA-Compatible' content="chrome=1" />
-	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" />
-	<meta name='title' content="WCode location" />
-	<meta itemprop='name' content="WCode location" />
+	<meta http-equiv='X-UA-Compatible' content="chrome=1" >
+	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
+	<meta name='title' content="WCode location" >
+	<meta itemprop='name' content="WCode location" >
 	<meta charset='utf-8' >
 	<meta name='robots' content='noindex' >
-	<meta name='author' content="Ujjwal Singh" />
+	<meta name='author' content="Ujjwal Singh" >
 	<meta name='viewport' content='initial-scale=1.0' >
 	<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' >
 	<link rel='manifest' href='/manifest.json' >
@@ -252,6 +252,13 @@ button {
 	text-align: center;
 }
 
+.center-container-abs {
+	left: 0;
+	right: 0;
+	position: absolute;
+	text-align: center;
+}
+
 #address_text {
 	position: absolute;
 	text-align: center;
@@ -432,8 +439,6 @@ button {
 		background-position: 0% 50%
 	}
 }
-	</style>
-	<style type='text/css'>
 .message_dialog {
 	top: 220px;
 	margin-left: auto;
@@ -475,6 +480,8 @@ button {
 	margin-left: 14px;
 	color: #69B7CF;
 }
+	</style>
+	<style type='text/css'>
 h2.message_dialog_label {
 	margin: 0.5em;
 }
@@ -587,10 +594,10 @@ h2.message_dialog_label {
 
 }
 	</style>
-	<link rel='preload' as='image' href='resource/address.svg'>
-	<link rel='preload' as='image' href='resource/copy.svg'>
-	<link rel='preload' as='image' href='resource/link.svg'>
-	<link rel='preload' as='image' href='resource/map.svg'>
+	<link rel='preload' as='image' href='resource/address.svg' >
+	<link rel='preload' as='image' href='resource/copy.svg' >
+	<link rel='preload' as='image' href='resource/link.svg' >
+	<link rel='preload' as='image' href='resource/map.svg' >
 </head>
 <body>
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>
@@ -636,7 +643,7 @@ h2.message_dialog_label {
 			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>
 		</div>
 		<div id='updated'>Updated:
-2018-Feb-18 22:47:31		</div>
+2018-Feb-20 20:49:14		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -889,5 +896,20 @@ function showOverlay() {
 	</script>
 	<script src="/root.js"></script>
 	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>
+	<script>var _umb = {
+		require: {
+				chrome: 60,
+				firefox: 37,
+				ie: 10,
+				opera: 7,
+				safari: 29
+		}
+};
+</script>
+	<script>(function(u) {
+		var s = document.createElement('script'); s.async = true; s.src = u;
+		var b = document.getElementsByTagName('script')[0]; b.parentNode.insertBefore(s, b);
+})('//updatemybrowser.org/umb.js');
+</script>
 </body>
 </html>

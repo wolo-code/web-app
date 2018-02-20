@@ -103,6 +103,13 @@ function submit_city(lat, lng, country, group, name) {
 		ref.set(cityList);
 	});
 }
+function hideDetails() {
+	address_details.classList.add('hide');
+}
+
+function showDetails() {
+	address_details.classList.remove('hide');
+}
 var map;
 var entryMarker;
 var markers = [];
@@ -457,6 +464,9 @@ function updateList() {
 	if(data.length > 0) {
 		view_data_index.innerText = data_index+1;
 		var entry = data[data_index];
+		data_gp_id.innerText = entry.gp_id;
+		data_lat.innerText = entry.lat_lng.lat
+		data_lng.innerText = entry.lat_lng.lng;
 		setAddress(entry.address, entry.gp_id);
 		data_time.innerText = formatDate(new Date(entry.time));
 		location_request_list.classList.remove('invisible');
@@ -468,6 +478,14 @@ function updateList() {
 }
 
 function setupControls() {
+	
+	view_data_index.addEventListener('click', function(e) {
+		showDetails();
+	});
+	
+	details_close.addEventListener('click', function(e) {
+		hideDetails();
+	});
 	
 	data_previous.addEventListener('click', function(e) {
 		previousRow();

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv='X-UA-Compatible' content="chrome=1" />
-	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" />
-	<meta name='title' content="WCode location" />
-	<meta itemprop='name' content="WCode location" />
+	<meta http-equiv='X-UA-Compatible' content="chrome=1" >
+	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
+	<meta name='title' content="WCode location" >
+	<meta itemprop='name' content="WCode location" >
 	<meta charset='utf-8' >
 	<meta name='robots' content='noindex' >
-	<meta name='author' content="Ujjwal Singh" />
+	<meta name='author' content="Ujjwal Singh" >
 	<meta name='viewport' content='initial-scale=1.0' >
 	<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' >
 	<link rel='manifest' href='/manifest.json' >
@@ -252,6 +252,13 @@ button {
 	text-align: center;
 }
 
+.center-container-abs {
+	left: 0;
+	right: 0;
+	position: absolute;
+	text-align: center;
+}
+
 #address_text {
 	position: absolute;
 	text-align: center;
@@ -432,69 +439,49 @@ button {
 		background-position: 0% 50%
 	}
 }
-	</style>
-	<style type='text/css'>
-.index {
-	width: 40px;
+.message_dialog {
+	top: 220px;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	max-width: 200px;
+	position: absolute;
+	border: 1px solid #ddd;
+	font-family: 'Abel';
+	width: 200px;
+	background-color: #FFFFFF;
+	z-index: 1;
+	padding: 20px;
 }
 
-.previous {
-	width: 20px;
+.message_dialog_close {
+	position: absolute;
+	top: 2px;
+	right: 10px;
 }
 
-.next {
-	width: 20px;
-}
-
-.time {
-	width: 100px;
-}
-
-.process {
-	width: 100px;
-}
-
-#data_process_checkbox {
-	width: 18px;
-	height: 18px;
-	-webkit-appearance: checkbox !important;
-}
-
-.data_control:hover {
-	cursor: pointer;
+.message_dialog_label {
 	color: #69B7CF;
-}
-
-td {
 	text-align: center;
 }
 
-#console_title {
-	font-family: Abel;
+.message_dialog_control {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.message_dialog_control button {
+	min-width: 80px;
+	font-size: larger;
+	padding: 8px 14px;
+	margin-bottom: 10px;
+	margin-left: 14px;
 	color: #69B7CF;
-	font-size: x-large;
 }
-
-#city_submit_panel {
-	position: absolute;
-	bottom: 20px;
-	z-index: 1;
-	left: 10px;
-}
-
-#submit_city_button {
-	z-index: 1;
-	height: 42px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
-	font-family: Roboto, Arial, sans-serif;
-	font-size: 15px;
-	background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
-	border: none;
-	border-radius: 2px;
-}
-
+	</style>
+	<style type='text/css'>
 #container {
 	height: 100%;
 }
@@ -512,13 +499,97 @@ td {
 }
 
 #map_canvas {
-	height: 80%;
+	height: 100%;
+}
+
+#console-title-container {
+	top: 4px;
+	z-index: 1;
+}
+
+#console_title {
+	font-family: Abel;
+	font-size: x-large;
+	color: #69B7CF;
+	background: #edf0e9c2;
+	padding: 0px 6px;
+	border-radius: 6px;
+}
+
+#data_count {
+	background: #edf0e9c2;
+	border-radius: 25px;
+	color: #69B7CF;
+	border: 1px solid #DDDDDD;
+	text-align: center;
+	font-size: xx-large;
+	display: inline-block;
+	width: 20px;
+	line-height: 20px;
+}
+
+#request-controls-container {
+	top: 80px;
+	z-index: 1;
+}
+
+#location_request_list {
+	font-family: Abel;
+	top: 40px;
+	border: 1px solid #69B7CF;
+	border-radius: 25px;
+	display: inline-block;
+	background: #edf0e9c2;
+}
+
+#data_process_checkbox {
+	width: 18px;
+	height: 18px;
+	-webkit-appearance: checkbox !important;
+}
+
+.data_control{
+	color: #69B7CF;
+}
+
+.data_control:hover {
+	cursor: pointer;
+}
+
+#location_request_list span {
+	padding: 10px;
+}
+
+#view_data_index {
+	font-weight: bolder;
+}
+
+#city_submit_panel {
+	position: absolute;
+	bottom: 60px;
+	z-index: 1;
+	left: 10px;
+}
+
+#submit_city_button {
+	z-index: 1;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
 }
 
 #city_submit_panel input {
+	background: transparent;
 	border-top: none;
 	border-left: none;
 	border-right: none;
+	height: 36px;
 }
 
 input:invalid {
@@ -528,20 +599,21 @@ input:invalid {
 input:valid {
 	border: 2px solid #69B7CF;
 }
+@media (max-width: 512px) {
+	
+	#console-title-container {
+		top: 66px;
+	}
+	
+	#request-controls-container {
+		top: 160px;
+	}
 
-#location_request_list th {
-	font-family: Abel;
-}
-
-#location_request_list th {
-	color: #69B7CF;
-}
-
-	</style>
-	<link rel='preload' as='image' href='resource/address.svg'>
-	<link rel='preload' as='image' href='resource/copy.svg'>
-	<link rel='preload' as='image' href='resource/link.svg'>
-	<link rel='preload' as='image' href='resource/map.svg'>
+}	</style>
+	<link rel='preload' as='image' href='resource/address.svg' >
+	<link rel='preload' as='image' href='resource/copy.svg' >
+	<link rel='preload' as='image' href='resource/link.svg' >
+	<link rel='preload' as='image' href='resource/map.svg' >
 </head>
 <body>
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>
@@ -552,29 +624,20 @@ input:valid {
 		<h3>Restricted! You are not authorized to have access here.</h3>
 	</div>
 	<div id='console_block' class='hide'>
-		<div id='console_title' class='center'>Console</div>
-		<table id='location_request_list' class='invisible'>
-			<tbody>
-				<tr>
-					<th class='count'>Count</th>
-					<th class='time'>Time</th>
-					<th class='previous'>&nbsp;</th>
-					<th class='index'>Index</th>
-					<th class='next'> </th>
-					<th class='reject'>Reject</th>
-					<th class='process'>Process</th>
-				</tr>
-				<tr>
-					<td id='data_count'></td>
-					<td id='data_time'></td>
-					<td id='data_previous' class='data_control'>◁</td>
-					<td id='view_data_index'></td>
-					<td id='data_next' class='data_control'>▷</td>
-					<td id='data_reject' class='data_control'>╳</td>
-					<td id='data_process'><input id='data_process_checkbox' type='checkbox'></td>
-				</tr>
-			</tbody>
-		</table>
+		<div id='console-title-container' class='center-container-abs'>
+			<span id='console_title'>Console</span>
+		</div>
+		<div id='request-controls-container' class='center-container-abs'>
+			<span id='location_request_list' class='invisible'>
+				<span id='data_count'></span>
+				<span id='data_time'></span>
+				<span id='data_previous' class='data_control'>◁</span>
+				<span id='view_data_index' class='data_control'></span>
+				<span id='data_next' class='data_control'>▷</span>
+				<span id='data_process'><input id='data_process_checkbox' type='checkbox'></span>
+				<span id='data_reject' class='data_control'>╳</span>
+			</span>
+		</div>
 		<div id='logo'>
 			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
 				<span class='image'><svg version="1.1"
@@ -637,6 +700,20 @@ input:valid {
 		</div>
 		<!-- <div id="map_container"> -->
 			<div id="map_canvas"></div>
+			<div id='address_details' class='message_dialog hide'>
+				<h2 class='message_dialog_label'>
+					Details
+				</h2>
+				<div id='details_close' class="message_dialog_close control">
+					<span class='image'><svg fill="#BEBEBE" height="38" viewBox="0 0 24 24" width="38" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    <path d="M0 0h24v24H0z" fill="none"/>
+</svg></span>
+				</div>
+				<span id='data_gp_id'>GP id</span>
+				<span id='data_lat'>Lat</span>
+				<span id='data_lng'>Long</span>
+			</div>
 			<div id='address_text'>
 				<span id='address_text_main'>
 					<div id='address_text_label'>Address</div>
@@ -645,11 +722,11 @@ input:valid {
 			</div>
 			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 			<form id='city_submit_panel'>
-				<input id='city_lat' type='number' step='any' placeholder='Lat' required tabindex='4' >
-				<input id='city_lng' type='number' step='any' placeholder='Long' required tabindex='5' >
-				<input id='city_name' type='text' placeholder='Name' required tabindex='6' >
-				<input id='city_group' type='text' placeholder='Group' required tabindex='7' >
-				<input id='city_country' type='text' placeholder='Country' required tabindex='8' >
+				<input id='city_lat' type='hidden' required >
+				<input id='city_lng' type='hidden' required >
+				<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
+				<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
+				<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
 				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='9'>Submit</button>
 			</form>
 		<!-- </div> -->
@@ -665,5 +742,20 @@ input:valid {
 	</script>
 	<script src="/console.js"></script>
 	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>
+	<script>var _umb = {
+		require: {
+				chrome: 60,
+				firefox: 37,
+				ie: 10,
+				opera: 7,
+				safari: 29
+		}
+};
+</script>
+	<script>(function(u) {
+		var s = document.createElement('script'); s.async = true; s.src = u;
+		var b = document.getElementsByTagName('script')[0]; b.parentNode.insertBefore(s, b);
+})('//updatemybrowser.org/umb.js');
+</script>
 </body>
 </html>

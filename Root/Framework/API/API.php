@@ -16,13 +16,16 @@
 			$pos = strpos($_SERVER['REQUEST_URI'], $_SERVER['QUERY_STRING']);
 			$component_id = (substr($_SERVER['REQUEST_URI'], 1, $pos - 2));
 		}
-		return substr($component_id, 0, strpos($component_id, '.'));
+		if(strpos($component_id, '.') !== false)
+			return substr($component_id, 0, strpos($component_id, '.'));
+		else
+			return $component_id;
 	}
 
 	function getComponent() {
 		$component = getOrigCallComponent();
 		while(true) {
-			if( $component == '' || is_dir($component) == 1 || is_file($component.'.php') == 1 || is_file($component.'.html') == 1 )
+			if( $component == '' || is_dir('..\\..\\HTML\\component\\'.$component) == 1 || is_file('..\\..\\HTML\\component\\'.$component.'.php') == 1 || is_file('..\\..\\HTML\\component\\'.$component.'.html') == 1 )
 				return $component;
 			else
 				$component = substr($component, 0, strpos('\\', $component));

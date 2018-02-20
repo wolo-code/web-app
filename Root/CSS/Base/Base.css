@@ -226,6 +226,13 @@ button {
 	text-align: center;
 }
 
+.center-container-abs {
+	left: 0;
+	right: 0;
+	position: absolute;
+	text-align: center;
+}
+
 #address_text {
 	position: absolute;
 	text-align: center;

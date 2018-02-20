@@ -1,0 +1,11 @@
+@media (max-width: 512px) {
+	
+	#console-title-container {
+		top: 66px;
+	}
+	
+	#request-controls-container {
+		top: 160px;
+	}
+
+}

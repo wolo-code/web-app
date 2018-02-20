@@ -18,10 +18,6 @@ function getAddress(latLng) {
 			} else {
 				console.log('Geocoder failed due to: ' + status);
 			}
-			if(pendingCitySubmit) {
-				execSubmitCity();
-				pendingCitySubmit = false;
-			}
 		});
 }
 
@@ -56,4 +52,10 @@ function refreshAddress() {
 
 function copyAddress() {
 	copyNodeText(address_text_content);
+}
+
+function setAddress(a, g) {
+	address = a;
+	gpId = g;
+	refreshAddress();
 }

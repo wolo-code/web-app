@@ -3,21 +3,23 @@ h2.message_dialog_label {
 }
 
 #no_city_message {
-	margin-left: auto;
-	margin-right: auto;
+	position: absolute;
 	left: 0;
 	right: 0;
 	max-width: 360px;
-	position: absolute;
-	font-family: 'Abel';
 	width: 360px;
+	margin: auto;
+	font-family: 'Abel';
 	background-color: #FFFFFF;
 	z-index: 1;
-	padding: 20px;
 }
 
 #no_city_message p {
 	font-size: larger;
+}
+
+#no_city_message_prompt, #no_city_message_wait {
+	padding: 2px 16px 8px;
 }
 
 .loader {

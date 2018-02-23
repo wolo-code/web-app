@@ -178,7 +178,7 @@ button {
 	border-radius: 25px;
 }
 
-.control {
+.control:hover {
 	cursor: pointer;
 }
 
@@ -226,7 +226,7 @@ button {
 #notification_bottom {
 	text-align: center;
 	position: absolute;
-	bottom: 80px;
+	bottom: 232px;
 	background-color: #FFFFFF;
 	padding: 4px 8px;
 	border-radius: 18px;
@@ -237,6 +237,9 @@ button {
 	margin-right: auto;
 	width: 350px;
 	z-index: 1;
+	border-color: #69B7CF;
+	border-style: solid;
+	border-width: 1px;
 }
 
 #wait_loader {
@@ -262,7 +265,7 @@ button {
 #address_text {
 	position: absolute;
 	text-align: center;
-	bottom: 134px;
+	bottom: 80px;
 	background-color: #FFFFFF;
 	padding: 4px 8px;
 	border: 1px solid #ddd;
@@ -440,24 +443,22 @@ button {
 	}
 }
 .message_dialog {
+	position: absolute;
 	top: 220px;
-	margin-left: auto;
-	margin-right: auto;
 	left: 0;
 	right: 0;
 	max-width: 200px;
-	position: absolute;
+	width: 200px;
+	margin: auto;
 	border: 1px solid #ddd;
 	font-family: 'Abel';
-	width: 200px;
 	background-color: #FFFFFF;
 	z-index: 1;
-	padding: 20px;
 }
 
 .message_dialog_close {
 	position: absolute;
-	top: 2px;
+	top: 8px;
 	right: 10px;
 }
 
@@ -630,12 +631,12 @@ input:valid {
 		<div id='request-controls-container' class='center-container-abs'>
 			<span id='location_request_list' class='invisible'>
 				<span id='data_count'></span>
+				<span id='data_process'><input id='data_process_checkbox' type='checkbox'></span>
+				<span id='data_reject' class='data_control'>╳</span>
 				<span id='data_time'></span>
 				<span id='data_previous' class='data_control'>◁</span>
 				<span id='view_data_index' class='data_control'></span>
 				<span id='data_next' class='data_control'>▷</span>
-				<span id='data_process'><input id='data_process_checkbox' type='checkbox'></span>
-				<span id='data_reject' class='data_control'>╳</span>
 			</span>
 		</div>
 		<div id='logo'>
@@ -720,16 +721,17 @@ input:valid {
 					<div id='address_text_content'></div>
 				</span>
 			</div>
-			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
+			<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
 			<form id='city_submit_panel'>
 				<input id='city_lat' type='hidden' required >
 				<input id='city_lng' type='hidden' required >
 				<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
 				<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
 				<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
-				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='9'>Submit</button>
+				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='9'>Submit</button>
 			</form>
 		<!-- </div> -->
+		<div id='notification_bottom' class='hide'></div>
 	</div>
 </div>
 		<script src='https://cdn.ravenjs.com/3.22.2/raven.min.js' crossorigin='anonymous'></script>

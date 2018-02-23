@@ -99,9 +99,11 @@ function submit_city(lat, lng, country, group, name) {
 			"group": group,
 			"name": name
 		};
-		cityList[Object.keys(cityList).length] = data;
+		cityList[Object.keys(cityList).length+1] = data;
 		ref.set(cityList);
 	});
+	showNotification("Request submitted");
+	clearForm();
 }
 function hideDetails() {
 	address_details.classList.add('hide');
@@ -327,7 +329,7 @@ function focus_(pos, bounds) {
 			title: 'Hello World!'
 		});
 		marker.addListener('click', function() {
-			infoWindow.open(map, marker);
+			fillForm();
 		})
 	}
 	else {
@@ -354,15 +356,7 @@ function focus_(pos, bounds) {
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
-	//infoWindow_setContent('Loading ..');
-	//infoWindow.open(map, marker);
 }
-
-// function infoWindow_setContent(string) {
-// 	if(typeof infoWindow == "undefined")
-// 		infoWindow = new google.maps.InfoWindow({map: map});
-// 	infoWindow.setContent(string);
-// }
 
 function resolveLatLng(latLng) {
 	return {'lat':latLng.lat(), 'lng':latLng.lng()};
@@ -472,6 +466,7 @@ function updateList() {
 		location_request_list.classList.remove('invisible');
 		map.panTo(entry.lat_lng);
 		showEntryMarker(entry.lat_lng);
+		fillForm();
 	}
 	else
 		location_request_list.classList.add('invisible');
@@ -514,7 +509,7 @@ function setupControls() {
 	
 	submit_city_button.addEventListener('click', function() {
 		if(city_submit_panel.checkValidity()) {
-			submit_city(city_lat.value, city_lng.value, city_country.value, city_group.value, city_name.value);
+			submit_city(city_lat.value, city_lng.value, city_country.value.trim(), city_group.value.trim(), city_name.value.trim());
 			if(data_process_checkbox.checked) {
 				process_entry(data[data_index].id);
 			}
@@ -547,4 +542,12 @@ function fillForm() {
 	city_lng.value = entry.lat_lng.lng;	
 	city_country.value = entry.address.split(' ').pop();
 	address_text_content.innerText = entry.address;
+}
+
+function clearForm() {
+	city_lat.value = '';
+	city_lng.value = '';
+	city_country.value = '';
+	city_group.value = '';
+	city_name.value = '';	
 }

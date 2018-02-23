@@ -10,12 +10,12 @@
 		<div id='request-controls-container' class='center-container-abs'>
 			<span id='location_request_list' class='invisible'>
 				<span id='data_count'></span>
+				<span id='data_process'><input id='data_process_checkbox' type='checkbox'></span>
+				<span id='data_reject' class='data_control'>╳</span>
 				<span id='data_time'></span>
 				<span id='data_previous' class='data_control'>◁</span>
 				<span id='view_data_index' class='data_control'></span>
 				<span id='data_next' class='data_control'>▷</span>
-				<span id='data_process'><input id='data_process_checkbox' type='checkbox'></span>
-				<span id='data_reject' class='data_control'>╳</span>
 			</span>
 		</div>
 		<div id='logo'>
@@ -44,15 +44,16 @@
 					<div id='address_text_content'></div>
 				</span>
 			</div>
-			<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
+			<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
 			<form id='city_submit_panel'>
 				<input id='city_lat' type='hidden' required >
 				<input id='city_lng' type='hidden' required >
 				<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
 				<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
 				<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
-				<botton id='submit_city_button' class='controls' type='button' value='Submit' tabindex='9'>Submit</button>
+				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='9'>Submit</button>
 			</form>
 		<!-- </div> -->
+		<div id='notification_bottom' class='hide'></div>
 	</div>
 </div>

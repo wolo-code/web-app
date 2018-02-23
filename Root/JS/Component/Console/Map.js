@@ -215,7 +215,7 @@ function focus_(pos, bounds) {
 			title: 'Hello World!'
 		});
 		marker.addListener('click', function() {
-			infoWindow.open(map, marker);
+			fillForm();
 		})
 	}
 	else {
@@ -242,15 +242,7 @@ function focus_(pos, bounds) {
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
-	//infoWindow_setContent('Loading ..');
-	//infoWindow.open(map, marker);
 }
-
-// function infoWindow_setContent(string) {
-// 	if(typeof infoWindow == "undefined")
-// 		infoWindow = new google.maps.InfoWindow({map: map});
-// 	infoWindow.setContent(string);
-// }
 
 function resolveLatLng(latLng) {
 	return {'lat':latLng.lat(), 'lng':latLng.lng()};

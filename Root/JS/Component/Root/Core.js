@@ -44,11 +44,19 @@ function encode(position) {
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
 		if(city == null) {
-			pendingPosition = position;
-			noCity(position);
+			if(!pendingCity) {
+				pendingPosition = position;
+				noCity(position);
+			}
 		}
-		else
+		else {
+			if(pendingCity) {
+				hideNoCityMessage();
+				infoWindow_setContent(MESSAGE_LOADING);
+				pendingCity = false;
+			}
 			encode_(city, position);
+		}
 	}
 	else
 		pendingPosition = position;

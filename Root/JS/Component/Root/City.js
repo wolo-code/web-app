@@ -1,4 +1,5 @@
 var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
+var pendingCity = false;
 
 function noCity(position) {
 	showAddress();
@@ -9,8 +10,10 @@ function noCity(position) {
 function submitCity() {
 	if(address == "")
 		pendingCitySubmit = true;
-	else
+	else {
 		execSubmitCity();
+		pendingCity = true;
+	}
 }
 
 function execSubmitCity() {
@@ -25,7 +28,7 @@ function execSubmitCity() {
 		};
 	updates['/CityRequest/' + newPostKey] = data;
 	firebase.database().ref().update(updates);
-	showNotification("Request submitted. Check back later");
+	showNotification("Request submitted");
 }
 
 function tryDefaultCity() {

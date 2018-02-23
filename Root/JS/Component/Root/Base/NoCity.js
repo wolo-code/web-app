@@ -4,6 +4,7 @@ function showNoCityMessage() {
 
 function hideNoCityMessage() {
 	no_city_message.classList.add('hide');
+	noCity_hideLoader();
 }
 
 function noCity_add() {
@@ -14,6 +15,11 @@ function noCity_add() {
 function noCity_showLoader() {
 	no_city_message_prompt.classList.add('hide');
 	no_city_message_wait.classList.remove('hide');
+}
+
+function noCity_hideLoader() {
+	no_city_message_prompt.classList.remove('hide');
+	no_city_message_wait.classList.add('hide');
 }
 
 function noCity_cancel() {

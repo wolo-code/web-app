@@ -10,7 +10,10 @@ var myLocDot;
 var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
+var infoWindow_open = false;
+
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
+var MESSAGE_LOADING = 'Loading ..';
 
 function initMap() {
 
@@ -209,9 +212,10 @@ function load(marker) {
 	focus_(marker.position);
 	window.marker.title = marker.title;
 	infoWindow.open(map, window.marker);
+	infoWindow_open = true;
 	marker.setVisible(false);
 	lastMarker = marker;
-	infoWindow_setContent('Loading ..');
+	infoWindow_setContent(MESSAGE_LOADING);
 	encode(marker.position);
 }
 
@@ -262,7 +266,14 @@ function focus_(pos, bounds) {
 			title: 'Hello World!'
 		});
 		marker.addListener('click', function() {
-			infoWindow.open(map, marker);
+			if(infoWindow_open == false) {
+				infoWindow.open(map, marker);
+				infoWindow_open = true;
+			}
+			else {
+				infoWindow.close();
+				infoWindow_open = false;
+			}
 		})
 	}
 	else {
@@ -291,6 +302,7 @@ function focus_(pos, bounds) {
 
 	infoWindow_setContent('Loading ..');
 	infoWindow.open(map, marker);
+	infoWindow_open = true;
 }
 
 function locate() {

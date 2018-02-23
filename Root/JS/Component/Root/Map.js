@@ -300,7 +300,7 @@ function focus_(pos, bounds) {
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
-	infoWindow_setContent('Loading ..');
+	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
 }

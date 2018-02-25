@@ -24,6 +24,23 @@ ga('create', 'UA-96994409-1', 'auto');
 ga('send', 'pageview');
 	</script>
 	<style type='text/css'>
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#logo {
+		width: auto !important;
+	}
+
+	#notification_top {
+		top: 168px !important;
+	}
+	
+}
 html,
 body {
 	height: 100%;
@@ -315,23 +332,6 @@ button {
 	margin-left: auto;
 	margin-right: auto;
 }
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#logo {
-		width: auto !important;
-	}
-
-	#notification_top {
-		top: 168px !important;
-	}
-	
-}
 #infowindow-content .title {
 	font-weight: bold;
 }
@@ -447,8 +447,8 @@ button {
 	top: 220px;
 	left: 0;
 	right: 0;
-	max-width: 200px;
-	width: 200px;
+	max-width: 280px;
+	width: 280px;
 	margin: auto;
 	border: 1px solid #ddd;
 	font-family: 'Abel';

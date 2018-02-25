@@ -24,6 +24,23 @@ ga('create', 'UA-96994409-1', 'auto');
 ga('send', 'pageview');
 	</script>
 	<style type='text/css'>
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#logo {
+		width: auto !important;
+	}
+
+	#notification_top {
+		top: 168px !important;
+	}
+	
+}
 html,
 body {
 	height: 100%;
@@ -315,23 +332,6 @@ button {
 	margin-left: auto;
 	margin-right: auto;
 }
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#logo {
-		width: auto !important;
-	}
-
-	#notification_top {
-		top: 168px !important;
-	}
-	
-}
 #infowindow-content .title {
 	font-weight: bold;
 }
@@ -447,8 +447,8 @@ button {
 	top: 220px;
 	left: 0;
 	right: 0;
-	max-width: 200px;
-	width: 200px;
+	max-width: 280px;
+	width: 280px;
 	margin: auto;
 	border: 1px solid #ddd;
 	font-family: 'Abel';
@@ -483,6 +483,29 @@ button {
 }
 	</style>
 	<style type='text/css'>
+@media (max-width: 512px) {
+
+	.message_dialog_control {
+		width: 192px;
+		min-height: 34px;
+	}
+
+	#locate_right_message_yes {
+		float: right;
+	}
+	
+	#locate_right_message_no {
+		float: left;
+	}
+
+}
+#locate_right_message_body {
+  padding: 2px 16px 8px;
+}
+
+#locate_right_message_body p {
+	padding-bottom: 8px;
+}
 h2.message_dialog_label {
 	margin: 0.5em;
 }
@@ -555,6 +578,27 @@ h2.message_dialog_label {
 	text-align: right;
 	padding-top: 20px;
 }
+
+#overlay .message_dialog_control {
+	padding: 10px 0 18px;
+}
+
+#agency {
+	text-align: right;
+}
+@media (max-width: 512px) {
+	
+	#decode_button {
+		top: 96px !important;
+		left: auto !important;
+		right: 10px !important;
+	}
+	
+	#result {
+		top: 60px !important;
+	}
+
+}
 #location_button {
 	z-index: 1;
 	position: absolute;
@@ -583,19 +627,6 @@ h2.message_dialog_label {
 	border: none;
 	border-radius: 2px;
 }
-@media (max-width: 512px) {
-	
-	#decode_button {
-		top: 96px !important;
-		left: auto !important;
-		right: 10px !important;
-	}
-	
-	#result {
-		top: 60px !important;
-	}
-
-}
 	</style>
 	<link rel='preload' as='image' href='resource/address.svg' >
 	<link rel='preload' as='image' href='resource/copy.svg' >
@@ -616,42 +647,61 @@ h2.message_dialog_label {
 		<h1>
 			WCode location
 		</h1>
-		<h2>
-			About
-		</h2>
-		<ul>
-			<li>This is a word based geocoding system</li>
-			<li>The first part specifies the city, the last three words are from a limited dictionary of 1024 easy common nouns</li>
-			<li>Incase if your city is not in the database, please submit a request</li>
-		</ul>
-		<br>
-		<div class="message_dialog_control"><button id='overlay_enter' type='button'>Start &#x25B7;</button></div>
-		<h2>
-			Steps
-		</h2>
-		<ul>
-			<li>Point a location to generate the corresponding WCode; Or</li>
-			<li>Enter a WCode and hit 'Decode' to go to that location</li>
-		</ul>
-		<h2>
-			Info
-		</h2>
-		<ul>
-			<li>Your precise location will NOT be recorded</li>
-			<li>Tested with Google Chrome</li>
-		</ul>
-		<h2>
-			Known issues
-		</h2>
-		<ol>
-			<li>The wordlist may change and thus your previous wcode may no longer work or point to a different location</li>
-			<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
-		</ol>
-		<div id='contact'>
-			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>
+<div id='info_intro'>
+	<ul>
+		<li>This is a word based geocoding system</li>
+		<li>The first part specifies the city, the last three words are from a limited dictionary of 1024 easy common nouns</li>
+		<li>Incase if your city is not in the database, please submit a request</li>
+	</ul>
+	<h2>
+		Steps
+	</h2>
+	<ul>
+		<li>Point a location to generate the corresponding WCode; Or</li>
+		<li>Enter a WCode and hit 'Decode' to go to that location</li>
+	</ul>
+	<div class="message_dialog_control"><button id='info_intro_close_button' type='button'>Start &#x25B7;</button></div>
+</div>
+<div id='info_full' class='hide'>
+	<ul>
+		<li>This is a word based geocoding system</li>
+		<li>The first part specifies the city, the last three words are from a limited dictionary of 1024 easy common nouns</li>
+		<li>Incase if your city is not in the database, please submit a request</li>
+	</ul>
+	<h2>
+		Steps
+	</h2>
+	<ul>
+		<li>Point a location to generate the corresponding WCode; Or</li>
+		<li>Enter a WCode and hit 'Decode' to go to that location</li>
+	</ul>
+	<h2>
+		Info
+	</h2>
+	<ul>
+		<li>Your precise location will NOT be recorded</li>
+		<li>Tested with Google Chrome</li>
+	</ul>
+	<h2>
+		Known issues
+	</h2>
+	<ol>
+		<li>The wordlist may change and thus your previous wcode may no longer work or point to a different location</li>
+		<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
+	</ol>
+	<div class="message_dialog_control"><button id='info_full_close_button' type='button'>&#x25C1; return</button></div>
+	<div id='contact'>
+		For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>
+	</div>
+	<div id='updated'>Updated:
+<?php
+		echo date('Y-M-d H:i:s');
+?>
+	</div>
+</div>
+		<div id='agency'>
+			by <a class='link' href='https://wcodes.org/about_me'>Ujjwal Singh</a>
 		</div>
-		<div id='updated'>Updated:
-2018-Feb-23 23:14:52		</div>
 	</div>
 </div>
 <div id='locate_right_message' class="message_dialog hide">
@@ -664,12 +714,14 @@ h2.message_dialog_label {
     <path d="M0 0h24v24H0z" fill="none"/>
 </svg></span>
 	</div>
-	<p>
-		Do you wish to allow access to your location?
-	</p>
-	<div class="center message_dialog_control">
-		<button id='locate_right_message_yes' type='button' onclick="locateRight_grant();">Yes</button>
-		<button id='locate_right_message_no' type='button' onclick="locateRight_deny();">No</button>
+	<div id='locate_right_message_body'>
+		<p>
+			Do you wish to allow this app to access your location?
+		</p>
+		<div class="center message_dialog_control">
+			<button id='locate_right_message_yes' type='button' onclick="locateRight_grant();">Yes</button>
+			<button id='locate_right_message_no' type='button' onclick="locateRight_deny();">No</button>
+		</div>
 	</div>
 </div>
 <div id='no_city_message' class="message_dialog hide">
@@ -806,32 +858,43 @@ h2.message_dialog_label {
 	<script src="/script.js"></script>
 	<script>
 document.addEventListener('DOMContentLoaded', domInit);
+
+var CURRENT_VERSION = 1;
 var initWCode = false;
-var locationAccess = false;
 
 function domInit() {
 	versionCheck();
 	urlDecode();
+}
+
+function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {
-		if (typeof(localStorage.location_access) !== 'undefined')
-			locationAccess = JSON.parse(localStorage.location_access);
+		localStorage.location_access = (status == true);
 	}
 }
 
-function setLocationAccess() {
-	if (typeof(Storage) !== 'undefined') {
-		localStorage.location_access = true;
-	}
+function locationAccessCheck() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true) 
+		return true;
+	return false;
 }
 
 function versionCheck() {
-	var cur_version = 1;
 	if (typeof(Storage) !== 'undefined') {
-		if(localStorage.note_version != cur_version) {
-			localStorage.note_version = cur_version;
+		var set = false;
+		if(typeof(localStorage.note_version) === 'undefined')
+			set = true;
+		else if(localStorage.note_version < CURRENT_VERSION)
+			set = true;
+		if(set) {
+			localStorage.note_version = CURRENT_VERSION;
 			initWCode = true;
 			showOverlay();
 		}
+	}
+	else {
+		info_intro.classList.add('hide');
+		info_full.classList.remove('hide');
 	}
 }
 
@@ -851,14 +914,12 @@ function hideLocateRightMessage() {
 }
 
 function locateRight_grant() {
-	locationAccess = true;
-	setLocationAccess();
+	setLocationAccess(true);
 	locate();
 	hideLocateRightMessage();
 }
 
 function locateRight_deny() {
-	locationAccess = false;
 	hideLocateRightMessage();
 }
 function showNoCityMessage() {

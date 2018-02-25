@@ -1,0 +1,16 @@
+@media (max-width: 512px) {
+
+	.message_dialog_control {
+		width: 192px;
+		min-height: 34px;
+	}
+
+	#locate_right_message_yes {
+		float: right;
+	}
+	
+	#locate_right_message_no {
+		float: left;
+	}
+
+}

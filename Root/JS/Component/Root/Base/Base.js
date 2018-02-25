@@ -21,17 +21,17 @@ function locationAccessCheck() {
 }
 
 function versionCheck() {
+	var set = false;
 	if (typeof(Storage) !== 'undefined') {
-		var set = false;
 		if(typeof(localStorage.note_version) === 'undefined')
 			set = true;
-		else if(localStorage.note_version < CURRENT_VERSION)
+		else if(localStorage.note_version != '' && JSON.parse(localStorage.note_version) < CURRENT_VERSION)
 			set = true;
-		if(set) {
-			localStorage.note_version = CURRENT_VERSION;
-			initWCode = true;
-			showOverlay();
-		}
+	}
+	if(set) {
+		localStorage.note_version = CURRENT_VERSION;
+		initWCode = true;
+		showOverlay();
 	}
 	else {
 		info_intro.classList.add('hide');

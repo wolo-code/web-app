@@ -7,13 +7,11 @@ function hideLocateRightMessage() {
 }
 
 function locateRight_grant() {
-	locationAccess = true;
-	setLocationAccess();
+	setLocationAccess(true);
 	locate();
 	hideLocateRightMessage();
 }
 
 function locateRight_deny() {
-	locationAccess = false;
 	hideLocateRightMessage();
 }

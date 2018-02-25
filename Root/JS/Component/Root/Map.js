@@ -14,6 +14,7 @@ var infoWindow_open = false;
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
+var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 
 function initMap() {
 
@@ -307,7 +308,7 @@ function focus_(pos, bounds) {
 
 function locate() {
 	// Try HTML5 geolocation.
-	if(!locationAccess) {
+	if(!locationAccessCheck()) {
 		pendingLocate = true;
 		showLocateRightMessage();
 	}
@@ -320,7 +321,7 @@ function locate() {
 function locateExec() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(function(position) {
-			locationAccess = true;
+			setLocationAccess(true);
 			var pos = {
 				lat: position.coords.latitude,
 				lng: position.coords.longitude
@@ -370,8 +371,10 @@ function locateExec() {
 				map.setZoom(12);
 			}
 		}, function(error) {
-			if(error.code = error.PERMISSION_DENIED)
-				showNotification("Location permission was denied. Click to point");
+			if(error.code = error.PERMISSION_DENIED) {
+				showNotification(LOCATION_PERMISSION_DENIED);
+				setLocationAccess(false);
+			}
 			else
 				handleLocationError(true, infoWindow, map.getCenter());
 		});

@@ -1,20 +1,21 @@
 document.addEventListener('DOMContentLoaded', domInit);
 var initWCode = false;
-var locationAccess = false;
 
 function domInit() {
 	versionCheck();
 	urlDecode();
+}
+
+function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {
-		if (typeof(localStorage.location_access) !== 'undefined')
-			locationAccess = JSON.parse(localStorage.location_access);
+		localStorage.location_access = (status == true);
 	}
 }
 
-function setLocationAccess() {
-	if (typeof(Storage) !== 'undefined') {
-		localStorage.location_access = true;
-	}
+function locationAccessCheck() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true) 
+		return true;
+	return false;
 }
 
 function versionCheck() {

@@ -28,14 +28,23 @@
 	color: #69B7CF;
 }
 
+#software_info {
+	padding: 20px 0;	
+}
+
+#version {
+	font-size: smaller;
+}
+
 #updated {
 	font-size: smaller;
-	text-align: right;
-	padding-top: 20px;
 }
 
 #overlay .message_dialog_control {
 	padding: 10px 0 18px;
+}
+#contact {
+	padding-bottom: 16px;
 }
 
 #agency {

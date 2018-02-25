@@ -24,23 +24,6 @@ ga('create', 'UA-96994409-1', 'auto');
 ga('send', 'pageview');
 	</script>
 	<style type='text/css'>
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#logo {
-		width: auto !important;
-	}
-
-	#notification_top {
-		top: 168px !important;
-	}
-	
-}
 html,
 body {
 	height: 100%;
@@ -332,6 +315,23 @@ button {
 	margin-left: auto;
 	margin-right: auto;
 }
+@media (max-width: 512px) {
+
+	#pac-input {
+		top: 96px !important;
+		left: -4px !important;
+		width: 310px !important;
+	}
+
+	#logo {
+		width: auto !important;
+	}
+
+	#notification_top {
+		top: 168px !important;
+	}
+	
+}
 #infowindow-content .title {
 	font-weight: bold;
 }
@@ -483,6 +483,13 @@ button {
 }
 	</style>
 	<style type='text/css'>
+#locate_right_message_body {
+  padding: 2px 16px 8px;
+}
+
+#locate_right_message_body p {
+	padding-bottom: 8px;
+}
 @media (max-width: 512px) {
 
 	.message_dialog_control {
@@ -498,13 +505,6 @@ button {
 		float: left;
 	}
 
-}
-#locate_right_message_body {
-  padding: 2px 16px 8px;
-}
-
-#locate_right_message_body p {
-	padding-bottom: 8px;
 }
 h2.message_dialog_label {
 	margin: 0.5em;
@@ -573,31 +573,27 @@ h2.message_dialog_label {
 	color: #69B7CF;
 }
 
+#software_info {
+	padding: 20px 0;	
+}
+
+#version {
+	font-size: smaller;
+}
+
 #updated {
 	font-size: smaller;
-	text-align: right;
-	padding-top: 20px;
 }
 
 #overlay .message_dialog_control {
 	padding: 10px 0 18px;
 }
+#contact {
+	padding-bottom: 16px;
+}
 
 #agency {
 	text-align: right;
-}
-@media (max-width: 512px) {
-	
-	#decode_button {
-		top: 96px !important;
-		left: auto !important;
-		right: 10px !important;
-	}
-	
-	#result {
-		top: 60px !important;
-	}
-
 }
 #location_button {
 	z-index: 1;
@@ -626,6 +622,19 @@ h2.message_dialog_label {
 	padding: 8px 10px;
 	border: none;
 	border-radius: 2px;
+}
+@media (max-width: 512px) {
+	
+	#decode_button {
+		top: 96px !important;
+		left: auto !important;
+		right: 10px !important;
+	}
+	
+	#result {
+		top: 60px !important;
+	}
+
 }
 	</style>
 	<link rel='preload' as='image' href='resource/address.svg' >
@@ -690,13 +699,15 @@ h2.message_dialog_label {
 		<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
 	</ol>
 	<div class="message_dialog_control"><button id='info_full_close_button' type='button'>&#x25C1; return</button></div>
-	<div id='contact'>
-		For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>
+	<div id='software_info'>
+		<div id='version'>
+			Version: 0.1 beta
+		</div>
+		<div id='updated'>Updated:
+	2018-Feb-25 18:34:57		</div>
 	</div>
-	<div id='updated'>Updated:
-<?php
-		echo date('Y-M-d H:i:s');
-?>
+	<div id='contact'>
+		for any related query contact me
 	</div>
 </div>
 		<div id='agency'>
@@ -880,17 +891,17 @@ function locationAccessCheck() {
 }
 
 function versionCheck() {
+	var set = false;
 	if (typeof(Storage) !== 'undefined') {
-		var set = false;
 		if(typeof(localStorage.note_version) === 'undefined')
 			set = true;
-		else if(localStorage.note_version < CURRENT_VERSION)
+		else if(localStorage.note_version != '' && JSON.parse(localStorage.note_version) < CURRENT_VERSION)
 			set = true;
-		if(set) {
-			localStorage.note_version = CURRENT_VERSION;
-			initWCode = true;
-			showOverlay();
-		}
+	}
+	if(set) {
+		localStorage.note_version = CURRENT_VERSION;
+		initWCode = true;
+		showOverlay();
 	}
 	else {
 		info_intro.classList.add('hide');

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', domInit);
+
+var CURRENT_VERSION = 1;
 var initWCode = false;
 
 function domInit() {
@@ -19,10 +21,14 @@ function locationAccessCheck() {
 }
 
 function versionCheck() {
-	var cur_version = 1;
 	if (typeof(Storage) !== 'undefined') {
-		if(localStorage.note_version != cur_version) {
-			localStorage.note_version = cur_version;
+		var set = false;
+		if(typeof(localStorage.note_version) === 'undefined')
+			set = true;
+		else if(localStorage.note_version < CURRENT_VERSION)
+			set = true;
+		if(set) {
+			localStorage.note_version = CURRENT_VERSION;
 			initWCode = true;
 			showOverlay();
 		}

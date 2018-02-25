@@ -33,3 +33,11 @@
 	text-align: right;
 	padding-top: 20px;
 }
+
+#overlay .message_dialog_control {
+	padding: 10px 0 18px;
+}
+
+#agency {
+	text-align: right;
+}

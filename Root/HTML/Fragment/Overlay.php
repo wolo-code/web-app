@@ -6,44 +6,12 @@
 		<h1>
 			WCode location
 		</h1>
-		<h2>
-			About
-		</h2>
-		<ul>
-			<li>This is a word based geocoding system</li>
-			<li>The first part specifies the city, the last three words are from a limited dictionary of 1024 easy common nouns</li>
-			<li>Incase if your city is not in the database, please submit a request</li>
-		</ul>
-		<br>
-		<div class="message_dialog_control"><button id='overlay_enter' type='button'>Start &#x25B7;</button></div>
-		<h2>
-			Steps
-		</h2>
-		<ul>
-			<li>Point a location to generate the corresponding WCode; Or</li>
-			<li>Enter a WCode and hit 'Decode' to go to that location</li>
-		</ul>
-		<h2>
-			Info
-		</h2>
-		<ul>
-			<li>Your precise location will NOT be recorded</li>
-			<li>Tested with Google Chrome</li>
-		</ul>
-		<h2>
-			Known issues
-		</h2>
-		<ol>
-			<li>The wordlist may change and thus your previous wcode may no longer work or point to a different location</li>
-			<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
-		</ol>
-		<div id='contact'>
-			For any related query contact <a class='link' href='https://wcodes.org/about_me'>me</a>
-		</div>
-		<div id='updated'>Updated:
 <?php
-			echo date('Y-M-d H:i:s');
+	echo file_get_contents('../../HTML/Fragment/Info_intro.html');
+	echo file_get_contents('../../HTML/Fragment/Info_full.php');
 ?>
+		<div id='agency'>
+			by <a class='link' href='https://wcodes.org/about_me'>Ujjwal Singh</a>
 		</div>
 	</div>
 </div>

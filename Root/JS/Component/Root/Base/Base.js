@@ -26,6 +26,10 @@ function versionCheck() {
 			showOverlay();
 		}
 	}
+	else {
+		info_intro.classList.add('hide');
+		info_full.classList.remove('hide');
+	}
 }
 
 function urlDecode() {

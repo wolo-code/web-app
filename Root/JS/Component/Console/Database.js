@@ -38,7 +38,7 @@ function submit_city(lat, lng, country, group, name) {
 			"group": group,
 			"name": name
 		};
-		cityList[Object.keys(cityList).length+1] = data;
+		cityList[Object.keys(cityList).length] = data;
 		ref.set(cityList);
 	});
 	showNotification("Request submitted");

@@ -9,9 +9,9 @@ function queryPendingList() {
 		data = [];
 		data_index = 0;		
 		snapshot.forEach(function(child) {
-			var x = child.val();
-			x['id'] = child.key;
-			data.push(x);
+			var entry = child.val();
+			entry['id'] = child.key;
+			data.push(entry);
 		});
 		data_count.innerText = data.length;
 		clearTimeout(idLoader);

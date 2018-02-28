@@ -60,24 +60,34 @@ function setAddress(a, g) {
 	refreshAddress();
 }
 var data
-var data_index;
+var data_index = 0;
 var idLoader;
+var prev_entry;
 
 function queryPendingList() {
 	beginLoader();
 	var ref = firebase.database().ref('CityRequest');
 	var list = ref.orderByChild("processed").equalTo(false).on("value", function(snapshot) {
+		if(data != null)
+			prev_entry = data[data_index];
 		data = [];
-		data_index = 0;		
 		snapshot.forEach(function(child) {
-			var x = child.val();
-			x['id'] = child.key;
-			data.push(x);
+			var entry = child.val();
+			entry['id'] = child.key;
+			data.push(entry);
 		});
 		data_count.innerText = data.length;
 		clearTimeout(idLoader);
 		endLoader('authenticated');
-		updateList();
+		if(prev_entry == null || data_index >= data.length || JSON.stringify(prev_entry) != JSON.stringify(data[data_index])) {
+			if(target_index == null)
+				data_index = 0;
+			else {
+				data_index = target_index;
+				target_index = null;
+			}
+			updateList();
+		}
 	})
 }
 
@@ -99,7 +109,7 @@ function submit_city(lat, lng, country, group, name) {
 			"group": group,
 			"name": name
 		};
-		cityList[Object.keys(cityList).length+1] = data;
+		cityList[Object.keys(cityList).length] = data;
 		ref.set(cityList);
 	});
 	showNotification("Request submitted");
@@ -363,11 +373,19 @@ function resolveLatLng(latLng) {
 }
 var auth_processed = false;
 var map_ready = false;
+var target_index;
 
 window.onload = function() {
 	initApp();
 	setupControls();
+	setTargetIndex();
 };
+
+function setTargetIndex() {
+	var param = window.location.hash.substr(1);
+	if(param.length > 0 && !isNaN(param))
+		target_index = parseInt(param)-1;
+}
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {
@@ -528,10 +546,17 @@ function formatDate(date) {
 
 	var day = date.getDate();
 	var monthIndex = date.getMonth();
-	var year = date.getFullYear();
 	var hour = date.getHours();
 	var minute = date.getMinutes();
-	return day + ' ' + monthNames[monthIndex] + ' ' + year + ' ' + hour + ':' + minute;
+	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
+}
+
+function formatNumber(number) {
+	WIDTH = 2;
+	if (String(number).length < WIDTH)
+		return ' '+number;
+	else
+		return number;
 }
 
 //google.maps.event.addDomListener(window, "load", initialize);

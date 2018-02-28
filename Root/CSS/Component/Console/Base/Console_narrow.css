@@ -1,9 +1,14 @@
 @media (max-width: 512px) {
 	
 	#console-title-container {
-		top: 66px;
+		top: 70px;
 	}
-	
+
+	#pac-input {
+		top: 104px !important;
+		right: 4px !important;
+	}
+		
 	#request-controls-container {
 		top: 160px;
 	}

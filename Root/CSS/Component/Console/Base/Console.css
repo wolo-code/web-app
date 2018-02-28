@@ -35,7 +35,7 @@
 #data_count {
 	background: #edf0e9c2;
 	border-radius: 25px;
-	color: #69B7CF;
+	color: #AAAAAA;
 	border: 1px solid #DDDDDD;
 	text-align: center;
 	font-size: xx-large;
@@ -56,6 +56,11 @@
 	border-radius: 25px;
 	display: inline-block;
 	background: #edf0e9c2;
+}
+
+#data_time {
+	font-family: consolas;
+	color: #AAAAAA;
 }
 
 #data_process_checkbox {

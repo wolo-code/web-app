@@ -1,0 +1,5 @@
+@media (max-width: 512px) {
+	#address_text {
+		bottom: 140px !important;
+	}
+}

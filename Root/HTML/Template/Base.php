@@ -39,7 +39,7 @@
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-database.js'></script>
 <?php
-	require "../../HTML/Component/$id.php";
+	require (getComponentPath($id));
 	if($bPublish) {
 ?>
 		<script src='https://cdn.ravenjs.com/3.22.2/raven.min.js' crossorigin='anonymous'></script>

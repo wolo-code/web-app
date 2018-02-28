@@ -10,7 +10,6 @@
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content='initial-scale=1.0' >
 	<link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' >
-	<link rel='manifest' href='/manifest.json' >
 	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
 	<title>
 <?php
@@ -29,11 +28,9 @@
 	require '../CSS/Fragment/CSS.php';
 	$component = $id;
 	require '../CSS/Fragment/CSS.php';
+	
+	require '../HTML/Fragment/Head.php';
 ?>
-	<link rel='preload' as='image' href='resource/address.svg' >
-	<link rel='preload' as='image' href='resource/copy.svg' >
-	<link rel='preload' as='image' href='resource/link.svg' >
-	<link rel='preload' as='image' href='resource/map.svg' >
 </head>
 <body>
 	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>

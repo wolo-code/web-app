@@ -6,6 +6,7 @@ Path	Name	Extension
 	console	js
 	favicon	ico
 	manifest	json
+	manifest-console	json
 	robots	txt
 	launcher-icon-0-75x	png
 	launcher-icon-1x	png

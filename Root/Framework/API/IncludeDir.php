@@ -62,4 +62,18 @@
 		return false;
 	}
 
+	function includeDirHeader($fileRoot, $dir) {
+		if(is_dir($fileRoot) == 1) {
+			$files = loadFiles($fileRoot);
+			foreach ($files as $file) {
+				if($file == 'Head' && (is_dir($fileRoot.$file) == 1)) {
+					includeDirHeader($fileRoot.$file.'/', true);
+				}
+				else if($file == 'Head.html' || $dir == true) {
+					echo file_get_contents($fileRoot.$file);
+				}
+			}
+		}
+	}
+	
 ?>

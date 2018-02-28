@@ -15,6 +15,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)\.js$ Framework/JS/Component.php [L]
 
 RewriteRule ^manifest\.json$ /Framework/Files/Manifest.json.php [L]
+RewriteRule ^manifest-console\.json$ /Files/manifest-console.json [L]
 
 rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]

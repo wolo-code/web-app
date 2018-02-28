@@ -32,6 +32,17 @@
 		}
 	}
 	
+	function getComponentPath($id) {
+		$s = "..\\..\\HTML\\Component\\".str_replace(' ','_', $id);
+		if(file_exists($s)) {
+			$s = $s."\Index";
+		}
+		if(file_exists($s.".php"))
+			return ($s.".php");
+		else
+			return ($s.".html");
+	}
+
 	function addAttribute(DOMElement $e, $name, $value) {
 		$a = $e->getAttribute($name);
 		$e->setAttribute($name, $a." ".$value);

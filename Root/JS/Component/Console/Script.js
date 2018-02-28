@@ -1,10 +1,18 @@
 var auth_processed = false;
 var map_ready = false;
+var target_index;
 
 window.onload = function() {
 	initApp();
 	setupControls();
+	setTargetIndex();
 };
+
+function setTargetIndex() {
+	var param = window.location.hash.substr(1);
+	if(param.length > 0 && !isNaN(param))
+		target_index = parseInt(param)-1;
+}
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {

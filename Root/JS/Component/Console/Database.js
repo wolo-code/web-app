@@ -1,13 +1,15 @@
 var data
-var data_index;
+var data_index = 0;
 var idLoader;
+var prev_entry;
 
 function queryPendingList() {
 	beginLoader();
 	var ref = firebase.database().ref('CityRequest');
 	var list = ref.orderByChild("processed").equalTo(false).on("value", function(snapshot) {
+		if(data != null)
+			prev_entry = data[data_index];
 		data = [];
-		data_index = 0;		
 		snapshot.forEach(function(child) {
 			var entry = child.val();
 			entry['id'] = child.key;
@@ -16,7 +18,10 @@ function queryPendingList() {
 		data_count.innerText = data.length;
 		clearTimeout(idLoader);
 		endLoader('authenticated');
-		updateList();
+		if(prev_entry == null || JSON.stringify(prev_entry) != JSON.stringify(data[data_index])) {
+				data_index = 0;
+			updateList();
+		}
 	})
 }
 

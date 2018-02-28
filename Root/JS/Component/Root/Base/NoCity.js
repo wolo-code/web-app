@@ -34,6 +34,7 @@ function noCityWait_continue() {
 
 function noCityWait_stop() {
 	pendingPosition = null;
+	pendingCity = false;
 	hideNoCityMessage();
 	notification_top.classList.remove('hide');
 }

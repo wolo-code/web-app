@@ -34,9 +34,11 @@
 				<div id='details_close' class="message_dialog_close control">
 					<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 				</div>
-				<span id='data_gp_id'>GP id</span>
-				<span id='data_lat'>Lat</span>
-				<span id='data_lng'>Long</span>
+				<div class="message_dialog_body">
+					<div id='data_gp_id'>GP id</div>
+					<div id='data_lat'>Lat</div>
+					<div id='data_lng'>Long</div>
+				</div>
 			</div>
 			<div id='address_text'>
 				<span id='address_text_main'>
@@ -51,7 +53,7 @@
 				<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
 				<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
 				<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
-				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='9'>Submit</button>
+				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='7'>Submit</button>
 			</form>
 		<!-- </div> -->
 		<div id='notification_bottom' class='hide'></div>

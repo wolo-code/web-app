@@ -165,10 +165,17 @@ function formatDate(date) {
 
 	var day = date.getDate();
 	var monthIndex = date.getMonth();
-	var year = date.getFullYear();
 	var hour = date.getHours();
 	var minute = date.getMinutes();
-	return day + ' ' + monthNames[monthIndex] + ' ' + year + ' ' + hour + ':' + minute;
+	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
+}
+
+function formatNumber(number) {
+	WIDTH = 2;
+	if (String(number).length < WIDTH)
+		return ' '+number;
+	else
+		return number;
 }
 
 //google.maps.event.addDomListener(window, "load", initialize);

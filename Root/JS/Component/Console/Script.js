@@ -111,10 +111,12 @@ function updateList() {
 		location_request_list.classList.remove('invisible');
 		map.panTo(entry.lat_lng);
 		showEntryMarker(entry.lat_lng);
-		fillForm();
 	}
-	else
+	else {
 		location_request_list.classList.add('invisible');
+		clearAddress();
+	}
+	clearForm();
 }
 
 function setupControls() {
@@ -188,12 +190,10 @@ function formatNumber(number) {
 
 //google.maps.event.addDomListener(window, "load", initialize);
 
-function fillForm() {
-	var entry = data[data_index];
-	city_lat.value = entry.lat_lng.lat;
-	city_lng.value = entry.lat_lng.lng;	
-	city_country.value = entry.address.split(' ').pop();
-	address_text_content.innerText = entry.address;
+function fillForm(lat, lng, country) {
+	city_lat.value = lat;
+	city_lng.value = lng;	
+	city_country.value = country;
 }
 
 function clearForm() {

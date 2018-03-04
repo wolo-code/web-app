@@ -11,7 +11,10 @@ function getAddress(latLng) {
 					address = results[0].formatted_address;
 					gpId = results[0].place_id;
 					refreshAddress();
-
+					if(pendingFillForm) {
+						fillForm(latLng.lat, latLng.lng, address.split(' ').pop());
+						pendingFillForm = null;
+					}
 				} else {
 					console.log('No geoCoding results found');
 				}

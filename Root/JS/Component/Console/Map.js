@@ -2,6 +2,7 @@ var map;
 var entryMarker;
 var markers = [];
 var accuCircle;
+var pendingFillForm;
 
 function initialize() {
 	var input = document.getElementById('pac-input');
@@ -42,8 +43,8 @@ function initialize() {
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 0) {
 		}
-		else if(places.length == 1){
-			focus_(places[0].geometry.location);
+		else if(places.length == 1) {
+			focus(places[0].geometry.location);
 		}
 		else {
 			places.forEach(function(place) {
@@ -66,9 +67,9 @@ function initialize() {
 					title: place.name,
 					position: place.geometry.location
 				});
-				// resultMarker.addListener('click', function() {
-				// 	load(this);
-				// });
+				resultMarker.addListener('click', function() {
+				 	focus(this.getPosition());
+				});
 				markers.push(resultMarker);
 
 				if (place.geometry.viewport) {
@@ -134,7 +135,7 @@ function showEntryMarker(location) {
 		//title: place.name,
 		position: location
 	});
-	google.maps.event.addListener(entryMarker, 'click', function() {fillForm();});
+	google.maps.event.addListener(entryMarker, 'click', function() {clearForm();});
 }
 
 var ClickEventHandler = function(map) {
@@ -188,6 +189,7 @@ function getSpanBounds(lat, lng) {
 }
 
 function focus_(pos, bounds) {
+
 	map.panTo(pos);
 	city_lat.value = pos.lat();
 	city_lng.value = pos.lng();
@@ -214,9 +216,6 @@ function focus_(pos, bounds) {
 			map: map,
 			title: 'Hello World!'
 		});
-		marker.addListener('click', function() {
-			fillForm();
-		})
 	}
 	else {
 		marker.setPosition(pos);
@@ -242,6 +241,12 @@ function focus_(pos, bounds) {
 		//map.setZoom(15);
 		accuCircle.setOptions({'fillOpacity': 0.10});
 
+}
+
+function focus(position) {
+	focus_(position);
+	pendingFillForm = true;
+	getAddress(resolveLatLng(position));
 }
 
 function resolveLatLng(latLng) {

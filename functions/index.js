@@ -1,5 +1,8 @@
 const functions = require('firebase-functions');
-
+var apiKey = "key-ceb0ce32644bf63b3c75c4a09acf12a2";
+var domain = 'wcodes.org';
+var mailgun = require('mailgun-js')({apiKey, domain});
+	
 // 2^(10+5)
 var N = 32768;
 
@@ -98,4 +101,35 @@ function decode(city_begin, code) {
 
 	//console.log(code, lat_diff + " " + lng_diff);
 	return({"lat":lat, "lng":lng});
+}
+
+exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWrite((event) => {
+	if (!event.data.exists() || event.data.previous.exists()) {
+		return
+	}
+	
+	const entry = event.data.val();
+	console.log('CityRequest - entry : ', event.params.pushId, entry);
+	
+	var data = {
+		from: 'WCode Location - app <app_location@wcodes.org>',
+		subject: 'New City request',
+		html: `<p>New City request:</p>` + combine({'Id':event.params.pushId, 'Address':entry.address}),
+		'h:Reply-To': 'app_location@wcodes.org',
+		to: 'admin@wcodes.org'
+	}
+
+	mailgun.messages().send(data, function (error, body) {
+		console.log(body)
+	})
+	
+	return null;
+});
+
+function combine(objects) {
+	var message = '';
+	for (var object in objects) {
+		message += object + ' : ' + objects[object] + '<br>';
+	}
+	return message;
 }

@@ -156,12 +156,16 @@ function setupControls() {
 	});
 	
 	submit_city_button.addEventListener('click', function() {
-		if(city_submit_panel.checkValidity()) {
-			submit_city(city_lat.value, city_lng.value, city_country.value.trim(), city_group.value.trim(), city_name.value.trim());
-			if(data_process_checkbox.checked) {
-				process_entry(data[data_index].id);
+		if(city_lat.value != '' && city_lng.value != '')
+			if(city_submit_panel.checkValidity()) {
+				submit_city(city_lat.value, city_lng.value, city_country.value.trim(), city_group.value.trim(), city_name.value.trim());
+				if(data_process_checkbox.checked)
+					process_entry(data[data_index].id);
 			}
-		}
+			else
+				showNotification("Check form data");
+		else
+			showNotification("Did you not select a search result?");
 	});
 	
 }

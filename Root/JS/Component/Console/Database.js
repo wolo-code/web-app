@@ -10,20 +10,24 @@ function queryPendingList() {
 		if(data != null)
 			prev_entry = data[data_index];
 		data = [];
+		var target_index;
 		snapshot.forEach(function(child) {
 			var entry = child.val();
 			entry['id'] = child.key;
 			data.push(entry);
+			if(target_index == null && target_id != null)
+				if(child.key == target_id)
+					target_index = data.length-1;
 		});
 		data_count.innerText = data.length;
 		if(idLoader != null)
 			endLoader('authenticated');
 		if(prev_entry == null || data_index >= data.length || JSON.stringify(prev_entry) != JSON.stringify(data[data_index])) {
-			if(target_index == null)
+			if(target_id == null)
 				data_index = 0;
 			else {
 				data_index = target_index;
-				target_index = null;
+				target_id = null;
 			}
 			updateList();
 		}

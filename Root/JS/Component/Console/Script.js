@@ -1,6 +1,6 @@
 var auth_processed = false;
 var map_ready = false;
-var target_index;
+var target_id;
 
 window.onload = function() {
 	initApp();
@@ -10,8 +10,8 @@ window.onload = function() {
 
 function setTargetIndex() {
 	var param = window.location.hash.substr(1);
-	if(param.length > 0 && !isNaN(param))
-		target_index = parseInt(param)-1;
+	if(param.length > 0)
+		target_id = param;
 }
 
 function initApp() {
@@ -75,7 +75,6 @@ function showConsloeBlock() {
 		initialize();
 	else
 		auth_processed = true;
-		
 }
 
 function nextRow() {

@@ -26,7 +26,12 @@ function queryPendingList() {
 			if(target_id == null)
 				data_index = 0;
 			else {
-				data_index = target_index;
+				if(target_index == null) {
+					data_index = 0;
+					showNotification("Target already processed");
+				}
+				else
+					data_index = target_index;
 				target_id = null;
 			}
 			updateList();

@@ -16,8 +16,8 @@ function queryPendingList() {
 			data.push(entry);
 		});
 		data_count.innerText = data.length;
-		clearTimeout(idLoader);
-		endLoader('authenticated');
+		if(idLoader != null)
+			endLoader('authenticated');
 		if(prev_entry == null || data_index >= data.length || JSON.stringify(prev_entry) != JSON.stringify(data[data_index])) {
 			if(target_index == null)
 				data_index = 0;

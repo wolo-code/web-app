@@ -48,6 +48,8 @@ function beginLoader() {
 }
 
 function endLoader(status) {
+	clearTimeout(idLoader);
+	idLoader = null;
 	if(status == 'authenticated')
 		showConsloeBlock();
 	else if('unauthenticated')

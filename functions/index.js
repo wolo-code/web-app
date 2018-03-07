@@ -110,11 +110,11 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 	
 	const entry = event.data.val();
 	console.log('CityRequest - entry : ', event.params.pushId, entry);
-	
+	var id_link = "<a href='https://location.wcodes.org/console#"+event.params.pushId+"'>"+event.params.pushId+'</a>';
 	var data = {
 		from: 'WCode Location - app <app_location@wcodes.org>',
 		subject: 'New City request',
-		html: `<p>New City request:</p>` + combine({'Id':event.params.pushId, 'Address':entry.address}),
+		html: `<p>New City request:</p>` + combine({'Id':id_link, 'Address':entry.address}),
 		'h:Reply-To': 'app_location@wcodes.org',
 		to: 'admin@wcodes.org'
 	}

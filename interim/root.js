@@ -348,6 +348,7 @@ var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
+var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
@@ -356,7 +357,7 @@ var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point
 function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: -34.397, lng: 150.644},
+		center: DEFAULT_LATLNG,
 		mapTypeControl: true,
 		mapTypeControlOptions: {
 			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
@@ -402,8 +403,8 @@ function initMap() {
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
 			clearAddress();
-			focus_(places[0].geometry.location);
 			var pos = resolveLatLng(places[0].geometry.location);
+			focus_(pos);
 			encode(pos);
 			getAddress(pos);
 		}
@@ -448,8 +449,9 @@ function initMap() {
 		pendingPosition = null;
 		notification_top.classList.add('hide');
 		clearAddress();
-		focus_(event.latLng);
-		encode(resolveLatLng(event.latLng));
+		var pos = resolveLatLng(event.latLng);
+		focus_(pos);
+		encode(pos);
 	});
 
 	location_button.addEventListener('click', function() {
@@ -458,7 +460,7 @@ function initMap() {
 
 	decode_button.addEventListener('click', function() {
 		clearMap();
-		result.setInnerText = '';
+		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
 	});
@@ -505,10 +507,10 @@ function suggestComplete(event) {
 			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
 				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
 			else
-				result.innerText = '';
+				suggestion_result.innerText = '';
 		}
 		else {
-			result.innerText = '';
+			suggestion_result.innerText = '';
 		}
 	}
 };
@@ -525,7 +527,7 @@ function matchWord(list, input) {
 
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
-	result.innerText = '';
+	suggestion_result.innerText = '';
 	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0])
 		return;
 	if(autoCompleteResult.length < 5 || val.length > 2)
@@ -533,7 +535,7 @@ function changeInput(list, val) {
 			var option = document.createElement('div');
 			option.innerText = autoCompleteResult[i];
 			option.addEventListener('click', chooseWord);
-			result.appendChild(option);
+			suggestion_result.appendChild(option);
 		}
 }
 
@@ -542,7 +544,7 @@ function chooseWord(event) {
 	cur_word[cur_word.length-1] = this.innerText;
 	document.getElementById('pac-input').value = cur_word.join(' ') + ' ';
 	document.getElementById('pac-input').focus();
-	result.innerText = '';
+	suggestion_result.innerText = '';
 }
 
 var lastMarker;
@@ -595,8 +597,9 @@ ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 };
 
 function focus_(pos, bounds) {
+	
 	hideNoCityMessage();
-	map.panTo(pos);
+
 	if(typeof marker === 'undefined') {
 		marker = new google.maps.Marker({
 			position: pos,
@@ -623,24 +626,24 @@ function focus_(pos, bounds) {
 
 	if(typeof bounds !== 'undefined') {
 		map.fitBounds(bounds, 26);
-		var offsetY = 0.06;
-		if(map.getBounds() != null) {
-			var span = map.getBounds().toSpan(); // a latLng - # of deg map span
-			var newCenter = {
-				lat: pos.lat + span.lat()*offsetY,
-				lng: pos.lng
-			};
-
-			map.panTo(newCenter);
-		}
 	}
-	else if (typeof accuCircle !== 'undefined')
-		//map.setZoom(15);
+	else if (typeof accuCircle !== 'undefined') {
 		accuCircle.setOptions({'fillOpacity': 0.10});
-
+	}
+	
+	map.panTo(pos);
+	map.panBy(0, getPanByOffset());
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
+	
+}
+
+function getPanByOffset() {
+	if(window.innerHeight < 1000)
+		return -118;
+	else
+		return 0;
 }
 
 function locate() {
@@ -730,7 +733,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 function setInfoWindowText(code, latLng) {
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
+	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {
@@ -740,20 +743,13 @@ function getIntentURL(latLng, code) {
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng+'&t=h';
 }
 
-function focusDefault_() {
-	var position = {'lat':12.978328666666666,'lng':77.59628655555555};
-	focus_(position);
-	setInfoWindowText(['Bangalore', 'hand', 'cat', 'bone'], position);
-	map.setZoom(12);
-}
-
 function clearMap() {
 	marker.setMap(null);
 }
 
 function infoWindow_setContent(string) {
 	if(typeof infoWindow == "undefined")
-		infoWindow = new google.maps.InfoWindow({map: map});
+		infoWindow = new google.maps.InfoWindow({'map': map});
 	infoWindow.setContent(string);
 }
 

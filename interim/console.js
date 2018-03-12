@@ -283,10 +283,8 @@ var ClickEventHandler = function(map) {
 
 ClickEventHandler.prototype.handleClick = function(event) {
 	if (event.placeId) {
-		// Calling e.stop() on the event prevents the default info window from
-		// showing.
-		// If you call stop here when there is no placeId you will prevent some
-		// other map click event handlers from receiving the event.
+		// Calling e.stop() on the event prevents the default info window from showing.
+		// If you call stop here when there is no placeId you will prevent some other map click event handlers from receiving the event.
 		event.stop();
 		this.getPlaceInformation(event.placeId);
 	}

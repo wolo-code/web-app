@@ -411,8 +411,8 @@ function clearMap() {
 }
 
 function infoWindow_setContent(string) {
-	if(typeof infoWindow == "undefined")
-		infoWindow = new google.maps.InfoWindow({map: map});
+	if(typeof infoWindow == 'undefined')
+		infoWindow = new google.maps.InfoWindow({'map': map});
 	infoWindow.setContent(string);
 }
 

@@ -87,6 +87,10 @@ button {
 	height: 50px;
 }
 
+#logo_location {
+	text-decoration: none;
+}
+
 #logo_location > .image > svg {
 	padding-top: 4px;
 	height: 14px;

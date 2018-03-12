@@ -406,13 +406,6 @@ function getIntentURL(latLng, code) {
 		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng+'&t=h';
 }
 
-function focusDefault_() {
-	var position = {'lat':12.978328666666666,'lng':77.59628655555555};
-	focus_(position);
-	setInfoWindowText(['Bangalore', 'hand', 'cat', 'bone'], position);
-	map.setZoom(12);
-}
-
 function clearMap() {
 	marker.setMap(null);
 }

@@ -13,7 +13,7 @@
 	</a>
 </div>
 <input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
-<div id='result'></div>
+<div id='suggestion_result'></div>
 <input id='decode_button' class='control' type='button' value='Decode' tabindex='4' >
 <div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php echo file_get_contents('../../Resource/Location.svg'); ?></span>

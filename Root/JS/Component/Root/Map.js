@@ -121,7 +121,7 @@ function initMap() {
 
 	decode_button.addEventListener('click', function() {
 		clearMap();
-		result.setInnerText = '';
+		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
 	});
@@ -168,10 +168,10 @@ function suggestComplete(event) {
 			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
 				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
 			else
-				result.innerText = '';
+				suggestion_result.innerText = '';
 		}
 		else {
-			result.innerText = '';
+			suggestion_result.innerText = '';
 		}
 	}
 };
@@ -188,7 +188,7 @@ function matchWord(list, input) {
 
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
-	result.innerText = '';
+	suggestion_result.innerText = '';
 	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0])
 		return;
 	if(autoCompleteResult.length < 5 || val.length > 2)
@@ -196,7 +196,7 @@ function changeInput(list, val) {
 			var option = document.createElement('div');
 			option.innerText = autoCompleteResult[i];
 			option.addEventListener('click', chooseWord);
-			result.appendChild(option);
+			suggestion_result.appendChild(option);
 		}
 }
 
@@ -205,7 +205,7 @@ function chooseWord(event) {
 	cur_word[cur_word.length-1] = this.innerText;
 	document.getElementById('pac-input').value = cur_word.join(' ') + ' ';
 	document.getElementById('pac-input').focus();
-	result.innerText = '';
+	suggestion_result.innerText = '';
 }
 
 var lastMarker;

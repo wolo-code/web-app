@@ -161,22 +161,6 @@ button {
 	font-size: large;
 }
 
-#result {
-	position: absolute;
-	top: 8px;
-	left: 12px;
-}
-
-#result > div {
-	display: inline-block;
-	background-color: #FFFFFF;
-	border-radius: 20px;
-	color: #69B7CF;
-	padding: 2px 8px;
-	margin: 0 4px;
-	cursor: pointer;
-}
-
 #notification_top {
 	text-align: center;
 	position: absolute;

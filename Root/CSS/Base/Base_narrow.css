@@ -1,17 +1,26 @@
-@media (max-width: 512px) {
-
-	#pac-input {
-		top: 96px !important;
-		left: -4px !important;
-		width: 310px !important;
-	}
-
-	#logo {
-		width: auto !important;
-	}
-
-	#notification_top {
-		top: 168px !important;
-	}
+@media (max-width: 662px) {
 	
+		#pac-input {
+			top: 100px !important;
+			left: -4px !important;
+			width: 310px !important;
+		}
+	
+		#logo {
+			width: auto !important;
+			left: 0;
+			right: 0;
+			text-align: center;
+		}
+		
+		#notification_top {
+			top: 168px !important;
+		}
+
+}
+
+@media (max-width: 316px) {
+	#pac-input {
+		top: 126px !important;
+	}
 }

@@ -1,9 +1,28 @@
-@media (max-width: 512px) {
+@media (max-width: 662px) {
 	
 	#decode_button {
-		top: 96px !important;
+		top: 100px !important;
+		left: 320px !important;
+		right: auto !important;
+	}
+	
+	#suggestion_result {
+		top: 74px !important;
+	}
+
+}
+
+@media (max-width: 390px) {
+	#decode_button {
 		left: auto !important;
 		right: 10px !important;
+	}
+}
+
+@media (max-width: 316px) {
+
+	#decode_button {
+		top: 126px !important;
 	}
 	
 	#suggestion_result {

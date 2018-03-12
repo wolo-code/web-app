@@ -11,6 +11,7 @@ var poiPlace;
 var pendingLocate = false;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
+var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
@@ -19,7 +20,7 @@ var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point
 function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
-		center: {lat: -34.397, lng: 150.644},
+		center: DEFAULT_LATLNG,
 		mapTypeControl: true,
 		mapTypeControlOptions: {
 			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,

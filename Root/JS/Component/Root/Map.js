@@ -66,8 +66,8 @@ function initMap() {
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
 			clearAddress();
-			focus_(places[0].geometry.location);
 			var pos = resolveLatLng(places[0].geometry.location);
+			focus_(pos);
 			encode(pos);
 			getAddress(pos);
 		}
@@ -112,8 +112,9 @@ function initMap() {
 		pendingPosition = null;
 		notification_top.classList.add('hide');
 		clearAddress();
-		focus_(event.latLng);
-		encode(resolveLatLng(event.latLng));
+		var pos = resolveLatLng(event.latLng);
+		focus_(pos);
+		encode(pos);
 	});
 
 	location_button.addEventListener('click', function() {
@@ -259,8 +260,9 @@ ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 };
 
 function focus_(pos, bounds) {
+	
 	hideNoCityMessage();
-	map.panTo(pos);
+
 	if(typeof marker === 'undefined') {
 		marker = new google.maps.Marker({
 			position: pos,
@@ -287,24 +289,24 @@ function focus_(pos, bounds) {
 
 	if(typeof bounds !== 'undefined') {
 		map.fitBounds(bounds, 26);
-		var offsetY = 0.06;
-		if(map.getBounds() != null) {
-			var span = map.getBounds().toSpan(); // a latLng - # of deg map span
-			var newCenter = {
-				lat: pos.lat + span.lat()*offsetY,
-				lng: pos.lng
-			};
-
-			map.panTo(newCenter);
-		}
 	}
-	else if (typeof accuCircle !== 'undefined')
-		//map.setZoom(15);
+	else if (typeof accuCircle !== 'undefined') {
 		accuCircle.setOptions({'fillOpacity': 0.10});
-
+	}
+	
+	map.panTo(pos);
+	map.panBy(0, getPanByOffset());
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
+	
+}
+
+function getPanByOffset() {
+	if(window.innerHeight < 1000)
+		return -118;
+	else
+		return 0;
 }
 
 function locate() {

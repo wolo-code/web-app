@@ -236,7 +236,7 @@ button {
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
-	width: 350px;
+	max-width: 350px;
 }
 
 #address_text_main {
@@ -254,7 +254,7 @@ button {
 #address_text_content {
 	font-family: 'Roboto';
 	min-height: 48px;
-	width: 306px;
+	max-width: 306px;
 	text-align: left;
 	padding: 6px 0 6px 6px;
 }

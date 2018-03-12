@@ -401,9 +401,9 @@ function setInfoWindowText(code, latLng) {
 
 function getIntentURL(latLng, code) {
 	if((navigator.userAgent.match(/android/i)))
-		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
+		return 'geo:0,0?q='+latLng.lat+','+latLng.lng+'(\\ '+code.join(' ')+' /)';
 	else
-		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng+'&t=h';
+		return 'https://maps.google.com/maps?q=loc:'+latLng.lat+','+latLng.lng+'&t=h';
 }
 
 function clearMap() {

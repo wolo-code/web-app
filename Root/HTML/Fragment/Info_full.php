@@ -25,7 +25,11 @@
 		<li>The wordlist may change and thus your previous wcode may no longer work or point to a different location</li>
 		<li>The server roundtrip involves a delay. You may have to wait a few seconds for the result to show up</li>
 	</ol>
-	<div class="message_dialog_control"><button id='info_full_close_button' type='button'>&#x25C1; return</button></div>
+	<div class='message_dialog_control_container'>
+		<div class='message_dialog_control'>
+			<button id='info_full_close_button' type='button'>&#x25C1; return</button>
+		</div>
+	</div>
 	<div id='software_info'>
 		<div id='version'>
 			Version: 0.1 beta

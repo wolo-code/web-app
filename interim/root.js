@@ -133,7 +133,7 @@ function setCodeWords(code, city, position) {
 	for(i of object)
 		message.push(wordList[i]);
 
-	setInfoWindowText(message, position);
+	setWcode(message, position);
 }
 
 function stringifyEncodeData(city_center, position) {
@@ -180,7 +180,38 @@ function setCodeCoord(codeIndex, code) {
 	var object = JSON.parse(codeIndex);
 	focus__(object, code);
 }
+var WCODE_CODE_COPIED_MESSAGE = "WCode copied to clipboard";
+var WCODE_LINK_COPIED_MESSAGE = "WCode link copied to clipboard";
+
+function showCopyWcodeMessage() {
+	copy_wcode_message_city_name.innerText = getWcodeCity();
+	copy_wcode_message.classList.remove('hide');
+}
+
+function hideCopyWcodeMessage() {
+	copy_wcode_message.classList.add('hide');
+	copy_wcode_message_city_name.innerText = '';	
+}
+
+function copyWcodeFull() {
+	showAndCopy(getWcodeFull_formatted().join(' '));
+	showNotification(WCODE_CODE_COPIED_MESSAGE);
+	hideCopyWcodeMessage();
+}
+
+function copyWcodeCode() {
+	showAndCopy(getWcodeCode_formatted().join(' '));
+	showNotification(WCODE_CODE_COPIED_MESSAGE);
+	hideCopyWcodeMessage();
+}
+
+function copyWcodeLink() {
+	var wcode_url = location.hostname + '/' + getWcodeFull().join('.');
+	showAndCopy(wcode_url.toLowerCase());
+	showNotification(WCODE_LINK_COPIED_MESSAGE);
+}
 var CityList = [];
+var city_styled_wordlist = [];
 var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
@@ -220,9 +251,11 @@ function getCityFromName(cityName) {
 		if(CityList[i].name.toLowerCase().localeCompare(cityName) == 0)
 			return CityList[i];
 	}
+	return null;
 }
 
 function encode(position) {
+	clearWcode();
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
 		if(city == null) {
@@ -285,6 +318,7 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 	CityList = snapshot.val();
 	
 	CityList.forEach (function(city){
+		city_styled_wordlist.push(city.name);
 		city_plus_wordList.push(city.name.toLowerCase());
 	});
 	city_plus_wordList = city_plus_wordList.concat(wordList);
@@ -297,27 +331,6 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 	}
 	
 });
-function copyWCode() {
-	showAndCopy(getWCodeFullFromInfoWindow().join(' '));
-	showNotification("WCode copied");
-}
-
-function copyLink() {
-	var wcode_url = location.hostname + '/' + getWCodeFromInfoWindow().join('.');
-	showAndCopy(wcode_url.toLowerCase());
-	showNotification("WCode link copied");
-}
-
-function getWCodeFullFromInfoWindow() {
-	var wcode_full = infowindow_code.innerText.replace(/(\r?\n|\r)/gm, ' ').split(' ');
-	wcode_full.pop();
-	return wcode_full;
-}
-
-function getWCodeFromInfoWindow() {
-	var wcode = getWCodeFullFromInfoWindow();
-	return wcode.slice(1, wcode.length-1);
-}
 function logCode(code, values) {
 	console.log("Code:")
 	console.log(code);
@@ -449,6 +462,7 @@ function initMap() {
 		pendingPosition = null;
 		notification_top.classList.add('hide');
 		clearAddress();
+		clearURL();
 		var pos = resolveLatLng(event.latLng);
 		focus_(pos);
 		encode(pos);
@@ -497,29 +511,63 @@ function execDecode(code) {
 }
 
 function suggestComplete(event) {
-	var input = document.getElementById('pac-input').value;
-	if(!input.includes(' ')) {
-		changeInput(city_plus_wordList, input);
+	var input_array = document.getElementById('pac-input').value.toLowerCase().split(' ');
+	var curList;
+	if(input_array.length > 0) {
+		curList = getPossibleList(input_array.slice(0, -1));
 	}
-	else {
-		var cur_word = input.split(' ');
-		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '') {
-			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
-				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
-			else
-				suggestion_result.innerText = '';
+	if(curList !=  null) {
+		var curWord = input_array[input_array.length-1];
+		if(curList != city_styled_wordlist && curList != wordList) {
+			var compareWord = input_array.slice(0, -1).join(' ')+' ';
+			var newList = [];
+			var regEx = new RegExp(compareWord, 'ig');
+			curList.forEach(function(city_name) {
+				if(city_name.toLowerCase().startsWith(compareWord))
+					newList.push(city_name.replace(regEx, ''));
+			});
+			curList = newList;
 		}
-		else {
-			suggestion_result.innerText = '';
-		}
+		changeInput(curList, curWord);
 	}
+	else
+		suggestion_result.innerText = '';
 };
 
+function getPossibleList(code) {
+	var list;
+	
+	if(code.length == 0)
+		list = city_styled_wordlist;
+	else {
+		var i;
+		for(i = code.length; i > 0; i--) {
+			var cityName = code.slice(0, i).join(' ');
+			if(getCityFromName(cityName)) {
+				list = wordList;
+				break;
+			}
+			else {
+				list = matchWord(city_styled_wordlist, cityName);
+				if(list && list.length > 0)
+					break;
+			}
+		}
+		for(; i < code.length; i++) {
+			if(wordList.indexOf(code[i]) == -1)
+				return null;
+			else
+				list = wordList;
+		}
+	}
+	return list;
+}
+
 function matchWord(list, input) {
-	var reg = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
+	var regEx = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
 	return list.filter(function(word) {
-		if (word.match(reg)) {
-			if(word.toLowerCase().startsWith(input.toLowerCase()))
+		if (word.match(regEx)) {
+			if(word.toLowerCase().startsWith(input))
 				return word;
 		}
 	});
@@ -528,7 +576,7 @@ function matchWord(list, input) {
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
 	suggestion_result.innerText = '';
-	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0])
+	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0].toLowerCase())
 		return;
 	if(autoCompleteResult.length < 5 || val.length > 2)
 		for(var i = 0; i < autoCompleteResult.length && i < 10; i++) {
@@ -561,7 +609,7 @@ function load(marker) {
 
 function focus__(pos, code) {
 	focus_(pos);
-	setInfoWindowText(code, pos);
+	setWcode(code, pos);
 }
 
 var ClickEventHandler = function(map) {
@@ -636,7 +684,7 @@ function focus_(pos, bounds) {
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
-	
+
 }
 
 function getPanByOffset() {
@@ -733,14 +781,14 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 function setInfoWindowText(code, latLng) {
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='copyWCode();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
+	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='showCopyWcodeMessage();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyWcodeLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {
 	if((navigator.userAgent.match(/android/i)))
-		return "geo:0,0?q="+latLng.lat+','+latLng.lng+"(\\ "+code.join(' ')+" /)";
+		return 'geo:0,0?q='+latLng.lat+','+latLng.lng+'(\\ '+code.join(' ')+' /)';
 	else
-		return "https://maps.google.com/maps?q=loc:"+latLng.lat+','+latLng.lng+'&t=h';
+		return 'https://maps.google.com/maps?q=loc:'+latLng.lat+','+latLng.lng+'&t=h';
 }
 
 function clearMap() {
@@ -748,7 +796,7 @@ function clearMap() {
 }
 
 function infoWindow_setContent(string) {
-	if(typeof infoWindow == "undefined")
+	if(typeof infoWindow == 'undefined')
 		infoWindow = new google.maps.InfoWindow({'map': map});
 	infoWindow.setContent(string);
 }
@@ -757,6 +805,51 @@ function arrayContainsArray(superset, subset) {
 	return subset.every(function (value) {
 		return (superset.indexOf(value.toLowerCase()) >= 0);
 	});
+}
+
+function clearURL() {
+	if(window.location.pathname.substr(1) != '')
+		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
+}
+var wcode_city;
+var wcode_code;
+var wcode_postition;
+
+function setWcode(wcode, latLng) {
+	wcode_city = wcode[0];
+	wcode_code = wcode.slice(1, wcode.length);
+	wcode_postition = latLng;
+	
+	setInfoWindowText(wcode, latLng);
+}
+
+function clearWcode() {
+	wcode_array = null;
+	wcode_postition = null;
+}
+
+function getWcodeFull() {
+	return [wcode_city].concat(wcode_code);
+}
+
+function formatWcode(wcode) {
+	return ["\\"].concat(wcode).concat(["/"]); 
+}
+
+function getWcodeFull_formatted() {
+	return formatWcode(getWcodeFull());
+}
+
+function getWcodeCode() {
+	return wcode_code;
+}
+
+function getWcodeCode_formatted() {
+	return formatWcode(getWcodeCode());
+}
+
+function getWcodeCity() {
+	return wcode_city;	
 }
 window.onload = init;
 
@@ -773,6 +866,9 @@ function init() {
 	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
 	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
 	notification_top.addEventListener('click', tryDefaultCity);
+	copy_wcode_message_close.addEventListener('click', hideCopyWcodeMessage);
+	copy_wcode_submit_yes.addEventListener('click', copyWcodeFull);
+	copy_wcode_submit_no.addEventListener('click', copyWcodeCode);
 }
 
 function showAndCopy(message) {

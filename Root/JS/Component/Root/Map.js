@@ -160,29 +160,63 @@ function execDecode(code) {
 }
 
 function suggestComplete(event) {
-	var input = document.getElementById('pac-input').value;
-	if(!input.includes(' ')) {
-		changeInput(city_plus_wordList, input);
+	var input_array = document.getElementById('pac-input').value.toLowerCase().split(' ');
+	var curList;
+	if(input_array.length > 0) {
+		curList = getPossibleList(input_array.slice(0, -1));
 	}
-	else {
-		var cur_word = input.split(' ');
-		if(cur_word.length > 0 && cur_word[cur_word.length-1] != '') {
-			if(arrayContainsArray(city_plus_wordList, cur_word.slice(0, -1)))
-				changeInput(city_plus_wordList, cur_word[cur_word.length-1]);
-			else
-				suggestion_result.innerText = '';
+	if(curList !=  null) {
+		var curWord = input_array[input_array.length-1];
+		if(curList != city_styled_wordlist && curList != wordList) {
+			var compareWord = input_array.slice(0, -1).join(' ')+' ';
+			var newList = [];
+			var regEx = new RegExp(compareWord, 'ig');
+			curList.forEach(function(city_name) {
+				if(city_name.toLowerCase().startsWith(compareWord))
+					newList.push(city_name.replace(regEx, ''));
+			});
+			curList = newList;
 		}
-		else {
-			suggestion_result.innerText = '';
-		}
+		changeInput(curList, curWord);
 	}
+	else
+		suggestion_result.innerText = '';
 };
 
+function getPossibleList(code) {
+	var list;
+	
+	if(code.length == 0)
+		list = city_styled_wordlist;
+	else {
+		var i;
+		for(i = code.length; i > 0; i--) {
+			var cityName = code.slice(0, i).join(' ');
+			if(getCityFromName(cityName)) {
+				list = wordList;
+				break;
+			}
+			else {
+				list = matchWord(city_styled_wordlist, cityName);
+				if(list && list.length > 0)
+					break;
+			}
+		}
+		for(; i < code.length; i++) {
+			if(wordList.indexOf(code[i]) == -1)
+				return null;
+			else
+				list = wordList;
+		}
+	}
+	return list;
+}
+
 function matchWord(list, input) {
-	var reg = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
+	var regEx = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
 	return list.filter(function(word) {
-		if (word.match(reg)) {
-			if(word.toLowerCase().startsWith(input.toLowerCase()))
+		if (word.match(regEx)) {
+			if(word.toLowerCase().startsWith(input))
 				return word;
 		}
 	});
@@ -191,7 +225,7 @@ function matchWord(list, input) {
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
 	suggestion_result.innerText = '';
-	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0])
+	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0].toLowerCase())
 		return;
 	if(autoCompleteResult.length < 5 || val.length > 2)
 		for(var i = 0; i < autoCompleteResult.length && i < 10; i++) {
@@ -299,7 +333,7 @@ function focus_(pos, bounds) {
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
-	
+
 }
 
 function getPanByOffset() {

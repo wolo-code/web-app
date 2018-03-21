@@ -1,4 +1,5 @@
 var CityList = [];
+var city_styled_wordlist = [];
 var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
@@ -38,6 +39,7 @@ function getCityFromName(cityName) {
 		if(CityList[i].name.toLowerCase().localeCompare(cityName) == 0)
 			return CityList[i];
 	}
+	return null;
 }
 
 function encode(position) {

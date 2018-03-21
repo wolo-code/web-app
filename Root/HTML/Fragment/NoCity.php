@@ -5,7 +5,7 @@
 	<div id='no_city_message_close' class="message_dialog_close control">
 		<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 	</div>
-	<div id='no_city_message_prompt'>
+	<div id='no_city_message_prompt' class='message_dialog_body'>
 		<p>
 			This location appears to not be in the database.<br>
 			Do you want it to be added?
@@ -15,7 +15,7 @@
 			<button id='no_city_submit_no' type='button'>No</button>
 		</div>
 	</div>
-	<div id='no_city_message_wait' class="hide">
+	<div id='no_city_message_wait' class="message_dialog_body hide">
 		<div class="loader center"></div>
 		<p>
 			Waiting for city add request to be processed.<br>

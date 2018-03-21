@@ -14,14 +14,6 @@ h2.message_dialog_label {
 	z-index: 1;
 }
 
-#no_city_message p {
-	font-size: larger;
-}
-
-#no_city_message_prompt, #no_city_message_wait {
-	padding: 2px 16px 8px;
-}
-
 .loader {
 	border: 15px solid #F0F0F0;
 	border-top: 15px solid #69B7CF;

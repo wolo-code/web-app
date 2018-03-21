@@ -24,15 +24,4 @@
 </div>
 <div id='notification_top' class='hide'>Try: Bangalore, India</div>
 <div id='notification_bottom' class='hide'></div>
-<div id='address_text' class='hide'>
-	<span id='address_text_main'>
-		<div id='address_text_label'>Address</div>
-		<div id='address_text_content'></div>
-	</span>
-	<span id='address_text_buttons'>
-		<span id='address_text_close' class="control" onclick='hideAddress();'>
-			<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
-		</span>
-		<img id='address_text_copy' class='control' onclick='copyAddress();' src='/resource/copy.svg' >
-	</span>
-</div>
+<?php require '../../HTML/Fragment/Address.php'; ?>

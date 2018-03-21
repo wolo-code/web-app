@@ -36,7 +36,7 @@ function setCodeWords(code, city, position) {
 	for(i of object)
 		message.push(wordList[i]);
 
-	setInfoWindowText(message, position);
+	setWcode(message, position);
 }
 
 function stringifyEncodeData(city_center, position) {

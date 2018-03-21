@@ -43,6 +43,7 @@ function getCityFromName(cityName) {
 }
 
 function encode(position) {
+	clearWcode();
 	if(CityList.length > 0) {
 		var city = getCityFromPosition(position);
 		if(city == null) {

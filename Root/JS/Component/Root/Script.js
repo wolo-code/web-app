@@ -13,6 +13,9 @@ function init() {
 	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
 	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
 	notification_top.addEventListener('click', tryDefaultCity);
+	copy_wcode_message_close.addEventListener('click', hideCopyWcodeMessage);
+	copy_wcode_submit_yes.addEventListener('click', copyWcodeFull);
+	copy_wcode_submit_no.addEventListener('click', copyWcodeCode);
 }
 
 function showAndCopy(message) {

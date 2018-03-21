@@ -1,15 +1,19 @@
 .message_dialog {
 	position: absolute;
-	top: 220px;
+	top: 230px;
 	left: 0;
 	right: 0;
-	max-width: 280px;
-	width: 280px;
+	max-width: 286px;
+	width: 286px;
 	margin: auto;
 	border: 1px solid #ddd;
 	font-family: 'Abel';
 	background-color: #FFFFFF;
 	z-index: 1;
+}
+
+.message_dialog_prompt {
+	padding: 2px 16px 8px;
 }
 
 .message_dialog_close {
@@ -25,6 +29,10 @@
 
 .message_dialog_body {
 	padding: 0 20px 20px;
+}
+
+.message_dialog_body p {
+	font-size: larger;
 }
 
 .message_dialog_control_container {

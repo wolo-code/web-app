@@ -2,6 +2,7 @@
 	require '../../HTML/Fragment/Overlay.php';
 	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/NoCity.php';
+	require '../../HTML/Fragment/Copy_wcode.html';
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>

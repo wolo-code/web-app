@@ -1,0 +1,11 @@
+@media (max-width: 512px) {
+
+	.dialog_message_primary {
+		float: right;
+	}
+	
+	.dialog_message_secondary {
+		float: left;
+	}
+
+}

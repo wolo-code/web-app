@@ -103,14 +103,13 @@ function decode(city_begin, code) {
 	return({"lat":lat, "lng":lng});
 }
 
-exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWrite((event) => {
-	if (!event.data.exists() || event.data.previous.exists()) {
-		return
-	}
+exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWrite((data, context) => {
+	if ( data.before.exists() || !data.after.exists())
+		return null;
 	
-	const entry = event.data.val();
-	console.log('CityRequest - entry : ', event.params.pushId, entry);
-	var id_link = "<a href='https://location.wcodes.org/console#"+event.params.pushId+"'>"+event.params.pushId+'</a>';
+	const entry = data.after.val();
+	console.log('CityRequest - entry : ', context.params.pushId, entry);
+	var id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
 	var data = {
 		from: 'WCode Location - app <app_location@wcodes.org>',
 		subject: 'New City request',

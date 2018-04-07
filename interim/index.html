@@ -60,8 +60,8 @@ ga('send', 'pageview');
 
 #address_text_close {
 	position: absolute;
-	top: 8px;
-	right: 10px;
+	top: 2px;
+	right: 6px;
 }
 
 #address_text_close svg {
@@ -79,7 +79,7 @@ ga('send', 'pageview');
 
 #address_text_copy {
 	padding-top: 2px;
-	padding-left: 4px;
+	padding-left: 10px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -518,11 +518,19 @@ button {
 	color: #CCCCCC;
 }
 #locate_right_message_body {
-  padding: 2px 16px 8px;
+	padding: 2px 16px 8px;
 }
 
 #locate_right_message_body p {
 	padding-bottom: 8px;
+}
+
+#locate_right_message_dnd_input {
+	width: 18px;
+	height: 18px;
+	margin-top: 6px;
+	margin-right: 4px;
+	-webkit-appearance: checkbox !important;
 }
 h2.message_dialog_label {
 	margin: 0.5em;
@@ -771,7 +779,7 @@ h2.message_dialog_label {
 			Version: 0.1 beta
 		</div>
 		<div id='updated'>Updated:
-	2018-Mar-19 01:34:00		</div>
+	2018-Apr-07 22:21:33		</div>
 	</div>
 	<div id='contact'>
 		for any related query contact me
@@ -799,6 +807,10 @@ h2.message_dialog_label {
 		<div class="center message_dialog_control">
 			<button id='locate_right_message_yes' class='dialog_message_primary' type='button' onclick="locateRight_grant();">Yes</button>
 			<button id='locate_right_message_no' class='dialog_message_secondary' type='button' onclick="locateRight_deny();">No</button>
+		</div>
+		<div id='locate_right_message_dnd' class='hide'>
+			<input id='locate_right_message_dnd_input' type='checkbox' >
+			<label for='locate_right_message_dnd_input'>Do not ask again</label>
 		</div>
 	</div>
 </div>
@@ -983,6 +995,27 @@ function locationAccessCheck() {
 	return false;
 }
 
+function setLocationAccessDND(status) {
+	if (typeof(Storage) !== 'undefined') {
+		localStorage.location_access_dnd = (status == true);
+	}
+}
+
+function locationAccessDNDcheck() {
+	if(locationAccessDNDstatus() && JSON.parse(localStorage.location_access_dnd) === true) 
+		return true;
+	return false;
+}
+
+function locationAccessDNDstatus() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access_dnd) !== 'undefined' && localStorage.location_access_dnd != '')
+		return true;
+	else {
+		setLocationAccessDND(false);
+		return false;
+	}
+}
+
 function versionCheck() {
 	var set = false;
 	if (typeof(Storage) !== 'undefined') {
@@ -1008,8 +1041,14 @@ function urlDecode() {
 		pendingWords = code.split('.');
 		initWCode = true;
 	}
+	else
+		locate();
 }
-function showLocateRightMessage() {
+function showLocateRightMessage(hide_dnd) {
+	if(hide_dnd == true)
+		locate_right_message_dnd.classList.add('hide');
+	else
+		locate_right_message_dnd.classList.remove('hide');
 	locate_right_message.classList.remove('hide');
 }
 
@@ -1021,10 +1060,22 @@ function locateRight_grant() {
 	setLocationAccess(true);
 	locate();
 	hideLocateRightMessage();
+	locateRight_DND_check();
 }
 
 function locateRight_deny() {
+	wait_loader.classList.add('hide');
 	hideLocateRightMessage();
+	locateRight_DND_check();
+}
+
+function locateRight_DND_check() {
+	if(locate_right_message_dnd_input.checked) {
+		setLocationAccessDND(true);
+	}
+	else {
+		setLocationAccessDND(false);
+	}
 }
 function showNoCityMessage() {
 	no_city_message.classList.remove('hide');

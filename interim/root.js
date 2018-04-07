@@ -289,7 +289,23 @@ function decode(words) {
 			valid = true;
 		}
 		else if (words.length == 3) {
-			city = getCityFromPosition(resolveLatLng(myLocDot.position));
+			var position;
+			if(myLocDot == null) {
+				if(marker != null && marker.position != null) {
+					position = marker.position;
+					focus(position);
+					showNotification("Since your city is not set - city was chosen from the last location");
+				}
+				else
+					showNotification("Since your city is not set - you must first choose the city or preceed the WCode with city name");
+				return;
+			}
+			else {
+				position = myLocDot.position;
+			}
+			
+			if(position != null)
+				city = getCityFromPosition(resolveLatLng(position));
 			if(city != null)
 				valid = true;
 		}
@@ -382,10 +398,6 @@ function initMap() {
 		zoomControl: false
 	});
 
-//	infoWindow = new google.maps.InfoWindow({map: map});
-//	infoWindow.setContent("Waiting for location access right");
-	locate();
-
 	var input = document.getElementById('pac-input');
 	var searchBox = new google.maps.places.SearchBox(input);
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
@@ -469,7 +481,7 @@ function initMap() {
 	});
 
 	location_button.addEventListener('click', function() {
-		locate();
+		locate(true);
 	});
 
 	decode_button.addEventListener('click', function() {
@@ -694,11 +706,16 @@ function getPanByOffset() {
 		return 0;
 }
 
-function locate() {
+function locate(override_dnd) {
 	// Try HTML5 geolocation.
 	if(!locationAccessCheck()) {
-		pendingLocate = true;
-		showLocateRightMessage();
+		var hide_dnd = override_dnd || !locationAccessDNDstatus();
+		if(override_dnd || !locationAccessDNDcheck()) {
+			pendingLocate = true;
+			showLocateRightMessage(hide_dnd);
+		}
+		else
+			wait_loader.classList.add('hide');
 	}
 	else {
 		pendingLocate = false;
@@ -762,6 +779,7 @@ function locateExec() {
 			if(error.code = error.PERMISSION_DENIED) {
 				showNotification(LOCATION_PERMISSION_DENIED);
 				setLocationAccess(false);
+				wait_loader.classList.add('hide');
 			}
 			else
 				handleLocationError(true, infoWindow, map.getCenter());
@@ -792,7 +810,8 @@ function getIntentURL(latLng, code) {
 }
 
 function clearMap() {
-	marker.setMap(null);
+	if(marker != null)
+		marker.setMap(null);
 }
 
 function infoWindow_setContent(string) {

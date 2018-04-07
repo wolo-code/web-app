@@ -34,6 +34,7 @@ exports.encode = functions.https.onRequest((req, res) => {
 	
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'Content-Type, version');
+	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
 
 	//respond to CORS preflight requests
 	if (req.method == 'OPTIONS') {
@@ -62,7 +63,8 @@ exports.decode = functions.https.onRequest((req, res) => {
 	
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Headers', 'Content-Type, version');
-
+	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+	
 	//respond to CORS preflight requests
 	if (req.method == 'OPTIONS') {
 		res.status(204).send('');

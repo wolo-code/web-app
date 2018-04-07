@@ -48,7 +48,7 @@
 	$component = $id;
 	require '../JS/Fragment/JS.php';
 ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=initMap' async defer></script>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=initMap' async defer></script>
 	<script><?php require '../../JS/Fragment/UpdateMyBrowser.js' ?></script>
 	<script><?php require '../JS/Fragment/UpdateMyBrowser.js' ?></script>
 </body>

@@ -442,7 +442,8 @@ function getIntentURL(latLng, code) {
 }
 
 function clearMap() {
-	marker.setMap(null);
+	if(marker != null)
+		marker.setMap(null);
 }
 
 function infoWindow_setContent(string) {

@@ -35,8 +35,8 @@
 
 #address_text_close {
 	position: absolute;
-	top: 8px;
-	right: 10px;
+	top: 2px;
+	right: 6px;
 }
 
 #address_text_close svg {
@@ -54,7 +54,7 @@
 
 #address_text_copy {
 	padding-top: 2px;
-	padding-left: 4px;
+	padding-left: 10px;
 	margin-left: auto;
 	margin-right: auto;
 }

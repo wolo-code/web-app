@@ -412,6 +412,7 @@ function locateExec() {
 			if(error.code = error.PERMISSION_DENIED) {
 				showNotification(LOCATION_PERMISSION_DENIED);
 				setLocationAccess(false);
+				wait_loader.classList.add('hide');
 			}
 			else
 				handleLocationError(true, infoWindow, map.getCenter());

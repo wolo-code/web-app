@@ -13,5 +13,6 @@ function locateRight_grant() {
 }
 
 function locateRight_deny() {
+	wait_loader.classList.add('hide');
 	hideLocateRightMessage();
 }

@@ -32,8 +32,6 @@ function initMap() {
 		zoomControl: false
 	});
 
-//	infoWindow = new google.maps.InfoWindow({map: map});
-//	infoWindow.setContent("Waiting for location access right");
 	locate();
 
 	var input = document.getElementById('pac-input');

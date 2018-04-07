@@ -45,4 +45,6 @@ function urlDecode() {
 		pendingWords = code.split('.');
 		initWCode = true;
 	}
+	else
+		locate();
 }

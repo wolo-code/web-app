@@ -115,7 +115,7 @@ function initMap() {
 	});
 
 	location_button.addEventListener('click', function() {
-		locate();
+		locate(true);
 	});
 
 	decode_button.addEventListener('click', function() {
@@ -340,11 +340,16 @@ function getPanByOffset() {
 		return 0;
 }
 
-function locate() {
+function locate(override_dnd) {
 	// Try HTML5 geolocation.
 	if(!locationAccessCheck()) {
-		pendingLocate = true;
-		showLocateRightMessage();
+		var hide_dnd = override_dnd || !locationAccessDNDstatus();
+		if(override_dnd || !locationAccessDNDcheck()) {
+			pendingLocate = true;
+			showLocateRightMessage(hide_dnd);
+		}
+		else
+			wait_loader.classList.add('hide');
 	}
 	else {
 		pendingLocate = false;

@@ -5,3 +5,11 @@
 #locate_right_message_body p {
 	padding-bottom: 8px;
 }
+
+#locate_right_message_dnd_input {
+	width: 18px;
+	height: 18px;
+	margin-top: 6px;
+	margin-right: 4px;
+	-webkit-appearance: checkbox !important;
+}

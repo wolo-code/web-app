@@ -20,6 +20,27 @@ function locationAccessCheck() {
 	return false;
 }
 
+function setLocationAccessDND(status) {
+	if (typeof(Storage) !== 'undefined') {
+		localStorage.location_access_dnd = (status == true);
+	}
+}
+
+function locationAccessDNDcheck() {
+	if(locationAccessDNDstatus() && JSON.parse(localStorage.location_access_dnd) === true) 
+		return true;
+	return false;
+}
+
+function locationAccessDNDstatus() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access_dnd) !== 'undefined' && localStorage.location_access_dnd != '')
+		return true;
+	else {
+		setLocationAccessDND(false);
+		return false;
+	}
+}
+
 function versionCheck() {
 	var set = false;
 	if (typeof(Storage) !== 'undefined') {

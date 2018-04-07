@@ -13,5 +13,9 @@
 			<button id='locate_right_message_yes' class='dialog_message_primary' type='button' onclick="locateRight_grant();">Yes</button>
 			<button id='locate_right_message_no' class='dialog_message_secondary' type='button' onclick="locateRight_deny();">No</button>
 		</div>
+		<div id='locate_right_message_dnd' class='hide'>
+			<input id='locate_right_message_dnd_input' type='checkbox' >
+			<label for='locate_right_message_dnd_input'>Do not ask again</label>
+		</div>
 	</div>
 </div>

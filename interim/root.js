@@ -216,6 +216,9 @@ var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
 
+const PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
+const PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the WCode with city name";
+
 function getCityFromPosition(latLng) {
 	var nearCityList = [];
 	CityList.forEach (function(city) {
@@ -294,10 +297,10 @@ function decode(words) {
 				if(marker != null && marker.position != null) {
 					position = marker.position;
 					focus(position);
-					showNotification("Since your city is not set - city was chosen from the last location");
+					showNotification(PURE_WCODE_CITY_PICKED);
 				}
 				else
-					showNotification("Since your city is not set - you must first choose the city or preceed the WCode with city name");
+					showNotification(PURE_WCODE_CITY_FAILED);
 				return;
 			}
 			else {

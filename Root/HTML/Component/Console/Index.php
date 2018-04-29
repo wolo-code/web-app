@@ -25,37 +25,35 @@
 				<span class='image'><?php echo file_get_contents('../../Resource/Logo_location.svg'); ?></span>
 			</a>
 		</div>
-		<!-- <div id="map_container"> -->
-				<h2 class='message_dialog_label'>
-					Details
-				</h2>
-					<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
-				</div>
-					<div id='data_gp_id'>GP id</div>
-					<div id='data_lat'>Lat</div>
-					<div id='data_lng'>Long</div>
-				</div>
 		<div id='map_canvas'></div>
 		<div id='address_details' class='message_dialog hide'>
+			<h2 class='message_dialog_label'>
+				Details
+			</h2>
 			<div id='details_close' class="message_dialog_close control">
+				<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
 			</div>
-			<div id='address_text'>
 			<div class='message_dialog_body'>
+				<div id='data_gp_id'>GP id</div>
+				<div id='data_lat'>Lat</div>
+				<div id='data_lng'>Long</div>
 			</div>
-			<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
-			<form id='city_submit_panel'>
 				<input id='city_lat' type='hidden' required >
 				<input id='city_lng' type='hidden' required >
-				<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
-				<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
-				<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
 				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='7'>Submit</button>
-			</form>
-		<!-- </div> -->
+		</div>
+		<div id='address_text'>
 			<div id='address_text_label'>Address</div>
 			<div id='address_text_main'>
 				<span id='address_text_content'></span>
 			</div>
+		</div>
+		<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
+		<form id='city_submit_panel'>
+			<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
+			<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
+			<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
+		</form>
 		<div id='notification_bottom' class='hide'></div>
 	</div>
 </div>

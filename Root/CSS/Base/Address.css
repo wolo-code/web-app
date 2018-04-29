@@ -26,6 +26,7 @@
 }
 
 #address_text_content {
+	display: block;
 	font-family: 'Roboto';
 	min-height: 48px;
 	max-width: 306px;
@@ -44,7 +45,8 @@
 }
 
 #address_text_buttons {
-	width: 100px;
+	display: inline-block;
+	width: 30px;
 }
 
 .address_text_button_spacer {

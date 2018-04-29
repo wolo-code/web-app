@@ -10,7 +10,7 @@
 	}
 	if($bPublish) {
 ?>
-	<style type='text/css'>
+	<style>
 <?php
 		includeDir('../CSS/Base/', $INCLUDE_TYPE_CSS, $INCLUDE_MODE_EMBED, '');
 		includeDir('../../CSS/'.$component_dir.'Base/', $INCLUDE_TYPE_CSS, $INCLUDE_MODE_EMBED, '');
@@ -19,7 +19,7 @@
 <?php
 		if(hasLink($INCLUDE_TYPE_CSS, '../CSS/', '../../CSS/')) {
 ?>
-	<link rel='stylesheet' type='text/css' href='/<?php echo $component_script ?>.css' >
+	<link rel='stylesheet' href='/<?php echo $component_script ?>.css' >
 <?php
 		}
 	}

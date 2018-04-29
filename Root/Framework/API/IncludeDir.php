@@ -26,7 +26,7 @@
 						$filePathRoot = substr($fileRoot, 5);
 						if ($type == $INCLUDE_TYPE_CSS) {
 ?>
-	<link rel='stylesheet' type='text/css' href='<?php echo $filePathRoot.$file ?>' >
+	<link rel='stylesheet' href='<?php echo $filePathRoot.$file ?>' >
 <?php
 						}
 						else if ($type == $INCLUDE_TYPE_JS) {

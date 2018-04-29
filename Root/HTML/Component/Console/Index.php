@@ -40,10 +40,6 @@
 			<div id='details_close' class="message_dialog_close control">
 			</div>
 			<div id='address_text'>
-				<span id='address_text_main'>
-					<div id='address_text_label'>Address</div>
-					<div id='address_text_content'></div>
-				</span>
 			<div class='message_dialog_body'>
 			</div>
 			<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
@@ -56,6 +52,10 @@
 				<botton id='submit_city_button' class='control' type='button' value='Submit' tabindex='7'>Submit</button>
 			</form>
 		<!-- </div> -->
+			<div id='address_text_label'>Address</div>
+			<div id='address_text_main'>
+				<span id='address_text_content'></span>
+			</div>
 		<div id='notification_bottom' class='hide'></div>
 	</div>
 </div>

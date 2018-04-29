@@ -27,13 +27,13 @@
 	font-family: Abel;
 	font-size: x-large;
 	color: #69B7CF;
-	background: #edf0e9c2;
+	background: rgba(237, 240, 233, 0.75);
 	padding: 0px 6px;
 	border-radius: 6px;
 }
 
 #data_count {
-	background: #edf0e9c2;
+	background: rgba(237, 240, 233, 0.75);
 	border-radius: 25px;
 	color: #AAAAAA;
 	border: 1px solid #DDDDDD;
@@ -55,7 +55,7 @@
 	border: 1px solid #69B7CF;
 	border-radius: 25px;
 	display: inline-block;
-	background: #edf0e9c2;
+	background: rgba(237, 240, 233, 0.75);
 }
 
 #data_time {

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' itemscope='' itemtype='http://schema.org/WebApplication'>
 <head>
-	<meta http-equiv='X-UA-Compatible' content="chrome=1" >
+	<meta http-equiv='X-UA-Compatible' content='IE=edge' >
 	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
 	<meta name='title' content="<?php echo $config['project_title'] ?>" >
 	<meta itemprop='name' content="<?php echo $config['project_title'] ?>" >
-	<meta charset='utf-8' >
 	<meta name='robots' content='noindex' >
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content='initial-scale=1.0' >

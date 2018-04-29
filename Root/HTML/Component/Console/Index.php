@@ -22,7 +22,7 @@
 			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
 				<span class='image'><?php echo file_get_contents('../../Resource/Logo_WCode.svg'); ?></span>
 			</a><a id='logo_location' href='https://location.wcodes.org' tabindex='2'>
-				<span class='image'><?php echo file_get_contents('../../Resource/Logo_location_console.svg'); ?></span>
+				<span class='image'><?php echo file_get_contents('../../Resource/Logo_location.svg'); ?></span>
 			</a>
 		</div>
 		<!-- <div id="map_container"> -->

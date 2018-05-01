@@ -8,6 +8,7 @@
 		$component_dir = "component/$component/";
 		$component_script = "$component";
 	}
+	
 	if($bPublish) {
 ?>
 	<script>

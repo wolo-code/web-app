@@ -13,6 +13,11 @@
 		global $INCLUDE_TYPE_EXT;
 
 		$files = loadFiles($fileRoot);
+		$i = array_search('Base', $files);
+		if($i != null) {
+			array_splice($files, $i, 1);
+			array_push($files, 'Base');
+		}
 		foreach ($files as $file) {
 			if(!in_array(strtolower($file), [$exclude, 'link', 'fragment', 'component'])) {
 				if(is_dir($fileRoot.$file) == 1) {

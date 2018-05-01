@@ -84,8 +84,11 @@ ga('send', 'pageview');
 	margin-left: auto;
 	margin-right: auto;
 }
-html,
-body {
+html {
+	background: rgba(100, 100, 100, 0.75);
+}
+
+html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
@@ -111,12 +114,9 @@ button {
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
 
-/* Always set the map height explicitly to define the size of the div
- * element that contains the map. */
 #map {
 	height: 100%;
 }
-/* Optional: Makes the sample page fill the window. */
 
 #description {
 	font-family: Roboto;
@@ -781,6 +781,27 @@ input:valid {
 		<script>Raven.config('https://67af341ea58c4424ab4af921f0583573@sentry.io/187322').install();
 </script>
 	<script>
+var config = {
+	apiKey: "AIzaSyCYD7Q0f4ZR0cH0EOi29wVV2Edgb_j5i_s",
+	authDomain: "location.wcodes.org",
+	databaseURL: "https://waddress-5f30b.firebaseio.com",
+	projectId: "waddress-5f30b",
+	storageBucket: "waddress-5f30b.appspot.com",
+	messagingSenderId: "744968913043"
+};
+firebase.initializeApp(config);
+
+var database = firebase.database();
+function showNotification(message) {
+	notification_bottom.innerText = message;
+	notification_bottom.classList.remove('hide');
+	if(typeof notification_timer != 'undefined' && notification_timer != null)
+		clearTimeout(notification_timer);
+	notification_timer = setTimeout(function(){
+		notification_bottom.innerText = '';
+		notification_bottom.classList.add('hide');
+	}, 2500);
+}
 	</script>
 	<script src="/script.js"></script>
 	<script>

@@ -6,6 +6,7 @@
 	$INCLUDE_TYPE_EXT = [$INCLUDE_TYPE_CSS => 'css', $INCLUDE_TYPE_JS => 'js'];
 
 	function includeDir($fileRoot, $type, $mode, $exclude) {
+		global $bPublish;
 		global $INCLUDE_MODE_EMBED;
 		global $INCLUDE_MODE_LINK;
 		global $INCLUDE_TYPE_CSS;
@@ -36,7 +37,7 @@
 						}
 						else if ($type == $INCLUDE_TYPE_JS) {
 ?>
-	<script <?php if($file != 'Base.js') echo 'async' ?> src='<?php echo $filePathRoot.$file ?>'></script>
+	<script <?php if($bPublish) echo 'async' ?> src='<?php echo $filePathRoot.$file ?>'></script>
 <?php
 						}
 						else {

@@ -794,10 +794,9 @@ function locateExec() {
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-	infoWindow_setContent(browserHasGeolocation ?
+	showNotification(browserHasGeolocation ?
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
-	infoWindow.setPosition(pos);
 	notification_top.classList.remove('hide');
 }
 

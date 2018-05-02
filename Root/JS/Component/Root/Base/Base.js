@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', domInit);
 var CURRENT_VERSION = 1;
 var initWCode = false;
 
+var wordList = new WordList(wordList_data);
+
 function domInit() {
 	versionCheck();
 	urlDecode();

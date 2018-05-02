@@ -34,7 +34,7 @@ function setCodeWords(code, city, position) {
 	var object = JSON.parse(code).code;
 
 	for(i of object)
-		message.push(wordList[i]);
+		message.push(wordList.getWord(i));
 
 	setWcode(message, position);
 }

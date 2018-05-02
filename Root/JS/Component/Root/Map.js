@@ -164,7 +164,7 @@ function suggestComplete(event) {
 	}
 	if(curList !=  null) {
 		var curWord = input_array[input_array.length-1];
-		if(curList != city_styled_wordlist && curList != wordList) {
+		if(curList != city_styled_wordlist && curList != wordList.curList) {
 			var compareWord = input_array.slice(0, -1).join(' ')+' ';
 			var newList = [];
 			var regEx = new RegExp(compareWord, 'ig');
@@ -190,7 +190,7 @@ function getPossibleList(code) {
 		for(i = code.length; i > 0; i--) {
 			var cityName = code.slice(0, i).join(' ');
 			if(getCityFromName(cityName)) {
-				list = wordList;
+				list = wordList.curList;
 				break;
 			}
 			else {
@@ -200,10 +200,10 @@ function getPossibleList(code) {
 			}
 		}
 		for(; i < code.length; i++) {
-			if(wordList.indexOf(code[i]) == -1)
+			if(!wordList.indexOf(code[i]))
 				return null;
 			else
-				list = wordList;
+				list = wordList.curList;
 		}
 	}
 	return list;

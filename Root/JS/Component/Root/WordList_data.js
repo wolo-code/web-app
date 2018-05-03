@@ -1024,3 +1024,5 @@ var wordList_data = [
 	['zebra'],
 	['zinc']
 ];
+
+var wordList = new WordList(wordList_data);

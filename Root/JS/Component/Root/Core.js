@@ -3,6 +3,7 @@ var city_styled_wordlist = [];
 var city_plus_wordList = [];
 var pendingPosition;
 var pendingWords;
+var wordList;
 
 const PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
 const PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the WCode with city name";

@@ -1,4 +1,4 @@
-var CityList = [];
+var CityList;
 var city_styled_wordlist = [];
 var city_plus_wordList = [];
 var pendingPosition;
@@ -38,7 +38,7 @@ function getCityFromName(cityName) {
 
 function encode(position) {
 	clearWcode();
-	if(CityList.length > 0) {
+	if(CityList != null) {
 		var city = getCityFromPosition(position);
 		if(city == null) {
 			if(!pendingCity) {
@@ -60,7 +60,7 @@ function encode(position) {
 }
 
 function decode(words) {
-	if(CityList.length > 0) {
+	if(CityList != null) {
 		var city;
 		var valid = false;
 		

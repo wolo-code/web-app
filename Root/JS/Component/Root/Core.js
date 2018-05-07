@@ -8,32 +8,23 @@ const PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen fro
 const PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the WCode with city name";
 
 function getCityFromPosition(latLng) {
-	var nearCityList = [];
+	var nearCity;
 	CityList.forEach (function(city) {
 		var dLat = Math.abs(city.center.lat - latLng.lat);
 		var dLng = Math.abs(city.center.lng - latLng.lng);
 		if(dLat < 0.25) {
 			if(dLng < 0.25) {
 				var dSquare = dLat * dLat + dLng * dLng;
-				if(nearCityList.length == 0) {
-					nearCityList.push({'city':city, 'dLng':dLng});
-				}
-				else {
-					for(i = 0; i < nearCityList.length; i++) {
-						if(nearCityList[i].dLng > dLng) {
-							nearCityList.splice(i, 0, {'city':city, 'dLng':dLng});
-							break;
-						}
-					}
-				}
+				if(nearCity == null || nearCity.dLng > dLng)
+					nearCity = {'city':city, 'dLng':dLng};
 			}
 		}
 	} );
 	
-	if(nearCityList.length == 0)
+	if(nearCity == null)
 		return null;
 	else
-		return nearCityList[0].city;//address_string.replace(/(,| )/gm, '_');
+		return nearCity.city;
 }
 
 function getCityFromName(cityName) {

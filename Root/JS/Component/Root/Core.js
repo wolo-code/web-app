@@ -90,6 +90,8 @@ function decode(words) {
 				city = getCityFromPosition(resolveLatLng(position));
 			if(city != null)
 				valid = true;
+			else
+				valid = false;
 		}
 
 		if(valid) {

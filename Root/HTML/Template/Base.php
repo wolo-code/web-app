@@ -15,6 +15,8 @@
 	echo $config['project_description'].' - '.$config['project_title'];
 ?>
 	</title>
+	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>
+	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-database.js'></script>
 <?php
 	if($bPublish) {
 ?>
@@ -32,8 +34,6 @@
 ?>
 </head>
 <body>
-	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-app.js'></script>
-	<script src='https://www.gstatic.com/firebasejs/4.6.0/firebase-database.js'></script>
 	<script src='/umb.js'></script>
 <?php
 	require (getComponentPath($id));

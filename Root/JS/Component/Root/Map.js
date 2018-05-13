@@ -340,7 +340,6 @@ function getPanByOffset() {
 }
 
 function locate(override_dnd) {
-	// Try HTML5 geolocation.
 	if(!locationAccessCheck()) {
 		var hide_dnd = override_dnd || !locationAccessDNDstatus();
 		if(override_dnd || !locationAccessDNDcheck()) {
@@ -349,9 +348,8 @@ function locate(override_dnd) {
 		else
 			wait_loader.classList.add('hide');
 	}
-	else {
+	else
 		locateExec();
-	}
 }
 
 function locateExec() {

@@ -17,7 +17,7 @@
 		includeDir('../../JS/'.$component_dir.'Base/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, '');
 ?>
 	</script>
-	<script src="/<?php echo $component_script ?>.js"></script>
+	<script src="/<?php echo $component_script ?>.js" defer></script>
 <?php
 	}
 	else {

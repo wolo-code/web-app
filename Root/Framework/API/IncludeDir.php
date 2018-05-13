@@ -37,7 +37,7 @@
 						}
 						else if ($type == $INCLUDE_TYPE_JS) {
 ?>
-	<script <?php if($bPublish) echo 'async' ?> src='<?php echo $filePathRoot.$file ?>'></script>
+	<script src='<?php echo $filePathRoot.$file ?>' defer></script>
 <?php
 						}
 						else {

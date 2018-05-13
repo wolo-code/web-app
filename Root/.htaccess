@@ -8,6 +8,9 @@ DirectorySlash Off
 
 RewriteRule ^(.+)/$ $1 [R=301]
 
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/Files%{REQUEST_URI} -f
+RewriteRule ^(.+)$ files/$1 [L]
 
 RewriteRule ^umb.js$ Modules/UMB/JS/Script.php [L]
 
@@ -44,10 +47,6 @@ RewriteRule ^(.*?)\.jpg$ $1/index.jpg [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*?)$ $1.html [L]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{DOCUMENT_ROOT}/Files%{REQUEST_URI} -f
-RewriteRule ^(.+)$ files/$1 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)$ / [L]

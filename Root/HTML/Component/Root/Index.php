@@ -8,9 +8,9 @@
 <div id='map'></div>
 <div id='wait_loader'></div>
 <div id='logo'>
-	<a id=logo_wcode href='https://wcodes.org' tabindex='1'>
+	<a id=logo_wcode href='//wcodes.org' tabindex='1'>
 		<span class='image'><?php echo file_get_contents('../../Resource/Logo_WCode.svg'); ?></span>
-	</a><a id=logo_location href='https://location.wcodes.org' tabindex='2'>
+	</a><a id=logo_location href='//location.wcodes.org' tabindex='2'>
 		<span class='image'><?php echo file_get_contents('../../Resource/Logo_location.svg'); ?></span>
 	</a>
 </div>

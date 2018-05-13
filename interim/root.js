@@ -382,7 +382,6 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
-var pendingLocate = false;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
 var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
@@ -489,7 +488,7 @@ function initMap() {
 	});
 
 	location_button.addEventListener('click', function() {
-		locate(true);
+		syncLocate(true);
 	});
 
 	decode_button.addEventListener('click', function() {
@@ -714,21 +713,17 @@ function getPanByOffset() {
 		return 0;
 }
 
-function locate(override_dnd) {
-	// Try HTML5 geolocation.
+function initLocate(override_dnd) {
 	if(!locationAccessCheck()) {
 		var hide_dnd = override_dnd || !locationAccessDNDstatus();
 		if(override_dnd || !locationAccessDNDcheck()) {
-			pendingLocate = true;
 			showLocateRightMessage(hide_dnd);
 		}
 		else
 			wait_loader.classList.add('hide');
 	}
-	else {
-		pendingLocate = false;
+	else
 		locateExec();
-	}
 }
 
 function locateExec() {
@@ -791,10 +786,13 @@ function locateExec() {
 			}
 			else
 				handleLocationError(true, infoWindow, map.getCenter());
+			
+			syncCheckIncompatibleBrowserMessage();	
 		});
 	} else {
 		// Browser doesn't support Geolocation
 		handleLocationError(false, infoWindow, map.getCenter());
+		syncCheckIncompatibleBrowserMessage();
 	}
 }
 
@@ -803,6 +801,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
 	notification_top.classList.remove('hide');
+	syncCheckIncompatibleBrowserMessage();
 }
 
 function setInfoWindowText(code, latLng) {
@@ -880,21 +879,25 @@ function getWcodeCity() {
 window.onload = init;
 
 function init() {
-	overlay.addEventListener('click', hideOverlay);
-	overlay_message_close.addEventListener('click', hideOverlay);
-	info.addEventListener('click', showOverlay);
-	no_city_message_close.addEventListener('click', hideNoCityMessage);
-	locate_right_message_close.addEventListener('click', hideLocateRightMessage);
-	locate_right_message_yes.addEventListener('click', locateRight_grant);
-	locate_right_message_no.addEventListener('click', locateRight_deny);
-	no_city_submit_yes.addEventListener('click', noCity_add);
-	no_city_submit_no.addEventListener('click', noCity_cancel);
-	no_city_submit_wait_continue.addEventListener('click', noCityWait_continue);
-	no_city_submit_wait_stop.addEventListener('click', noCityWait_stop);
-	notification_top.addEventListener('click', tryDefaultCity);
-	copy_wcode_message_close.addEventListener('click', hideCopyWcodeMessage);
-	copy_wcode_submit_yes.addEventListener('click', copyWcodeFull);
-	copy_wcode_submit_no.addEventListener('click', copyWcodeCode);
+	document.getElementById('overlay').addEventListener('click', hideOverlay);
+	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
+	document.getElementById('info').addEventListener('click', showOverlay);
+	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
+	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
+	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);
+	document.getElementById('locate_right_message_no').addEventListener('click', locateRight_deny);
+	document.getElementById('no_city_submit_yes').addEventListener('click', noCity_add);
+	document.getElementById('no_city_submit_no').addEventListener('click', noCity_cancel);
+	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
+	document.getElementById('no_city_submit_wait_stop').addEventListener('click', noCityWait_stop);
+	document.getElementById('notification_top').addEventListener('click', tryDefaultCity);
+	document.getElementById('copy_wcode_message_close').addEventListener('click', hideCopyWcodeMessage);
+	document.getElementById('copy_wcode_submit_yes').addEventListener('click', copyWcodeFull);
+	document.getElementById('copy_wcode_submit_no').addEventListener('click', copyWcodeCode);
+	document.getElementById('incompatible_browser_message_close').addEventListener('click', hideIncompatibleBrowserMessage);
+	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
+	document.getElementById('address_text_close').addEventListener('click', hideAddress);
+	document.getElementById('address_text_copy').addEventListener('click', copyAddress);
 }
 
 function showAndCopy(message) {

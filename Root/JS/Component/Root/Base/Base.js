@@ -67,5 +67,5 @@ function urlDecode() {
 		initWCode = true;
 	}
 	else
-		locate();
+		syncLocate();
 }

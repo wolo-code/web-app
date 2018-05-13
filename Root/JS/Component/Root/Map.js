@@ -114,7 +114,7 @@ function initMap() {
 	});
 
 	location_button.addEventListener('click', function() {
-		locate(true);
+		syncLocate(true);
 	});
 
 	decode_button.addEventListener('click', function() {
@@ -339,7 +339,7 @@ function getPanByOffset() {
 		return 0;
 }
 
-function locate(override_dnd) {
+function initLocate(override_dnd) {
 	if(!locationAccessCheck()) {
 		var hide_dnd = override_dnd || !locationAccessDNDstatus();
 		if(override_dnd || !locationAccessDNDcheck()) {

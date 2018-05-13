@@ -8,7 +8,6 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
-var pendingLocate = false;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
 var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
@@ -345,14 +344,12 @@ function locate(override_dnd) {
 	if(!locationAccessCheck()) {
 		var hide_dnd = override_dnd || !locationAccessDNDstatus();
 		if(override_dnd || !locationAccessDNDcheck()) {
-			pendingLocate = true;
 			showLocateRightMessage(hide_dnd);
 		}
 		else
 			wait_loader.classList.add('hide');
 	}
 	else {
-		pendingLocate = false;
 		locateExec();
 	}
 }

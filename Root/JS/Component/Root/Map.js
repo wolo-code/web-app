@@ -417,10 +417,13 @@ function locateExec() {
 			}
 			else
 				handleLocationError(true, infoWindow, map.getCenter());
+			
+			syncCheckIncompatibleBrowserMessage();	
 		});
 	} else {
 		// Browser doesn't support Geolocation
 		handleLocationError(false, infoWindow, map.getCenter());
+		syncCheckIncompatibleBrowserMessage();
 	}
 }
 
@@ -429,6 +432,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
 	notification_top.classList.remove('hide');
+	syncCheckIncompatibleBrowserMessage();
 }
 
 function setInfoWindowText(code, latLng) {

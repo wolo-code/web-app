@@ -8,6 +8,9 @@ DirectorySlash Off
 
 RewriteRule ^(.+)/$ $1 [R=301]
 
+
+RewriteRule ^umb.js$ Modules/UMB/JS/Script.php [L]
+
 RewriteRule ^style.css$ Framework/CSS/Style.php [L]
 RewriteRule ^script.js$ Framework/JS/Script.php [L]
 

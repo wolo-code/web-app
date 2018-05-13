@@ -3,6 +3,7 @@
 	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/NoCity.php';
 	require '../../HTML/Fragment/Copy_wcode.html';
+	require '../../HTML/Fragment/Incompatible_browser.html';
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>

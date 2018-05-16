@@ -1,18 +1,11 @@
 var auth_processed = false;
-var map_ready = false;
 var target_id;
 
-window.onload = function() {
+document.addEventListener('DOMContentLoaded', function() {
 	initApp();
 	setupControls();
 	setTargetIndex();
-};
-
-function setTargetIndex() {
-	var param = window.location.hash.substr(1);
-	if(param.length > 0)
-		target_id = param;
-}
+});
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {
@@ -43,81 +36,11 @@ function initApp() {
 	});
 }
 
-function beginLoader() {
-	idLoader = setTimeout(function(){endLoader('unauthenticated')}, 2500);
-}
-
-function endLoader(status) {
-	clearTimeout(idLoader);
-	idLoader = null;
-	if(status == 'authenticated')
-		showConsloeBlock();
-	else if('unauthenticated')
-		showRestrictedBlock();
-}
-
 function initMap() {
 	if(auth_processed)
 		initialize();
 	else
 		map_processed = true;
-}
-
-function showRestrictedBlock() {
-	console_block.classList.add('hide');
-	restrict_block.classList.remove('hide');
-}
-
-function showConsloeBlock() {
-	restrict_block.classList.add('hide');	
-	console_block.classList.remove('hide');
-	if(map_processed)
-		initialize();
-	else
-		auth_processed = true;
-}
-
-function nextRow() {
-	if(data_index+1 < data.length) {
-		data_index++;
-		updateList();
-	}
-}
-
-function deleteRow() {
-}
-
-function previousRow() {
-	if(data_index == 0) {
-		if(data.length > 0) {
-			data_index = data.length-1;
-			updateList();
-		}
-	}
-	else {
-		data_index--;
-		updateList();
-	}
-}
-
-function updateList() {
-	if(data.length > 0) {
-		view_data_index.innerText = data_index+1;
-		var entry = data[data_index];
-		data_gp_id.innerText = entry.gp_id;
-		data_lat.innerText = entry.lat_lng.lat
-		data_lng.innerText = entry.lat_lng.lng;
-		setAddress(entry.address, entry.gp_id);
-		data_time.innerText = formatDate(new Date(entry.time));
-		location_request_list.classList.remove('invisible');
-		map.panTo(entry.lat_lng);
-		showEntryMarker(entry.lat_lng);
-	}
-	else {
-		location_request_list.classList.add('invisible');
-		clearAddress();
-	}
-	clearForm();
 }
 
 function setupControls() {
@@ -168,43 +91,4 @@ function setupControls() {
 			showNotification("Did you not select a search result?");
 	});
 	
-}
-
-function formatDate(date) {
-	var monthNames = [
-		"Jan", "Feb", "Mar",
-		"Apr", "May", "Jun", "Jul",
-		"Aug", "Sep", "Oct",
-		"Nov", "Dec"
-	];
-
-	var day = date.getDate();
-	var monthIndex = date.getMonth();
-	var hour = date.getHours();
-	var minute = date.getMinutes();
-	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
-}
-
-function formatNumber(number) {
-	WIDTH = 2;
-	if (String(number).length < WIDTH)
-		return ' '+number;
-	else
-		return number;
-}
-
-//google.maps.event.addDomListener(window, "load", initialize);
-
-function fillForm(lat, lng, country) {
-	city_lat.value = lat;
-	city_lng.value = lng;	
-	city_country.value = country;
-}
-
-function clearForm() {
-	city_lat.value = '';
-	city_lng.value = '';
-	city_country.value = '';
-	city_group.value = '';
-	city_name.value = '';	
 }

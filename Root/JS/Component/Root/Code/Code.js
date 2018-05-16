@@ -7,7 +7,7 @@ function encode_(city, position) {
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
-	http.setRequestHeader('version', 1);
+	http.setRequestHeader('version', '1');
 
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
@@ -33,7 +33,7 @@ function setCodeWords(code, city, position) {
 	message.push(city.name);
 	var object = JSON.parse(code).code;
 
-	for(i of object)
+	for(const i of object)
 		message.push(wordList.getWord(i));
 
 	setWcode(message, position);
@@ -53,7 +53,7 @@ function decode_(city, code) {
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
-	http.setRequestHeader('version', 1);
+	http.setRequestHeader('version', '1');
 	
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {

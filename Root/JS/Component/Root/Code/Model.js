@@ -11,7 +11,6 @@ function setWcode(wcode, latLng) {
 }
 
 function clearWcode() {
-	wcode_array = null;
 	wcode_postition = null;
 }
 

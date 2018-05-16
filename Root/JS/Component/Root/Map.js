@@ -1,8 +1,3 @@
-/*
-	Map code from Google Maps Javascript library documentaion under Apache 2.0 license
-*/
-
-var map;
 var marker;
 var infoWindow;
 var accuCircle;
@@ -10,26 +5,12 @@ var myLocDot;
 var poiPlace;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
-var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 
 function initMap() {
-
-	map = new google.maps.Map(document.getElementById('map'), {
-		center: DEFAULT_LATLNG,
-		mapTypeControl: true,
-		mapTypeControlOptions: {
-			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-			position: google.maps.ControlPosition.BOTTOM_CENTER
-		},
-		zoom: 8,
-		fullscreenControl: false,
-		streetViewControl: false,
-		zoomControl: false
-	});
 
 	var input = document.getElementById('pac-input');
 	var searchBox = new google.maps.places.SearchBox(input);
@@ -125,7 +106,7 @@ function initMap() {
 	});
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
-	var clickHandler = new ClickEventHandler(map);
+	clickHandler = new ClickEventHandler(map);
 }
 
 function resolveLatLng(latLng) {
@@ -252,186 +233,11 @@ function load(marker) {
 	encode(marker.position);
 }
 
-function focus__(pos, code) {
-	focus_(pos);
-	setWcode(code, pos);
-}
-
-var ClickEventHandler = function(map) {
-	this.map = map;
-	this.placesService = new google.maps.places.PlacesService(map);
-
-	this.map.addListener('click', this.handleClick.bind(this));
-};
-
-ClickEventHandler.prototype.handleClick = function(event) {
-	if (event.placeId) {
-		// Calling e.stop() on the event prevents the default info window from
-		// showing.
-		// If you call stop here when there is no placeId you will prevent some
-		// other map click event handlers from receiving the event.
-		event.stop();
-		this.getPlaceInformation(event.placeId);
-	}
-	else {
-		getAddress(resolveLatLng(event.latLng));
-	}
-};
-
-ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
-	var me = this;
-	this.placesService.getDetails({placeId: placeId}, function(place, status) {
-		if (status === 'OK') {
-			poiPlace = place;
-			address = place.formatted_address;
-			refreshAddress();
-		}
-	});
-};
-
-function focus_(pos, bounds) {
-	
-	hideNoCityMessage();
-
-	if(typeof marker === 'undefined') {
-		marker = new google.maps.Marker({
-			position: pos,
-			map: map,
-			title: 'Hello World!'
-		});
-		marker.addListener('click', function() {
-			if(infoWindow_open == false) {
-				infoWindow.open(map, marker);
-				infoWindow_open = true;
-			}
-			else {
-				infoWindow.close();
-				infoWindow_open = false;
-			}
-		})
-	}
-	else {
-		marker.setPosition(pos);
-	}
-
-	if(marker.getMap() == null)
-		marker.setMap(map);
-
-	if(typeof bounds !== 'undefined') {
-		map.fitBounds(bounds, 26);
-	}
-	else if (typeof accuCircle !== 'undefined') {
-		accuCircle.setOptions({'fillOpacity': 0.10});
-	}
-	
-	map.panTo(pos);
-	map.panBy(0, getPanByOffset());
-	infoWindow_setContent(MESSAGE_LOADING);
-	infoWindow.open(map, marker);
-	infoWindow_open = true;
-
-}
-
 function getPanByOffset() {
 	if(window.innerHeight < 1000)
 		return -118;
 	else
 		return 0;
-}
-
-function initLocate(override_dnd) {
-	if(!locationAccessCheck()) {
-		var hide_dnd = override_dnd || !locationAccessDNDstatus();
-		if(override_dnd || !locationAccessDNDcheck()) {
-			showLocateRightMessage(hide_dnd);
-		}
-		else
-			wait_loader.classList.add('hide');
-	}
-	else
-		locateExec();
-}
-
-function locateExec() {
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			setLocationAccess(true);
-			var pos = {
-				lat: position.coords.latitude,
-				lng: position.coords.longitude
-			};
-			if(typeof accuCircle === 'undefined') {
-				accuCircle = new google.maps.Circle({
-					strokeColor: '#69B7CF',
-					strokeOpacity: 0,
-					strokeWeight: 0,
-					fillColor: '#69B7CF',
-					fillOpacity: 0.35,
-					map: map,
-					center: pos,
-					radius: position.coords.accuracy,
-					clickable: false
-				});
-			}
-			else {
-				accuCircle.setOptions({'fillOpacity': 0.35});
-				accuCircle.setCenter(pos);
-				accuCircle.setRadius(position.coords.accuracy);
-			}
-
-			if(typeof myLocDot === 'undefined') {
-				myLocDot = new google.maps.Marker({
-					clickable: false,
-					icon: new google.maps.MarkerImage('https://maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-							new google.maps.Size(22,22),
-							new google.maps.Point(0,18),
-							new google.maps.Point(11,11)),
-					shadow: null,
-					zIndex: 999,
-					map: map,
-					position: pos
-				});
-			}
-			else {
-				myLocDot.setPosition(pos);
-			}
-			if(initWCode == false) {
-				focus_(pos, accuCircle.getBounds());
-				encode(pos);
-				getAddress(pos);
-			}
-			else {
-				initWCode = false;
-				map.setZoom(12);
-			}
-		}, function(error) {
-			if(error.code = error.PERMISSION_DENIED) {
-				showNotification(LOCATION_PERMISSION_DENIED);
-				setLocationAccess(false);
-				wait_loader.classList.add('hide');
-			}
-			else
-				handleLocationError(true, infoWindow, map.getCenter());
-			
-			syncCheckIncompatibleBrowserMessage();	
-		});
-	} else {
-		// Browser doesn't support Geolocation
-		handleLocationError(false, infoWindow, map.getCenter());
-		syncCheckIncompatibleBrowserMessage();
-	}
-}
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-	showNotification(browserHasGeolocation ?
-												'Error: The Geolocation service failed' :
-												'Error: Your browser doesn\'t support geolocation');
-	notification_top.classList.remove('hide');
-	syncCheckIncompatibleBrowserMessage();
-}
-
-function setInfoWindowText(code, latLng) {
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='showCopyWcodeMessage();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyWcodeLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {
@@ -444,21 +250,4 @@ function getIntentURL(latLng, code) {
 function clearMap() {
 	if(marker != null)
 		marker.setMap(null);
-}
-
-function infoWindow_setContent(string) {
-	if(typeof infoWindow == 'undefined')
-		infoWindow = new google.maps.InfoWindow({'map': map});
-	infoWindow.setContent(string);
-}
-
-function arrayContainsArray(superset, subset) {
-	return subset.every(function (value) {
-		return (superset.indexOf(value.toLowerCase()) >= 0);
-	});
-}
-
-function clearURL() {
-	if(window.location.pathname.substr(1) != '')
-		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
 }

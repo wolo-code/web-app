@@ -2,8 +2,8 @@ function WordList(list) {
 	this.wordList = list;
 	this.curList = [];
 	
-	for(x of this.wordList)
-		this.curList.push(x[0]);
+	for(const subList of this.wordList)
+		this.curList.push(subList[0]);
 	
 	this.indexOf = function(word) {
 		for(var index = 0; index < 1024; index++) {
@@ -19,8 +19,8 @@ function WordList(list) {
 	};
 	
 	this.includes = function(word) {
-		for(group of this.wordList) {
-			for(entry of group) {
+		for(const group of this.wordList) {
+			for(const entry of group) {
 				if(entry == word)
 					return true;
 			}

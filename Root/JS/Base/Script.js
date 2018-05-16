@@ -1,23 +1,20 @@
-var pendingLocate = false;
+var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
+var pendingInitMap = true;
+var clickHandler;
+var map;
 
-function syncInitMap() {
-	if (typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function') {
-		initMap();
-		if(pendingLocate)
-			syncLocate();
-	}
-}
-
-function syncLocate(override_dnd) {
-	if (typeof google === 'object' && typeof google.maps === 'object' && typeof map == 'object') {
-		initLocate(override_dnd);
-		pendingLocate = false;
-	}
-	else
-		pendingLocate = true;
-}
-
-function syncCheckIncompatibleBrowserMessage() {
-	if(UMB.getStatus() == 'unsupported')
-		showIncompatibleBrowserMessage();
+function createMap() {
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: DEFAULT_LATLNG,
+		mapTypeControl: true,
+		mapTypeControlOptions: {
+			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+			position: google.maps.ControlPosition.BOTTOM_CENTER
+		},
+		zoom: 8,
+		fullscreenControl: false,
+		streetViewControl: false,
+		zoomControl: false
+	});
+	syncInitMap();
 }

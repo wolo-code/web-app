@@ -1,6 +1,12 @@
-window.onload = init;
+document.addEventListener('DOMContentLoaded', function() {
+	versionCheck();
+	if(!urlDecode())
+		syncLocate();
+	syncInitMap();
+	setupControls();
+});
 
-function init() {
+function setupControls() {
 	document.getElementById('overlay').addEventListener('click', hideOverlay);
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
 	document.getElementById('info').addEventListener('click', showOverlay);

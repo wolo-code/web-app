@@ -1,12 +1,5 @@
-document.addEventListener('DOMContentLoaded', domInit);
-
 var CURRENT_VERSION = 1;
 var initWCode = false;
-
-function domInit() {
-	versionCheck();
-	urlDecode();
-}
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {
@@ -65,7 +58,8 @@ function urlDecode() {
 		var code = window.location.pathname.substr(1).toLowerCase();
 		pendingWords = code.split('.');
 		initWCode = true;
+		return true;
 	}
 	else
-		syncLocate();
+		return false;
 }

@@ -18,7 +18,8 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 });
 
 function initData() {
-	city_plus_wordList = city_plus_wordList.concat(wordList.wordList);
+	city_styled_wordlist = city_styled_wordlist.concat(wordList.curList);
+	city_plus_wordList = city_plus_wordList.concat(wordList.curList);
 	
 	if(pendingPosition != null) {
 		encode(pendingPosition);

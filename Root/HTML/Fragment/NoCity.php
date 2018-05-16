@@ -3,7 +3,7 @@
 		Add city
 	</h2>
 	<div id='no_city_message_close' class="message_dialog_close control">
-		<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
+		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='no_city_message_prompt' class='message_dialog_body'>
 		<p>

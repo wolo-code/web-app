@@ -1,7 +1,7 @@
 <div id='overlay' class='hide'>
 	<div id='overlay_message'>
 		<div id='overlay_message_close' class="message_dialog_close control">
-			<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
+			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</div>
 		<h1>
 			WCode location

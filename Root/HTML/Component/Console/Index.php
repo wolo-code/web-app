@@ -20,9 +20,9 @@
 		</div>
 		<div id='logo'>
 			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
-				<span class='image'><?php echo file_get_contents('../../Resource/Logo_WCode.svg'); ?></span>
+				<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
 			</a><a id='logo_location' href='https://location.wcodes.org' tabindex='2'>
-				<span class='image'><?php echo file_get_contents('../../Resource/Logo_location.svg'); ?></span>
+				<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
 			</a>
 		</div>
 		<div id='map_canvas'></div>
@@ -31,7 +31,7 @@
 				Details
 			</h2>
 			<div id='details_close' class="message_dialog_close control">
-				<span class='image'><?php echo file_get_contents('../../Resource/Close.svg'); ?></span>
+				<span class='image'><?php includeSVG('', 'Close'); ?></span>
 			</div>
 			<div class='message_dialog_body'>
 				<div id='data_gp_id'>GP id</div>

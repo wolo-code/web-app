@@ -1,6 +1,7 @@
 <?php
 	require_once '../API/API.php';
 	require_once '../API/Config.php';
+	require_once '../API/IncludeSVG.php';
 
 	$config = loadConfig();
 

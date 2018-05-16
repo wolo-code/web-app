@@ -25,7 +25,7 @@
 				<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
 			</a>
 		</div>
-		<div id='map_canvas'></div>
+		<div id='map'></div>
 		<div id='address_details' class='message_dialog hide'>
 			<h2 class='message_dialog_label'>
 				Details

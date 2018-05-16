@@ -13,33 +13,27 @@
 	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
-?>
-	<script>
-		<?php require '../../JS/Fragment/GA_header.js' ?>
-	</script>
-<?php
-	}
-	$component = "";
-	require '../CSS/Fragment/CSS.php';
-	$component = $id;
-	require '../CSS/Fragment/CSS.php';
-?>
-</head>
-<body>
-	<script src='/umb.js'></script>
-<?php
-	require (getComponentPath($id));
-	if($bPublish) {
-?>
+<?php	if($bPublish) { ?>
+		<script><?php require '../../JS/Fragment/GA_header.js' ?></script>
 		<script <?php require '../JS/Fragment/Sentry_version.php' ?>></script>
 		<script><?php require '../JS/Fragment/Sentry_exec.php' ?></script>
-<?php
-	}
+<?php	} else { ?>
+		<script src='/umb.js'></script>
+		<script src='/svgs.js'></script>
+<?php }
 	$component = "";
 	require '../JS/Fragment/JS.php';
 	$component = $id;
-	require '../JS/Fragment/JS.php';
+	require '../JS/Fragment/JS.php';	
 ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=createMap' async defer></script></head>
+<?php
+	$component = "";
+	require '../CSS/Fragment/CSS.php';
+	$component = $id;
+	require '../CSS/Fragment/CSS.php';
+?>
+<body>
+	<?php	require (getComponentPath($id)); ?>
 </body>
 </html>

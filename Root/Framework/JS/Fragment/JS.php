@@ -17,8 +17,9 @@
 		includeDir('../../JS/'.$component_dir.'Base/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, '');
 ?>
 	</script>
-	<script src="/<?php echo $component_script ?>.js" defer></script>
-<?php
+<?php	if($component != "") { ?>
+	<script src="/<?php echo $component_script ?>.js" async></script>
+<?php }
 	}
 	else {
 		includeDir('../../Framework/JS/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_LINK, '');

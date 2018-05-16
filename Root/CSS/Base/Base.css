@@ -98,6 +98,7 @@ button {
 }
 
 #pac-input {
+	position: absolute;
 	left: 0px !important;
 	top: 36px !important;
 	height: 26px;

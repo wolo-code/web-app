@@ -1,3 +1,69 @@
+var ClickEventHandler = function(map) {
+	this.map = map;
+	this.placesService = new google.maps.places.PlacesService(map);
+	this.map.addListener('click', this.handleClick.bind(this));
+};
+
+ClickEventHandler.prototype.handleClick = function(event) {
+	if (event.placeId) {
+		// Calling e.stop() on the event prevents the default info window from showing.
+		// If you call stop here when there is no placeId you will prevent some other map click event handlers from receiving the event.
+		event.stop();
+		this.getPlaceInformation(event.placeId);
+	}
+	else {
+		getAddress(resolveLatLng(event.latLng));
+	}
+};
+
+ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
+	var me = this;
+	this.placesService.getDetails({placeId: placeId}, function(place, status) {
+		if (status === 'OK') {
+			poiPlace = place;
+			address = place.formatted_address;
+			refreshAddress();
+		}
+	});
+};
+var config = {
+	apiKey: "AIzaSyCYD7Q0f4ZR0cH0EOi29wVV2Edgb_j5i_s",
+	authDomain: "location.wcodes.org",
+	databaseURL: "https://waddress-5f30b.firebaseio.com",
+	projectId: "waddress-5f30b",
+	storageBucket: "waddress-5f30b.appspot.com",
+	messagingSenderId: "744968913043"
+};
+firebase.initializeApp(config);
+
+var database = firebase.database();
+function showIncompatibleBrowserMessage() {
+	document.getElementById('incompatible_browser_message').classList.remove('hide');
+}
+
+function hideIncompatibleBrowserMessage() {
+	document.getElementById('incompatible_browser_message').classList.add('hide');
+	showNotification("This browser is not unsupported");
+}
+function showNotification(message) {
+	notification_bottom.innerText = message;
+	notification_bottom.classList.remove('hide');
+	if(typeof notification_timer != 'undefined' && notification_timer != null)
+		clearTimeout(notification_timer);
+	notification_timer = setTimeout(function(){
+		notification_bottom.innerText = '';
+		notification_bottom.classList.add('hide');
+	}, 2500);
+}
+var _umb = {
+		require: {
+				chrome: 60,
+				firefox: 37,
+				ie: 10,
+				opera: 7,
+				safari: 29
+		}
+};
 var latLng_p = "";
 var address = "";
 var gpId = "";
@@ -57,6 +123,71 @@ function refreshAddress() {
 function copyAddress() {
 	copyNodeText(address_text_content);
 }
+var CURRENT_VERSION = 1;
+var initWCode = false;
+
+function setLocationAccess(status) {
+	if (typeof(Storage) !== 'undefined') {
+		localStorage.location_access = (status == true);
+	}
+}
+
+function locationAccessCheck() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true) 
+		return true;
+	return false;
+}
+
+function setLocationAccessDND(status) {
+	if (typeof(Storage) !== 'undefined') {
+		localStorage.location_access_dnd = (status == true);
+	}
+}
+
+function locationAccessDNDcheck() {
+	if(locationAccessDNDstatus() && JSON.parse(localStorage.location_access_dnd) === true) 
+		return true;
+	return false;
+}
+
+function locationAccessDNDstatus() {
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access_dnd) !== 'undefined' && localStorage.location_access_dnd != '')
+		return true;
+	else {
+		setLocationAccessDND(false);
+		return false;
+	}
+}
+
+function versionCheck() {
+	var set = false;
+	if (typeof(Storage) !== 'undefined') {
+		if(typeof(localStorage.note_version) === 'undefined')
+			set = true;
+		else if(localStorage.note_version != '' && JSON.parse(localStorage.note_version) < CURRENT_VERSION)
+			set = true;
+	}
+	if(set) {
+		localStorage.note_version = CURRENT_VERSION;
+		initWCode = true;
+		showOverlay();
+	}
+	else {
+		info_intro.classList.add('hide');
+		info_full.classList.remove('hide');
+	}
+}
+
+function urlDecode() {
+	if(window.location.pathname.substr(1) != '') {
+		var code = window.location.pathname.substr(1).toLowerCase();
+		pendingWords = code.split('.');
+		initWCode = true;
+		return true;
+	}
+	else
+		return false;
+}
 var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
 
@@ -104,7 +235,7 @@ function encode_(city, position) {
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
-	http.setRequestHeader('version', 1);
+	http.setRequestHeader('version', '1');
 
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
@@ -130,7 +261,7 @@ function setCodeWords(code, city, position) {
 	message.push(city.name);
 	var object = JSON.parse(code).code;
 
-	for(i of object)
+	for(const i of object)
 		message.push(wordList.getWord(i));
 
 	setWcode(message, position);
@@ -150,7 +281,7 @@ function decode_(city, code) {
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
-	http.setRequestHeader('version', 1);
+	http.setRequestHeader('version', '1');
 	
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
@@ -288,7 +419,7 @@ function decode(words) {
 			if(myLocDot == null) {
 				if(marker != null && marker.position != null) {
 					position = marker.position;
-					focus(position);
+					focus_(position);
 					showNotification(PURE_WCODE_CITY_PICKED);
 				}
 				else
@@ -326,6 +457,76 @@ function decode(words) {
 	else
 		pendingWords = words;
 }
+var wcode_city;
+var wcode_code;
+var wcode_postition;
+
+function setWcode(wcode, latLng) {
+	wcode_city = wcode[0];
+	wcode_code = wcode.slice(1, wcode.length);
+	wcode_postition = latLng;
+	
+	setInfoWindowText(wcode, latLng);
+}
+
+function clearWcode() {
+	wcode_postition = null;
+}
+
+function getWcodeFull() {
+	return [wcode_city].concat(wcode_code);
+}
+
+function formatWcode(wcode) {
+	return ["\\"].concat(wcode).concat(["/"]); 
+}
+
+function getWcodeFull_formatted() {
+	return formatWcode(getWcodeFull());
+}
+
+function getWcodeCode() {
+	return wcode_code;
+}
+
+function getWcodeCode_formatted() {
+	return formatWcode(getWcodeCode());
+}
+
+function getWcodeCity() {
+	return wcode_city;	
+}
+function WordList(list) {
+	this.wordList = list;
+	this.curList = [];
+	
+	for(const subList of this.wordList)
+		this.curList.push(subList[0]);
+	
+	this.indexOf = function(word) {
+		for(var index = 0; index < 1024; index++) {
+			var i = this.wordList[index].indexOf(word);
+			if(i != -1)
+				return index;
+		}
+		return -1;
+	};
+	
+	this.getWord = function(index) {
+		return this.curList[index];
+	};
+	
+	this.includes = function(word) {
+		for(const group of this.wordList) {
+			for(const entry of group) {
+				if(entry == word)
+					return true;
+			}
+		}
+		return false;
+	};
+	
+}
 firebase.database().ref('WordList').on('value', function(snapshot) {
 	wordList = new WordList(snapshot.val());
 	if(CityList != null)
@@ -346,7 +547,8 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 });
 
 function initData() {
-	city_plus_wordList = city_plus_wordList.concat(wordList.wordList);
+	city_styled_wordlist = city_styled_wordlist.concat(wordList.curList);
+	city_plus_wordList = city_plus_wordList.concat(wordList.curList);
 	
 	if(pendingPosition != null) {
 		encode(pendingPosition);
@@ -355,28 +557,185 @@ function initData() {
 		decode(pendingWords);
 	}
 }
-function logCode(code, values) {
-	console.log("Code:")
-	console.log(code);
-	console.log(values);
-	console.log("--")
+function focus__(pos, code) {
+	focus_(pos);
+	setWcode(code, pos);
 }
 
-function logDifference(lat, long, values) {
-	var lat_diff_pc = Math.round((lat - curPos.lat) * 1000000) / 1000000;
-	var long_diff_pc = Math.round((long - curPos.lng) * 1000000) / 1000000;
-	console.log("Difference:")
-	console.log(lat_diff_pc + " " + long_diff_pc);
-	console.log(curPos.lat + " " + curPos.lng);
-	console.log(lat + " " + long);
-	console.log(values)
-	console.log("--")
-}
-/*
-	Map code from Google Maps Javascript library documentaion under Apache 2.0 license
-*/
+function focus_(pos, bounds) {
+	
+	hideNoCityMessage();
 
-var map;
+	if(typeof marker === 'undefined') {
+		marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			title: 'Hello World!'
+		});
+		marker.addListener('click', function() {
+			if(infoWindow_open == false) {
+				infoWindow.open(map, marker);
+				infoWindow_open = true;
+			}
+			else {
+				infoWindow.close();
+				infoWindow_open = false;
+			}
+		})
+	}
+	else {
+		marker.setPosition(pos);
+	}
+
+	if(marker.getMap() == null)
+		marker.setMap(map);
+
+	if(typeof bounds !== 'undefined') {
+		map.fitBounds(bounds, 26);
+	}
+	else if (typeof accuCircle !== 'undefined') {
+		accuCircle.setOptions({'fillOpacity': 0.10});
+	}
+	
+	map.panTo(pos);
+	map.panBy(0, getPanByOffset());
+	infoWindow_setContent(MESSAGE_LOADING);
+	infoWindow.open(map, marker);
+	infoWindow_open = true;
+
+}
+function infoWindow_setContent(string) {
+	if(typeof infoWindow == 'undefined')
+		infoWindow = new google.maps.InfoWindow({'map': map});
+	infoWindow.setContent(string);
+}
+
+function setInfoWindowText(code, latLng) {
+	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src=" + svg_address + " ><img id='copy_code_button' class='control' onclick='showCopyWcodeMessage();' src=" + svg_copy + " ><img id='copy_link_button' class='control' onclick='copyWcodeLink();' src=" + svg_link + " ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src=" + svg_map + " ></a></div>")
+}
+function initLocate(override_dnd) {
+	if(!locationAccessCheck()) {
+		var hide_dnd = override_dnd || !locationAccessDNDstatus();
+		if(override_dnd || !locationAccessDNDcheck()) {
+			showLocateRightMessage(hide_dnd);
+		}
+		else
+			wait_loader.classList.add('hide');
+	}
+	else
+		locateExec();
+}
+
+function locateExec() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function(position) {
+			setLocationAccess(true);
+			var pos = {
+				lat: position.coords.latitude,
+				lng: position.coords.longitude
+			};
+			if(typeof accuCircle === 'undefined') {
+				accuCircle = new google.maps.Circle({
+					strokeColor: '#69B7CF',
+					strokeOpacity: 0,
+					strokeWeight: 0,
+					fillColor: '#69B7CF',
+					fillOpacity: 0.35,
+					map: map,
+					center: pos,
+					radius: position.coords.accuracy,
+					clickable: false
+				});
+			}
+			else {
+				accuCircle.setOptions({'fillOpacity': 0.35});
+				accuCircle.setCenter(pos);
+				accuCircle.setRadius(position.coords.accuracy);
+			}
+
+			if(typeof myLocDot === 'undefined') {
+				myLocDot = new google.maps.Marker({
+					clickable: false,
+					icon: new google.maps.MarkerImage('https://maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+							new google.maps.Size(22,22),
+							new google.maps.Point(0,18),
+							new google.maps.Point(11,11)),
+					shadow: null,
+					zIndex: 999,
+					map: map,
+					position: pos
+				});
+			}
+			else {
+				myLocDot.setPosition(pos);
+			}
+			if(initWCode == false) {
+				focus_(pos, accuCircle.getBounds());
+				encode(pos);
+				getAddress(pos);
+			}
+			else {
+				initWCode = false;
+				map.setZoom(12);
+			}
+		}, function(error) {
+			if(error.code = error.PERMISSION_DENIED) {
+				showNotification(LOCATION_PERMISSION_DENIED);
+				setLocationAccess(false);
+				wait_loader.classList.add('hide');
+			}
+			else
+				handleLocationError(true, infoWindow, map.getCenter());
+			
+			syncCheckIncompatibleBrowserMessage();	
+		});
+	} else {
+		// Browser doesn't support Geolocation
+		handleLocationError(false, infoWindow, map.getCenter());
+		syncCheckIncompatibleBrowserMessage();
+	}
+}
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+	showNotification(browserHasGeolocation ?
+												'Error: The Geolocation service failed' :
+												'Error: Your browser doesn\'t support geolocation');
+	notification_top.classList.remove('hide');
+	syncCheckIncompatibleBrowserMessage();
+}
+function showLocateRightMessage(hide_dnd) {
+	if(hide_dnd == true)
+		locate_right_message_dnd.classList.add('hide');
+	else
+		locate_right_message_dnd.classList.remove('hide');
+	locate_right_message.classList.remove('hide');
+}
+
+function hideLocateRightMessage() {
+	locate_right_message.classList.add('hide');
+}
+
+function locateRight_grant() {
+	setLocationAccess(true);
+	initLocate();
+	hideLocateRightMessage();
+	locateRight_DND_check();
+}
+
+function locateRight_deny() {
+	wait_loader.classList.add('hide');
+	hideLocateRightMessage();
+	locateRight_DND_check();
+}
+
+function locateRight_DND_check() {
+	if(locate_right_message_dnd_input.checked) {
+		setLocationAccessDND(true);
+	}
+	else {
+		setLocationAccessDND(false);
+	}
+}
 var marker;
 var infoWindow;
 var accuCircle;
@@ -384,26 +743,12 @@ var myLocDot;
 var poiPlace;
 var pendingCitySubmit = false;
 var infoWindow_open = false;
-var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 
 function initMap() {
-
-	map = new google.maps.Map(document.getElementById('map'), {
-		center: DEFAULT_LATLNG,
-		mapTypeControl: true,
-		mapTypeControlOptions: {
-			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-			position: google.maps.ControlPosition.BOTTOM_CENTER
-		},
-		zoom: 8,
-		fullscreenControl: false,
-		streetViewControl: false,
-		zoomControl: false
-	});
 
 	var input = document.getElementById('pac-input');
 	var searchBox = new google.maps.places.SearchBox(input);
@@ -499,7 +844,7 @@ function initMap() {
 	});
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
-	var clickHandler = new ClickEventHandler(map);
+	clickHandler = new ClickEventHandler(map);
 }
 
 function resolveLatLng(latLng) {
@@ -626,186 +971,11 @@ function load(marker) {
 	encode(marker.position);
 }
 
-function focus__(pos, code) {
-	focus_(pos);
-	setWcode(code, pos);
-}
-
-var ClickEventHandler = function(map) {
-	this.map = map;
-	this.placesService = new google.maps.places.PlacesService(map);
-
-	this.map.addListener('click', this.handleClick.bind(this));
-};
-
-ClickEventHandler.prototype.handleClick = function(event) {
-	if (event.placeId) {
-		// Calling e.stop() on the event prevents the default info window from
-		// showing.
-		// If you call stop here when there is no placeId you will prevent some
-		// other map click event handlers from receiving the event.
-		event.stop();
-		this.getPlaceInformation(event.placeId);
-	}
-	else {
-		getAddress(resolveLatLng(event.latLng));
-	}
-};
-
-ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
-	var me = this;
-	this.placesService.getDetails({placeId: placeId}, function(place, status) {
-		if (status === 'OK') {
-			poiPlace = place;
-			address = place.formatted_address;
-			refreshAddress();
-		}
-	});
-};
-
-function focus_(pos, bounds) {
-	
-	hideNoCityMessage();
-
-	if(typeof marker === 'undefined') {
-		marker = new google.maps.Marker({
-			position: pos,
-			map: map,
-			title: 'Hello World!'
-		});
-		marker.addListener('click', function() {
-			if(infoWindow_open == false) {
-				infoWindow.open(map, marker);
-				infoWindow_open = true;
-			}
-			else {
-				infoWindow.close();
-				infoWindow_open = false;
-			}
-		})
-	}
-	else {
-		marker.setPosition(pos);
-	}
-
-	if(marker.getMap() == null)
-		marker.setMap(map);
-
-	if(typeof bounds !== 'undefined') {
-		map.fitBounds(bounds, 26);
-	}
-	else if (typeof accuCircle !== 'undefined') {
-		accuCircle.setOptions({'fillOpacity': 0.10});
-	}
-	
-	map.panTo(pos);
-	map.panBy(0, getPanByOffset());
-	infoWindow_setContent(MESSAGE_LOADING);
-	infoWindow.open(map, marker);
-	infoWindow_open = true;
-
-}
-
 function getPanByOffset() {
 	if(window.innerHeight < 1000)
 		return -118;
 	else
 		return 0;
-}
-
-function initLocate(override_dnd) {
-	if(!locationAccessCheck()) {
-		var hide_dnd = override_dnd || !locationAccessDNDstatus();
-		if(override_dnd || !locationAccessDNDcheck()) {
-			showLocateRightMessage(hide_dnd);
-		}
-		else
-			wait_loader.classList.add('hide');
-	}
-	else
-		locateExec();
-}
-
-function locateExec() {
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-			setLocationAccess(true);
-			var pos = {
-				lat: position.coords.latitude,
-				lng: position.coords.longitude
-			};
-			if(typeof accuCircle === 'undefined') {
-				accuCircle = new google.maps.Circle({
-					strokeColor: '#69B7CF',
-					strokeOpacity: 0,
-					strokeWeight: 0,
-					fillColor: '#69B7CF',
-					fillOpacity: 0.35,
-					map: map,
-					center: pos,
-					radius: position.coords.accuracy,
-					clickable: false
-				});
-			}
-			else {
-				accuCircle.setOptions({'fillOpacity': 0.35});
-				accuCircle.setCenter(pos);
-				accuCircle.setRadius(position.coords.accuracy);
-			}
-
-			if(typeof myLocDot === 'undefined') {
-				myLocDot = new google.maps.Marker({
-					clickable: false,
-					icon: new google.maps.MarkerImage('https://maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-							new google.maps.Size(22,22),
-							new google.maps.Point(0,18),
-							new google.maps.Point(11,11)),
-					shadow: null,
-					zIndex: 999,
-					map: map,
-					position: pos
-				});
-			}
-			else {
-				myLocDot.setPosition(pos);
-			}
-			if(initWCode == false) {
-				focus_(pos, accuCircle.getBounds());
-				encode(pos);
-				getAddress(pos);
-			}
-			else {
-				initWCode = false;
-				map.setZoom(12);
-			}
-		}, function(error) {
-			if(error.code = error.PERMISSION_DENIED) {
-				showNotification(LOCATION_PERMISSION_DENIED);
-				setLocationAccess(false);
-				wait_loader.classList.add('hide');
-			}
-			else
-				handleLocationError(true, infoWindow, map.getCenter());
-			
-			syncCheckIncompatibleBrowserMessage();	
-		});
-	} else {
-		// Browser doesn't support Geolocation
-		handleLocationError(false, infoWindow, map.getCenter());
-		syncCheckIncompatibleBrowserMessage();
-	}
-}
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-	showNotification(browserHasGeolocation ?
-												'Error: The Geolocation service failed' :
-												'Error: Your browser doesn\'t support geolocation');
-	notification_top.classList.remove('hide');
-	syncCheckIncompatibleBrowserMessage();
-}
-
-function setInfoWindowText(code, latLng) {
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'>" + code[0] + "</span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code.slice(1, code.length).join(' ') + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' onclick='toggleAddress();' src='/resource/address.svg' ><img id='copy_code_button' class='control' onclick='showCopyWcodeMessage();' src='/resource/copy.svg' ><img id='copy_link_button' class='control' onclick='copyWcodeLink();' src='/resource/link.svg' ><a href='"+ getIntentURL(latLng, code) + "'><img id='external_map_button' class='control' onclick='' src='/resource/map.svg' ></a></div>")
 }
 
 function getIntentURL(latLng, code) {
@@ -819,66 +989,62 @@ function clearMap() {
 	if(marker != null)
 		marker.setMap(null);
 }
-
-function infoWindow_setContent(string) {
-	if(typeof infoWindow == 'undefined')
-		infoWindow = new google.maps.InfoWindow({'map': map});
-	infoWindow.setContent(string);
+function showNoCityMessage() {
+	no_city_message.classList.remove('hide');
 }
 
-function arrayContainsArray(superset, subset) {
-	return subset.every(function (value) {
-		return (superset.indexOf(value.toLowerCase()) >= 0);
-	});
+function hideNoCityMessage() {
+	no_city_message.classList.add('hide');
+	noCity_hideLoader();
 }
 
-function clearURL() {
-	if(window.location.pathname.substr(1) != '')
-		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
-}
-var wcode_city;
-var wcode_code;
-var wcode_postition;
-
-function setWcode(wcode, latLng) {
-	wcode_city = wcode[0];
-	wcode_code = wcode.slice(1, wcode.length);
-	wcode_postition = latLng;
-	
-	setInfoWindowText(wcode, latLng);
+function noCity_add() {
+	submitCity();
+	noCity_showLoader();
 }
 
-function clearWcode() {
-	wcode_array = null;
-	wcode_postition = null;
+function noCity_showLoader() {
+	no_city_message_prompt.classList.add('hide');
+	no_city_message_wait.classList.remove('hide');
 }
 
-function getWcodeFull() {
-	return [wcode_city].concat(wcode_code);
+function noCity_hideLoader() {
+	no_city_message_prompt.classList.remove('hide');
+	no_city_message_wait.classList.add('hide');
 }
 
-function formatWcode(wcode) {
-	return ["\\"].concat(wcode).concat(["/"]); 
+function noCity_cancel() {
+	hideNoCityMessage();
+	notification_top.classList.remove('hide');
 }
 
-function getWcodeFull_formatted() {
-	return formatWcode(getWcodeFull());
+function noCityWait_continue() {
+	infoWindow_setContent("Waiting for update");
+	hideNoCityMessage();
 }
 
-function getWcodeCode() {
-	return wcode_code;
+function noCityWait_stop() {
+	pendingPosition = null;
+	pendingCity = false;
+	hideNoCityMessage();
+	notification_top.classList.remove('hide');
+}
+function hideOverlay() {
+	document.getElementById('overlay').classList.add('hide');
 }
 
-function getWcodeCode_formatted() {
-	return formatWcode(getWcodeCode());
+function showOverlay() {
+	document.getElementById('overlay').classList.remove('hide');
 }
+document.addEventListener('DOMContentLoaded', function() {
+	versionCheck();
+	if(!urlDecode())
+		syncLocate();
+	syncInitMap();
+	setupControls();
+});
 
-function getWcodeCity() {
-	return wcode_city;	
-}
-window.onload = init;
-
-function init() {
+function setupControls() {
 	document.getElementById('overlay').addEventListener('click', hideOverlay);
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
 	document.getElementById('info').addEventListener('click', showOverlay);
@@ -913,34 +1079,734 @@ function copyNodeText(node) {
 	document.execCommand('copy');
 	window.getSelection().removeAllRanges();
 }
-function WordList(list) {
-	this.wordList = list;
-	this.curList = [];
-	
-	for(x of this.wordList)
-		this.curList.push(x[0]);
-	
-	this.indexOf = function(word) {
-		for(var index = 0; index < 1024; index++) {
-			var i = this.wordList[index].indexOf(word);
-			if(i != -1)
-				return index;
-		}
-		return -1;
-	};
-	
-	this.getWord = function(index) {
-		return this.curList[index];
-	};
-	
-	this.includes = function(word) {
-		for(group of this.wordList) {
-			for(entry of group) {
-				if(entry == word)
-					return true;
-			}
-		}
-		return false;
-	};
-	
+function arrayContainsArray(superset, subset) {
+	return subset.every(function (value) {
+		return (superset.indexOf(value.toLowerCase()) >= 0);
+	});
 }
+
+function clearURL() {
+	if(window.location.pathname.substr(1) != '')
+		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
+}
+/*!
+ * updatemybrowser.org JavaScript Library v1
+ * http://updatemybrowser.org/
+ *
+ * Copyright 2015, Joram van den Boezem
+ * Licensed under the GPL Version 3 license.
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+;
+
+UMB = function () {
+
+    var hasInit = false;
+    var hasLoaded = false;
+    var config = {};
+
+    /*
+     * Recursively merge properties of two objects
+     */
+    function mergeRecursive(obj1, obj2, lvl) {
+        var lvl = lvl || 0;
+        for (var p in obj1) {
+            try {
+                if (obj2[p].constructor == Object) {
+                    obj1[p] = mergeRecursive(obj1[p], obj2[p], lvl + 1);
+                } else {
+                    obj1[p] = obj2[p];
+                }
+            } catch (e) {
+            }
+        }
+        return obj1;
+    }
+
+    var init = function () {
+        if (hasInit) {
+            return;
+        }
+        hasInit = true;
+
+        UMB.Detect.init();
+
+        var _umb = window._umb || {};
+        config = {
+            require: {
+                chrome: UMB.Browsers['chrome'].minimum,
+                firefox: UMB.Browsers['firefox'].minimum,
+                ie: UMB.Browsers['ie'].minimum,
+                opera: UMB.Browsers['opera'].minimum,
+                safari: UMB.Browsers['safari'].minimum,
+                edge: UMB.Browsers['edge'].minimum
+            },
+            display: true,
+            nonCritical: false
+        };
+        config = mergeRecursive(config, _umb);
+    };
+
+    return {
+
+        load: function () {
+            if (hasLoaded) {
+                return;
+            }
+            hasLoaded = true;
+
+            UMB.attach(window, 'load', function () {
+                init();
+                // Display at all?
+                if (config.display) {
+                    UMB.autoDisplayWidget();
+                }
+            });
+        },
+
+        // http://stackoverflow.com/questions/9434/how-do-i-add-an-additional-window-onload-event-in-javascript
+        attach: function (elm, event, callback) {
+            if (elm.addEventListener) { // W3C standard
+                window.addEventListener(event, callback, false);
+            } else if (elm.attachEvent) { // Microsoft
+                elm.attachEvent('on' + event, callback);
+            }
+        },
+
+        getConfig: function () {
+            init();
+            return config;
+        },
+
+        getCurrentBrowser: function () {
+            init();
+            return UMB.Detect.browser;
+        },
+
+        getCurrentVersion: function () {
+            init();
+            return UMB.Detect.version;
+        },
+
+        getBrowserInfo: function (browser) {
+            init();
+            return UMB.Browsers[browser];
+        },
+
+        getStatus: function () {
+            init();
+            return UMB.Status.getStatus();
+        },
+
+        displayWidget: function () {
+            init();
+            UMB.Widget.display();
+        },
+
+        hideWidget: function () {
+            init();
+            UMB.Widget.hide();
+        },
+
+        autoDisplayWidget: function () {
+            init();
+
+            // Cookie set to hide bar?
+            if (document.cookie.indexOf('_umb=hide') == -1) {
+                var status = UMB.getStatus();
+
+                if (status == 'update' && config.nonCritical) {
+                    // Display on recommended update
+                    UMB.displayWidget();
+                } else if (status == 'warning') {
+                    // Display on critical update
+                    UMB.displayWidget();
+                }
+            }
+        },
+
+        scrollToTop: function () {
+            // http://stackoverflow.com/questions/871399/cross-browser-method-for-detecting-the-scrolltop-of-the-browser-window
+            var B = document.body; //IE 'quirks'
+            var D = document.documentElement; //IE with doctype
+            D = (B.clientHeight) ? B : D;
+            D.scrollTop = 0;
+        }
+    };
+}();
+UMB.load();/*!
+ * updatemybrowser.org JavaScript Library v1
+ * http://updatemybrowser.org/
+ *
+ * Copyright 2012, Joram van den Boezem
+ * Licensed under the GPL Version 3 license.
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+;if (typeof UMB === "undefined") {UMB = function() {}};
+
+UMB.Browsers = {
+		chrome: {
+				name: "Chrome",
+				vendor: "Google",
+				current: "62",
+				minimum: "61",
+				update_url: "https://www.google.com/chrome/browser/desktop/index.html",
+				info_url: "http://www.google.com/chrome/intl/en/more/index.html"
+		},
+		safari: {
+				name: "Safari",
+				vendor: "Apple",
+				current: "11",
+				minimum: "10",
+				update_url: "http://www.apple.com/safari/",
+				info_url: "http://www.apple.com/safari/"
+		},
+		edge: {
+				name: "Edge",
+				vendor: "Microsoft",
+				current: "16",
+				minimum: "15",
+				update_url: "https://www.microsoft.com/en-us/download/details.aspx?id=48126",
+				info_url: "https://www.microsoft.com/en-us/windows/microsoft-edge"
+		},
+		firefox: {
+				name: "Firefox",
+				vendor: "Mozilla",
+				current: "56",
+				minimum: "55",
+				update_url: "http://www.getfirefox.com/",
+				info_url: "https://www.mozilla.org/firefox/desktop/"
+		},
+		ie: {
+				name: "Internet Explorer",
+				vendor: "Microsoft",
+				current: "11",
+				minimum: "10",
+				update_url: "http://www.microsoft.com/ie",
+				info_url: "http://windows.microsoft.com/internet-explorer"
+		},
+		opera: {
+				name: "Opera",
+				vendor: null,
+				current: "48",
+				minimum: "47",
+				update_url: "http://www.opera.com/browser/",
+				info_url: "http://www.opera.com/browser/features/"
+		}
+};
+/*!
+ * updatemybrowser.org JavaScript Library v1
+ * http://updatemybrowser.org/
+ *
+ * Copyright 2015, Joram van den Boezem
+ * Licensed under the GPL Version 3 license.
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+/*!
+ * Based on Browser detect script by Peter-Paul Koch
+ * See http://www.quirksmode.org/js/detect.html
+ */
+;if (typeof UMB === "undefined") {UMB = function(){}};
+
+UMB.Detect = {
+    init: function () {
+        this.browser = this.searchString(this.dataBrowser) || "unknown";
+        this.version = this.searchVersion(navigator.userAgent)
+            || this.searchVersion(navigator.appVersion)
+            || "an unknown version";
+        this.OS = this.searchString(this.dataOS) || "unknown";
+    },
+    searchString: function (data) {
+        for (var i = 0; i < data.length; i++) {
+            var dataString = data[i].string;
+            var dataProp = data[i].prop;
+            this.versionSearchString = data[i].versionSearch || data[i].identity;
+            if (dataString) {
+                if (dataString.indexOf(data[i].subString) != -1)
+                    return data[i].identity;
+            }
+            else if (dataProp)
+                return data[i].identity;
+        }
+    },
+    searchVersion: function (dataString) {
+        var index = dataString.indexOf(this.versionSearchString);
+        if (index == -1) return;
+        return parseFloat(dataString.substring(index + this.versionSearchString.length + 1));
+    },
+    dataBrowser: [
+        {
+            string: navigator.userAgent,
+            subString: "OPR/",
+            identity: "opera",
+            versionSearch: "OPR"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Edge",
+            identity: "edge",
+            versionSearch: "Edge"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Chrome",
+            versionSearch: "Chrome",
+            identity: "chrome"
+        },
+        {
+            string: navigator.vendor,
+            subString: "Apple",
+            identity: "safari",
+            versionSearch: "Version"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Firefox",
+            versionSearch: "Firefox",
+            identity: "firefox"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "MSIE",
+            identity: "ie",
+            versionSearch: "MSIE"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Trident",
+            identity: "ie",
+            versionSearch: "rv"
+        }
+    ],
+    dataOS: [
+        {
+            string: navigator.userAgent,
+            subString: "iPhone",
+            identity: "iOS"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "iPad",
+            identity: "iOS"
+        },
+        {
+            string: navigator.userAgent,
+            subString: "Android",
+            identity: "Android"
+        },
+        {
+            string: navigator.platform,
+            subString: "Win",
+            identity: "Windows"
+        },
+        {
+            string: navigator.platform,
+            subString: "Mac",
+            identity: "Mac"
+        },
+        {
+            string: navigator.platform,
+            subString: "Linux",
+            identity: "Linux"
+        }
+    ]
+};/*!
+ * updatemybrowser.org JavaScript Library v1
+ * http://updatemybrowser.org/
+ *
+ * Copyright 2015, Joram van den Boezem
+ * Licensed under the GPL Version 3 license.
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+/*!
+ * Require UMB.Detect
+ * Require UMB.Browsers
+ */
+;if (typeof UMB === "undefined") {UMB = function(){}};
+
+UMB.Status = function () {
+
+    var STATUS_LATEST = 'latest';
+    var STATUS_UPDATE = 'update';
+    var STATUS_WARNING = 'warning';
+    var STATUS_UNSUPPORTED = 'unsupported';
+
+    return {
+        getStatus: function () {
+            var browser = UMB.getBrowserInfo(UMB.Detect.browser);
+            var os = UMB.Detect.OS;
+            if (!browser || os == 'iOS' || os == 'Android') return STATUS_UNSUPPORTED;
+            var latestVersion = parseFloat(browser.current);
+            var minimumVersion = parseFloat(UMB.getConfig().require[UMB.Detect.browser]);
+            if (UMB.Detect.version >= latestVersion) {
+                return STATUS_LATEST;
+            } else if (UMB.Detect.version >= minimumVersion) {
+                return STATUS_UPDATE;
+            } else {
+                return STATUS_WARNING;
+            }
+        }
+    };
+}();/*!
+ * updatemybrowser.org JavaScript Library v1
+ * http://updatemybrowser.org/
+ *
+ * Copyright 2012, Joram van den Boezem
+ * Licensed under the GPL Version 3 license.
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+/*!
+ * Require UMB.Status
+ */
+;if (typeof UMB === "undefined") {UMB = function(){}};
+
+UMB.Widget = function () {
+
+    var hasInit = false;
+    var isFixed = false;
+
+    var oldBodyMarginTop;
+
+    var applyStyle = function (style, elm) {
+        for (var x in style) {
+            elm.style[x] = style[x];
+        }
+        ;
+    };
+
+    var setCookie = function (key, value, days) {
+        var exdate = new Date();
+        exdate.setDate(exdate.getDate() + days);
+        var content = encodeURIComponent(value) + ((days == null) ? '' : '; expires=' + exdate.toUTCString()) + '; path=/';
+        document.cookie = key + '=' + content;
+    };
+
+    var insertHtml = function () {
+
+        // CLEAN UP OLD WRAPPER
+        isFixed = false;
+        var oldWrapper = document.getElementById('BrowserBar');
+        if (oldWrapper) {
+            document.getElementsByTagName('body')[0].removeChild(oldWrapper);
+        }
+
+        // WRAPPER
+        var wrapper = document.createElement('div');
+        var wrapperStyle = {
+            display: 'none',
+            position: 'absolute',
+            height: '19px',
+            fontSize: '14px',
+            lineHeight: '1em',
+            fontFamily: 'Arial, sans-serif',
+            color: 'black',
+            padding: '10px 0',
+            top: '-40px',
+            left: '0px',
+            backgroundColor: '#FDF2AB',
+            backgroundImage: 'url(//updatemybrowser.org/warning.gif)',
+            backgroundPosition: '10px center',
+            backgroundRepeat: 'no-repeat',
+            borderBottom: '1px solid #A29330',
+            width: '100%',
+            textAlign: 'left',
+            cursor: 'pointer',
+            zoom: '1',
+            zIndex: 9999,
+            '-webkit-box-sizing': 'content-box',
+            '-moz-box-sizing': 'content-box',
+            'box-sizing': 'content-box',
+            overflow: 'hidden'
+        };
+        applyStyle(wrapperStyle, wrapper);
+        wrapper.setAttribute('id', 'BrowserBar');
+
+        // PARAGRAPH
+        var p = document.createElement('p');
+        var pStyle = {
+            margin: '0px 0px 0px 40px',
+            padding: '0px',
+            lineHeight: '1.5em'
+        };
+        applyStyle(pStyle, p);
+
+        // CLOSE BUTTON
+        var a = document.createElement('a');
+        a.href = 'javascript:void(0);';
+        a.title = 'Don\'t show me this notification bar for the next 24 hours';
+        a.onclick = function (e) {
+            if (!e) {
+                var e = window.event;
+            }
+            e.cancelBubble = true;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            UMB.Widget.hidePersistent(1);
+            return false;
+        };
+        var aStyle = {
+            display: 'block',
+            width: '20px',
+            height: '20px',
+            margin: '0px 0px 0px 40px',
+            padding: '0px',
+            lineHeight: '1.5em',
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            backgroundImage: 'url(//updatemybrowser.org/close.gif)',
+            backgroundPosition: '0 0',
+            backgroundRepeat: 'no-repeat'
+        };
+        applyStyle(aStyle, a);
+
+        wrapper.appendChild(p);
+        wrapper.appendChild(a);
+        document.getElementsByTagName('body')[0].appendChild(wrapper);
+    };
+
+    var prepareHtml = function () {
+        // Get current browser info and status
+        var status = UMB.getStatus();
+        var browser = UMB.getBrowserInfo(UMB.getCurrentBrowser());
+        var version = UMB.getCurrentVersion();
+
+        if (!status || !browser || !version) return;
+
+        var wrapper = document.getElementById('BrowserBar');
+        var link = document.createElement('a');
+        link.href = 'https://www.updatemybrowser.org';
+        link.onclick = function () {
+            return false;
+        };
+        link.style.color = '#2183d0';
+        link.style.fontWeight = 'bold';
+        link.target = '_blank';
+
+        var message = '';
+        var post = '';
+        if (status == 'latest') {
+            message = 'You have the latest version of your browser installed (' + browser.name + ' ' + version + '). ';
+            link.style.color = '#00A651';
+            link.appendChild(document.createTextNode('Learn more'));
+        } else if (status == 'update') {
+            message = 'An update (' + browser.name + ' ' + browser.current + ') is available for your browser. Please ';
+            link.appendChild(document.createTextNode('install this browser update'));
+            post = '.';
+        } else if (status == 'warning') {
+            message = 'An important update (' + browser.name + ' ' + browser.current + ') is available for your browser. Please ';
+            link.style.color = '#ED1C24';
+            link.appendChild(document.createTextNode('install this critical browser update'));
+            post = '.';
+            isFixed = true;	// make position fixed
+        }
+        wrapper.getElementsByTagName('p')[0].appendChild(document.createTextNode(message));
+        wrapper.getElementsByTagName('p')[0].appendChild(link);
+        wrapper.getElementsByTagName('p')[0].appendChild(document.createTextNode(post));
+
+        // Make click event on BrowserBar go to link
+        document.getElementById('BrowserBar').onclick = function () {
+            window.open(link.href);
+        };
+    };
+
+    var getComputedVal = function (elm, property) {
+        var r;
+        if (window.getComputedStyle) {
+            r = window.getComputedStyle(elm)[property];
+        } else if (elm.currentStyle) {
+            r = elm.currentStyle[property];
+        }
+        if (!r) {
+            r = elm.style[property];
+        }
+        return r;
+    };
+
+    var animate = function (elm, property, end, length, callback, pre, post) {
+        // Animate opacity for IE
+        if (property == 'opacity') {
+            animate(elm, 'filter', end * 100, length, callback, 'alpha(opacity=', ')');
+        }
+
+        // Set property syntax
+        var pxProps = '|top|marginTop|';
+        pre = pre || '';
+        post = post || '';
+        if (pxProps.indexOf(property) > -1) {
+            post = post || 'px';
+        }
+
+        // Begin value
+        var begin = parseFloat(getComputedVal(elm, property).replace(pre, '').replace(post, '')) || 0;
+
+        // Relative value?
+        if (end.toString().indexOf('+') == 0 || end.toString().indexOf('-') == 0) {
+            end = begin + parseFloat(end);
+        }
+
+        // Setup variables
+        var interval = 10;
+        var percstep = 1 / (length / interval);
+        var perc = 0;
+
+        // Setup helpers
+        var prop = function (p) {
+            var easedP = 0.5 - Math.cos(p * Math.PI) / 2;
+            var propStep = (end - begin) * easedP;
+            var newProp = begin + propStep;
+            return Math.round(newProp * 100) / 100;
+        };
+        var apply = function (v) {
+            elm.style[property] = pre + v + post;
+        };
+
+        // Make an interval
+        var timer = setInterval(function () {
+            perc = perc + percstep;
+            apply(prop(perc));
+
+            if (perc >= 1) {
+                clearInterval(timer);
+                apply(prop(1));
+                if (callback) {
+                    callback();
+                }
+            }
+        }, interval);
+    };
+
+    var showBar = function () {
+        var body = document.getElementsByTagName('body')[0];
+        var BrowserBar = document.getElementById('BrowserBar');
+
+        // Hide bar body only when BrowserBar is invisible
+        if (getComputedVal(BrowserBar, 'display') !== 'none') {
+            return;
+        }
+
+        // Add body class
+        body.className += ' umb-active';
+
+        // BrowserBar
+        BrowserBar.style.opacity = '0';
+        BrowserBar.style.filter = 'alpha(opacity=0)';
+        BrowserBar.style.display = 'block';
+        animate(BrowserBar, 'opacity', 0.95, 600);
+
+        if ((UMB.getCurrentBrowser() == 'ie' && document.compatMode == 'BackCompat')) {
+            // Reposition BrowserBar for IE quirks workaround
+            BrowserBar.style.top = '0px';
+            BrowserBar.style.width = (document.documentElement.clientWidth || document.body.clientWidth) + 'px';
+        } else {
+            // Reposition body element
+            body.style.position = 'relative';
+            body.style.overflow = 'visible';
+            animate(body, 'top', "+40", 300);
+
+            if (!isFixed) {
+                // Body margin fix
+                UMB.attach(window, 'resize', function () {
+                    BrowserBar.style.width = (document.documentElement.clientWidth || document.body.clientWidth) + 'px';
+                });
+                BrowserBar.style.width = (document.documentElement.clientWidth || document.body.clientWidth) + 'px';
+                BrowserBar.style.top = '-' + (parseFloat(getComputedVal(body, 'marginTop')) + 40) + 'px';
+                BrowserBar.style.left = '-' + parseFloat(getComputedVal(body, 'marginLeft')) + 'px';
+            }
+        }
+        if (isFixed) {
+            if ((UMB.getCurrentBrowser() == 'ie' && document.compatMode == 'BackCompat')) {
+                // Fixed position for Quirks mode
+                UMB.attach(window, 'scroll', function () {
+                    BrowserBar.style.top = ((document.documentElement.scrollTop || document.body.scrollTop) + (!BrowserBar.offsetHeight && 0)) + 'px';
+                });
+                BrowserBar.style.top = ((document.documentElement.scrollTop || document.body.scrollTop) + (!BrowserBar.offsetHeight && 0)) + 'px';
+            } else if (UMB.getCurrentBrowser() == 'ie' && UMB.getCurrentVersion() <= 6) {
+                // Fixed position IE6
+                UMB.attach(window, 'resize', function () {
+                    BrowserBar.style.width = (document.documentElement.clientWidth || document.body.clientWidth) + 'px';
+                });
+                BrowserBar.style.width = (document.documentElement.clientWidth || document.body.clientWidth) + 'px';
+                var bbTop = parseFloat(getComputedVal(body, 'marginTop')) + 40;
+                BrowserBar.style.top = '-' + bbTop + 'px';
+                BrowserBar.style.left = '-' + parseFloat(getComputedVal(body, 'marginLeft')) + 'px';
+                UMB.attach(window, 'scroll', function () {
+                    BrowserBar.style.top = ((document.documentElement.scrollTop || document.body.scrollTop) - bbTop) + 'px';
+                });
+                BrowserBar.style.top = ((document.documentElement.scrollTop || document.body.scrollTop) - bbTop) + 'px';
+            } else {
+                // Fixed position
+                BrowserBar.style.top = '0px';
+                BrowserBar.style.position = 'fixed';
+            }
+        }
+    };
+
+    var hideBar = function () {
+        var body = document.getElementsByTagName('body')[0];
+        var BrowserBar = document.getElementById('BrowserBar');
+
+        // Hide bar body only when BrowserBar is visible
+        if (getComputedVal(BrowserBar, 'display') !== 'block') {
+            return;
+        }
+
+        // Remove body class
+        body.className = body.className.replace(' umb-active', '');
+
+        // BrowserBar
+        animate(BrowserBar, 'opacity', 0, 600, function () {
+            BrowserBar.style.display = 'none';
+        });
+
+        // IE Quirks workaround
+        if (UMB.getCurrentBrowser() == 'ie' && document.compatMode == 'BackCompat') {
+        } else {
+            animate(body, 'top', "-40", 300);
+        }
+    };
+
+    return {
+
+        init: function () {
+            if (hasInit) {
+                return;
+            }
+            hasInit = true;
+
+            UMB.Widget.redraw();
+        },
+
+        redraw: function () {
+            insertHtml();
+            prepareHtml();
+        },
+
+        display: function () {
+            UMB.Widget.init();
+            showBar();
+        },
+
+        hide: function () {
+            UMB.Widget.init();
+            hideBar();
+        },
+
+        hidePersistent: function (days) {
+            days = days || 1;
+            setCookie('_umb', 'hide', days);
+            UMB.hideWidget();
+        }
+
+    };
+}();var svg_address = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGhlaWdodD0nMjgnIHdpZHRoPScyOCcgdmlld0JveD0iMCAwIDI0IDI0Ij4gPHBhdGggZmlsbD0nIzY5QjdDRicgZD0iTTE0IDE3SDR2MmgxMHYtMnptNi04SDR2MmgxNlY5ek00IDE1aDE2di0ySDR2MnpNNCA1djJoMTZWNUg0eiIgLz4gPHBhdGggZmlsbD0nbm9uZScgZD0iTTAgMGgyNHYyNEgweiIgLz4gPC9zdmc+IA==";
+var svg_copy = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIGhlaWdodD0nMjAnIHdpZHRoPScyMCcgdmlld0JveD0iMCAwIDI0IDI0Ij4gPHBhdGggZmlsbD0nbm9uZScgZD0iTTAgMGgyNHYyNEgweiIgLz4gPHBhdGggZmlsbD0nIzY5QjdDRicgZD0iTTE2IDFINGMtMS4xIDAtMiAuOS0yIDJ2MTRoMlYzaDEyVjF6bTMgNEg4Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDExYzEuMSAwIDItLjkgMi0yVjdjMC0xLjEtLjktMi0yLTJ6bTAgMTZIOFY3aDExdjE0eiIgLz4gPC9zdmc+IA==";
+var svg_link = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSczMicgaGVpZ2h0PScyMCcgdmlld0JveD0iMCA0IDI0IDE1Ij4gPHBhdGggZmlsbD0nbm9uZScgZD0iTTAgMGgyNHYyNEgweiIgLz4gPHBhdGggZmlsbD0nIzY5QjdDRicgZD0iTTMuOSAxMmMwLTEuNzEgMS4zOS0zLjEgMy4xLTMuMWg0VjdIN2MtMi43NiAwLTUgMi4yNC01IDVzMi4yNCA1IDUgNWg0di0xLjlIN2MtMS43MSAwLTMuMS0xLjM5LTMuMS0zLjF6TTggMTNoOHYtMkg4djJ6bTktNmgtNHYxLjloNGMxLjcxIDAgMy4xIDEuMzkgMy4xIDMuMXMtMS4zOSAzLjEtMy4xIDMuMWgtNFYxN2g0YzIuNzYgMCA1LTIuMjQgNS01cy0yLjI0LTUtNS01eiIgLz4gPC9zdmc+IA==";
+var svg_map = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMCcgaGVpZ2h0PScyMCcgdmlld0JveD0iMCAwIDI0IDI0Ij4gPHBhdGggZmlsbD0nIzY5QjdDRicgZD0iTTIwLjUgM2wtLjE2LjAzTDE1IDUuMSA5IDMgMy4zNiA0LjljLS4yMS4wNy0uMzYuMjUtLjM2LjQ4VjIwLjVjMCAuMjguMjIuNS41LjVsLjE2LS4wM0w5IDE4LjlsNiAyLjEgNS42NC0xLjljLjIxLS4wNy4zNi0uMjUuMzYtLjQ4VjMuNWMwLS4yOC0uMjItLjUtLjUtLjV6TTE1IDE5bC02LTIuMTFWNWw2IDIuMTFWMTl6IiAvPiA8cGF0aCBmaWxsPSdub25lJyBkPSdNMCAwaDI0djI0SDB6JyAvPiA8L3N2Zz4g";

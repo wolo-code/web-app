@@ -23,8 +23,6 @@
 	require '../CSS/Fragment/CSS.php';
 	$component = $id;
 	require '../CSS/Fragment/CSS.php';
-	
-	require '../HTML/Fragment/Head.php';
 ?>
 </head>
 <body>

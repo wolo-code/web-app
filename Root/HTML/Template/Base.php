@@ -10,13 +10,7 @@
 	<meta name='viewport' content='initial-scale=1.0' >
 	<link rel="shortcut icon" type='image/x-icon' href='/favicon.ico' >
 	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
-	<title>
-<?php
-	echo $config['project_description'].' - '.$config['project_title'];
-?>
-	</title>
-<?php
-	if($bPublish) {
+	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
 ?>

@@ -1,12 +1,3 @@
-function syncInitMap() {
-	if (typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
-		initMap();
-		pendingInitMap = false;
-		if(pendingLocate)
-			syncLocate();
-	}
-}
-
 var pendingLocate = true;
 function syncLocate(override_dnd) {
 	if (typeof google === 'object' && typeof google.maps === 'object' && typeof map == 'object') {

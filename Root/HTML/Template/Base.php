@@ -26,7 +26,7 @@
 	$component = "";
 	require '../JS/Fragment/JS.php';
 ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=createMap' async defer></script></head>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script></head>
 <?php
 	$component = "";
 	require '../CSS/Fragment/CSS.php';

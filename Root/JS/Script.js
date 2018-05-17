@@ -1,0 +1,2 @@
+var initLoadDone = false;
+initLoad();

@@ -1,3 +1,13 @@
+function initLoad () {
+	if(!initLoadDone && document.readyState === 'interactive') {
+		versionCheck();
+		if(!urlDecode())
+			syncLocate();
+		syncInitMap();
+		setupControls();
+		initLoadDone = true;
+	}
+};
 
 function setupControls() {
 	document.getElementById('overlay').addEventListener('click', hideOverlay);

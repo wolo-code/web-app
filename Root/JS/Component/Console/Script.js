@@ -1,6 +1,14 @@
 var auth_processed = false;
 var target_id;
 
+function initLoad () {
+	if(!initLoadDone && document.readyState === 'interactive') {
+		initApp();
+		setupControls();
+		setTargetIndex();
+		initLoadDone = true;
+	}
+};
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {

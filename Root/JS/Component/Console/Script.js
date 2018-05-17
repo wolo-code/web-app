@@ -1,4 +1,5 @@
 var auth_processed = false;
+var map_processed = false;
 var target_id;
 
 function initLoad () {

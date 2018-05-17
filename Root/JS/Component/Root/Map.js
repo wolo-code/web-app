@@ -107,6 +107,9 @@ function initMap() {
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
 	clickHandler = new ClickEventHandler(map);
+	
+	if(pendingLocate)
+		syncLocate();
 }
 
 function resolveLatLng(latLng) {

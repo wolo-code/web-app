@@ -42,7 +42,7 @@
 						}
 						else if ($type == $INCLUDE_TYPE_JS) {
 ?>
-	<script src='<?php echo $filePathRoot.$file ?>' <?php if($bPublish) echo 'async' ?>></script>
+	<script src='<?php echo $filePathRoot.$file ?>' <?php if($bPublish) echo 'async'; else if(in_array(strtolower($file), ['script.js', 'database.js'])) echo 'defer' ?>></script>
 <?php
 						}
 						else {

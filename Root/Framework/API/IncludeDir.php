@@ -17,7 +17,12 @@
 		$i = array_search('Base', $files);
 		if($i != null) {
 			array_splice($files, $i, 1);
-			array_push($files, 'Base');
+			array_unshift($files, 'Base');
+		}
+		$i = array_search('Script.js', $files);
+		if($i != null) {
+			array_splice($files, $i, 1);
+			array_push($files, 'Script.js');
 		}
 		foreach ($files as $file) {
 			if(!in_array(strtolower($file), [$exclude, 'link', 'fragment', 'component'])) {

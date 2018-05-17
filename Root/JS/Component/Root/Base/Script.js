@@ -12,4 +12,3 @@ function syncCheckIncompatibleBrowserMessage() {
 	if(typeof UMB === 'object' && UMB.getStatus() == 'unsupported')
 		showIncompatibleBrowserMessage();
 }
-

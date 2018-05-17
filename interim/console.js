@@ -64,6 +64,8 @@ var _umb = {
 				safari: 29
 		}
 };
+var initLoadDone = false;
+initLoad();
 var latLng_p = "";
 var address = "";
 var gpId = "";
@@ -492,14 +494,40 @@ function getSpanBounds(lat, lng) {
 function resolveLatLng(latLng) {
 	return {'lat':latLng.lat(), 'lng':latLng.lng()};
 }
+function formatNumber(number) {
+	WIDTH = 2;
+	if (String(number).length < WIDTH)
+		return ' '+number;
+	else
+		return number;
+}
+
+function formatDate(date) {
+	var monthNames = [
+		"Jan", "Feb", "Mar",
+		"Apr", "May", "Jun", "Jul",
+		"Aug", "Sep", "Oct",
+		"Nov", "Dec"
+	];
+
+	var day = date.getDate();
+	var monthIndex = date.getMonth();
+	var hour = date.getHours();
+	var minute = date.getMinutes();
+	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
+}
 var auth_processed = false;
+var map_processed = false;
 var target_id;
 
-document.addEventListener('DOMContentLoaded', function() {
-	initApp();
-	setupControls();
-	setTargetIndex();
-});
+function initLoad () {
+	if(!initLoadDone && document.readyState === 'interactive') {
+		initApp();
+		setupControls();
+		setTargetIndex();
+		initLoadDone = true;
+	}
+};
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {
@@ -585,28 +613,6 @@ function setupControls() {
 			showNotification("Did you not select a search result?");
 	});
 	
-}
-function formatNumber(number) {
-	WIDTH = 2;
-	if (String(number).length < WIDTH)
-		return ' '+number;
-	else
-		return number;
-}
-
-function formatDate(date) {
-	var monthNames = [
-		"Jan", "Feb", "Mar",
-		"Apr", "May", "Jun", "Jul",
-		"Aug", "Sep", "Oct",
-		"Nov", "Dec"
-	];
-
-	var day = date.getDate();
-	var monthIndex = date.getMonth();
-	var hour = date.getHours();
-	var minute = date.getMinutes();
-	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
 }
 /*!
  * updatemybrowser.org JavaScript Library v1

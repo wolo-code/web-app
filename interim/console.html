@@ -25,37 +25,39 @@ ga('send', 'pageview');
 		<script>Raven.config('https://67af341ea58c4424ab4af921f0583573@sentry.io/187322').install();
 </script>
 	<script>
+	</script>
+	<script src="/console.js" async></script>
+	<script>
 var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 var pendingInitMap = true;
 var clickHandler;
 var map;
 
-function createMap() {
-	map = new google.maps.Map(document.getElementById('map'), {
-		center: DEFAULT_LATLNG,
-		mapTypeControl: true,
-		mapTypeControlOptions: {
-			style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-			position: google.maps.ControlPosition.BOTTOM_CENTER
-		},
-		zoom: 8,
-		fullscreenControl: false,
-		streetViewControl: false,
-		zoomControl: false
-	});
-	syncInitMap();
-}
-	</script>
-	<script>
 function syncInitMap() {
 	if (typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
+		map = new google.maps.Map(document.getElementById('map'), {
+			center: DEFAULT_LATLNG,
+			mapTypeControl: true,
+			mapTypeControlOptions: {
+				style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+				position: google.maps.ControlPosition.BOTTOM_CENTER
+			},
+			zoom: 8,
+			fullscreenControl: false,
+			streetViewControl: false,
+			zoomControl: false
+		});
 		initMap();
 		pendingInitMap = false;
 	}
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+	if(typeof initLoad != 'undefined')
+		initLoad();
+});
 	</script>
-	<script src="/console.js" async></script>
-	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=createMap' async defer></script></head>
+	<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD3qtN-ejbFTrkes1Y5j3qRY8PmQrxYHDQ&libraries=places&callback=syncInitMap' async defer></script></head>
 	<style>
 #address_text {
 	position: absolute;

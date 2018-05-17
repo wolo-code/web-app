@@ -64,6 +64,8 @@ var _umb = {
 				safari: 29
 		}
 };
+var initLoadDone = false;
+initLoad();
 var latLng_p = "";
 var address = "";
 var gpId = "";
@@ -845,6 +847,9 @@ function initMap() {
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
 	clickHandler = new ClickEventHandler(map);
+	
+	if(pendingLocate)
+		syncLocate();
 }
 
 function resolveLatLng(latLng) {
@@ -1036,13 +1041,26 @@ function hideOverlay() {
 function showOverlay() {
 	document.getElementById('overlay').classList.remove('hide');
 }
-document.addEventListener('DOMContentLoaded', function() {
-	versionCheck();
-	if(!urlDecode())
-		syncLocate();
-	syncInitMap();
-	setupControls();
-});
+function arrayContainsArray(superset, subset) {
+	return subset.every(function (value) {
+		return (superset.indexOf(value.toLowerCase()) >= 0);
+	});
+}
+
+function clearURL() {
+	if(window.location.pathname.substr(1) != '')
+		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
+}
+function initLoad () {
+	if(!initLoadDone && document.readyState === 'interactive') {
+		versionCheck();
+		if(!urlDecode())
+			syncLocate();
+		syncInitMap();
+		setupControls();
+		initLoadDone = true;
+	}
+};
 
 function setupControls() {
 	document.getElementById('overlay').addEventListener('click', hideOverlay);
@@ -1078,16 +1096,6 @@ function copyNodeText(node) {
 	window.getSelection().addRange(range);
 	document.execCommand('copy');
 	window.getSelection().removeAllRanges();
-}
-function arrayContainsArray(superset, subset) {
-	return subset.every(function (value) {
-		return (superset.indexOf(value.toLowerCase()) >= 0);
-	});
-}
-
-function clearURL() {
-	if(window.location.pathname.substr(1) != '')
-		window.history.pushState({"html":'',"pageTitle":''}, '', '/');
 }
 /*!
  * updatemybrowser.org JavaScript Library v1

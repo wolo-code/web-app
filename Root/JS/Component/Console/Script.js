@@ -1,11 +1,6 @@
 var auth_processed = false;
 var target_id;
 
-document.addEventListener('DOMContentLoaded', function() {
-	initApp();
-	setupControls();
-	setTargetIndex();
-});
 
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {

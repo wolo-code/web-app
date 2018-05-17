@@ -1,10 +1,3 @@
-document.addEventListener('DOMContentLoaded', function() {
-	versionCheck();
-	if(!urlDecode())
-		syncLocate();
-	syncInitMap();
-	setupControls();
-});
 
 function setupControls() {
 	document.getElementById('overlay').addEventListener('click', hideOverlay);

@@ -21,10 +21,10 @@
 		<script src='/umb.js'></script>
 		<script src='/svgs.js'></script>
 <?php }
+	$component = $id;
+	require '../JS/Fragment/JS.php';
 	$component = "";
 	require '../JS/Fragment/JS.php';
-	$component = $id;
-	require '../JS/Fragment/JS.php';	
 ?>
 	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=createMap' async defer></script></head>
 <?php

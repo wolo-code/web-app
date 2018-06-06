@@ -86,11 +86,11 @@ exports.decode = functions.https.onRequest((req, res) => {
 });
 
 function encode(city_begin, position) {
-	lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
-	lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
-	word_index_1 = lat_diff >> 5
-	word_index_2 = lng_diff >> 5;
-	word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
+	var lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
+	var lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
+	var word_index_1 = lat_diff >> 5;
+	var word_index_2 = lng_diff >> 5;
+	var word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
 	var code = [word_index_1, word_index_2, word_index_3];
 
 	//console.log(code, lat_diff + " " + lng_diff);
@@ -98,15 +98,15 @@ function encode(city_begin, position) {
 }
 
 function decode(city_begin, code) {
-	word_index_1 = code[0];
-	word_index_2 = code[1];
-	word_index_3 = code[2];
-	lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
-	lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
+	var word_index_1 = code[0];
+	var word_index_2 = code[1];
+	var word_index_3 = code[2];
+	var lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
+	var lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
 	var lat_diff = decodeData(lat_diff_bin, SPAN_D);
 	var lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
-	lat = lat_diff + city_begin.lat;
-	lng = lng_diff + city_begin.lng;
+	var lat = lat_diff + city_begin.lat;
+	var lng = lng_diff + city_begin.lng;
 
 	//console.log(code, lat_diff + " " + lng_diff);
 	return({"lat":lat, "lng":lng});

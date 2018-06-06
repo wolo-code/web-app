@@ -18,6 +18,12 @@ function ang_span_d(ang) {
 
 function encodeData(value, d) {
 	var i = Math.round(value/d);
+	if(i < 0 || i > N) {
+		console.log("Error: Out of data limit");
+		console.log("Value: " + value);
+		console.log("d: " + d);
+	}
+	else
 		return i;
 }
 

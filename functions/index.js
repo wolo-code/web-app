@@ -17,7 +17,8 @@ function ang_span_d(ang) {
 }
 
 function encodeData(value, d) {
-	return Math.floor(value/d);
+	var i = Math.round(value/d);
+		return i;
 }
 
 function decodeData(data, d) {

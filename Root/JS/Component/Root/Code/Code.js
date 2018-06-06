@@ -1,9 +1,9 @@
-var urlFunctions = 'https://location.wcodes.org/api/';
-//'http://localhost:5002/waddress-5f30b/us-central1/';
+var urlFunctions = 'https://location.wcodes.org/api';
+//'http://localhost:5000/waddress-5f30b/us-central1';
 
 function encode_(city, position) {
 	var http = new XMLHttpRequest();
-	http.open('POST', urlFunctions+'encode', true);
+	http.open('POST', urlFunctions+'/'+'encode', true);
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
@@ -49,7 +49,7 @@ function stringifyEncodeData(city_center, position) {
 function decode_(city, code) {
 
 	var http = new XMLHttpRequest();
-	http.open('POST', urlFunctions+'decode', true);
+	http.open('POST', urlFunctions+'/'+'decode', true);
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');

@@ -1,17 +1,17 @@
 'use strict';
 
 const functions = require('firebase-functions');
-var domain = 'wcodes.org';
-var mailgun = require('mailgun-js')({apiKey, domain});
-	
+const domain = 'wcodes.org';
 const apiKey = functions.config().mailgun.api_key;
+const mailgun = require('mailgun-js')({apiKey, domain});
+
 // 2^(10+5)
-var N = 32768;
+const N = 32768;
 
 // LatLng limit
-var SPAN = 0.5;
+const SPAN = 0.5;
 
-var SPAN_D = SPAN/N;
+const SPAN_D = SPAN/N;
 
 // resolution of addressable divisions
 function ang_span_d(ang) {
@@ -19,7 +19,7 @@ function ang_span_d(ang) {
 }
 
 function encodeData(value, d) {
-	var i = Math.round(value/d);
+	const i = Math.round(value/d);
 	if(i < 0 || i > N) {
 		console.log("Error: Out of data limit");
 		console.log("Value: " + value);
@@ -34,8 +34,8 @@ function decodeData(data, d) {
 }
 
 function getCityBegin(cityCenter) {
-	var lat = cityCenter.lat - SPAN/2;
-	var lng = cityCenter.lng - ang_span_d(cityCenter.lng)*N/2;
+	const lat = cityCenter.lat - SPAN/2;
+	const lng = cityCenter.lng - ang_span_d(cityCenter.lng)*N/2;
 	return {'lat': lat, 'lng': lng};
 }
 
@@ -54,8 +54,8 @@ exports.encode = functions.https.onRequest((req, res) => {
 	if(req.headers.version != 1)
 		res.send({"error" : "Version mismatch"});
 	else {
-		code = encode(getCityBegin(req.body.city_center), req.body.position);
-		for(i of code)
+		const code = encode(getCityBegin(req.body.city_center), req.body.position);
+		for(var i of code)
 			if(i < 0 || i > 1023) {
 				console.log("Error: Out of WCode index limit");
 				console.log(req.body.city_center);
@@ -88,27 +88,27 @@ exports.decode = functions.https.onRequest((req, res) => {
 });
 
 function encode(city_begin, position) {
-	var lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
-	var lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
-	var word_index_1 = lat_diff >> 5;
-	var word_index_2 = lng_diff >> 5;
-	var word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
-	var code = [word_index_1, word_index_2, word_index_3];
+	const lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
+	const lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
+	const word_index_1 = lat_diff >> 5;
+	const word_index_2 = lng_diff >> 5;
+	const word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
+	const code = [word_index_1, word_index_2, word_index_3];
 
 	//console.log(code, lat_diff + " " + lng_diff);
 	return code;
 }
 
 function decode(city_begin, code) {
-	var word_index_1 = code[0];
-	var word_index_2 = code[1];
-	var word_index_3 = code[2];
-	var lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
-	var lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
-	var lat_diff = decodeData(lat_diff_bin, SPAN_D);
-	var lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
-	var lat = lat_diff + city_begin.lat;
-	var lng = lng_diff + city_begin.lng;
+	const word_index_1 = code[0];
+	const word_index_2 = code[1];
+	const word_index_3 = code[2];
+	const lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
+	const lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
+	const lat_diff = decodeData(lat_diff_bin, SPAN_D);
+	const lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
+	const lat = lat_diff + city_begin.lat;
+	const lng = lng_diff + city_begin.lng;
 
 	//console.log(code, lat_diff + " " + lng_diff);
 	return({"lat":lat, "lng":lng});
@@ -120,7 +120,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 	
 	const entry = data.after.val();
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
-	var id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
+	const id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
 	const mail_data = {
 		from: 'WCode Location - app <app_location@wcodes.org>',
 		subject: 'New City request',

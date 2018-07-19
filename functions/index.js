@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
-var apiKey = "key-ceb0ce32644bf63b3c75c4a09acf12a2";
 var domain = 'wcodes.org';
 var mailgun = require('mailgun-js')({apiKey, domain});
 	
+const apiKey = functions.config().mailgun.api_key;
 // 2^(10+5)
 var N = 32768;
 

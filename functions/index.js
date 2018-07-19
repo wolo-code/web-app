@@ -121,7 +121,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 	const entry = data.after.val();
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
 	var id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
-	var data = {
+	const mail_data = {
 		from: 'WCode Location - app <app_location@wcodes.org>',
 		subject: 'New City request',
 		html: `<p>New City request:</p>` + combine({'Id':id_link, 'Address':entry.address}),
@@ -129,7 +129,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 		to: 'admin@wcodes.org'
 	}
 
-	mailgun.messages().send(data, function (error, body) {
+	mailgun.messages().send(mail_data, function (error, body) {
 		console.log(body)
 	})
 	

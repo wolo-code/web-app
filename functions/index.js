@@ -1,3 +1,5 @@
+'use strict';
+
 const functions = require('firebase-functions');
 var domain = 'wcodes.org';
 var mailgun = require('mailgun-js')({apiKey, domain});

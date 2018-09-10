@@ -132,7 +132,9 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 	}
 
 	mailgun.messages().send(mail_data, function (error, body) {
-		console.log(body)
+		if(error) {
+			console.log(error)
+		}
 	})
 	
 	return null;

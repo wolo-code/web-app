@@ -1,6 +1,8 @@
 'use strict';
 
 const functions = require('firebase-functions');
+
+// mailgun variable names - 'apiKey' and 'domain' - MUST be same
 const domain = 'wcodes.org';
 const apiKey = functions.config().mailgun.api_key;
 const mailgun = require('mailgun-js')({apiKey, domain});

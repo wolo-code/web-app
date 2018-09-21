@@ -109,8 +109,8 @@ function decode(city_begin, code) {
 	const lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
 	const lat_diff = decodeData(lat_diff_bin, SPAN_D);
 	const lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
-	const lat = lat_diff + city_begin.lat;
-	const lng = lng_diff + city_begin.lng;
+	const lat = city_begin.lat + lat_diff;
+	const lng = city_begin.lng + lng_diff;
 
 	//console.log(code, lat_diff + " " + lng_diff);
 	return({"lat":lat, "lng":lng});

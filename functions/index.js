@@ -9,15 +9,20 @@ const mailgun = require('mailgun-js')({apiKey, domain});
 
 // 2^(10+5)
 const N = 32768;
+const a = 6378137;
+const b = 6356752.314140;
+const e_sq = (a*a-b*b)/(a*a);
+const factor = Math.PI/180;
 
-// LatLng limit
-const SPAN = 0.5;
+function lat_span_half(lat) {
+	const lat_r = factor*lat;
+	const x = Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r));
+	return Math.abs((x*x*x)/(factor*a*(1-e_sq)));
+}
 
-const SPAN_D = SPAN/N;
-
-// resolution of addressable divisions
-function ang_span_d(ang) {
-	return Math.abs(Math.cos(ang * Math.PI / 180)/SPAN)/N;
+function lng_span_half(lat) {
+	const lat_r = factor*lat;
+	return Math.abs(Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r))/(factor*a*Math.cos(lat_r)));
 }
 
 function encodeData(value, d) {
@@ -36,8 +41,8 @@ function decodeData(data, d) {
 }
 
 function getCityBegin(cityCenter) {
-	const lat = cityCenter.lat - SPAN/2;
-	const lng = cityCenter.lng - ang_span_d(cityCenter.lng)*N/2;
+	const lat = cityCenter.lat - lat_span_half(cityCenter.lat)*N;
+	const lng = cityCenter.lng - lng_span_half(cityCenter.lat)*N;
 	return {'lat': lat, 'lng': lng};
 }
 
@@ -90,8 +95,8 @@ exports.decode = functions.https.onRequest((req, res) => {
 });
 
 function encode(city_begin, position) {
-	const lat_diff = encodeData(position.lat - city_begin.lat, SPAN_D);
-	const lng_diff = encodeData(position.lng - city_begin.lng, ang_span_d(city_begin.lng));
+	const lat_diff = encodeData(position.lat - city_begin.lat, lat_span_half(city_begin.lat)*2);
+	const lng_diff = encodeData(position.lng - city_begin.lng, lng_span_half(city_begin.lat)*2);
 	const word_index_1 = lat_diff >> 5;
 	const word_index_2 = lng_diff >> 5;
 	const word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
@@ -107,8 +112,8 @@ function decode(city_begin, code) {
 	const word_index_3 = code[2];
 	const lat_diff_bin = word_index_1 << 5 | word_index_3 >> 5;
 	const lng_diff_bin = word_index_2 << 5 | word_index_3 & 0x001F;
-	const lat_diff = decodeData(lat_diff_bin, SPAN_D);
-	const lng_diff = decodeData(lng_diff_bin, ang_span_d(city_begin.lng));
+	const lat_diff = decodeData(lat_diff_bin, lat_span_half(city_begin.lat)*2);
+	const lng_diff = decodeData(lng_diff_bin, lng_span_half(city_begin.lat)*2);
 	const lat = city_begin.lat + lat_diff;
 	const lng = city_begin.lng + lng_diff;
 

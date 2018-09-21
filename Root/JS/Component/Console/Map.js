@@ -123,16 +123,26 @@ function showEntryMarker(location) {
 	google.maps.event.addListener(entryMarker, 'click', function() {clearForm();});
 }
 
-// LatLng limit
-var SPAN = 0.5;
+var N = 32768;
+var a = 6378137;
+var b = 6356752.314140;
+var e_sq = (a*a-b*b)/(a*a);
+var factor = Math.PI/180;
 
-function ang_span_d(ang) {
-	return Math.abs(Math.cos(ang * Math.PI / 180)/SPAN);
+function lat_span_half(lat) {
+	var lat_r = factor*lat;
+	var x = Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r));
+	return Math.abs((x*x*x)/(factor*a*(1-e_sq)));
+}
+
+function lng_span_half(lat) {
+	var lat_r = factor*lat;
+	return Math.abs(Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r))/(factor*a*Math.cos(lat_r)));
 }
 
 function getSpanBounds(lat, lng) {
-	var lat_span = SPAN;
-	var lng_span = ang_span_d(lng);
+	var lat_span = lat_span_half(lat)*N;
+	var lng_span = lng_span_half(lat)*N;
 	return {
 		'north': lat+lat_span,
 		'south': lat-lat_span,

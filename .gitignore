@@ -2,3 +2,5 @@
 .firebase/*.cache
 functions/node_modules
 firebase-debug.log
+public
+interim

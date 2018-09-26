@@ -228,20 +228,23 @@ function tryDefaultCity() {
 	notification_top.classList.add('hide');
 	infoWindow.close();
 }
-var urlFunctions = 'https://location.wcodes.org/api/';
-//'http://localhost:5002/waddress-5f30b/us-central1/';
+var urlFunctions = 'https://location.wcodes.org/api';
+var curEncRequestId = 0;
+//'http://localhost:5000/waddress-5f30b/us-central1';
 
 function encode_(city, position) {
 	var http = new XMLHttpRequest();
-	http.open('POST', urlFunctions+'encode', true);
+	http.open('POST', urlFunctions+'/'+'encode', true);
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', '1');
+	http.requestId = ++curEncRequestId;
 
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
+			if(http.requestId == curEncRequestId) {
 			if(http.status == 200) {
 				setCodeWords(http.responseText, city, position);
 				wait_loader.classList.add('hide');
@@ -252,6 +255,7 @@ function encode_(city, position) {
 				wait_loader.classList.add('hide');
 			}
 		}
+	}
 	}
 
 	http.send( stringifyEncodeData(city.center, position) );
@@ -279,7 +283,7 @@ function stringifyEncodeData(city_center, position) {
 function decode_(city, code) {
 
 	var http = new XMLHttpRequest();
-	http.open('POST', urlFunctions+'decode', true);
+	http.open('POST', urlFunctions+'/'+'decode', true);
 
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
@@ -629,7 +633,9 @@ function initLocate(override_dnd) {
 }
 
 function locateExec() {
+	wait_loader.classList.remove('hide');
 	if (navigator.geolocation) {
+		wait_loader.classList.add('hide');
 		navigator.geolocation.getCurrentPosition(function(position) {
 			setLocationAccess(true);
 			var pos = {
@@ -834,15 +840,19 @@ function initMap() {
 		encode(pos);
 	});
 
-	location_button.addEventListener('click', function() {
-		syncLocate(true);
-	});
-
 	decode_button.addEventListener('click', function() {
 		clearMap();
 		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
+	});
+
+	map_type_button.addEventListener('click', function() {
+		toggleMapType(true);
+	});
+	
+	location_button.addEventListener('click', function() {
+		syncLocate(true);
 	});
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
@@ -993,6 +1003,17 @@ function getIntentURL(latLng, code) {
 function clearMap() {
 	if(marker != null)
 		marker.setMap(null);
+}
+
+function toggleMapType() {
+	if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
+		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		map_type_button.value = 'Map';
+	}
+	else {
+		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+		map_type_button.value = 'Sattelite';
+	}
 }
 function showNoCityMessage() {
 	no_city_message.classList.remove('hide');

@@ -51,11 +51,7 @@ function syncInitMap() {
 	if (typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: DEFAULT_LATLNG,
-			mapTypeControl: true,
-			mapTypeControlOptions: {
-				style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-				position: google.maps.ControlPosition.BOTTOM_CENTER
-			},
+			mapTypeControl: false,
 			zoom: 8,
 			fullscreenControl: false,
 			streetViewControl: false,
@@ -685,6 +681,22 @@ h2.message_dialog_label {
 	cursor: pointer;
 }
 
+#decode_button {
+	z-index: 1;
+	position: absolute;
+	left: 428px;
+	top: 36px;
+	height: 42px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-radius: 2px;
+}
+
 #info {
 	z-index: 1;
 	position: absolute;
@@ -699,6 +711,26 @@ h2.message_dialog_label {
 	border-radius: 25px;
 }
 
+#map_type_button {
+	z-index: 1;
+	text-align: center;
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	bottom: 28px;
+	width: 84px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 4px;
+	border: none;
+	border-radius: 2px;
+}
+
 #location_button {
 	z-index: 1;
 	position: absolute;
@@ -708,22 +740,6 @@ h2.message_dialog_label {
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 	background-color: rgb(255, 255, 255);
 	padding: 6px;
-	border: none;
-	border-radius: 2px;
-}
-
-#decode_button {
-	z-index: 1;
-	position: absolute;
-	left: 428px;
-	top: 36px;
-	height: 42px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
-	font-family: Roboto, Arial, sans-serif;
-	font-size: 15px;
-	background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
 	border: none;
 	border-radius: 2px;
 }
@@ -908,7 +924,7 @@ h2.message_dialog_label {
 			Version: 0.1 beta
 		</div>
 		<div id='updated'>Updated:
-	2018-May-17 20:46:26		</div>
+	2018-Sep-26 10:13:09		</div>
 	</div>
 	<div id='contact'>
 		for any related query contact me
@@ -1019,7 +1035,8 @@ h2.message_dialog_label {
 </svg>
 </span>
 </div>
-<div id='info' class='control' tabindex='6'>
+<input id='map_type_button' class='control' type='button' value='Map' tabindex='6' >
+<div id='info' class='control' tabindex='7'>
 	<span class='image'><svg xmlns='http://www.w3.org/2000/svg'
 	 width='36' height='36' viewBox="0 0 24 24">
 	<path fill='none' d="M0 0h24v24H0z" />

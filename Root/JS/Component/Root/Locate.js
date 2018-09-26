@@ -12,7 +12,9 @@ function initLocate(override_dnd) {
 }
 
 function locateExec() {
+	wait_loader.classList.remove('hide');
 	if (navigator.geolocation) {
+		wait_loader.classList.add('hide');
 		navigator.geolocation.getCurrentPosition(function(position) {
 			setLocationAccess(true);
 			var pos = {

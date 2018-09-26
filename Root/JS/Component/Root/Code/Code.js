@@ -1,6 +1,7 @@
 var urlFunctions = 'https://location.wcodes.org/api';
 //'http://localhost:5000/waddress-5f30b/us-central1';
 var curEncRequestId = 0;
+var curDecRequestId = 0;
 
 function encode_(city, position) {
 	var http = new XMLHttpRequest();
@@ -58,13 +59,16 @@ function decode_(city, code) {
 	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', '1');
+	http.requestId = ++curDecRequestId;
 	
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
-			setCodeCoord(http.responseText, new Array(city.name).concat(code));
-			notification_top.classList.add('hide');
-			wait_loader.classList.add('hide');
+			if(http.requestId == curDecRequestId) {
+				setCodeCoord(http.responseText, new Array(city.name).concat(code));
+				notification_top.classList.add('hide');
+				wait_loader.classList.add('hide');
+			}
 		}
 	}
 

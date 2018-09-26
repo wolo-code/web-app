@@ -44,6 +44,26 @@
 	border-radius: 25px;
 }
 
+#map_type_button {
+	z-index: 1;
+	text-align: center;
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	bottom: 28px;
+	width: 84px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 15px;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 4px;
+	border: none;
+	border-radius: 2px;
+}
+
 #location_button {
 	z-index: 1;
 	position: absolute;

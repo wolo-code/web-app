@@ -94,15 +94,19 @@ function initMap() {
 		encode(pos);
 	});
 
-	location_button.addEventListener('click', function() {
-		syncLocate(true);
-	});
-
 	decode_button.addEventListener('click', function() {
 		clearMap();
 		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
+	});
+
+	map_type_button.addEventListener('click', function() {
+		toggleMapType(true);
+	});
+	
+	location_button.addEventListener('click', function() {
+		syncLocate(true);
 	});
 
 	document.getElementById('pac-input').addEventListener('input', suggestComplete);
@@ -253,4 +257,15 @@ function getIntentURL(latLng, code) {
 function clearMap() {
 	if(marker != null)
 		marker.setMap(null);
+}
+
+function toggleMapType() {
+	if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
+		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		map_type_button.value = 'Map';
+	}
+	else {
+		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+		map_type_button.value = 'Sattelite';
+	}
 }

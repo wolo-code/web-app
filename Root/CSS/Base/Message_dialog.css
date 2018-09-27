@@ -35,6 +35,10 @@
 	font-size: larger;
 }
 
+.message_dialog_body > .secondary > span:first-child {
+	padding-left: 10px;
+}
+
 .message_dialog_control_container {
 	overflow: hidden;
 }
@@ -57,4 +61,15 @@
 	color: #69B7CF;
 	position: relative;
 	left: 50%;
+}
+
+.message_dialog_separator {
+	clear: both;
+	height: 1px;
+	width: 240px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 88px;
+	margin-bottom: 20px;
+	border-top: 1px solid #CCCCCC;
 }

@@ -1,5 +1,8 @@
 #copy_wcode_message_city_name {
+	display: block;
+	text-align: center;
 	color: #69B7CF;
+	padding-top: 8px;
 }
 
 #copy_wcode_message_city_name_question {

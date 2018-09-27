@@ -25,6 +25,7 @@ function setupControls() {
 	document.getElementById('copy_wcode_message_close').addEventListener('click', hideCopyWcodeMessage);
 	document.getElementById('copy_wcode_submit_yes').addEventListener('click', copyWcodeFull);
 	document.getElementById('copy_wcode_submit_no').addEventListener('click', copyWcodeCode);
+	document.getElementById('copy_link_button').addEventListener('click', copyWcodeLink);
 	document.getElementById('incompatible_browser_message_close').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);

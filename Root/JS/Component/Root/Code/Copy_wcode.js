@@ -27,4 +27,5 @@ function copyWcodeLink() {
 	var wcode_url = location.hostname + '/' + getWcodeFull().join('.');
 	showAndCopy(wcode_url.toLowerCase());
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
+	hideCopyWcodeMessage();
 }

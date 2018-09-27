@@ -52,8 +52,8 @@
 }
 
 #copy_link_button {
-  width: 38px;
-	vertical-align: bottom;
+	display: block;
+	width: 48px;
 }
 
 #external_map_button {

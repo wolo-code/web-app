@@ -86,6 +86,7 @@ function initMap() {
 
 	map.addListener('click', function(event) {
 		pendingPosition = null;
+		pendingCity = null;
 		notification_top.classList.add('hide');
 		clearAddress();
 		clearURL();

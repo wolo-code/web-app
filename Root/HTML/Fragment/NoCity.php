@@ -18,8 +18,9 @@
 	<div id='no_city_message_wait' class="message_dialog_body hide">
 		<div class="loader center"></div>
 		<p>
-			Waiting for city add request to be processed.<br>
-			Since this involves manual intervention, it may take hours.
+			Waiting for your city add request to be processed by backend team.<br>
+			This involves manual intervention and may take hours.<br>
+			Do you wish to stop or continue waiting?
 		</p>
 		<div class="center message_dialog_control">
 			<button id='no_city_submit_wait_continue' type='button'>Continue</button>

@@ -20,9 +20,9 @@ function initApp() {
 			queryPendingList();
 		}
 		else if (firebase.auth().currentUser) {
-			queryPendingList();
 			// User already signed in.
 			// Update your UI, hide the sign in button.
+			queryPendingList();
 		} else {
 			showRestrictedBlock();
 			// No user signed in, update your UI, show the sign in button.

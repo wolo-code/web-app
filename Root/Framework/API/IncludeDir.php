@@ -80,6 +80,9 @@
 				if($file == 'Head' && (is_dir($fileRoot.$file) == 1)) {
 					includeDirHeader($fileRoot.$file.'/', true);
 				}
+				else if($file == 'Head.php' || $dir == true) {
+					require($fileRoot.$file);
+				}
 				else if($file == 'Head.html' || $dir == true) {
 					echo file_get_contents($fileRoot.$file);
 				}

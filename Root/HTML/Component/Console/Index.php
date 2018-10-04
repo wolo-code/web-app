@@ -1,4 +1,3 @@
-<script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>
 <div id='container'>
 	<div id='restrict_block' class='hide'>
 		<h3>Restricted! You are not authorized to have access here.</h3>

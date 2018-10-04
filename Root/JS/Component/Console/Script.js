@@ -1,6 +1,7 @@
 var auth_processed = false;
 var map_processed = false;
 var target_id;
+var pendingEntry_lat_lng = null;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
@@ -74,8 +75,7 @@ function setupControls() {
 	data_process_checkbox.addEventListener('change', function() {
 		if(this.checked) {
 			var entry = data[data_index];
-			map.panTo(entry.lat_lng);
-			showEntryMarker(entry.lat_lng);			
+			syncMarkEntry(entry.lat_lng);
 		}
 		else {
 			

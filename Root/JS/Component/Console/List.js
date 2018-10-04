@@ -37,8 +37,7 @@ function updateList() {
 		setAddress(entry.address, entry.gp_id);
 		data_time.innerText = formatDate(new Date(entry.time));
 		location_request_list.classList.remove('invisible');
-		map.panTo(entry.lat_lng);
-		showEntryMarker(entry.lat_lng);
+		syncMarkEntry(entry.lat_lng);
 	}
 	else {
 		location_request_list.classList.add('invisible');

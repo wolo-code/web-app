@@ -13,7 +13,10 @@
 	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
-<?php	if($bPublish) { ?>
+<?php
+	$component = $id;
+	require '../HTML/Fragment/Head.php';
+	if($bPublish) { ?>
 		<script><?php require '../../JS/Fragment/GA_header.js' ?></script>
 		<script <?php require '../JS/Fragment/Sentry_version.php' ?>></script>
 		<script><?php require '../JS/Fragment/Sentry_exec.php' ?></script>

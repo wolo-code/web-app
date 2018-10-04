@@ -7,7 +7,6 @@ function encode_(city, position) {
 	var http = new XMLHttpRequest();
 	http.open('POST', urlFunctions+'/'+'encode', true);
 
-	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curEncRequestId;
@@ -56,7 +55,6 @@ function decode_(city, code) {
 	var http = new XMLHttpRequest();
 	http.open('POST', urlFunctions+'/'+'decode', true);
 
-	// http.setRequestHeaders('Content-type', 'version');
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curDecRequestId;

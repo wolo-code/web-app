@@ -22,6 +22,8 @@ function queryPendingList() {
 		data_count.innerText = data.length;
 		if(idLoader != null)
 			endLoader('authenticated');
+		else if(idLoader == -1)
+			showConsoleBlock();
 		if(prev_entry == null || data_index >= data.length || JSON.stringify(prev_entry) != JSON.stringify(data[data_index])) {
 			if(target_id == null)
 				data_index = 0;

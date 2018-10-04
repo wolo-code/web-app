@@ -4,7 +4,7 @@ function beginLoader() {
 
 function endLoader(status) {
 	clearTimeout(idLoader);
-	idLoader = null;
+	idLoader = -1;
 	if(status == 'authenticated')
 		showConsloeBlock();
 	else if('unauthenticated')

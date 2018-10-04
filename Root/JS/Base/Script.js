@@ -4,7 +4,7 @@ var clickHandler;
 var map;
 
 function syncInitMap() {
-	if (typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
+	if (document.readyState === 'interactive' && typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: DEFAULT_LATLNG,
 			mapTypeControl: false,

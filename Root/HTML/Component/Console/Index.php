@@ -48,9 +48,9 @@
 		<form id='city_submit_panel'>
 			<input id='city_lat' type='hidden' >
 			<input id='city_lng' type='hidden' >
-			<input id='city_name' type='text' placeholder='Name' required tabindex='4' >
-			<input id='city_group' type='text' placeholder='Group' required tabindex='5' >
-			<input id='city_country' type='text' placeholder='Country' required tabindex='6' >
+			<input id='city_name' class='city_form_field' type='text' placeholder='Name' required tabindex='4' autocomplete='new-password' >
+			<input id='city_group' class='city_form_field' type='text' placeholder='Group' required tabindex='5' autocomplete='new-password' >
+			<input id='city_country' class='city_form_field' type='text' placeholder='Country' required tabindex='6' autocomplete='new-password' >
 			<input id='submit_city_button' class='control' type='submit' value='Submit' tabindex='7'>
 		</form>
 		<div id='notification_bottom' class='hide'></div>

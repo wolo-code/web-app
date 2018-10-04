@@ -100,23 +100,27 @@
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
 	background-color: rgb(255, 255, 255);
-	padding: 8px 10px;
+	padding: 8px 14px;
 	border: none;
 	border-radius: 2px;
 }
 
 #city_submit_panel input {
-	background: transparent;
-	border-top: none;
-	border-left: none;
-	border-right: none;
 	height: 36px;
 }
 
+.city_form_field {
+	padding-left: 6px;
+	background: #aadddd80;
+	border-top: none !important;
+	border-left: none !important;
+	border-right: none !important;
+}
+
 input:invalid {
-	border: 2px solid red;
+	border-bottom: 2px solid #69B7CF;
 }
 
 input:valid {
-	border: 2px solid #69B7CF;
+	border-bottom: 2px solid #B7B7B7;
 }

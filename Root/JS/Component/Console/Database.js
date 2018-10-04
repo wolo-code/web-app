@@ -5,8 +5,7 @@ var prev_entry;
 
 function queryPendingList() {
 	beginLoader();
-	var ref = firebase.database().ref('CityRequest');
-	var list = ref.orderByChild("processed").equalTo(false).on("value", function(snapshot) {
+	var list = database.ref('CityRequest').orderByChild('processed').equalTo(false).on('value', function(snapshot) {
 		if(data != null)
 			prev_entry = data[data_index];
 		data = [];

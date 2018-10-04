@@ -74,6 +74,8 @@
 	}
 
 	function includeDirHeader($fileRoot, $dir) {
+		global $config;
+		
 		if(is_dir($fileRoot) == 1) {
 			$files = loadFiles($fileRoot);
 			foreach ($files as $file) {

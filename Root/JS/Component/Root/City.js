@@ -1,5 +1,6 @@
 var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
+var pendingCitySubmit = false;
 
 function noCity(position) {
 	showAddress();

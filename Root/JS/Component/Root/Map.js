@@ -3,7 +3,6 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
-var pendingCitySubmit = false;
 var infoWindow_open = false;
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';

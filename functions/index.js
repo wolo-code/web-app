@@ -37,7 +37,7 @@ function encodeData(value, d) {
 }
 
 function decodeData(data, d) {
-	return data*d+d/2;
+	return data*d;
 }
 
 function getCityBegin(cityCenter) {

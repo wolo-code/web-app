@@ -102,7 +102,6 @@ function encode(city_begin, position) {
 	const word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
 	const code = [word_index_1, word_index_2, word_index_3];
 
-	//console.log(code, lat_diff + " " + lng_diff);
 	return code;
 }
 
@@ -117,7 +116,6 @@ function decode(city_begin, code) {
 	const lat = city_begin.lat + lat_diff;
 	const lng = city_begin.lng + lng_diff;
 
-	//console.log(code, lat_diff + " " + lng_diff);
 	return({"lat":lat, "lng":lng});
 }
 

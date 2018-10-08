@@ -3,6 +3,7 @@ function focus_(pos, bounds) {
 	map.panTo(pos);
 	city_lat.value = pos.lat();
 	city_lng.value = pos.lng();
+	var posBounds = getSpanBounds(pos.lat(), pos.lng());
 	if(typeof accuCircle === 'undefined') {
 		accuCircle = new google.maps.Rectangle({
 			strokeColor: '#69B7CF',
@@ -12,12 +13,12 @@ function focus_(pos, bounds) {
 			fillOpacity: 0.5,
 			map: map,
 			//center: pos,
-			bounds: getSpanBounds(pos.lat(), pos.lng()),
+			bounds: posBounds,
 			clickable: false
 		});
 	}
 	else {
-		accuCircle.setBounds(getSpanBounds(pos.lat(), pos.lng()));
+		accuCircle.setBounds(posBounds);
 	}
 
 	if(typeof marker === 'undefined') {

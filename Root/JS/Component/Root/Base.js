@@ -8,7 +8,7 @@ function setLocationAccess(status) {
 }
 
 function locationAccessCheck() {
-	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true) 
+	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true)
 		return true;
 	return false;
 }
@@ -20,7 +20,7 @@ function setLocationAccessDND(status) {
 }
 
 function locationAccessDNDcheck() {
-	if(locationAccessDNDstatus() && JSON.parse(localStorage.location_access_dnd) === true) 
+	if(locationAccessDNDstatus() && JSON.parse(localStorage.location_access_dnd) === true)
 		return true;
 	return false;
 }

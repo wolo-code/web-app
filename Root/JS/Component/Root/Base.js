@@ -39,7 +39,7 @@ function versionCheck() {
 	if (typeof(Storage) !== 'undefined') {
 		if(typeof(localStorage.note_version) === 'undefined')
 			set = true;
-		else if(localStorage.note_version != '' && JSON.parse(localStorage.note_version) < CURRENT_VERSION)
+		else if(localStorage.note_version != '' && localStorage.note_version != 'undefined' && JSON.parse(localStorage.note_version) < CURRENT_VERSION)
 			set = true;
 	}
 	if(set) {

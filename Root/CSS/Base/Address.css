@@ -16,6 +16,7 @@
 #address_text_main {
 	display: inline-block;
 	float: left;
+	min-width: 89%;
 }
 
 #address_text_label {

@@ -32,7 +32,9 @@
 	padding-left: 10px;
 }
 
-.gm-style-iw + div {display: none;}
+.gm-style-iw + button {
+	display: none !important;
+}
 
 .gm-style-iw {
 	left: 12px;

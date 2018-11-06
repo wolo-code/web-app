@@ -25,11 +25,11 @@
 #infowindow_code_right {
 	padding-top: 10px;
 	padding-bottom: 10px;
+	padding-left: 14px;
 }
 
 #infowindow_code_right_code {
 	font-size: x-large;
-	padding-left: 10px;
 }
 
 .gm-style-iw + button {

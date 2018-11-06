@@ -7,7 +7,7 @@
 	</div>
 	<div class='message_dialog_body'>
 		<p class='secondary'>
-			<span>Copy text with the city name?</span>
+			<span>copy text with the city name?</span>
 			<span id='copy_wcode_message_city_name'></span>
 		</p>
 		<div class="center message_dialog_control">

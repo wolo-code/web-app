@@ -44,7 +44,6 @@ function versionCheck() {
 	}
 	if(set) {
 		localStorage.note_version = CURRENT_VERSION;
-		initWCode = true;
 		showOverlay();
 	}
 	else {

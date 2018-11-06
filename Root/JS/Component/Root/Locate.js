@@ -63,7 +63,6 @@ function locateExec() {
 			}
 			else {
 				initWCode = false;
-				map.setZoom(12);
 			}
 		}, function(error) {
 			if(error.code = error.PERMISSION_DENIED) {

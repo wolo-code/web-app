@@ -1,4 +1,4 @@
-var pendingLocate = true;
+// var pendingLocate;
 function syncLocate(override_dnd) {
 	if (typeof google === 'object' && typeof google.maps === 'object' && typeof map == 'object') {
 		initLocate(override_dnd);

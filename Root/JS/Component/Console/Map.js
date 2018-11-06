@@ -1,5 +1,5 @@
 var entryMarker;
-var markers = [];
+// var markers;
 var accuCircle;
 var pendingFillForm;
 
@@ -123,21 +123,21 @@ function showEntryMarker(location) {
 	google.maps.event.addListener(entryMarker, 'click', function() {clearForm();});
 }
 
-var N = 32768;
-var a = 6378137;
-var b = 6356752.314140;
-var e_sq = (a*a-b*b)/(a*a);
-var factor = Math.PI/180;
+// const N;
+// const A;
+// const B;
+// const E_SQ;
+// const DEG_RAD;
 
 function lat_span_half(lat) {
-	var lat_r = factor*lat;
-	var x = Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r));
-	return Math.abs((x*x*x)/(factor*a*(1-e_sq)));
+	var lat_r = DEG_RAD*lat;
+	var x = Math.sqrt(1-E_SQ*Math.sin(lat_r)*Math.sin(lat_r));
+	return Math.abs((x*x*x)/(DEG_RAD*A*(1-E_SQ)));
 }
 
 function lng_span_half(lat) {
-	var lat_r = factor*lat;
-	return Math.abs(Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r))/(factor*a*Math.cos(lat_r)));
+	var lat_r = DEG_RAD*lat;
+	return Math.abs(Math.sqrt(1-E_SQ*Math.sin(lat_r)*Math.sin(lat_r))/(DEG_RAD*A*Math.cos(lat_r)));
 }
 
 function getSpanBounds(lat, lng) {

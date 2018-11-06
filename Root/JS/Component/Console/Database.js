@@ -1,5 +1,5 @@
 var data
-var data_index = 0;
+// var data_index;
 var idLoader;
 var prev_entry;
 

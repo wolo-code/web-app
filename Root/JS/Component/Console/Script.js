@@ -1,7 +1,7 @@
-var auth_processed = false;
-var map_processed = false;
+// var auth_processed;
+// var map_processed;
 var target_id;
-var pendingEntry_lat_lng = null;
+// var pendingEntry_lat_lng;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {

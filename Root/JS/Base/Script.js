@@ -1,5 +1,4 @@
-var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
-var pendingInitMap = true;
+var pendingInitMap;
 var clickHandler;
 var map;
 
@@ -7,8 +6,8 @@ function syncInitMap() {
 	if (document.readyState === 'interactive' && typeof google === 'object' && typeof google.maps === 'object' && typeof initMap == 'function' && pendingInitMap) {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: DEFAULT_LATLNG,
+			zoom: DEFAULT_INIT_ZOOM,
 			mapTypeControl: false,
-			zoom: 8,
 			fullscreenControl: false,
 			streetViewControl: false,
 			zoomControl: false

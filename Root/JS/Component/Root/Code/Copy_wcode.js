@@ -1,5 +1,5 @@
-var WCODE_CODE_COPIED_MESSAGE = "WCode copied to clipboard";
-var WCODE_LINK_COPIED_MESSAGE = "WCode link copied to clipboard";
+// const WCODE_CODE_COPIED_MESSAGE;
+// const WCODE_LINK_COPIED_MESSAGE;
 
 function showCopyWcodeMessage() {
 	copy_wcode_message_city_name.innerText = getWcodeCity();

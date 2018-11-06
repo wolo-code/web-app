@@ -1,5 +1,5 @@
-var CURRENT_VERSION = 1;
-var initWCode = false;
+// const CURRENT_VERSION;
+// var initWCode;
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {

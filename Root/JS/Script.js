@@ -1,2 +1,2 @@
-var initLoadDone = false;
+var initLoadDone;
 initLoad();

@@ -1,6 +1,6 @@
-var latLng_p = "";
-var address = "";
-var gpId = "";
+// var latLng_p;
+// var address;
+// var gpId;
 
 function getAddress(latLng) {
 	var geocoder = new google.maps.Geocoder;

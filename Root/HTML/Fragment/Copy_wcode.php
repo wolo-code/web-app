@@ -15,6 +15,9 @@
 			<button id='copy_wcode_submit_yes' class='dialog_message_secondary' type='button'>Yes</button>
 		</div>
 		<div class="center message_dialog_separator"></div>
+		<p class='secondary'>
+			<span>copy link:</span>
+		</p>
 		<img id='copy_link_button' class="center control" src="<?php getSVG('', 'link'); ?>" >
 	</div>
 </div>

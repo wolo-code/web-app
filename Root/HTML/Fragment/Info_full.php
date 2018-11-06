@@ -9,7 +9,7 @@
 	</ul>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
-			<button id='info_full_close_button' type='button'>&#x25C1; return</button>
+			<button id='info_full_close_button' class='button_highlight' type='button'>&#x25C1; return</button>
 		</div>
 	</div>
 	<div id='software_info'>

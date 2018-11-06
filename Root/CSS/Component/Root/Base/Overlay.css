@@ -52,3 +52,9 @@
 #agency {
 	text-align: right;
 }
+
+.button_highlight {
+	color: white !important;
+	background: #69B7CF !important;
+	border-color: #69b7cf;
+}

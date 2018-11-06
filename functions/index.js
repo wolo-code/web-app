@@ -9,20 +9,20 @@ const mailgun = require('mailgun-js')({apiKey, domain});
 
 // 2^(10+5)
 const N = 32768;
-const a = 6378137;
-const b = 6356752.314140;
-const e_sq = (a*a-b*b)/(a*a);
-const factor = Math.PI/180;
+const A = 6378137;
+const B = 6356752.314140;
+const E_SQ = (A*A-B*B)/(A*A);
+const DEG_RAD = Math.PI/180;
 
 function lat_span_half(lat) {
-	const lat_r = factor*lat;
-	const x = Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r));
-	return Math.abs((x*x*x)/(factor*a*(1-e_sq)));
+	const lat_r = DEG_RAD*lat;
+	const x = Math.sqrt(1-E_SQ*Math.sin(lat_r)*Math.sin(lat_r));
+	return Math.abs((x*x*x)/(DEG_RAD*A*(1-E_SQ)));
 }
 
 function lng_span_half(lat) {
-	const lat_r = factor*lat;
-	return Math.abs(Math.sqrt(1-e_sq*Math.sin(lat_r)*Math.sin(lat_r))/(factor*a*Math.cos(lat_r)));
+	const lat_r = DEG_RAD*lat;
+	return Math.abs(Math.sqrt(1-E_SQ*Math.sin(lat_r)*Math.sin(lat_r))/(DEG_RAD*A*Math.cos(lat_r)));
 }
 
 function encodeData(value, d) {

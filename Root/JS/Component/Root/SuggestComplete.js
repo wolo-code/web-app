@@ -1,9 +1,8 @@
 function suggestComplete(event) {
 	var input_array = document.getElementById('pac-input').value.toLowerCase().split(' ');
 	var curList;
-	if(input_array.length > 0) {
+	if(input_array.length > 0)
 		curList = getPossibleList(input_array.slice(0, -1));
-	}
 	if(curList !=  null) {
 		var curWord = input_array[input_array.length-1];
 		if(curList != city_styled_wordlist && curList != wordList.curList) {

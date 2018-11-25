@@ -35,7 +35,7 @@ function getPossibleList(code) {
 				break;
 			}
 			else {
-				list = matchWord(city_styled_wordlist, cityName);
+				list = matchWord(city_styled_wordlist, cityName+' ');
 				if(list && list.length > 0)
 					break;
 			}

@@ -55,7 +55,8 @@ function matchWord(list, input) {
 	return list.filter(function(word) {
 		if (word.match(regEx)) {
 			if(word.toLowerCase().startsWith(input))
-				return word;
+				if(word.toLowerCase() != input)
+					return word;
 		}
 	});
 }
@@ -63,8 +64,6 @@ function matchWord(list, input) {
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
 	suggestion_result.innerText = '';
-	if(autoCompleteResult.length == 1 && val == autoCompleteResult[0].toLowerCase())
-		return;
 	if(autoCompleteResult.length < 5 || val.length > 2)
 		for(var i = 0; i < autoCompleteResult.length && i < 10; i++) {
 			var option = document.createElement('div');

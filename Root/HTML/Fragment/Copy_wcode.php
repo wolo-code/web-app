@@ -11,8 +11,8 @@
 			<span id='copy_wcode_message_city_name'></span>
 		</p>
 		<div class="center message_dialog_control">
-			<button id='copy_wcode_submit_no' class='dialog_message_primary' type='button'>No</button>
-			<button id='copy_wcode_submit_yes' class='dialog_message_secondary' type='button'>Yes</button>
+			<button id='copy_wcode_submit_yes' class='dialog_message_primary' type='button'>Yes</button>
+			<button id='copy_wcode_submit_no' class='dialog_message_secondary' type='button'>No</button>
 		</div>
 		<div class="center message_dialog_separator"></div>
 		<p class='secondary'>

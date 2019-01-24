@@ -23,7 +23,7 @@ function suggestComplete(event) {
 
 function getPossibleList(code) {
 	var list;
-	
+
 	if(code.length == 0)
 		list = city_styled_wordlist;
 	else {

@@ -49,39 +49,39 @@ function initMap() {
 }
 
 function setupControls() {
-	
+
 	view_data_index.addEventListener('click', function(e) {
 		showDetails();
 	});
-	
+
 	details_close.addEventListener('click', function(e) {
 		hideDetails();
 	});
-	
+
 	data_previous.addEventListener('click', function(e) {
 		previousRow();
 	});
-	
+
 	data_reject.addEventListener('click', function(e) {
 		process_entry(data[data_index].id);
 		deleteRow();
 //		updateRow();
 	});
-	
+
 	data_next.addEventListener('click', function(e) {
 		nextRow();
 	});
-	
+
 	data_process_checkbox.addEventListener('change', function() {
 		if(this.checked) {
 			var entry = data[data_index];
 			syncMarkEntry(entry.lat_lng);
 		}
 		else {
-			
+
 		}
 	});
-	
+
 	submit_city_button.addEventListener('click', function() {
 		if(city_lat.value != '' && city_lng.value != '')
 			if(city_submit_panel.checkValidity()) {
@@ -94,5 +94,5 @@ function setupControls() {
 		else
 			showNotification("Did you not select a search result?");
 	});
-	
+
 }

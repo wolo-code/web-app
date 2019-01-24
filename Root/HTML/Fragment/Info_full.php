@@ -23,6 +23,6 @@
 		</div>
 	</div>
 	<div id='contact'>
-		for any related query contact me
+		for any related query contact me: <a class="content-link" href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
 	</div>
 </div>

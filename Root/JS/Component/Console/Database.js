@@ -49,18 +49,18 @@ function process_entry(key) {
 
 function submit_city(lat, lng, country, group, name) {
 	var cityList;
-	var ref = firebase.database().ref('CityList');
-	ref.once('value', function(snapshot) {
-		cityList = snapshot.val();
-		var data = {
-			"center": {'lat':lat, 'lng':lng},
-			"country": country,
-			"group": group,
-			"name": name
-		};
-		cityList[Object.keys(cityList).length] = data;
-		ref.set(cityList);
+	var refCityDetail = firebase.database().ref('CityDetail').push();
+	refCityDetail.set({
+		"country": country,
+		"group": group,
+		"name": name
 	});
+	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
+	  	console.log("Provided key has been added to GeoFire");
+		}, function(error) {
+	  	console.log("Error: " + error);
+		}
+	);
 	showNotification("Request submitted");
 	clearForm();
 }

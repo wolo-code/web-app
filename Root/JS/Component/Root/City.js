@@ -2,6 +2,62 @@
 // var pendingCity;
 // var pendingCitySubmit;
 
+function getCityFromPositionThenEncode(latLng) {
+	var nearCity = new Object;
+
+	var geoQuery = geoFire.query({
+		center: [latLng.lat, latLng.lng],
+		radius: CITY_RANGE_RADIUS
+	});
+
+	geoQuery.on("ready", function() {
+		geoQuery.cancel();
+		if(nearCity == null)
+			encode_continue(null, latLng);
+		else
+			encode_continue(nearCity.city, latLng);
+	});
+
+	geoData = geoQuery.on("key_entered", function(key, location, distance) {
+		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
+			nearCity.city = {name:CityList[key].name, center:{ lat: location[0], lng: location[1]} };
+			nearCity.distance = distance;
+		}
+	});
+
+}
+
+function getCityFromPositionThenDecode(latLng, wcode) {
+	var nearCity = new Object;
+
+	var geoQuery = geoFire.query({
+	  center: [latLng.lat, latLng.lng],
+	  radius: CITY_RANGE_RADIUS
+	});
+
+	geoQuery.on("ready", function() {
+	  geoQuery.cancel();
+		if(nearCity == null)
+			decode_continue(null, wcode);
+		else
+			decode_continue(nearCity.city, wcode);
+	});
+
+	geoData = geoQuery.on("key_entered", function(key, location, distance) {
+		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
+			nearCity.city = {name:CityList[key].name, center:{ lat: location[0], lng: location[1]} };
+			nearCity.distance = distance;
+		}
+	});
+
+}
+
+function getCityIdFromName(cityName) {
+	if(cityName in city_id_hashlist)
+		return city_id_hashlist[cityName];
+	return null;
+}
+
 function noCity(position) {
 	showAddress();
 	showNoCityMessage();

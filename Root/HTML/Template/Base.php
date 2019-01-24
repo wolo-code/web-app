@@ -13,6 +13,7 @@
 	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
+	<script src="https://cdn.firebase.com/libs/geofire/<?php echo $config['geofire_version'] ?>/geofire.min.js"></script>
 <?php
 	$component = $id;
 	require '../HTML/Fragment/Head.php';

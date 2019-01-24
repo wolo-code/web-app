@@ -30,7 +30,7 @@ function getPossibleList(code) {
 		var i;
 		for(i = code.length; i > 0; i--) {
 			var cityName = code.slice(0, i).join(' ');
-			if(getCityFromName(cityName)) {
+			if(getCityIdFromName(cityName)) {
 				list = wordList.curList;
 				break;
 			}

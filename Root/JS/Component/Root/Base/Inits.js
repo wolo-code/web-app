@@ -14,6 +14,7 @@ var WCODE_LINK_COPIED_MESSAGE = "WCode link copied to clipboard";
 // Code\Core
 var city_styled_wordlist = [];
 var city_plus_wordList = [];
+var city_id_hashlist = new Object;
 
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
 var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the WCode with city name";
@@ -38,3 +39,5 @@ var infoWindow_open = false;
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
+
+var CITY_RANGE_RADIUS = 32.767;

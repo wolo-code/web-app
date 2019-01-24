@@ -4,15 +4,16 @@ firebase.database().ref('WordList').on('value', function(snapshot) {
 		initData();
 });
 
-firebase.database().ref('CityList').on('value', function(snapshot) {
-	
+firebase.database().ref('CityDetail').on('value', function(snapshot) {
+
 	CityList = snapshot.val();
-	
-	CityList.forEach (function(city){
-		city_styled_wordlist.push(city.name);
-		city_plus_wordList.push(city.name.toLowerCase());
-	});
-	
+
+	for(let key in CityList) {
+		city_id_hashlist[CityList[key].name.toLowerCase()] = key;
+		city_styled_wordlist.push(CityList[key].name);
+		city_plus_wordList.push(CityList[key].name.toLowerCase());
+	};
+
 	if(wordList != null)
 		initData();
 });
@@ -20,7 +21,7 @@ firebase.database().ref('CityList').on('value', function(snapshot) {
 function initData() {
 	city_styled_wordlist = city_styled_wordlist.concat(wordList.curList);
 	city_plus_wordList = city_plus_wordList.concat(wordList.curList);
-	
+
 	if(pendingPosition != null) {
 		encode(pendingPosition);
 	}

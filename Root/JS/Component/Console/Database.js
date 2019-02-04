@@ -56,7 +56,7 @@ function submit_city(lat, lng, country, group, name) {
 		"name": name
 	});
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
-	  	console.log("Provided key has been added to GeoFire");
+	  	;
 		}, function(error) {
 	  	console.log("Error: " + error);
 		}

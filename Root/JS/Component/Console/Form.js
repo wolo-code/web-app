@@ -1,6 +1,6 @@
 function fillForm(lat, lng, country) {
 	city_lat.value = lat;
-	city_lng.value = lng;	
+	city_lng.value = lng;
 	city_country.value = country;
 }
 

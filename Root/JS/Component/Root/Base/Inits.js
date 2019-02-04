@@ -1,5 +1,5 @@
 // .\Script
-var pendingLocate = true;
+var pendingLocate = false;
 
 // Code\Code
 var FUNCTIONS_BASE_URL = 'https://location.wcodes.org/api';

@@ -52,10 +52,21 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 }
 
+function getCityNameFromId(id) {
+	return CityList[id].name;
+}
+
 function getCityIdFromName(cityName) {
 	if(cityName in city_id_hashlist)
 		return city_id_hashlist[cityName];
 	return null;
+}
+
+function getCityAccentFromId(id) {
+	if(typeof (CityList[id].accent) != 'undefined')
+		return CityList[id].accent;
+	else
+		return CityList[id].name;
 }
 
 function noCity(position) {

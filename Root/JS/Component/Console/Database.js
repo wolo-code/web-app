@@ -47,13 +47,14 @@ function process_entry(key) {
 	ref.update(updates);
 }
 
-function submit_city(lat, lng, country, group, name) {
+function submit_city(lat, lng, country, group, name, accent) {
 	var cityList;
 	var refCityDetail = firebase.database().ref('CityDetail').push();
 	refCityDetail.set({
-		"country": country,
-		"group": group,
-		"name": name
+		'country': country,
+		'group': group,
+		'name': name,
+		'accent': accent
 	});
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
 	  	;

@@ -3,6 +3,7 @@
 		<h3>Restricted! You are not authorized to have access here.</h3>
 	</div>
 	<div id='console_block' class='hide'>
+
 		<div id='console-title-container' class='center-container-abs'>
 			<span id='console_title'>Console</span>
 		</div>
@@ -49,10 +50,15 @@
 			<input id='city_lat' type='hidden' >
 			<input id='city_lng' type='hidden' >
 			<input id='city_name' class='city_form_field' type='text' placeholder='Name' required tabindex='4' autocomplete='new-password' >
-			<input id='city_group' class='city_form_field' type='text' placeholder='Group' required tabindex='5' autocomplete='new-password' >
+			<input id='city_accent' class='city_form_field' type='text' placeholder='Accent' tabindex='4' autocomplete='new-password' >
+			<input id='city_group' class='city_form_field' type='text' placeholder='Group' tabindex='5' autocomplete='new-password' >
 			<input id='city_country' class='city_form_field' type='text' placeholder='Country' required tabindex='6' autocomplete='new-password' >
 			<input id='submit_city_button' class='control' type='submit' value='Submit' tabindex='7'>
 		</form>
 		<div id='notification_bottom' class='hide'></div>
-	</div>
+		<div id='file_container'>
+			<input id='file_input' type='file'>
+			<button id='file_upload' type='button' onclick="upload_data();">Upload</button>
+		</div>
+ 	</div>
 </div>

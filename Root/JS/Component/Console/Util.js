@@ -20,3 +20,7 @@ function formatDate(date) {
 	var minute = date.getMinutes();
 	return monthNames[monthIndex] + ' ' + formatNumber(day) + ' ' + formatNumber(hour) + ':' + formatNumber(minute);
 }
+
+function unquote(str) {
+	return str.replace(/^"(.*)"$/, '$1');
+}

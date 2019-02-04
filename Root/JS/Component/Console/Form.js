@@ -9,5 +9,6 @@ function clearForm() {
 	city_lng.value = '';
 	city_country.value = '';
 	city_group.value = '';
-	city_name.value = '';	
+	city_name.value = '';
+	city_accent.value = '';
 }

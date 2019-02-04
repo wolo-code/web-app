@@ -1,13 +1,15 @@
-var wcode_city;
+var wcode_city_id;
+var wcode_city_name;
 var wcode_code;
 var wcode_postition;
 
-function setWcode(wcode, latLng) {
-	wcode_city = wcode[0];
-	wcode_code = wcode.slice(1, wcode.length);
+function setWcode(code, latLng) {
+	wcode_city_name = code[0].toLocaleLowerCase();
+	wcode_city_id = getCityIdFromName(wcode_city_name);
+	wcode_code = code.slice(1, code.length);
 	wcode_postition = latLng;
-	
-	setInfoWindowText(wcode, latLng);
+
+	setInfoWindowText(getCityAccentFromId(wcode_city_id), code, latLng);
 }
 
 function clearWcode() {
@@ -15,11 +17,11 @@ function clearWcode() {
 }
 
 function getWcodeFull() {
-	return [wcode_city].concat(wcode_code);
+	return [wcode_city_name].concat(wcode_code);
 }
 
 function formatWcode(wcode) {
-	return ["\\"].concat(wcode).concat(["/"]); 
+	return ["\\"].concat(wcode).concat(["/"]);
 }
 
 function getWcodeFull_formatted() {
@@ -35,5 +37,5 @@ function getWcodeCode_formatted() {
 }
 
 function getWcodeCity() {
-	return wcode_city;	
+	return wcode_city_name;
 }

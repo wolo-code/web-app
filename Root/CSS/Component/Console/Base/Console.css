@@ -124,3 +124,22 @@ input:invalid {
 input:valid {
 	border-bottom: 2px solid #B7B7B7;
 }
+
+#file_container {
+	position: absolute;
+	left: 10px;
+	bottom: 10px;
+}
+
+#file_upload {
+	z-index: 1;
+  height: 36px;
+  box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+  color: #69B7CF;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 0.9375em;
+  background-color: rgb(255, 255, 255);
+  padding: 8px 14px;
+  border: none;
+  border-radius: 2px;
+}

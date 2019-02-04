@@ -21,6 +21,7 @@ function locateRight_deny() {
 	wait_loader.classList.add('hide');
 	hideLocateRightMessage();
 	locateRight_DND_check();
+	showNotification("Choose a place on the map");
 }
 
 function locateRight_DND_check() {

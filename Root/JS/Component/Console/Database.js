@@ -47,8 +47,7 @@ function process_entry(key) {
 	ref.update(updates);
 }
 
-function submit_city(lat, lng, country, group, name, accent) {
-	var cityList;
+function submit_city(lat, lng, country, group, name, accent, callback) {
 	var refCityDetail = database.ref('CityDetail').push();
 	refCityDetail.set({
 		'country': country,
@@ -57,11 +56,10 @@ function submit_city(lat, lng, country, group, name, accent) {
 		'accent': accent
 	});
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
-	  	;
+			if(typeof callback == 'function')
+				callback();
 		}, function(error) {
 	  	console.log("Error: " + error);
 		}
 	);
-	showNotification("Request submitted");
-	clearForm();
 }

@@ -88,6 +88,8 @@ function setupControls() {
 				submit_city(parseFloat(city_lat.value), parseFloat(city_lng.value), city_country.value.trim(), city_group.value.trim(), city_name.value.trim(), city_accent.value.trim());
 				if(data_process_checkbox.checked)
 					process_entry(data[data_index].id);
+				showNotification("Request submitted");
+				clearForm();
 			}
 			else
 				showNotification("Check form data");

@@ -85,7 +85,7 @@ function submitCity() {
 }
 
 function execSubmitCity() {
-	var newPostKey = firebase.database().ref().child('CityRequest').push().key;
+	var newPostKey = database.ref().child('CityRequest').push().key;
 	var updates = {};
 	var data = {
 			"time": firebase.database.ServerValue.TIMESTAMP,
@@ -95,7 +95,7 @@ function execSubmitCity() {
 			"processed": false
 		};
 	updates['/CityRequest/' + newPostKey] = data;
-	firebase.database().ref().update(updates);
+	database.ref().update(updates);
 	showNotification("Request submitted");
 }
 

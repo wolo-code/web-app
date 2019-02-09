@@ -41,7 +41,7 @@ function queryPendingList() {
 }
 
 function process_entry(key) {
-	var ref = firebase.database().ref('CityRequest/'+key);
+	var ref = database.ref('CityRequest/'+key);
 	var updates = {};
 	updates['processed'] = 'true';
 	ref.update(updates);
@@ -49,7 +49,7 @@ function process_entry(key) {
 
 function submit_city(lat, lng, country, group, name, accent) {
 	var cityList;
-	var refCityDetail = firebase.database().ref('CityDetail').push();
+	var refCityDetail = database.ref('CityDetail').push();
 	refCityDetail.set({
 		'country': country,
 		'group': group,

@@ -1,4 +1,4 @@
-firebase.database().ref('WordList').on('value', function(snapshot) {
+database.ref('WordList').on('value', function(snapshot) {
 	wordList = new WordList(snapshot.val());
 	if(CityList != null)
 		initData();

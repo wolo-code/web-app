@@ -22,7 +22,7 @@ function setupControls() {
 	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
 	document.getElementById('no_city_submit_wait_stop').addEventListener('click', noCityWait_stop);
 	document.getElementById('notification_top').addEventListener('click', tryDefaultCity);
-	document.getElementById('copy_wcode_message_close').addEventListener('click', hideCopyWcodeMessage);
+	document.getElementById('copy_wcode_message_close').addEventListener('click', hideCopyCodeMessage);
 	document.getElementById('copy_wcode_submit_yes').addEventListener('click', copyWcodeFull);
 	document.getElementById('copy_wcode_submit_no').addEventListener('click', copyWcodeCode);
 	document.getElementById('copy_link_button').addEventListener('click', copyWcodeLink);

@@ -1,4 +1,15 @@
-function suggestComplete(event) {
+function suggestWrapper(event) {
+	cityNameList = [];
+	getCitiesFromName(document.getElementById('pac-input').value.toLowerCase(), function(cityList) {
+		for(let key in cityList)
+			cityNameList.push(getProperCityAccent(cityList[key]));
+		city_styled_wordlist = cityNameList.concat(wordList.curList);
+		suggestComplete();
+	});
+	suggestComplete();
+}
+
+function suggestComplete() {
 	var input_array = document.getElementById('pac-input').value.toLowerCase().split(' ');
 	var curList;
 	if(input_array.length > 0)
@@ -30,7 +41,7 @@ function getPossibleList(code) {
 		var i;
 		for(i = code.length; i > 0; i--) {
 			var cityName = code.slice(0, i).join(' ');
-			if(getCityIdFromName(cityName)) {
+			if(cityNameList.includes(cityName)) {
 				list = wordList.curList;
 				break;
 			}

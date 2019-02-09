@@ -1,12 +1,12 @@
-function focus__(pos, code) {
+function focus__(city, pos, code) {
 	focus_(pos);
-	setWcode(code, pos);
+	setCode(city, code, pos);
 }
 
 const ZOOM_ANIMATION_SPEED = 250;
 var firstFocus = true;
 function focus_(pos, bounds) {
-	
+
 	hideNoCityMessage();
 
 	if(typeof marker === 'undefined') {
@@ -35,7 +35,7 @@ function focus_(pos, bounds) {
 
 	map.panTo(pos);
 	map.panBy(0, getPanByOffset());
-	
+
 	var idleListenerPan = map.addListener('idle', function() {
 		idleListenerPan.remove();
 		var newZoom;
@@ -53,7 +53,7 @@ function focus_(pos, bounds) {
 			firstFocus = false;
 		}
 	});
-	
+
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
 	infoWindow_open = true;
@@ -77,7 +77,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 				if(typeof bounds !== 'undefined')
 					setTimeout(function() {
 							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-					}, ZOOM_ANIMATION_SPEED);			
+					}, ZOOM_ANIMATION_SPEED);
 			}
 		}, ZOOM_ANIMATION_SPEED);
 	}
@@ -88,15 +88,15 @@ function getZoomByBounds( map, bounds ) {
 	var MIN_ZOOM = map.mapTypes.get(map.getMapTypeId()).minZoom || 0;
 
 	var ne = map.getProjection().fromLatLngToPoint( bounds.getNorthEast() );
-	var sw = map.getProjection().fromLatLngToPoint( bounds.getSouthWest() ); 
+	var sw = map.getProjection().fromLatLngToPoint( bounds.getSouthWest() );
 
 	var worldCoordWidth = Math.abs(ne.x-sw.x);
 	var worldCoordHeight = Math.abs(ne.y-sw.y);
 
 	var FIT_PAD = 10;
 
-	for(var zoom = MAX_ZOOM; zoom >= MIN_ZOOM; --zoom) { 
-		if( worldCoordWidth*(1<<zoom)+2*FIT_PAD < document.getElementById('map').scrollWidth && 
+	for(var zoom = MAX_ZOOM; zoom >= MIN_ZOOM; --zoom) {
+		if( worldCoordWidth*(1<<zoom)+2*FIT_PAD < document.getElementById('map').scrollWidth &&
 				worldCoordHeight*(1<<zoom)+2*FIT_PAD < document.getElementById('map').scrollHeight )
 			return zoom;
 	}

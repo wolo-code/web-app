@@ -8,14 +8,13 @@ var curEncRequestId = 0;
 var curDecRequestId = 0;
 
 // Code\Copy_wcode
+var city_styled_wordlist = [];
+var cityNameList;
+
 var WCODE_CODE_COPIED_MESSAGE = "WCode copied to clipboard";
 var WCODE_LINK_COPIED_MESSAGE = "WCode link copied to clipboard";
 
 // Code\Core
-var city_styled_wordlist = [];
-var city_plus_wordList = [];
-var city_id_hashlist = new Object;
-
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
 var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the WCode with city name";
 

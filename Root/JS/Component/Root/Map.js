@@ -104,16 +104,16 @@ function initMap() {
 	map_type_button.addEventListener('click', function() {
 		toggleMapType(true);
 	});
-	
+
 	location_button.addEventListener('click', function() {
 		syncLocate(true);
 	});
 
-	document.getElementById('pac-input').addEventListener('input', suggestComplete);
+	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
 	clickHandler = new ClickEventHandler(map);
-	
+
 	postMap();
-	
+
 }
 
 function resolveLatLng(latLng) {
@@ -162,9 +162,9 @@ function getPanByOffset() {
 		return 0;
 }
 
-function getIntentURL(latLng, code) {
+function getIntentURL(latLng, code_string) {
 	if((navigator.userAgent.match(/android/i)))
-		return 'geo:0,0?q='+latLng.lat+','+latLng.lng+'(\\ '+code.join(' ')+' /)';
+		return 'geo:0,0?q='+latLng.lat+','+latLng.lng+'(\\ '+code_string+' /)';
 	else
 		return 'https://maps.google.com/maps?q=loc:'+latLng.lat+','+latLng.lng+'&t=h';
 }

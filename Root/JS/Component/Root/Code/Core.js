@@ -1,6 +1,3 @@
-var CityList;
-// var city_styled_wordlist;
-// var city_plus_wordList;
 var pendingPosition;
 var pendingWords;
 var wordList;
@@ -9,12 +6,8 @@ var wordList;
 // const PURE_WCODE_CITY_FAILED;
 
 function encode(position) {
-	clearWcode();
-	if(CityList != null) {
-		getCityFromPositionThenEncode(position);
-	}
-	else
-		pendingPosition = position;
+	clearCode();
+	getCityFromPositionThenEncode(position);
 }
 
 function encode_continue(city, position) {
@@ -49,18 +42,19 @@ function decode(words) {
 	}
 
 	if(valid) {
-		if(CityList != null) {
 
 			if(city_words_length > 0) {
 				var ipCityName = words.slice(0, city_words_length).join(' ');
-				var cityId = getCityIdFromName(ipCityName);
-				if(cityId == null)
-					decode_continue(null, words.slice(city_words_length, words.length));
-				else
-					refCityCenter.child(cityId).once('value', function(snapshot) {
-						var location = snapshot.val().l;
-						decode_continue({name:CityList[cityId].name, center:{ lat: location[0], lng: location[1]} }, words.slice(city_words_length, words.length));
-					});
+				getCityFromName(ipCityName, function(city) {
+					if(city == null)
+						decode_continue(null, words.slice(city_words_length, words.length));
+					else
+						refCityCenter.child(city.id).once('value', function(snapshot) {
+							var location = snapshot.val().l;
+							city.center = { lat: location[0], lng: location[1]};
+							decode_continue(city, words.slice(city_words_length, words.length));
+						});
+				});
 			}
 			else if (words.length == 3) {
 				var position;
@@ -82,9 +76,6 @@ function decode(words) {
 					getCityFromPositionThenDecode(resolveLatLng(position), words);
 			}
 
-		}
-		else
-			pendingWords = words;
 	}
 	else
 		showNotification(INCORRECT_WCODE);

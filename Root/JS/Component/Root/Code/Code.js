@@ -33,13 +33,12 @@ function encode_(city, position) {
 
 function setCodeWords(code, city, position) {
 	var message = [];
-	message.push(city.name);
 	var object = JSON.parse(code).code;
 
 	for(const i of object)
 		message.push(wordList.getWord(i));
 
-	setWcode(message, position);
+	setCode(city, message, position);
 }
 
 function stringifyEncodeData(city_center, position) {
@@ -57,12 +56,12 @@ function decode_(city, code) {
 	http.setRequestHeader('Content-type', 'application/json');
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curDecRequestId;
-	
+
 	wait_loader.classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			if(http.requestId == curDecRequestId) {
-				setCodeCoord(http.responseText, new Array(city.name).concat(code));
+				setCodeCoord(city, http.responseText, code);
 				notification_top.classList.add('hide');
 				wait_loader.classList.add('hide');
 			}
@@ -84,7 +83,7 @@ function stringifyDecodeData(city_center, code) {
 	return JSON.stringify(object);
 }
 
-function setCodeCoord(codeIndex, code) {
+function setCodeCoord(city, codeIndex, code) {
 	var object = JSON.parse(codeIndex);
-	focus__(object, code);
+	focus__(city, object, code);
 }

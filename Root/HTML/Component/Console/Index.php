@@ -58,7 +58,7 @@
 		<div id='notification_bottom' class='hide'></div>
 		<div id='file_container'>
 			<input id='file_input' type='file'>
-			<button id='file_upload' type='button' onclick="upload_data();">Upload</button>
+			<button id='file_upload' type='button' class='border' onclick="upload_data();">Upload</button>
 		</div>
  	</div>
 </div>

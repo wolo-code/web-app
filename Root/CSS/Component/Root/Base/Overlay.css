@@ -56,5 +56,5 @@
 .button_highlight {
 	color: white !important;
 	background: #69B7CF !important;
-	border-color: #69b7cf;
+	border-color: #69b7cf !important;
 }

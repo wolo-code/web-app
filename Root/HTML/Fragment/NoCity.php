@@ -11,8 +11,8 @@
 			Do you want it to be added?
 		</p>
 		<div class="center message_dialog_control">
-			<button id='no_city_submit_yes' type='button'>Yes</button>
-			<button id='no_city_submit_no' type='button'>No</button>
+			<button id='no_city_submit_yes' class='border' type='button'>Yes</button>
+			<button id='no_city_submit_no' class='border' type='button'>No</button>
 		</div>
 	</div>
 	<div id='no_city_message_wait' class="message_dialog_body hide">
@@ -23,8 +23,8 @@
 			Do you wish to stop or continue waiting?
 		</p>
 		<div class="center message_dialog_control">
-			<button id='no_city_submit_wait_continue' type='button'>Continue</button>
-			<button id='no_city_submit_wait_stop' type='button'>Stop</button>
+			<button id='no_city_submit_wait_continue' class='border' type='button'>Continue</button>
+			<button id='no_city_submit_wait_stop' class='border' type='button'>Stop</button>
 		</div>
 	</div>
 </div>

@@ -32,10 +32,6 @@
 	font-size: x-large;
 }
 
-.gm-style-iw + button {
-	display: none !important;
-}
-
 .gm-style-iw {
 	left: 12px;
 	margin-left: auto;

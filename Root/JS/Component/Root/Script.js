@@ -30,6 +30,7 @@ function setupControls() {
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);
 	document.getElementById('address_text_copy').addEventListener('click', copyAddress);
+	document.getElementById('choose_city_message_close').addEventListener('click', hideChooseCityMessage);
 }
 
 function showAndCopy(message) {

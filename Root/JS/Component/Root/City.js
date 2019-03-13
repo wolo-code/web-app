@@ -1,13 +1,17 @@
 // const DEFAULT_WCODE;
 // var pendingCity;
 // var pendingCitySubmit;
+var multiple_city;
+var multiple_country;
+var multiple_group;
 
 function getProperCityAccent(city) {
-	var city_accent_normalized = city.accent.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-	if(city.name.localeCompare(city_accent_normalized.toLocaleLowerCase()) == 0)
-		return city_accent_normalized;
-	else
-		return capitalizeWords(city.name);
+	if(typeof city.accent != 'undefined') {
+		var city_accent_normalized = city.accent.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+		if(city.name.localeCompare(city_accent_normalized.toLocaleLowerCase()) == 0)
+			return city_accent_normalized;
+	}
+	return capitalizeWords(city.name);
 }
 
 function getCityFromPositionThenEncode(latLng) {
@@ -18,7 +22,9 @@ function getCityFromPositionThenEncode(latLng) {
 		radius: CITY_RANGE_RADIUS
 	});
 
-	geoQuery.on("ready", function() {
+	wait_loader.classList.remove('hide');;
+	geoQuery.on('ready', function() {
+		wait_loader.classList.add('hide');
 		geoQuery.cancel();
 		if(Object.keys(nearCity).length === 0)
 			encode_continue(null, latLng);
@@ -46,7 +52,9 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 	  radius: CITY_RANGE_RADIUS
 	});
 
-	geoQuery.on("ready", function() {
+	wait_loader.classList.remove('hide');
+	geoQuery.on('ready', function() {
+		wait_loader.classList.add('hide');
 	  geoQuery.cancel();
 		if(nearCity == null)
 			decode_continue(null, wcode);
@@ -65,31 +73,49 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 function getCityFromId(id, callback) {
 	var ref = database.ref('CityDetail'+'/'+id);
+	wait_loader.classList.remove('hide');;
 	ref.once('value').then(function(snapshot) {
+		wait_loader.classList.add('hide');
 		callback(snapshot.val());
 	});
 }
 
 function getCityFromName(name, callback) {
 	var ref = database.ref('CityDetail');
-	ref.orderByChild('name').equalTo(name).on("child_added", function(snapshot) {
-		var city = snapshot.val();
-		city.id = snapshot.key;
-    callback(city);
+	wait_loader.classList.remove('hide');
+	ref.orderByChild('name').equalTo(name).on('value', function(snapshot) {
+		wait_loader.classList.add('hide');
+		var list = snapshot.val();
+		if(list == null)
+			decode_continue();
+		else {
+			if (Object.keys(list).length > 1)
+				chooseCity(list, callback);
+			else {
+				var id = Object.keys(list)[0];
+				var city = list[id];
+				city.id = id;
+				callback(city);
+			}
+		}
 	});
 }
 
 function getCitiesFromName(name, callback) {
 	var ref = database.ref('CityDetail');
-	ref.orderByChild('name').startAt(name).limitToFirst(10).on("value", function(snapshot) {
-    callback(snapshot.val());
+	wait_loader.classList.remove('hide');;
+	ref.orderByChild('name').startAt(name).endAt(name+'\uf8ff').limitToFirst(10).on('value', function(snapshot) {
+		wait_loader.classList.add('hide');
+		callback(snapshot.val());
 	});
 }
 
 function getCityIdFromName(name, callback) {
 	var ref = database.ref('CityDetail');
-	ref.orderByChild('name').equalTo(name).on("child_added", function(snapshot) {
-    callback(snapshot.key);
+	wait_loader.classList.remove('hide');;
+	ref.orderByChild('name').equalTo(name).on('child_added', function(snapshot) {
+		wait_loader.classList.add('hide');
+		callback(snapshot.key);
 	});
 }
 

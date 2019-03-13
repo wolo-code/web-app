@@ -54,7 +54,7 @@ function versionCheck() {
 
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
-		var code = window.location.pathname.substr(1).toLowerCase();
+		var code = window.location.pathname.substr(1).toLowerCase().replace('_', ' ');
 		pendingWords = code.split('.');
 		initWCode = true;
 		return true;

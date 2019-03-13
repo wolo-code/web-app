@@ -58,8 +58,8 @@ function copyWcodeCode() {
 }
 
 function copyWcodeLink() {
-	var code_url = location.hostname + '/' + getCodeFull().join('.');
-	showAndCopy(code_url.toLowerCase());
+	var code_url = location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_');
+	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
 }

@@ -52,7 +52,7 @@ function submit_city(lat, lng, country, group, name, accent, callback) {
 	refCityDetail.set({
 		'country': country,
 		'group': group,
-		'name': name,
+		'name': name.toLocaleLowerCase(),
 		'accent': accent
 	});
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {

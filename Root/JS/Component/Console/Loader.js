@@ -1,5 +1,5 @@
 function beginLoader() {
-	idLoader = setTimeout(function(){endLoader('unauthenticated')}, 2500);
+	idLoader = setTimeout(function(){ endLoader('unauthenticated'); }, 2500);
 }
 
 function endLoader(status) {

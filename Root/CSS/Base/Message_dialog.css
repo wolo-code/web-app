@@ -73,3 +73,7 @@
 	margin-bottom: 20px;
 	border-top: 1px solid #CCCCCC;
 }
+
+h2.message_dialog_label {
+	margin: 0.5em;
+}

@@ -29,7 +29,7 @@ function getCityFromPositionThenEncode(latLng) {
 			});
 	});
 
-	geoData = geoQuery.on("key_entered", function(key, location, distance) {
+	geoData = geoQuery.on('key_entered', function(key, location, distance) {
 		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
 			nearCity.city = {id:key, center:{ lat: location[0], lng: location[1]} };
 			nearCity.distance = distance;
@@ -54,7 +54,7 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 			decode_continue(nearCity.city, wcode);
 	});
 
-	geoData = geoQuery.on("key_entered", function(key, location, distance) {
+	geoData = geoQuery.on('key_entered', function(key, location, distance) {
 		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
 			nearCity.city = {name:CityList[key].name, center:{ lat: location[0], lng: location[1]} };
 			nearCity.distance = distance;
@@ -107,7 +107,7 @@ function noCity(position) {
 }
 
 function submitCity() {
-	if(address == "")
+	if(address == '')
 		pendingCitySubmit = true;
 	else {
 		execSubmitCity();

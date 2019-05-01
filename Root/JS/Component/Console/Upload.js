@@ -18,13 +18,14 @@ function upload_entry() {
 	if (upload_data_index < upload_data_rows.length) {
 		var cells = unquote(upload_data_rows[upload_data_index]).split('\",\"');
 		if (cells.length > 1) {
+			var gp_id = null;
 			var lat = parseFloat(unquote(cells[3]));
 			var lng = parseFloat(unquote(cells[4]));
 			var name = unquote(cells[1]);
 			var accent = unquote(cells[2]);
 			var group = null;
 			var country_iso = unquote(cells[0]);
-				submit_city(lat, lng, name, accent, group, country_iso, upload_entry);
+				submit_city(gp_id, lat, lng, name, accent, group, country_iso, upload_entry);
 		}
 		upload_data_index++;
 	}

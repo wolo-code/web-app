@@ -1,12 +1,16 @@
 var upload_data_index = 0;
 var upload_data_rows;
 
+var upload_on = false;
+var upload_completed_id = "in_tiruttangal";
+
 function upload_data () {
 	var file = document.getElementById('file_input').files[0];
 	if(file != null) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			upload_data_rows = e.target.result.split("\n");
+			while(!upload_on)
 				upload_entry();
 			upload_entry();
 		}
@@ -25,7 +29,12 @@ function upload_entry() {
 			var accent = unquote(cells[2]);
 			var group = null;
 			var country_iso = unquote(cells[0]);
+			if(upload_on)
 				submit_city(gp_id, lat, lng, name, accent, group, country_iso, upload_entry);
+			else {
+				if(upload_completed_id == country_iso+'_'+name)
+					upload_on = true;
+			}
 		}
 		upload_data_index++;
 	}

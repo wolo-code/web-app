@@ -30,7 +30,6 @@ function focus_(pos, bounds) {
 		marker.setMap(map);
 
 	map.panTo(pos);
-	map.panBy(0, getPanByOffset());
 
 	var idleListenerPan = map.addListener('idle', function() {
 		idleListenerPan.remove();
@@ -56,11 +55,16 @@ function focus_(pos, bounds) {
 
 const ZOOM_ANIMATION_INCREMENT = 1;
 const ZOOM_BOUND_PADDING = 36;
+var smoothZoomToBounds_callCount = 0;
 function smoothZoomToBounds(bounds, map, max, current) {
 	if (current >= max) {
+		if(smoothZoomToBounds_callCount-- == 0) {
+					map.panBy(0, getPanByOffset());
+		}
 		return;
 	}
 	else {
+		smoothZoomToBounds_callCount++;
 		var z = google.maps.event.addListener(map, 'zoom_changed', function(event) {
 			google.maps.event.removeListener(z);
 			smoothZoomToBounds(bounds, map, max, current + ZOOM_ANIMATION_INCREMENT);

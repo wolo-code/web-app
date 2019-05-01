@@ -3,7 +3,6 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
-// var infoWindow_open;
 
 // const INCORRECT_WCODE;
 // const MESSAGE_LOADING;
@@ -31,13 +30,11 @@ function initMap() {
 		}
 
 		clearMap();
-		// Clear out the old markers.
 		markers.forEach(function(marker) {
 			marker.setMap(null);
 		});
 		markers = [];
 
-		// For each place, get the icon, name and location.
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
 			clearAddress();
@@ -60,7 +57,6 @@ function initMap() {
 					scaledSize: new google.maps.Size(25, 25)
 				};
 
-				// Create a marker for each place.
 				var resultMarker = new google.maps.Marker({
 					map: map,
 					icon: icon,
@@ -73,7 +69,6 @@ function initMap() {
 				markers.push(resultMarker);
 
 				if (place.geometry.viewport) {
-					// Only geocodes have viewport.
 					bounds.union(place.geometry.viewport);
 				} else {
 					bounds.extend(place.geometry.location);

@@ -59,7 +59,11 @@ var smoothZoomToBounds_callCount = 0;
 function smoothZoomToBounds(bounds, map, max, current) {
 	if (current >= max) {
 		if(smoothZoomToBounds_callCount-- == 0) {
+			if(typeof bounds !== 'undefined')
+				setTimeout(function() {
+					map.fitBounds(bounds, ZOOM_BOUND_PADDING);
 					map.panBy(0, getPanByOffset());
+				}, ZOOM_ANIMATION_SPEED);
 		}
 		return;
 	}
@@ -71,12 +75,6 @@ function smoothZoomToBounds(bounds, map, max, current) {
 		});
 		setTimeout(function() {
 			map.setZoom(current);
-			if (current+ZOOM_ANIMATION_INCREMENT >= max) {
-				if(typeof bounds !== 'undefined')
-					setTimeout(function() {
-							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-					}, ZOOM_ANIMATION_SPEED);
-			}
 		}, ZOOM_ANIMATION_SPEED);
 	}
 }

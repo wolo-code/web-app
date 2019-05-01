@@ -16,15 +16,11 @@ function focus_(pos, bounds) {
 			title: 'Hello World!'
 		});
 		marker.addListener('click', function() {
-			if(infoWindow_open == false) {
+			if(!isInfoWindowOpen())
 				infoWindow.open(map, marker);
-				infoWindow_open = true;
-			}
-			else {
+			else
 				infoWindow.close();
-				infoWindow_open = false;
-			}
-		})
+		});
 	}
 	else {
 		marker.setPosition(pos);
@@ -56,7 +52,6 @@ function focus_(pos, bounds) {
 
 	infoWindow_setContent(MESSAGE_LOADING);
 	infoWindow.open(map, marker);
-	infoWindow_open = true;
 
 }
 

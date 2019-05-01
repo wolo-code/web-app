@@ -148,7 +148,6 @@ function load(marker) {
 	focus_(marker.position);
 	window.marker.title = marker.title;
 	infoWindow.open(map, window.marker);
-	infoWindow_open = true;
 	marker.setVisible(false);
 	lastMarker = marker;
 	infoWindow_setContent(MESSAGE_LOADING);

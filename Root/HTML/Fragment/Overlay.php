@@ -4,7 +4,7 @@
 			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</div>
 		<h1>
-			WCode location
+			<a class='link' href="//wcodes.org/location">WCode location</a>
 		</h1>
 <?php
 	require '../../HTML/Fragment/Info_intro.php';

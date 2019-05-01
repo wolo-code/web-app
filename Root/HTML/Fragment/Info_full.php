@@ -9,7 +9,7 @@
 	</ul>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
-			<button id='info_full_close_button' class='button_highlight' type='button'>&#x25C1; return</button>
+			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'>&#x25C4;</span> return</button>
 		</div>
 	</div>
 	<div id='software_info'>
@@ -23,6 +23,6 @@
 		</div>
 	</div>
 	<div id='contact'>
-		for any related query contact me: <a class="content-link" href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
+		contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
 	</div>
 </div>

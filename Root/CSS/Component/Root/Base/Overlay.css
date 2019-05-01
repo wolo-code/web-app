@@ -58,3 +58,8 @@
 	background: #69B7CF !important;
 	border-color: #69b7cf !important;
 }
+
+.button_highlight .indicator {
+	margin-left: -5px;
+	margin-right: 4px;
+}

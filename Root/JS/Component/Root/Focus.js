@@ -86,14 +86,14 @@ function getZoomByBounds(map, bounds) {
 	var ne = map.getProjection().fromLatLngToPoint( bounds.getNorthEast() );
 	var sw = map.getProjection().fromLatLngToPoint( bounds.getSouthWest() );
 
-	var worldCoordWidth = Math.abs(ne.x-sw.x);
-	var worldCoordHeight = Math.abs(ne.y-sw.y);
+	var worldCoordWidth = Math.abs(ne.x-sw.x)/2;
+	var worldCoordHeight = Math.abs(ne.y-sw.y)/2;
 
 	var FIT_PAD = 10;
 
 	for(var zoom = MAX_ZOOM; zoom >= MIN_ZOOM; --zoom) {
-		if( worldCoordWidth*(1<<zoom)+2*FIT_PAD < document.getElementById('map').scrollWidth &&
-				worldCoordHeight*(1<<zoom)+2*FIT_PAD < document.getElementById('map').scrollHeight )
+		if( worldCoordWidth*(1<<zoom)+2*FIT_PAD < document.body.scrollWidth &&
+				worldCoordHeight*(1<<zoom)+2*FIT_PAD < document.body.scrollHeight )
 			return zoom;
 	}
 	return 0;

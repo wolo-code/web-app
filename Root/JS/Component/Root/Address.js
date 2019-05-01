@@ -5,6 +5,7 @@
 function getAddress(latLng) {
 	var geocoder = new google.maps.Geocoder;
 	geocoder.geocode({'location': latLng}, function(results, status) {
+		address_results = results;
 			latLng_p = latLng;
 			if (status === 'OK') {
 				if (results[0]) {

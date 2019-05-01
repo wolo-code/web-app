@@ -47,13 +47,15 @@ function process_entry(key) {
 	ref.update(updates);
 }
 
-function submit_city(lat, lng, country, group, name, accent, callback) {
+function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 	var refCityDetail = database.ref('CityDetail').push();
 	refCityDetail.set({
-		'country': country,
+		'gp_id': gp_id,
+		'name': name,
+		'name_id': name.toLocaleLowerCase(),
+		'accent': accent == null? name : accent,
 		'group': group,
-		'name': name.toLocaleLowerCase(),
-		'accent': accent
+		'country': country
 	});
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
 			if(typeof callback == 'function')

@@ -70,7 +70,7 @@ function initialize() {
 		
 	map.addListener('click', function(event) {
 		clearAddress();
-		focus_(event.latLng);
+		focus(event.latLng);
 		//encode(resolveLatLng(event.latLng));
 	});
 	var clickHandler = new ClickEventHandler(map);

@@ -14,7 +14,15 @@ function encode_continue(city, position) {
 	if(city == null) {
 		if(!pendingCity) {
 			pendingPosition = position;
-			noCity(position);
+			var city_gp_id = getCityGpId(address_results);
+			if(city_gp_id != null)
+				addCity(city_gp_id, function(city_id) {
+					getCityFromId(city_id, function(city) {
+						getCityCenterFromId(city, function(city) {
+							encode_(city, position);
+						});
+					});
+				});
 		}
 	}
 	else {
@@ -24,6 +32,28 @@ function encode_continue(city, position) {
 			pendingCity = false;
 		}
 		encode_(city, position);
+	}
+}
+
+function getCityGpId(address_components) {
+	var found_city_i;
+	for(var i = results.length-1; i >= 0; i--) {
+		if ( address_components[i].types.includes('administrative_area_level_1') || address_components[i].types.includes('administrative_area_level_2') ) {
+			found_city_i = i;
+		} else if(address_components[i].types.includes('locality')) {
+			found_city_i = i;
+			break;
+		} else if ( found_city_i == null && (address_components[i].types.includes('sublocality') || address_components[i].types.includes('sublocality_level_1')) ) {
+			found_city_i = i;
+			break;
+		}
+	}
+
+	if(found_city_i != null)
+		return address_components[found_city_i].place_id;
+	else {
+		noCity(latLng_p);
+		return null;
 	}
 }
 
@@ -49,11 +79,7 @@ function decode(words) {
 					if(city == null)
 						decode_continue(null, words.slice(city_words_length, words.length));
 					else
-						refCityCenter.child(city.id).once('value', function(snapshot) {
-							var location = snapshot.val().l;
-							city.center = { lat: location[0], lng: location[1]};
-							decode_continue(city, words.slice(city_words_length, words.length));
-						});
+						getCityCenterFromId(city, function(city) { decode_continue(city, words.slice(city_words_length, words.length)); });
 				});
 			}
 			else if (words.length == 3) {

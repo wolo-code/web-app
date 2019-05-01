@@ -85,7 +85,15 @@ function setupControls() {
 	submit_city_button.addEventListener('click', function() {
 		if(city_lat.value != '' && city_lng.value != '')
 			if(city_submit_panel.checkValidity()) {
-				submit_city(parseFloat(city_lat.value), parseFloat(city_lng.value), city_country.value.trim(), city_group.value.trim(), city_name.value.trim(), city_accent.value.trim());
+				submit_city (
+					city_gpid.value,
+					parseFloat(city_lat.value),
+					parseFloat(city_lng.value),
+					city_name.value.trim(),
+					city_accent.value.trim(),
+					city_group.value.trim(),
+					city_country.value.trim()
+				);
 				if(data_process_checkbox.checked)
 					process_entry(data[data_index].id);
 				showNotification("Request submitted");

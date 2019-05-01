@@ -7,4 +7,6 @@
     "mailgun-js": "^0.22.0"
   },
   "private": true
+		"@google/maps": "^0.5.5",
+		"geofire": "^5.0.1"
 }

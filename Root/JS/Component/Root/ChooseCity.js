@@ -41,6 +41,6 @@ function getFullCity(city) {
 	var fullCity = city.country + ' \\ ';
 	if(typeof (city.group) != 'undefined' && city.group != null && city.group.length > 0)
 		fullCity += city.group + ' ~ ';
-	fullCity += getProperCityAccent(city);
+	fullCity += city.accent;
 	return fullCity;
 }

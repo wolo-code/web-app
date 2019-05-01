@@ -1,6 +1,7 @@
 // const FUNCTIONS_BASE_URL;
 // var curEncRequestId;
 // var curDecRequestId;
+// var curAddCityRequestId;
 
 function encode_(city, position) {
 	var http = new XMLHttpRequest();
@@ -86,4 +87,33 @@ function stringifyDecodeData(city_center, code) {
 function setCodeCoord(city, codeIndex, code) {
 	var object = JSON.parse(codeIndex);
 	focus__(city, object, code);
+}
+
+function addCity(gp_id, callback) {
+
+	var http = new XMLHttpRequest();
+	http.open('POST', FUNCTIONS_BASE_URL+'/'+'add-city', true);
+
+	http.setRequestHeader('Content-type', 'application/json');
+	http.setRequestHeader('version', '1');
+	http.requestId = ++curAddCityRequestId;
+
+	wait_loader.classList.remove('hide');
+	http.onreadystatechange = function() {
+		if(http.readyState == 4 && http.status == 200) {
+			if(http.requestId == curAddCityRequestId) {
+				callback(JSON.parse(http.responseText).added);
+				wait_loader.classList.add('hide');
+			}
+		}
+	}
+
+	http.send( stringifyAddCityData(gp_id) );
+
+}
+
+function stringifyAddCityData(gp_id) {
+	var object = {};
+	object['place_id'] = gp_id;
+	return JSON.stringify(object);
 }

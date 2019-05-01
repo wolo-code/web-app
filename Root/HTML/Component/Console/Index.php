@@ -47,6 +47,7 @@
 		</div>
 		<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
 		<form id='city_submit_panel'>
+			<input id='city_gpid' type='hidden' >
 			<input id='city_lat' type='hidden' >
 			<input id='city_lng' type='hidden' >
 			<input id='city_name' class='city_form_field' type='text' placeholder='Name' required tabindex='4' autocomplete='new-password' >

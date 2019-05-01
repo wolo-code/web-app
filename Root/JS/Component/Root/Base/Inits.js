@@ -6,6 +6,7 @@ var FUNCTIONS_BASE_URL = 'https://location.wcodes.org/api';
 //'http://localhost:5000/waddress-5f30b/us-central1';
 var curEncRequestId = 0;
 var curDecRequestId = 0;
+var curAddCityRequestId = 0;
 
 // Code\Copy_wcode
 var city_styled_wordlist = [];

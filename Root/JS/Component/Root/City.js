@@ -29,10 +29,7 @@ function getCityFromPositionThenEncode(latLng) {
 		if(Object.keys(nearCity).length === 0)
 			encode_continue(null, latLng);
 		else
-			getCityFromId(nearCity.city.id, function(city) {
-				city.center = nearCity.city.center;
-				encode_continue(city, latLng);
-			});
+			getCityFromIdThenEncode(nearCity.city.id, nearCity.city.center, latLng);
 	});
 
 	geoData = geoQuery.on('key_entered', function(key, location, distance) {
@@ -42,6 +39,13 @@ function getCityFromPositionThenEncode(latLng) {
 		}
 	});
 
+}
+
+function getCityFromIdThenEncode(city_id, city_center, latLng) {
+	getCityFromId(city_id, function(city) {
+		city.center = city_center;
+		encode_continue(city, latLng);
+	});
 }
 
 function getCityFromPositionThenDecode(latLng, wcode) {
@@ -76,14 +80,16 @@ function getCityFromId(id, callback) {
 	wait_loader.classList.remove('hide');;
 	ref.once('value').then(function(snapshot) {
 		wait_loader.classList.add('hide');
-		callback(snapshot.val());
+		var city = snapshot.val();
+		city.id = id;
+		callback(city);
 	});
 }
 
 function getCityFromName(name, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');
-	ref.orderByChild('name').equalTo(name).on('value', function(snapshot) {
+	ref.orderByChild('name_id').equalTo(name).on('value', function(snapshot) {
 		wait_loader.classList.add('hide');
 		var list = snapshot.val();
 		if(list == null)
@@ -101,6 +107,14 @@ function getCityFromName(name, callback) {
 	});
 }
 
+function getCityCenterFromId(city, callback) {
+	refCityCenter.child(city.id).once('value', function(snapshot) {
+		var location = snapshot.val().l;
+		city.center = { lat: location[0], lng: location[1]};
+		callback(city);
+	});
+}
+
 function getCitiesFromName(name, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');;
@@ -113,7 +127,7 @@ function getCitiesFromName(name, callback) {
 function getCityIdFromName(name, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');;
-	ref.orderByChild('name').equalTo(name).on('child_added', function(snapshot) {
+	ref.orderByChild('name_id').equalTo(name).on('child_added', function(snapshot) {
 		wait_loader.classList.add('hide');
 		callback(snapshot.key);
 	});

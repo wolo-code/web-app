@@ -54,10 +54,10 @@ function getCityBegin(cityCenter) {
 }
 
 exports.encode = functions.https.onRequest((req, res) => {
-	
+
 	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'Content-Type, version');
-	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+	res.header('Access-Control-Allow-Headers', "Content-Type, version");
+	res.set('Cache-Control', "public, max-age=300, s-maxage=600");
 
 	//respond to CORS preflight requests
 	if (req.method == 'OPTIONS') {
@@ -66,7 +66,7 @@ exports.encode = functions.https.onRequest((req, res) => {
 	}
 
 	if(req.headers.version != 1)
-		res.send({"error" : "Version mismatch"});
+		res.send({'error' : "Version mismatch"});
 	else {
 		const code = encode(getCityBegin(req.body.city_center), req.body.position);
 		for(var i of code)
@@ -77,28 +77,28 @@ exports.encode = functions.https.onRequest((req, res) => {
 				res.status(204).send('');
 				return;
 			}
-		res.send({"code" : code});
+		res.send({'code' : code});
 	}
-	
+
 });
 
 exports.decode = functions.https.onRequest((req, res) => {
-	
+
 	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'Content-Type, version');
-	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
-	
+	res.header('Access-Control-Allow-Headers', "Content-Type, version");
+	res.set('Cache-Control', "public, max-age=300, s-maxage=600");
+
 	//respond to CORS preflight requests
 	if (req.method == 'OPTIONS') {
 		res.status(204).send('');
 		return;
 	}
-	
+
 	if(req.headers.version != 1)
-		res.send({"error" : "Version mismatch"});
-	else		
+		res.send({'error' : "Version mismatch"});
+	else
 		res.send(decode(getCityBegin(req.body.city_center), req.body.code));
-	
+
 });
 
 function encode(city_begin, position) {
@@ -129,13 +129,13 @@ function decode(city_begin, code) {
 exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWrite((data, context) => {
 	if ( data.before.exists() || !data.after.exists())
 		return null;
-	
+
 	const entry = data.after.val();
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
 	const id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
 	const mail_data = {
-		from: 'WCode Location - app <app_location@wcodes.org>',
-		subject: 'New City request',
+		from: "WCode Location - app <app_location@wcodes.org>",
+		subject: "New City request",
 		html: `<p>New City request:</p>` + combine({'Id':id_link, 'Address':entry.address}),
 		'h:Reply-To': 'app_location@wcodes.org',
 		to: 'admin@wcodes.org'
@@ -146,7 +146,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 			console.log(error)
 		}
 	})
-	
+
 	return null;
 });
 

@@ -77,7 +77,7 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 function getCityFromId(id, callback) {
 	var ref = database.ref('CityDetail'+'/'+id);
-	wait_loader.classList.remove('hide');;
+	wait_loader.classList.remove('hide');
 	ref.once('value').then(function(snapshot) {
 		wait_loader.classList.add('hide');
 		var city = snapshot.val();

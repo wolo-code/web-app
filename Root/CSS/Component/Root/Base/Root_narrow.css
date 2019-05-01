@@ -1,11 +1,11 @@
 @media (max-width: 662px) {
-	
+
 	#decode_button {
 		top: 100px !important;
 		left: auto !important;
 		right: 10px !important;
 	}
-	
+
 	#suggestion_result {
 		top: 74px !important;
 	}
@@ -24,7 +24,7 @@
 	#decode_button {
 		top: 126px !important;
 	}
-	
+
 	#suggestion_result {
 		top: 100px !important;
 	}

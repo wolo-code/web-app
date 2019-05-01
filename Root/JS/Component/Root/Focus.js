@@ -35,9 +35,8 @@ function focus_(pos, bounds) {
 	var idleListenerPan = map.addListener('idle', function() {
 		idleListenerPan.remove();
 		var newZoom;
-		if(typeof bounds !== 'undefined') {
+		if(typeof bounds !== 'undefined')
 			newZoom = getZoomByBounds(map, bounds);
-		}
 		else {
 			newZoom = DEFAULT_LOCATE_ZOOM;
 			if (typeof accuCircle !== 'undefined') {
@@ -78,7 +77,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 	}
 }
 
-function getZoomByBounds( map, bounds ) {
+function getZoomByBounds(map, bounds) {
 	var MAX_ZOOM = map.mapTypes.get(map.getMapTypeId()).maxZoom || DEFAULT_LOCATE_ZOOM;
 	var MIN_ZOOM = map.mapTypes.get(map.getMapTypeId()).minZoom || 0;
 

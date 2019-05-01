@@ -7,7 +7,7 @@ function initialize() {
 	var input = document.getElementById('pac-input');
 	var searchBox = new google.maps.places.SearchBox(input);
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-	
+
 	// Bias the SearchBox results towards current map's viewport.
 	map.addListener('bounds_changed', function() {
 		searchBox.setBounds(map.getBounds());
@@ -67,7 +67,7 @@ function initialize() {
 			map.fitBounds(bounds);
 		}
 	});
-		
+
 	map.addListener('click', function(event) {
 		clearAddress();
 		focus(event.latLng);
@@ -101,7 +101,7 @@ function reverseGeoCode(latLng) {
 				showNotification("Oops something got wrong!");
 			}
 		}
-	);	
+	);
 }
 
 var entryMarker;

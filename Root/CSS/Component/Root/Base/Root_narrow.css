@@ -2,8 +2,8 @@
 	
 	#decode_button {
 		top: 100px !important;
-		left: 320px !important;
-		right: auto !important;
+		left: auto !important;
+		right: 10px !important;
 	}
 	
 	#suggestion_result {

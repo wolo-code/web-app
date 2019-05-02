@@ -7,7 +7,7 @@ function setCode(city, wcode, latLng) {
 	code_wcode = wcode;
 	code_postition = latLng;
 
-	setInfoWindowText(getProperCityAccent(city.accent), city.name_id, wcode.join(' '), latLng);
+	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng);
 }
 
 function clearCode() {

@@ -209,10 +209,10 @@ function getAddressCity(place_id, address_components, geometry, res) {
 			break;
 		}
 	}
-	var city_name;
-	var city_accent;
 	var city_lat;
 	var city_lng;
+	var city_name;
+	var city_accent;
 	if(found_city_i != null) {
 		city_name = address_components[found_city_i].short_name;
 		city_accent = address_components[found_city_i].long_name;

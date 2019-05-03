@@ -240,7 +240,7 @@ function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 			'name': name,
 			'accent': accent,
 			'group': group,
-			'country': country,
+			'country': country
 		});
 		geoFireCenter.set(refCityDetail.key, [lat, lng]).then( function() {
 				if(typeof callback == 'function')

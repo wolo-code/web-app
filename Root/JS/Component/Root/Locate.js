@@ -61,6 +61,7 @@ function locateExec() {
 				if(initWCode == false) {
 					focus_(pos, accuCircle.getBounds());
 					encode(pos);
+					clearAddress();
 					getAddress(pos);
 				}
 				else {

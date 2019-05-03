@@ -44,8 +44,8 @@ function hideAddress() {
 }
 
 function clearAddress() {
-	address = '';
-	gpId = '';
+	address = null;
+	gpId = null;
 	address_text_content.innerText = '';
 }
 

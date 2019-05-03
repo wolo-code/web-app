@@ -41,6 +41,7 @@ function initMap() {
 			var pos = resolveLatLng(places[0].geometry.location);
 			focus_(pos);
 			encode(pos);
+			clearAddress();
 			getAddress(pos);
 		}
 		else {

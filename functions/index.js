@@ -216,7 +216,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	if(found_city_i != null) {
 		city_name = address_components[found_city_i].short_name;
 		city_accent = address_components[found_city_i].long_name;
-		if(city_accent.localeCompare(name) == 0)
+		if(city_accent === city_name)
 			city_accent = null;
 		city_lat = geometry['location']['lat'];
 		city_lng = geometry['location']['lng'];

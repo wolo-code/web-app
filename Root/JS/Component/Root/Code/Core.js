@@ -37,7 +37,7 @@ function encode_continue(city, position) {
 
 function getCityGpId(address_components) {
 	var found_city_i;
-	for(var i = results.length-1; i >= 0; i--) {
+	for(var i = address_components.length-1; i >= 0; i--) {
 		if ( address_components[i].types.includes('administrative_area_level_1') || address_components[i].types.includes('administrative_area_level_2') ) {
 			found_city_i = i;
 		} else if(address_components[i].types.includes('locality')) {

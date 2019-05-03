@@ -199,14 +199,18 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	var found_group_i;
 	var found_country_i;
 	for(var i = address_components.length-1; i >= 0; i--) {
-		if ( address_components[i].types.includes('administrative_area_level_1') || address_components[i].types.includes('administrative_area_level_2') ) {
-			found_city_i = i;
-		} else if(address_components[i].types.includes('locality')) {
+		if(address_components[i].types.includes('locality')) {
 			found_city_i = i;
 			break;
+		} else if (address_components[i].types.includes('administrative_area_level_1')) {
+			found_group_i = i;
+			found_city_i = i;
+		} else if (address_components[i].types.includes('administrative_area_level_2')) {
+			found_city_i = i;
 		} else if ( found_city_i == null && (address_components[i].types.includes('sublocality') || address_components[i].types.includes('sublocality_level_1')) ) {
 			found_city_i = i;
-			break;
+		} else if (address_components[i].types.includes('country')) {
+			found_country_i = i;
 		}
 	}
 	var city_lat;

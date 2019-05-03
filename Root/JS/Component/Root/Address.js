@@ -2,28 +2,28 @@
 // var address;
 // var gpId;
 
-function getAddress(latLng) {
+function getAddress(latLng, callback) {
 	var geocoder = new google.maps.Geocoder;
-	geocoder.geocode({'location': latLng}, function(results, status) {
-		address_results = results;
-			latLng_p = latLng;
-			if (status === 'OK') {
-				if (results[0]) {
-					address = results[0].formatted_address;
-					gpId = results[0].place_id;
-					refreshAddress();
-
-				} else {
-					console.log('No geoCoding results found');
-				}
+	geocoder.geocode({'location': latLng}, function(address_components, status) {
+		latLng_p = latLng;
+		if (status === 'OK') {
+			if (address_components[0]) {
+				address = address_components[0].formatted_address;
+				gpId = address_components[0].place_id;
+				refreshAddress();
+				if(typeof callback != 'undefined')
+					callback(address_components);
 			} else {
-				console.log('Geocoder failed due to: ' + status);
+				console.log('No geoCoding results found');
 			}
-			if(pendingCitySubmit) {
-				execSubmitCity();
-				pendingCitySubmit = false;
-			}
-		});
+		} else {
+			console.log('Geocoder failed due to: ' + status);
+		}
+		if(pendingCitySubmit) {
+			execSubmitCity();
+			pendingCitySubmit = false;
+		}
+	});
 }
 
 function toggleAddress() {

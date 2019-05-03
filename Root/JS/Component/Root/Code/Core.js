@@ -14,15 +14,17 @@ function encode_continue(city, position) {
 	if(city == null) {
 		if(!pendingCity) {
 			pendingPosition = position;
-			var city_gp_id = getCityGpId(address_results);
-			if(city_gp_id != null)
-				addCity(city_gp_id, function(city_id) {
-					getCityFromId(city_id, function(city) {
-						getCityCenterFromId(city, function(city) {
-							encode_(city, position);
+			getAddress(position, function(address_components) {
+				var city_gp_id = getCityGpId(address_components);
+				if(city_gp_id != null)
+					addCity(city_gp_id, function(city_id) {
+						getCityFromId(city_id, function(city) {
+							getCityCenterFromId(city, function(city) {
+								encode_(city, position);
+							});
 						});
 					});
-				});
+			});
 		}
 	}
 	else {

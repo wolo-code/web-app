@@ -63,13 +63,22 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 		if(nearCity == null)
 			decode_continue(null, wcode);
 		else
-			decode_continue(nearCity.city, wcode);
+			getCityFromId(nearCity.id, function(city) {
+				city.center = nearCity.center;
+				decode_continue(city, wcode);
+			});
 	});
 
 	geoData = geoQuery.on('key_entered', function(key, location, distance) {
 		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
-			nearCity.city = {name:CityList[key].name, center:{ lat: location[0], lng: location[1]} };
-			nearCity.distance = distance;
+			nearCity = {
+				id:key,
+				center: {
+					lat: location[0],
+					lng: location[1]
+				},
+				distance: distance
+			};
 		}
 	});
 

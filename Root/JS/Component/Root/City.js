@@ -142,13 +142,6 @@ function getCityIdFromName(name, callback) {
 	});
 }
 
-function getCityAccentFromId(id) {
-	if(typeof (CityList[id].accent) != 'undefined')
-		return CityList[id].accent;
-	else
-		return CityList[id].name;
-}
-
 function noCity(position) {
 	showAddress();
 	showNoCityMessage();

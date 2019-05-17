@@ -47,6 +47,10 @@ function getCodeCityName() {
 	return code_city.name;
 }
 
+function getCodeCityNameId() {
+	return code_city.name_id;
+}
+
 function getCodeGroupName() {
 	return code_city.group;
 }

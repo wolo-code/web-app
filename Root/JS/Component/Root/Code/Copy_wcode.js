@@ -2,13 +2,13 @@
 // const WCODE_LINK_COPIED_MESSAGE;
 
 function showCopyWcodeMessage() {
-	var city_name = getCodeCityName();
+	var city_name_id = getCodeCityNameId();
 	var country_name = getCodeCityCountryName();
 	var group_name = getCodeCityGroupName();
 	var country_repeat_count = 0;
 	var group_repeat_count = 0;
 	var city_repeat_count = 0;
-	getCitiesFromName(city_name, function(cities) {
+	getCitiesFromNameId(city_name_id, function(cities) {
 		for(let key in cities) {
 			if(cities[key].country == country_name)
 				country_repeat_count++;

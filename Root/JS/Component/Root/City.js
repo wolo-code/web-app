@@ -124,19 +124,19 @@ function getCityCenterFromId(city, callback) {
 	});
 }
 
-function getCitiesFromName(name, callback) {
+function getCitiesFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');;
-	ref.orderByChild('name').startAt(name).endAt(name+'\uf8ff').limitToFirst(10).on('value', function(snapshot) {
+	wait_loader.classList.remove('hide');
+	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).on('value', function(snapshot) {
 		wait_loader.classList.add('hide');
 		callback(snapshot.val());
 	});
 }
 
-function getCityIdFromName(name, callback) {
+function getCityIdFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');;
-	ref.orderByChild('name_id').equalTo(name).on('child_added', function(snapshot) {
+	wait_loader.classList.remove('hide');
+	ref.orderByChild('name_id').equalTo(name_id).on('child_added', function(snapshot) {
 		wait_loader.classList.add('hide');
 		callback(snapshot.key);
 	});

@@ -1,6 +1,6 @@
 function suggestWrapper(event) {
 	cityNameList = [];
-	getCitiesFromName(document.getElementById('pac-input').value.toLowerCase(), function(cityList) {
+	getCitiesFromNameId(document.getElementById('pac-input').value.toLowerCase(), function(cityList) {
 		for(let key in cityList)
 			cityNameList.push(getProperCityAccent(cityList[key]));
 		city_styled_wordlist = cityNameList.concat(wordList.curList);

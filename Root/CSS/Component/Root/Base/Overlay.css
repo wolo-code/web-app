@@ -40,6 +40,10 @@
 	font-size: smaller;
 }
 
+#version > span, #updated > span {
+	font-weight: bold;
+}
+
 #overlay .message_dialog_control {
 	font-size: smaller;
 	padding: 10px 0 18px;

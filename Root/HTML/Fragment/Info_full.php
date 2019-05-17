@@ -14,12 +14,14 @@
 	</div>
 	<div id='software_info'>
 		<div id='version'>
-			Version: 0.1 beta
+			Version: <span>0.1 beta</span>
 		</div>
 		<div id='updated'>Updated:
+			<span>
 	<?php
-			echo date('Y-M-d H:i:s');
+			echo date('Y M d - H:i:s');
 	?>
+			</span>
 		</div>
 	</div>
 	<div id='contact'>

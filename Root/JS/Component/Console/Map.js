@@ -69,6 +69,7 @@ function initialize() {
 	});
 
 	map.addListener('click', function(event) {
+		document.getElementById('pac-input').blur();
 		clearAddress();
 		focus(event.latLng);
 		//encode(resolveLatLng(event.latLng));

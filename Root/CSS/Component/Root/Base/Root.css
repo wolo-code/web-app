@@ -9,9 +9,10 @@
 	background-color: #FFFFFF;
 	border-radius: 20px;
 	color: #69B7CF;
-	padding: 2px 8px;
-	margin: 0 4px;
+	padding: 1px 8px 2px 8px;
+	margin: 0 2px;
 	cursor: pointer;
+	border: 1px solid #CDCDCD
 }
 
 #decode_button {

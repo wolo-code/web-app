@@ -56,7 +56,7 @@
 			<input id='city_country' class='city_form_field' type='text' placeholder='Country' required tabindex='6' autocomplete='new-password' >
 			<input id='submit_city_button' class='control' type='submit' value='Submit' tabindex='7'>
 		</form>
-		<div id='notification_bottom' class='hide'></div>
+		<div id='notification_bottom' class="notification_bar hide"></div>
 		<div id='file_container'>
 			<input id='file_input' type='file'>
 			<button id='file_upload' type='button' class='border' onclick="upload_data();">Upload</button>

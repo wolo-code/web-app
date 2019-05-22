@@ -77,15 +77,12 @@ function locateExec() {
 				}
 				else
 					handleLocationError(true, infoWindow, map.getCenter());
-
-				syncCheckIncompatibleBrowserMessage();
 			},
 			{ maximumAge:10000, timeout:5000, enableHighAccuracy:true }
 		);
 	} else {
 		// Browser doesn't support Geolocation
 		handleLocationError(false, infoWindow, map.getCenter());
-		syncCheckIncompatibleBrowserMessage();
 	}
 }
 

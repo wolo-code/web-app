@@ -8,6 +8,10 @@ html, body {
 	padding: 0;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Roboto Condensed', Abel, sans-serif;
+}
+
 input {
 	border-radius:0;
 	-webkit-appearance: none;
@@ -20,14 +24,6 @@ button {
 
 button.border {
 	border: 1px solid;
-}
-
-@font-face {
-	font-family: 'Abel';
-	font-style: normal;
-	font-weight: 400;
-	src: local('Abel'), local('Abel-Regular'), url(//fonts.gstatic.com/s/abel/v6/brdGGFwqYJxjg2CD1E9o7g.woff2) format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
 
 #map {

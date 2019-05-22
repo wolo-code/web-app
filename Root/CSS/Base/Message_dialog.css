@@ -25,6 +25,7 @@
 .message_dialog_label {
 	color: #69B7CF;
 	text-align: center;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
 }
 
 .message_dialog_body {
@@ -62,6 +63,7 @@
 	position: relative;
 	left: 50%;
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
 }
 
 .message_dialog_separator {

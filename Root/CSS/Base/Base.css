@@ -151,43 +151,31 @@ button.border {
 	font-size: large;
 }
 
-#notification_top {
-	text-align: center;
+.notification_bar {
+	z-index: 1;
 	position: absolute;
-	top: 118px;
-	background-color: #ebf2fe;
-	padding: 4px 8px;
-	border-radius: 18px;
-	color: #69B7CF;
 	left: 0;
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
-	width: 182px;
-	z-index: 1;
-	cursor: pointer;
-	border-color: #69B7CF;
+	padding: 4px 8px;
+	background-color: #ebf2fe;
+	color: #69B7CF;
+	text-align: center;
+	border-radius: 18px;
+	border-color: #c6c6c6;
 	border-style: solid;
 	border-width: 1px;
 }
 
+#notification_top {
+	top: 118px;
+	width: 182px;
+}
+
 #notification_bottom {
-	text-align: center;
-	position: absolute;
 	bottom: 232px;
-	background-color: #ebf2fe;
-	padding: 4px 8px;
-	border-radius: 18px;
-	color: #69B7CF;
-	left: 0;
-	right: 0;
-	margin-left: auto;
-	margin-right: auto;
 	width: 350px;
-	z-index: 1;
-	border-color: #69B7CF;
-	border-style: solid;
-	border-width: 1px;
 }
 
 .center {

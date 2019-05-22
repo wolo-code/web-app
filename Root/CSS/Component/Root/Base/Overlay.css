@@ -61,6 +61,7 @@
 	color: white !important;
 	background: #69B7CF !important;
 	border-color: #69b7cf !important;
+	box-shadow: rgba(0, 0, 0, 0.7) 0px 1px 4px -1px !important;
 }
 
 .button_highlight .indicator {

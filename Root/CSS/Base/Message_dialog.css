@@ -30,6 +30,7 @@
 
 .message_dialog_body {
 	padding: 0 20px 20px;
+	color: #999999
 }
 
 .message_dialog_body p {
@@ -62,7 +63,7 @@
 	color: #69B7CF;
 	position: relative;
 	left: 50%;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	box-shadow: rgba(0, 0, 0, 0.285) 0px 1px 4px -1px;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 }
 
@@ -74,7 +75,7 @@
 	margin-right: auto;
 	margin-top: 88px;
 	margin-bottom: 20px;
-	border-top: 1px solid #CCCCCC;
+	border-top: 1px solid #E0E0E0;
 }
 
 h2.message_dialog_label {

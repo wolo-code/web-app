@@ -29,11 +29,11 @@ var CURRENT_VERSION = 1;
 var initWCode = false;
 
 // City
-var DEFAULT_WCODE = ['bangalore', 'diesel', 'hall', 'planet'];
+var DEFAULT_WCODE = ['bengaluru', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
 var pendingCitySubmit = false;
 
-var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bangalore cat apple tomato"';
+var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 WCode words, optionally preceded by a city. E.g: "Bengaluru cat apple tomato"';
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 

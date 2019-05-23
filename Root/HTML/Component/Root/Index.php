@@ -25,6 +25,6 @@
 <div id='info' class='control' tabindex='7'>
 	<span class='image'><?php includeSVG('', 'Info'); ?></span>
 </div>
-<div id='notification_top' class="notification_bar hide">Try: Bangalore, India</div>
+<div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <div id='notification_bottom' class="notification_bar hide"></div>
 <?php require '../../HTML/Fragment/Address.php'; ?>

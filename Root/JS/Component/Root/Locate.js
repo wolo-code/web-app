@@ -1,17 +1,20 @@
 function initLocate(override_dnd) {
-	if(!locationAccessCheck()) {
-		var hide_dnd = override_dnd || !locationAccessDNDstatus();
-		if(override_dnd || !locationAccessDNDcheck()) {
-			showLocateRightMessage(hide_dnd);
-		}
-		else
-			wait_loader.classList.add('hide');
-	}
+	if(!locationAccessInitCheck())
+		showLocateRightMessage(true);
 	else
-		locateExec();
+		locateExec(function() {
+			if(!locationAccessCheck()) {
+				var hide_dnd = typeof override_dnd == 'undefined' || override_dnd || !locationAccessDNDstatus();
+				if(override_dnd || !locationAccessDNDcheck()) {
+					showLocateRightMessage(hide_dnd);
+				}
+				else
+					wait_loader.classList.add('hide');
+			}
+		});
 }
 
-function locateExec() {
+function locateExec(failure) {
 	wait_loader.classList.remove('hide');
 	if (navigator.geolocation) {
 		wait_loader.classList.add('hide');
@@ -74,6 +77,7 @@ function locateExec() {
 					showNotification(LOCATION_PERMISSION_DENIED);
 					setLocationAccess(false);
 					wait_loader.classList.add('hide');
+					failure();
 				}
 				else
 					handleLocationError(true, infoWindow, map.getCenter());

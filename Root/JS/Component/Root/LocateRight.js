@@ -12,7 +12,7 @@ function hideLocateRightMessage() {
 
 function locateRight_grant() {
 	setLocationAccess(true);
-	initLocate();
+	initLocate(false);
 	hideLocateRightMessage();
 	locateRight_DND_check();
 }

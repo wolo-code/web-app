@@ -7,8 +7,15 @@ function setLocationAccess(status) {
 	}
 }
 
+function locationAccessInitCheck() {
+	if(typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined')
+		return true;
+	else
+		return false;
+}
+
 function locationAccessCheck() {
-	if (typeof(Storage) !== 'undefined' && typeof(localStorage.location_access) !== 'undefined' && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true)
+	if (locationAccessInitCheck() === true && localStorage.location_access != '' && JSON.parse(localStorage.location_access) === true)
 		return true;
 	return false;
 }

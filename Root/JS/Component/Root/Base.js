@@ -46,10 +46,13 @@ function versionCheck() {
 		localStorage.note_version = CURRENT_VERSION;
 		showOverlay();
 	}
-	else {
-		info_intro.classList.add('hide');
-		info_full.classList.remove('hide');
-	}
+	else
+		activateOverlayInfo_full();
+}
+
+function activateOverlayInfo_full() {
+	info_intro.classList.add('hide');
+	info_full.classList.remove('hide');
 }
 
 function urlDecode() {

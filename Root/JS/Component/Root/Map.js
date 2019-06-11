@@ -92,6 +92,7 @@ function initMap() {
 
 	decode_button.addEventListener('click', function() {
 		clearMap();
+		firstFocus = true;
 		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);

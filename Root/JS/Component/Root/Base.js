@@ -1,5 +1,6 @@
 // const CURRENT_VERSION;
 // var initWCode;
+// var initWCode_jumpToMap;
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {
@@ -66,7 +67,16 @@ function activateOverlayInfo_full() {
 
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
-		var code = window.location.pathname.substr(1).toLowerCase().replace('_', ' ');
+		var code_string;
+		if(window.location.pathname.substr(1).endsWith('/')) {
+			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
+			initWCode_jumpToMap = true;
+		}
+		else {
+			code_string = window.location.pathname.substr(1);
+			initWCode_jumpToMap = false;
+		}
+		var code = code_string.toLowerCase().replace('_', ' ');
 		pendingWords = code.split('.');
 		initWCode = true;
 		return true;

@@ -85,6 +85,10 @@ function stringifyDecodeData(city_center, code) {
 }
 
 function setCodeCoord(city, codeIndex, code) {
-	var object = JSON.parse(codeIndex);
-	focus__(city, object, code);
+	var latLng = JSON.parse(codeIndex);
+	if(initWCode_jumpToMap) {
+		initWCode_jumpToMap = false;
+		window.location.replace(getIntentURL(latLng, city.name + ' ' + code.join(' ')));
+	}
+	focus__(city, latLng, code);
 }

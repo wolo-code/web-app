@@ -3,6 +3,7 @@ Path	Name	Extension
 	console	
 	root	js
 	console	js
+	geofire.min	js
 	favicon	ico
 	manifest	json
 	manifest-console	json

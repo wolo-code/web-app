@@ -1,12 +1,22 @@
+#share_include_city, #share_jumto_map {
+	-webkit-appearance: checkbox !important
+}
+
 #copy_wcode_message_city_name {
-	display: block;
 	text-align: center;
-	color: #69B7CF;
+	color: #585858;
 	padding-top: 8px;
-	font-weight: bold;
 	font-family: 'Roboto Condensed', Abel, sans-serif
 }
 
 #copy_wcode_message_city_name_question {
 	color: #CCCCCC
+}
+
+#share_copy_button {
+	padding-top: 4px
+}
+
+#share_link_button {
+	padding-top: 8px
 }

@@ -63,3 +63,24 @@ function copyWcodeLink() {
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
 }
+
+function copyWcodeJumpLink() {
+	var code_url = location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/';
+	showAndCopy(code_url);
+	showNotification(WCODE_LINK_COPIED_MESSAGE);
+	hideCopyCodeMessage();
+}
+
+function shareWCodeCopy() {
+	if(share_include_city.checked)
+		copyWcodeFull();
+	else
+		copyWcodeCode();
+}
+
+function shareWCodeLink() {
+	if(share_jumto_map.checked)
+		copyWcodeJumpLink();
+	else
+		copyWcodeLink();
+}

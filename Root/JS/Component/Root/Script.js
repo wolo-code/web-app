@@ -1,5 +1,7 @@
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
+		firebaseInit();
+		dbInit();
 		versionCheck();
 		if(!urlDecode())
 			syncLocate();

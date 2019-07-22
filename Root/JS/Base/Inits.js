@@ -13,6 +13,9 @@ var FIREBASE_CONFIG = {
 	storageBucket: "waddress-5f30b.appspot.com",
 	messagingSenderId: "744968913043"
 };
+var database;
+var refCityCenter;
+var geoFire;
 
 //Script
 var initLoadDone = false;

@@ -1,4 +1,10 @@
-firebase.initializeApp(FIREBASE_CONFIG);
-var database = firebase.database();
-var refCityCenter = database.ref('CityCenter');
-var geoFire = new GeoFire(refCityCenter);
+// var database;
+// var refCityCenter;
+// var geoFire;
+
+function firebaseInit() {
+	firebase.initializeApp(FIREBASE_CONFIG);
+	database = firebase.database();
+	refCityCenter = database.ref('CityCenter');
+	geoFire = new GeoFire(refCityCenter);
+}

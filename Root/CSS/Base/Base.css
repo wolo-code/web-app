@@ -20,6 +20,7 @@ input {
 button {
 	-webkit-appearance: none;
 	background: white;
+	border-radius: 5px
 }
 
 button.border {
@@ -69,7 +70,7 @@ button.border {
 	position: absolute;
 	right: 10px;
 	top: 10px;
-	width: 153px;
+	width: 152px;
 }
 
 #logo a {

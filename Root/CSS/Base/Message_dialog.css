@@ -23,7 +23,7 @@
 }
 
 .message_dialog_label {
-	color: #69B7CF;
+	color: #c2c2c2;
 	text-align: center;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 }
@@ -76,6 +76,10 @@
 	margin-top: 88px;
 	margin-bottom: 20px;
 	border-top: 1px solid #E0E0E0;
+}
+
+.message_dialog_control_right {
+	float: right
 }
 
 h2.message_dialog_label {

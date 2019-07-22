@@ -53,6 +53,7 @@
 	display: block;
 	width: 100px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px -1px;
+	border-radius: 5px
 }
 
 #external_map_button {

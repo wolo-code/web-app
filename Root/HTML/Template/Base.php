@@ -11,8 +11,6 @@
 	<link rel="shortcut icon" type='image/x-icon' href='/favicon.ico' >
 	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
 	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
-	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
 <?php
 	$component = $id;
 	require '../HTML/Fragment/Head.php';
@@ -29,7 +27,6 @@
 	$component = $id;
 	require '../JS/Fragment/JS.php';
 ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script></head>
 <?php
 	$component = "";
 	require '../CSS/Fragment/CSS.php';
@@ -38,6 +35,9 @@
 ?>
 <body>
 	<?php	require (getComponentPath($id)); ?>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script></head>
+	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
 	<script src="/geofire.min.js"></script>
 </body>
 </html>

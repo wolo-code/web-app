@@ -171,6 +171,7 @@ button.border {
 #notification_top {
 	top: 118px;
 	width: 182px;
+	cursor: pointer
 }
 
 #notification_bottom {

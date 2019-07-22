@@ -15,7 +15,7 @@ function clearCode() {
 }
 
 function getCodeFull() {
-	var codeFull_city_part = [code_city.name].concat(code_wcode);
+	var codeFull_city_part = [code_city.name_id].concat(code_wcode);
 	var prefix;
 
 	if(!multiple_country)

@@ -89,6 +89,7 @@ function setCodeCoord(city, codeIndex, code) {
 	if(initWCode_jumpToMap) {
 		initWCode_jumpToMap = false;
 		window.location.replace(getIntentURL(latLng, city.name + ' ' + code.join(' ')));
+		return;
 	}
 	focus__(city, latLng, code);
 }

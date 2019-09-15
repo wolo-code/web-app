@@ -39,6 +39,10 @@
 	text-align: center;
 }
 
+.gm-style-iw-d {
+	overflow: hidden
+}
+
 #show_address_button {
 	width: 26px;
 	vertical-align: bottom;

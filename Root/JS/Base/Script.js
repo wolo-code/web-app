@@ -20,4 +20,8 @@ function syncInitMap() {
 document.addEventListener('DOMContentLoaded', function() {
 	if(typeof initLoad != 'undefined')
 		initLoad();
+	if( typeof CSS == 'undefined' || !CSS.supports("backdrop-filter: blur(8px)") ) {
+		document.getElementById('logo').classList.add('plain_background');
+		document.getElementById('footer-content').classList.add('plain_background');
+	}
 });

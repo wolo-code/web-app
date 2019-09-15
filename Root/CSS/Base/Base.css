@@ -75,7 +75,6 @@ button.border {
 
 #logo a {
 	display: inline-block;
-	background: rgba(241, 241, 241, 0.75);
 	border-radius: 6px;
 	border-width: thin;
 	border-color: #e8e8e8;
@@ -218,3 +217,10 @@ button.border {
 	border-radius: 5px;
 }
 
+.blur_background {
+	backdrop-filter: blur(8px)
+}
+
+.plain_background {
+	background: rgba(241, 241, 241, 0.75)
+}

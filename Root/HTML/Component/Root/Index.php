@@ -8,7 +8,7 @@
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>
-<div id='logo'>
+<div id='logo' class='blur_background'>
 	<a id=logo_wcode href='//wcodes.org' tabindex='1'>
 		<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
 	</a><a id=logo_location href='//location.wcodes.org' tabindex='2'>

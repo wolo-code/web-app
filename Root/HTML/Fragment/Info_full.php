@@ -24,7 +24,12 @@
 			</span>
 		</div>
 	</div>
-	<div id='contact'>
-		contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
+	<div>
+		<p>
+			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
+		</p>
+		<p id='contact'>
+			contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
+		</p>
 	</div>
 </div>

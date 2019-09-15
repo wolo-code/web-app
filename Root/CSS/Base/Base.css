@@ -135,6 +135,12 @@ button.border {
 	text-decoration: none;
 }
 
+.link-gray {
+	text-decoration: none;
+	color: #bbb!important;
+	transition: all ease-out .3s;
+}
+
 .hide {
 	display: none;
 }
@@ -196,3 +202,19 @@ button.border {
 .blue {
 	color: #69B7CF;
 }
+
+#footer-content-container {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 4px;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 0.9em;
+}
+
+#footer-content {
+	display: inline-block;
+	padding: 0 4px;
+	border-radius: 5px;
+}
+

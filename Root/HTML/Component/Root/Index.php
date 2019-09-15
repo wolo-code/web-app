@@ -27,4 +27,10 @@
 </div>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <div id='notification_bottom' class="notification_bar hide"></div>
+<div id='footer-content-container' class='center'>
+	<div id='footer-content' class='blur_background'>
+		<a class="link-gray" href='wcodes.org/license'>Copyright &copy; 2019</a>
+		<a class="link" href='wcodes.org/about_me'>Ujjwal Singh</a><a class='content-link' target='_blank' href='/about_me' rel='author'></a>
+	</div>
+</div>
 <?php require '../../HTML/Fragment/Address.php'; ?>

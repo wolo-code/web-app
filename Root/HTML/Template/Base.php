@@ -5,7 +5,6 @@
 	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
 	<meta name='title' content="<?php echo $config['project_title'] ?>" >
 	<meta itemprop='name' content="<?php echo $config['project_title'] ?>" >
-	<meta name='robots' content='noindex' >
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content='initial-scale=1.0, viewport-fit=cover' >
 	<meta name='theme-color' content='#ffffff' >

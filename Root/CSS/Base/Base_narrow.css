@@ -17,6 +17,11 @@
 			top: 168px !important;
 		}
 
+		#footer-content-container {
+			bottom: 14px;
+			font-size: 0.7em
+		}
+		
 }
 
 @media (max-width: 316px) {

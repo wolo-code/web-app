@@ -1,6 +1,23 @@
 // const WCODE_CODE_COPIED_MESSAGE;
 // const WCODE_LINK_COPIED_MESSAGE;
 
+function handleShareWCode() {
+	if (navigator.share)
+		shareWCode();
+	else
+		copyWcodeJumpLink();
+}
+
+function shareWCode() {
+	navigator.share( {
+		title: 'WCode Location',
+		text: 'WCode Location for: ' + address,
+		url: '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/'
+	} )
+	.then(() => console.log('Successful share'))
+	.catch((error) => console.log('Error sharing', error));
+}
+
 function showCopyWcodeMessage() {
 	var city_name_id = getCodeCityNameId();
 	var country_name = getCodeCityCountryName();

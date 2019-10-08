@@ -14,6 +14,7 @@
 				<img id='share_copy_button' class="center control" src="<?php getSVG('', 'code'); ?>" >
 			</span>
 		</p>
+		<hr>
 		<p>
 			<input id='share_jumto_map' type='checkbox'>
 			jump directly to map

@@ -13,7 +13,7 @@ function focus_(pos, bounds) {
 		marker = new google.maps.Marker({
 			position: pos,
 			map: map,
-			title: 'Hello World!'
+			title: pos.lat + " | " + pos.lng
 		});
 		marker.addListener('click', function() {
 			if(!isInfoWindowOpen())

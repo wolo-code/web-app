@@ -218,7 +218,8 @@ button.border {
 }
 
 .blur_background {
-	backdrop-filter: blur(8px)
+	backdrop-filter: blur(8px);
+	background-color: #fbfbfb60
 }
 
 .plain_background {

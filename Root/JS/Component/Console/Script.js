@@ -5,6 +5,7 @@ var target_id;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
+		firebaseInit();
 		initApp();
 		setupControls();
 		setTargetIndex();

@@ -28,6 +28,7 @@ var gpId = '';
 var CURRENT_VERSION = 1;
 var initWCode = false;
 var initWCode_jumpToMap = false;
+
 // City
 var DEFAULT_WCODE = ['bengaluru', 'diesel', 'hall', 'planet'];
 var pendingCity = false;

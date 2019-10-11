@@ -68,10 +68,16 @@ function activateOverlayInfo_full() {
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
 		var code_string;
-		if(window.location.pathname.substr(1).endsWith('/')) {
+		var end_flag_char = window.location.pathname.substr(-1);
+		if(end_flag_char == '/') {
 			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
 			initWCode_jumpToMap = true;
 		}
+		else if (end_flag_char == '_') {
+			init_map_mode = 'satellite';
+			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
+			initWCode_jumpToMap = false;
+		} 
 		else {
 			code_string = window.location.pathname.substr(1);
 			initWCode_jumpToMap = false;

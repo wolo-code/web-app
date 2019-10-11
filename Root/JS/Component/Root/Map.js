@@ -109,6 +109,9 @@ function initMap() {
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
 	clickHandler = new ClickEventHandler(map);
 
+	if(init_map_mode == 'satellite')
+		toggleMapType();
+
 	postMap();
 
 }

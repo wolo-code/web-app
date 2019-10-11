@@ -38,3 +38,5 @@ var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 
 var CITY_RANGE_RADIUS = 32.767;
+
+var init_map_mode = false;

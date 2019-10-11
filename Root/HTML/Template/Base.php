@@ -36,8 +36,6 @@
 <body>
 	<?php	require (getComponentPath($id)); ?>
 	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script></head>
-	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-database.js"></script>
 	<script src="/geofire.min.js"></script>
 </body>
 </html>

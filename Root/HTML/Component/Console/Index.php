@@ -63,3 +63,5 @@
 		</div>
  	</div>
 </div>
+<?php require '../../HTML/Fragment/Firebase_includes.html'; ?>
+<script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>

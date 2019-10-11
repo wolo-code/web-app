@@ -61,7 +61,7 @@
 			<input id='file_input' type='file'>
 			<button id='file_upload' type='button' class='border' onclick="upload_data();">Upload</button>
 		</div>
- 	</div>
+	</div>
 </div>
 <?php require '../../HTML/Fragment/Firebase_includes.html'; ?>
 <script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>

@@ -14,7 +14,6 @@ function shareWCode() {
 		text: "WCode Location for: " + ' ' + address + ' ' + '|',
 		url: '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/'
 	} )
-	.then(() => console.log('Successful share'))
 	.catch((error) => console.log('Error sharing', error));
 }
 

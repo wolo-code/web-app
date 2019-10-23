@@ -12,7 +12,6 @@ function initLoad () {
 };
 
 function setupControls() {
-	document.getElementById('overlay').addEventListener('click', hideOverlay);
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
 	document.getElementById('info').addEventListener('click', showOverlay);
 	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);

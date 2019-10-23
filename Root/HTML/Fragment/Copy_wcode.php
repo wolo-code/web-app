@@ -7,6 +7,7 @@
 	</div>
 	<div class='message_dialog_body'>
 		<p>
+			<span>Text</span>
 			<input id='share_include_city' type='checkbox'>
 			include 
 			<span id='copy_wcode_message_city_name'></span>
@@ -16,6 +17,7 @@
 		</p>
 		<hr>
 		<p>
+			<span>Link</span>
 			<input id='share_jumto_map' type='checkbox'>
 			jump directly to map
 			<span class='message_dialog_control_right'>

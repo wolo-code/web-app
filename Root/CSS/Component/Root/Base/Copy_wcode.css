@@ -1,5 +1,6 @@
 #share_include_city, #share_jumto_map {
 	-webkit-appearance: checkbox !important
+	margin-left: 6px;
 }
 
 #copy_wcode_message_city_name {

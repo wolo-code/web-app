@@ -31,6 +31,11 @@ function setupControls() {
 	document.getElementById('choose_city_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('share_copy_button').addEventListener('click', shareWCodeCopy);
 	document.getElementById('share_link_button').addEventListener('click', shareWCodeLink);
+	document.getElementById('share_qr_button').addEventListener('click', showQR);
+	document.getElementById('qr_close').addEventListener('click', closeQR);
+	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
+	document.getElementById('qr_print').addEventListener('click', printQR);
+	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 }
 
 function showAndCopy(message) {

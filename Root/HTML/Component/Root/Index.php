@@ -5,6 +5,7 @@
 	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/Overlay.php';
 	require '../../HTML/Fragment/Incompatible_browser.html';
+	require '../../HTML/Fragment/QR.php'
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>

@@ -1,0 +1,25 @@
+@media print {
+	
+	html {
+		background: none;
+	}
+	
+	body > *:not(.section-to-print) {
+		display: none;
+	}
+	
+	.section-to-print, .section-to-print * {
+		visibility: visible;
+	}
+	
+	.section-to-print {
+		position: absolute !important;
+		left: 0;
+		top: 0;
+	}
+	
+	.section-to-not-print {
+		display: none;
+	}
+	
+}

@@ -20,3 +20,19 @@
 #share_link_button {
 	padding-top: 8px
 }
+
+#share_qr_button {
+	padding-right: 6px;
+}
+
+#qr_pre_title_main, #qr_pre_title_segment {
+	margin-left: 6px;
+	background-color: white;
+	color: #999999;
+	outline: 0;
+	outline-style: none;
+	border-top: 0;
+	border-left: none;
+	border-right: 0;
+	min-width: 202px;
+}

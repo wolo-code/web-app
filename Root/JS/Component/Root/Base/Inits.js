@@ -41,3 +41,7 @@ var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point
 var CITY_RANGE_RADIUS = 32.767;
 
 var init_map_mode = false;
+
+// QR
+var mode_preview = false;
+var qr_address_active_first = true;

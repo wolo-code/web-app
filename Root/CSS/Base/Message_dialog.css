@@ -85,3 +85,14 @@
 h2.message_dialog_label {
 	margin: 0.5em;
 }
+
+.message_dialog_body > p > span:first-child {
+	display: block;
+	color: #B5B5B5
+}
+
+.button_active {
+	color: white !important;
+	background: #69B7CF !important;
+	border-color: #69b7cf !important;
+}

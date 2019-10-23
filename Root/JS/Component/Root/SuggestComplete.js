@@ -62,14 +62,18 @@ function getPossibleList(code) {
 }
 
 function matchWord(list, input) {
-	var regEx = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
-	return list.filter(function(word) {
-		if (word.match(regEx)) {
-			if(word.toLowerCase().startsWith(input))
-				if(word.toLowerCase() != input)
-					return word;
-		}
-	});
+	if(input.match(/^[A-Za-z]+$/)) {
+		var regEx = new RegExp(input.split('').join('\\w*').replace(/\W/, ''), 'i');
+		return list.filter(function(word) {
+			if (word.match(regEx)) {
+				if(word.toLowerCase().startsWith(input))
+					if(word.toLowerCase() != input)
+						return word;
+			}
+		});
+	}
+	else
+		return [];
 }
 
 function changeInput(list, val) {

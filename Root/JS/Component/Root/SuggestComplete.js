@@ -14,7 +14,7 @@ function suggestComplete() {
 	var curList;
 	if(input_array.length > 0)
 		curList = getPossibleList(input_array.slice(0, -1));
-	if(curList !=  null) {
+	if(curList != null) {
 		var curWord = input_array[input_array.length-1];
 		if(curList != city_styled_wordlist && curList != wordList.curList) {
 			var compareWord = input_array.slice(0, -1).join(' ')+' ';

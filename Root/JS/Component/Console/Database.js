@@ -61,7 +61,7 @@ function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 			if(typeof callback == 'function')
 				callback();
 		}, function(error) {
-	  	console.log("Error: " + error);
+			console.log("Error: " + error);
 		}
 	);
 }

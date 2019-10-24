@@ -52,14 +52,14 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 	var nearCity = new Object;
 
 	var geoQuery = geoFire.query({
-	  center: [latLng.lat, latLng.lng],
-	  radius: CITY_RANGE_RADIUS
+		center: [latLng.lat, latLng.lng],
+		radius: CITY_RANGE_RADIUS
 	});
 
 	wait_loader.classList.remove('hide');
 	geoQuery.on('ready', function() {
 		wait_loader.classList.add('hide');
-	  geoQuery.cancel();
+		geoQuery.cancel();
 		if(nearCity == null)
 			decode_continue(null, wcode);
 		else

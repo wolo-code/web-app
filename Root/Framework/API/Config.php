@@ -6,7 +6,7 @@ function loadConfig() {
 		$config[$tsvLine[0]] = $tsvLine[1];
 	}
 
-  return $config;
+	return $config;
 }
 
 ?>

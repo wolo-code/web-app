@@ -250,7 +250,7 @@ function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 				if(typeof callback == 'function')
 					callback(refCityDetail.key);
 			}, function(err) {
-		  	console.error("Error: " + err);
+				console.error("Error: " + err);
 			}
 		);
 	}

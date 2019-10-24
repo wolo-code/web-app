@@ -21,7 +21,7 @@
 	<?php
 			echo date('Y M d - H:i:s');
 	?>
-			</span>
+			</span> (UTC)
 		</div>
 	</div>
 	<div>

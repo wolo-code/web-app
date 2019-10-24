@@ -43,6 +43,10 @@
 	font-size: large;
 }
 
+#qr_wcode_right {
+	padding-left: 10px;
+}
+
 #qr_code {
 	margin-top: 12px;
 	margin-bottom: 4px;

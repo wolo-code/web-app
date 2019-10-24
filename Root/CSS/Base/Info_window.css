@@ -76,6 +76,10 @@
 	vertical-align: bottom;
 }
 
+#infowindow_actions {
+	padding-left: 4px;
+}
+
 #infowindow_actions > * {
 	margin: 0 20px;
 }

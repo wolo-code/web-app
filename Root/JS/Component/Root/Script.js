@@ -13,6 +13,8 @@ function initLoad () {
 
 function setupControls() {
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
+	document.getElementById('info_intro_close_button').addEventListener('click', hideOverlay);
+	document.getElementById('info_full_close_button').addEventListener('click', hideOverlay);
 	document.getElementById('info').addEventListener('click', showOverlay);
 	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);

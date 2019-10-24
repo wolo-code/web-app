@@ -45,3 +45,4 @@ var init_map_mode = false;
 // QR
 var mode_preview = false;
 var qr_address_active_first = true;
+var mode_preview_activated = false;

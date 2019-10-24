@@ -75,16 +75,25 @@ function toggleQRpreview() {
 }
 
 function printQR() {
-	var mode_preview_activated = false;
+	window.addEventListener('beforeprint', beforeQRprint);
+	window.addEventListener('afterprint', afterQRprint);
+	window.print();
+}
+
+function beforeQRprint() {
 	if(!mode_preview) {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
 	document.getElementById('qr').classList.remove('overlay');
 	document.getElementById('qr').classList.add('section-to-print');
-	window.print();
+	window.removeEventListener('beforeprint', beforeQRprint);
+}
+
+function afterQRprint() {
 	document.getElementById('qr').classList.add('overlay');
 	document.getElementById('qr').classList.remove('section-to-print');
 	if(mode_preview_activated)
 		toggleQRpreview();
+	window.removeEventListener('afterprint', afterQRprint);
 }

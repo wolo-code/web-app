@@ -66,11 +66,9 @@ function unHideEmptyAndRemovePreview(node) {
 function toggleQRpreview() {
 	if(mode_preview) {
 		previewQR_deactivate();
-		document.getElementById('qr_body').classList.remove('section-to-print');
 	}
 	else {
 		previewQR_activate();
-		document.getElementById('qr_body').classList.add('section-to-print');
 	}
 }
 

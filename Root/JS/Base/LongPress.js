@@ -40,7 +40,7 @@ var start = function(e) {
 		presstimer = setTimeout(function() {
 			showCopyWcodeMessage();
 			longpress = true;
-		}, 1000);
+		}, 500);
 	}
 
 	return false;

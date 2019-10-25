@@ -8,6 +8,9 @@ function showQR() {
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
 	document.getElementById('qr_image').setAttribute( 'src', src="https://chart.googleapis.com/chart?cht=qr&chs=380x380&chl=https://"+location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + "&chld=L|2" );
 	document.getElementById('qr').classList.remove('hide');
+	
+	window.addEventListener('beforeprint', beforeQRprint);
+	window.addEventListener('afterprint', afterQRprint);
 }
 
 function closeQR() {
@@ -16,6 +19,9 @@ function closeQR() {
 	document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
 	document.getElementById('qr_address').classList.add('initial');
 	qr_address_active_first = true;
+	
+	window.removeEventListener('afterprint', afterQRprint);
+	window.removeEventListener('beforeprint', beforeQRprint);
 }
 
 function previewQR_activate() {
@@ -64,18 +70,10 @@ function unHideEmptyAndRemovePreview(node) {
 }
 
 function toggleQRpreview() {
-	if(mode_preview) {
+	if(mode_preview)
 		previewQR_deactivate();
-	}
-	else {
+	else
 		previewQR_activate();
-	}
-}
-
-function printQR() {
-	window.addEventListener('beforeprint', beforeQRprint);
-	window.addEventListener('afterprint', afterQRprint);
-	window.print();
 }
 
 function beforeQRprint() {
@@ -85,7 +83,6 @@ function beforeQRprint() {
 	}
 	document.getElementById('qr').classList.remove('overlay');
 	document.getElementById('qr').classList.add('section-to-print');
-	window.removeEventListener('beforeprint', beforeQRprint);
 }
 
 function afterQRprint() {
@@ -93,5 +90,12 @@ function afterQRprint() {
 	document.getElementById('qr').classList.remove('section-to-print');
 	if(mode_preview_activated)
 		toggleQRpreview();
-	window.removeEventListener('afterprint', afterQRprint);
+}
+
+function printQR() {
+	if(UMB.getCurrentBrowser() == 'safari')	
+		beforeQRprint();
+	window.print();
+	if(UMB.getCurrentBrowser() == 'safari')
+		afterQRprint();
 }

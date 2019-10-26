@@ -1,0 +1,7 @@
+@media print {
+
+	#qr_webapp_url {
+		-webkit-print-color-adjust: exact;
+	}
+
+}

@@ -34,10 +34,8 @@
 		<div id='qr_address_container' class='center'>
 			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address (optional)</div>
 		</div>
-		<div>
-			<div id='qr_webapp_url' class='center'>
-				<div>location.wcodes.org</div>
-			</div>
+		<div id='qr_webapp_url' class='center'>
+			<div>location.wcodes.org</div>
 		</div>
 		<div class="center message_dialog_control section-to-not-print">
 			<button id='qr_preview' class='border' type='button'>Preview</button>

@@ -1,24 +1,24 @@
 @media print {
 	
-	html {
+	html .print {
 		background: none;
 	}
 	
-	body > *:not(.section-to-print) {
+	body.print > *:not(.section-to-print) {
 		display: none;
 	}
 	
-	.section-to-print, .section-to-print * {
+	.print .section-to-print, .print .section-to-print * {
 		visibility: visible;
 	}
 	
-	.section-to-print {
+	.print .section-to-print {
 		position: absolute !important;
 		left: 0;
 		top: 0;
 	}
 	
-	.section-to-not-print {
+	.print .section-to-not-print {
 		display: none;
 	}
 	

@@ -77,6 +77,7 @@ function toggleQRpreview() {
 }
 
 function beforeQRprint() {
+	document.body.classList.add('print');
 	if(!mode_preview) {
 		toggleQRpreview();
 		mode_preview_activated = true;
@@ -86,6 +87,7 @@ function beforeQRprint() {
 }
 
 function afterQRprint() {
+	document.body.classList.remove('print');
 	document.getElementById('qr').classList.add('overlay');
 	document.getElementById('qr').classList.remove('section-to-print');
 	if(mode_preview_activated)

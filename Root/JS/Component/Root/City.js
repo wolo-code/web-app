@@ -98,7 +98,7 @@ function getCityFromId(id, callback) {
 function getCityFromName(name, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');
-	ref.orderByChild('name_id').equalTo(name).on('value', function(snapshot) {
+	ref.orderByChild('name_id').equalTo(name).once('value', function(snapshot) {
 		wait_loader.classList.add('hide');
 		var list = snapshot.val();
 		if(list == null)
@@ -127,18 +127,19 @@ function getCityCenterFromId(city, callback) {
 function getCitiesFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');
-	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).on('value', function(snapshot) {
+	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value', function(snapshot) {
 		wait_loader.classList.add('hide');
 		callback(snapshot.val());
 	});
 }
 
+// unused
 function getCityIdFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
 	wait_loader.classList.remove('hide');
-	ref.orderByChild('name_id').equalTo(name_id).on('child_added', function(snapshot) {
+	ref.orderByChild('name_id').equalTo(name_id).once('value', function(snapshot) {
 		wait_loader.classList.add('hide');
-		callback(snapshot.key);
+		callback(Object.keys(snapshot.val())[0]);
 	});
 }
 

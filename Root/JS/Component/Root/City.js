@@ -142,6 +142,21 @@ function getCityIdFromNameId(name_id, callback) {
 	});
 }
 
+function getCityFromCityGp_id(city_gp_id, callback_success, callback_failure) {
+	var ref = database.ref('CityDetail');
+	wait_loader.classList.remove('hide');
+	ref.orderByChild('gp_id').equalTo(city_gp_id).once('value', function(snapshot) {
+		wait_loader.classList.add('hide');
+		if (snapshot.exists()) {
+			var city = Object.values(snapshot.val())[0];
+			city.id = Object.keys(snapshot.val())[0];
+			callback_success(city);
+		}
+		else
+			callback_failure();
+	});	
+}
+
 function noCity(position) {
 	showAddress();
 	showNoCityMessage();

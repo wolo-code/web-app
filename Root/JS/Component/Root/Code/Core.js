@@ -7,7 +7,23 @@ var wordList;
 
 function encode(position) {
 	clearCode();
-	getCityFromPositionThenEncode(position);
+	getAddress(position, function(address_components) {
+			var city_gp_id = getCityGpId(address_components);
+			if(city_gp_id != null) {
+				getCityFromCityGp_id( city_gp_id, function(city) {
+					getCityCenterFromId(city, function(city) {
+						if(city != null)
+							encode_continue(city, position);
+						else
+							encode_continue(null, position);
+					});
+				}, function() {
+				encode_continue(null, position)
+				} );
+			}
+			else
+				getCityFromPositionThenEncode(position);
+		});
 }
 
 function encode_continue(city, position) {

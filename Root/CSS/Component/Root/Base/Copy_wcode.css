@@ -26,8 +26,8 @@
 	padding-right: 6px;
 }
 
-#qr_pre_title_main, #qr_pre_title_segment {
 	margin-left: 6px;
+#qr_pre_title_main {
 	background-color: white;
 	color: #999999;
 	outline: 0;

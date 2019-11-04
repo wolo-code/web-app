@@ -4,6 +4,7 @@ Path	Name	Extension
 	root	js
 	console	js
 	geofire.min	js
+	qrcode.min	js
 	favicon	ico
 	manifest	json
 	manifest-console	json

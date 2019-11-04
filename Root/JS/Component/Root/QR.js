@@ -6,7 +6,16 @@ function showQR() {
 	var code_string = code_wcode.join(' ');
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
-	document.getElementById('qr_image').setAttribute( 'src', src="https://chart.googleapis.com/chart?cht=qr&chs=380x380&chl=https://"+location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + "&chld=L|2" );
+	var qrcode = new QRCode({
+		content: "https://"+location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_'),
+		container: "svg",
+		join: true,
+		xmlDeclaration: false,
+		width: 380,
+		height: 380
+	});
+	var svg = qrcode.svg();
+	document.getElementById('qr_code').innerHTML = svg;
 	document.getElementById('qr').classList.remove('hide');
 	
 	window.addEventListener('beforeprint', beforeQRprint);

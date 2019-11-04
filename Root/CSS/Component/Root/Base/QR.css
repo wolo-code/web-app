@@ -52,20 +52,6 @@
 	margin-bottom: 4px;
 }
 
-#qr_code > div {
-	position: absolute;
-	width: 300px;
-	height: 300px;
-	margin-left: 35px;
-	margin-top: 25px;
-}
-
-#qr_code > img {
-	position: relative;
-	width: 380px;
-	height: 380px;
-}
-
 .preview#qr_title_main, .preview#qr_title_segment, .preview#qr_address {
 	border-bottom: 0;
 	text-align: center;
@@ -83,10 +69,6 @@
 
 #qr_wcode {
 	padding-top: 20px;
-}
-
-#qr_image {
-	margin-left: 0px;
 }
 
 #qr_sticker_title {

@@ -27,10 +27,7 @@
 				</div>
 			</div>
 		</div>
-		<div id='qr_code' class='center'>
-			<div id='qr_code_loader' class='loader'></div>
-			<img id='qr_image'>
-		</div>
+		<div id='qr_code' class='center'></div>
 		<div id='qr_address_container' class='center'>
 			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address (optional)</div>
 		</div>

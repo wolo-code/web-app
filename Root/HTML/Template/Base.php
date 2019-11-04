@@ -37,5 +37,6 @@
 	<?php	require (getComponentPath($id)); ?>
 	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script></head>
 	<script src="/geofire.min.js"></script>
+	<script src="/qrcode.min.js"></script>
 </body>
 </html>

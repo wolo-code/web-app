@@ -57,9 +57,7 @@
 	text-align: center;
 }
 
-#qr_logo_location > .image > svg {
-	width: 120px;
-	height: 34px;
+#qr_logo_location > .image {
 	padding-left: 18px;
 }
 

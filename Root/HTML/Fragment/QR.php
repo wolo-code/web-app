@@ -36,6 +36,7 @@
 		</div>
 		<div class="center message_dialog_control section-to-not-print">
 			<button id='qr_preview' class='border' type='button'>Preview</button>
+			<button id='qr_download' class='border' type='button'>Download</button>
 			<button id='qr_print' class='border' type='button'>Print</button>
 		</div>
 	</div>

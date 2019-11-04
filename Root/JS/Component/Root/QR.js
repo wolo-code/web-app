@@ -110,3 +110,29 @@ function printQR() {
 	if(UMB.getCurrentBrowser() == 'safari')
 		afterQRprint();
 }
+
+function downloadQR() {
+	if(!mode_preview) {
+		toggleQRpreview();
+		mode_preview_activated = true;
+	}
+	document.getElementById('qr_body').setAttribute( 'style',
+	 "height: "+(document.getElementById('qr_body').offsetHeight-6)+"px"+"; "+
+	 "width: "+document.getElementById('qr_body').offsetWidth+"px" );
+	document.getElementById('qr_close').classList.add('hide');
+	html2canvas(document.querySelector('#qr_body')).then(canvas => {
+		if(mode_preview_activated)
+			toggleQRpreview();
+		document.getElementById('qr_body').removeAttribute('style');
+		document.getElementById('qr_close').classList.remove('hide');			
+		var qrImage = canvas.toDataURL("image/png");
+		downloadURI('data:' + qrImage, "wcode-location.png");
+	});
+}
+
+function downloadURI(uri, name) {
+	var link = document.createElement('a');
+	link.download = name;
+	link.href = uri;
+	link.click();
+}

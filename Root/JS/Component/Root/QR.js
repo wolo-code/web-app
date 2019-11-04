@@ -1,6 +1,6 @@
 function showQR() {
 	document.getElementById('qr_title_main').value = document.getElementById('qr_pre_title_main').value;
-	document.getElementById('qr_title_segment').value = document.getElementById('qr_pre_title_segment').value;
+	document.getElementById('qr_title_segment').value = '';
 	
 	var city_accent = getProperCityAccent(code_city);
 	var code_string = code_wcode.join(' ');

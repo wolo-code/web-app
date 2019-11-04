@@ -5,7 +5,7 @@
 		</div>
 		<div id='qr_label' class='center'>
 			<div id=qr_logo_wcode tabindex='1'>
-				<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
+				<span class='image'><?php includeSVG('', 'QR_Logo_WCode'); ?></span>
 			</div>
 			<div id=qr_logo_location tabindex='2'>
 				<span class='image'><?php includeSVG('', 'QR_Logo_location'); ?></span>

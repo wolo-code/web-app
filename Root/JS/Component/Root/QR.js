@@ -43,7 +43,6 @@ function previewQR_activate() {
 		document.getElementById('qr_address').classList.add('preview');
 		document.getElementById('qr_address').setAttribute('contenteditable', false);
 	}
-	document.getElementById('qr_close').classList.add('hide');
 	document.getElementById('qr_preview').classList.add('button_active');
 }
 
@@ -54,7 +53,6 @@ function previewQR_deactivate() {
 	document.getElementById('qr_address').setAttribute('contenteditable', true);
 	document.getElementById('qr_address').classList.remove('preview');
 	document.getElementById('qr_address').classList.remove('hide');
-	document.getElementById('qr_close').classList.remove('hide');
 	document.getElementById('qr_preview').classList.remove('button_active');
 }
 
@@ -93,12 +91,14 @@ function beforeQRprint() {
 	}
 	document.getElementById('qr').classList.remove('overlay');
 	document.getElementById('qr').classList.add('section-to-print');
+	document.getElementById('qr_close').classList.add('hide');
 }
 
 function afterQRprint() {
 	document.body.classList.remove('print');
 	document.getElementById('qr').classList.add('overlay');
 	document.getElementById('qr').classList.remove('section-to-print');
+	document.getElementById('qr_close').classList.remove('hide');
 	if(mode_preview_activated)
 		toggleQRpreview();
 }

@@ -43,9 +43,10 @@ function focus_(pos, bounds) {
 			}
 		}
 		if(firstFocus == true) {
-			smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
+			showNotification('Getting more accurate location - wait for one minute or hit "Proceed"');
 			firstFocus = false;
 		}
+		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
 	});
 
 	infoWindow_setContent(MESSAGE_LOADING);

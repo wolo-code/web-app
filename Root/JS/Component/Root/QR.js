@@ -126,7 +126,7 @@ function downloadQR() {
 		document.getElementById('qr_body').removeAttribute('style');
 		document.getElementById('qr_close').classList.remove('hide');			
 		var qrImage = canvas.toDataURL("image/png");
-		downloadURI('data:' + qrImage, "wcode-location.png");
+		downloadURI('data:' + qrImage, "WCode Location - " + getCodeFull_text() + ".png");
 	});
 }
 

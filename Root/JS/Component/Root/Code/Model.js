@@ -31,8 +31,29 @@ function getCodeFull() {
 		return codeFull_city_part;
 }
 
+function getCodeFull_capitalized() {
+	var codeFull_city_part = [code_city.name].concat(code_wcode);
+	var prefix;
+
+	if(!multiple_country)
+		prefix = [];
+	else
+		prefix = [code_city.country];
+	if(multiple_group)
+		prefix = prefix.concat([code_city.group]);
+
+	if(multiple_city)
+		return prefix.concat(codeFull_city_part);
+	else
+		return codeFull_city_part;
+}
+
+function getCodeFull_text() {
+	return getCodeFull_capitalized().join(' ');
+}
+
 function getWcodeFull_formatted() {
-	return formatWcode(getCodeFull());
+	return formatWcode(getCodeFull_capitalized());
 }
 
 function getCodeWCode() {

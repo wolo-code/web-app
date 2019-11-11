@@ -43,7 +43,7 @@ function focus_(pos, bounds) {
 			}
 		}
 		if(firstFocus == true) {
-			showNotification('Getting more accurate location - wait for one minute or hit "Proceed"', 'LONG_DURATION');
+			showNotification('Getting more accurate location <br> wait for one minute or hit "Proceed"', NOTIFICATION_DURATION_LONG);
 			firstFocus = false;
 		}
 		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());

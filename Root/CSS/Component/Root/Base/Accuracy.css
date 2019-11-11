@@ -1,0 +1,40 @@
+#accuracy_container {
+	bottom: 88px;
+	z-index: 1;
+}
+
+#accuracy_container > div {
+	padding: 4px 0 4px 12px;
+	background: rgba(237, 240, 233, 0.75);
+	border-radius: 25px;
+	color: #707070;
+	border: 1px solid #DDDDDD;
+	text-align: center;
+	font-size: large;
+	display: inline-block;
+	line-height: 30px;
+}
+
+#accuracy_container.highlight > div {
+	padding-right: 12px;
+	background-color: #FFFFFF;
+}
+
+#accuracy_meter {
+	font-family: monospace;
+}
+
+.highlight #accuracy_meter {
+	font-weight: bold;
+}
+
+#proceed_button {
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 0.9375em;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 12px;
+	border: none;
+	border-radius: 28px;	
+}

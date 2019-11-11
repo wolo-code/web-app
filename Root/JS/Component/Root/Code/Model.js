@@ -6,7 +6,7 @@ function setCode(city, wcode, latLng) {
 	code_city = city;
 	code_wcode = wcode;
 	code_postition = latLng;
-
+	document.getElementById('accuracy_container').classList.add('hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng);
 }
 

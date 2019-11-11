@@ -42,6 +42,14 @@ var CITY_RANGE_RADIUS = 32.767;
 
 var init_map_mode = false;
 
+//Location
+var location_button_begin_time;
+var location_button_PRESS_THRESHOLD = 500;
+var locating = false;
+var locate_button_pressed = false;
+var watch_location_timer;
+var watch_location_id;
+
 // QR
 var mode_preview = false;
 var qr_address_active_first = true;

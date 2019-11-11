@@ -80,6 +80,10 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
+		locating = false;
+		wait_loader.classList.add('hide');
+		navigator.geolocation.clearWatch(watch_location_id);
+		clearTimeout(watch_location_timer);
 		pendingPosition = null;
 		pendingCity = null;
 		notification_top.classList.add('hide');
@@ -101,9 +105,8 @@ function initMap() {
 		toggleMapType(true);
 	});
 
-	location_button.addEventListener('click', function() {
-		syncLocate(true);
-	});
+	location_button.addEventListener('mousedown', processPositionButtonDown);
+	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
 
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
 	clickHandler = new ClickEventHandler(map);

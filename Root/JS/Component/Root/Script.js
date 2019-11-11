@@ -25,6 +25,7 @@ function setupControls() {
 	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
 	document.getElementById('no_city_submit_wait_stop').addEventListener('click', noCityWait_stop);
 	document.getElementById('notification_top').addEventListener('click', tryDefaultCity);
+	document.getElementById('proceed_button').addEventListener('click', proceedPosition);
 	document.getElementById('share_wcode_message_close').addEventListener('click', hideCopyCodeMessage);
 	document.getElementById('incompatible_browser_message_close').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);

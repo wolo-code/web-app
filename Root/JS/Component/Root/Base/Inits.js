@@ -54,3 +54,7 @@ var watch_location_id;
 var mode_preview = false;
 var qr_address_active_first = true;
 var mode_preview_activated = false;
+
+// Notification
+var NOTIFICATION_DURATION_DEFAULT = 2500;
+var NOTIFICATION_DURATION_LONG = 10000;

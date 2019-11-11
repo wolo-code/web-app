@@ -111,6 +111,8 @@ button.border {
 	text-overflow: ellipsis;
 	width: 400px;
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
 }
 
 #pac-input:focus {

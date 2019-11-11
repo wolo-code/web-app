@@ -4,7 +4,8 @@ function showNotification(message, duration) {
 	
 	if(typeof duration == 'undefined')
 		duration = NOTIFICATION_DURATION_DEFAULT;
-	notification_bottom.innerText = message;
+		
+	notification_bottom.innerHTML = message;
 	notification_bottom.classList.remove('hide');
 	if(typeof notification_timer != 'undefined' && notification_timer != null)
 		clearTimeout(notification_timer);

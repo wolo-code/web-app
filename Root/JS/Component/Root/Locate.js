@@ -122,7 +122,7 @@ function endWatchLocation() {
 		if(pos != null)
 			processPosition(pos);
 		else
-			failure();
+			showNotification("Could not get your location.<br> Please move to a more open area and try again by pressing the location icon", NOTIFICATION_DURATION_LONG);
 	}
 }
 

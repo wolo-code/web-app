@@ -12,8 +12,8 @@
 			</div>
 		</div>
 		<div id='qr_title_container' class='center'>
-			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title (optional)">
-			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment (optional)">
+			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title&nbsp; &nbsp;e.g. Taj Mahal">
+			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment&nbsp; &nbsp;e.g. West gate">
 		</div>
 		<div id='qr_wcode'>
 			<div id='qr_wcode_container' class='center'>
@@ -29,7 +29,7 @@
 		</div>
 		<div id='qr_code' class='center'></div>
 		<div id='qr_address_container' class='center'>
-			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address (optional)</div>
+			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address&nbsp; &nbsp;(optional)</div>
 		</div>
 		<div id='qr_webapp_url' class='center'>
 			<div>location.wcodes.org</div>

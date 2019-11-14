@@ -27,13 +27,7 @@
 	<span class='image'><?php includeSVG('', 'Info'); ?></span>
 </div>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
-<div id='accuracy_container' class="center-container-abs hide">
-	<div>
-		<span>accuracy</span> <span id='accuracy_meter'></span> <span>m</span>
-		<span id='proceed_container'>&nbsp<span>
-		<span id='proceed_button' class='control'>Proceed</span>
-	</div>
-</div>
+<?php require '../../HTML/Fragment/Accuracy.php' ?>
 <div id='notification_bottom' class="notification_bar hide"></div>
 <div id='footer-content-container' class='center'>
 	<div id='footer-content' class='blur_background'>

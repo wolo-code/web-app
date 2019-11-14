@@ -8,5 +8,8 @@
 		"mailgun-js": "^0.22.0",
 		"geofire": "^5.0.1"
 	},
-	"private": true
+	"private": true,
+	"engines": {
+		"node": "8"
+	}
 }

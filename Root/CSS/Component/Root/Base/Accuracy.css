@@ -38,3 +38,13 @@
 	border: none;
 	border-radius: 28px;	
 }
+
+#location_icon_dot.blinking {
+	animation:blinkingBlue 1.3s infinite;
+}
+
+@keyframes blinkingBlue {
+	0%	{ fill: #FFFFFF; }
+	50%	{ fill: #69B7CF; }
+	100%{ fill: #FFFFFF; }
+}

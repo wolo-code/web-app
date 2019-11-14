@@ -179,9 +179,11 @@ function toggleMapType() {
 	if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		map_type_button.value = 'Map';
+		document.body.classList.remove('satellite');
 	}
 	else {
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
 		map_type_button.value = 'Sattelite';
+		document.body.classList.add('satellite');
 	}
 }

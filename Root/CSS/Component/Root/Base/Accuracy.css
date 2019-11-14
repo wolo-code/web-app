@@ -20,6 +20,12 @@
 	background-color: #FFFFFF;
 }
 
+#accuracy_indicator {
+	padding-left: 15px;
+	margin-right: 3px;
+	border-radius: 50%;
+}
+
 #accuracy_meter {
 	font-family: monospace;
 }

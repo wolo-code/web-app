@@ -70,10 +70,14 @@ function locateExec(failure) {
 						accuCircle.setCenter(pos);
 						accuCircle.setRadius(position.coords.accuracy);
 					}
-					if(position.coords.accuracy >= 99.5)
+					if(position.coords.accuracy >= 99.5) {
 						document.getElementById('accuracy_meter').innerText = "99+";
-					else
+						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: #FF0000');
+					}
+					else {
 						document.getElementById('accuracy_meter').innerText = Math.round(position.coords.accuracy);
+						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: '+percantageToColor(100-position.coords.accuracy));
+					}
 					document.getElementById('proceed_container').classList.remove('hide');
 					document.getElementById('accuracy_container').classList.remove('highlight');
 					document.getElementById('accuracy_container').classList.remove('hide');

@@ -15,3 +15,7 @@ function showNotification(message, duration) {
 	}, duration);
 	
 }
+
+function hideNotication() {
+	notification_bottom.classList.add('hide');
+}

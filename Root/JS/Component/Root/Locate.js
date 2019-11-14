@@ -138,8 +138,7 @@ function proceedPosition() {
 }
 
 function processPosition(pos) {
-	locating = false;
-	wait_loader.classList.add('hide');
+	clearLocating();
 	navigator.geolocation.clearWatch(watch_location_id);
 	clearTimeout(watch_location_timer);
 	document.getElementById('proceed_container').classList.add('hide');
@@ -182,9 +181,16 @@ function processPositionButtonTouchEnd(e) {
 }
 
 function handleLocationError(browserHasGeolocation) {
+	clearLocating();
 	showNotification(browserHasGeolocation ?
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
 	notification_top.classList.remove('hide');
 	syncCheckIncompatibleBrowserMessage();
+}
+
+function clearLocating() {
+	locating = false;
+	wait_loader.classList.add('hide');
+	hideNotication();
 }

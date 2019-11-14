@@ -199,7 +199,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	var found_group_i;
 	var found_country_i;
 	for(var i = address_components.length-1; i >= 0; i--) {
-		if(address_components[i].types.includes('locality')) {
+		if(found_city_i == null && address_components[i].types.includes('locality')) {
 			found_city_i = i;
 			break;
 		} else if (address_components[i].types.includes('administrative_area_level_1')) {

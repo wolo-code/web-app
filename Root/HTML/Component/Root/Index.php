@@ -36,4 +36,4 @@
 	</div>
 </div>
 <?php require '../../HTML/Fragment/Address.php'; ?>
-<?php require '../../HTML/Fragment/Firebase_includes.html'; ?>
+<?php require '../../HTML/Fragment/Firebase_includes.php'; ?>

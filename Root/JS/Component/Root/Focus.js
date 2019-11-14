@@ -42,10 +42,6 @@ function focus_(pos, bounds) {
 				accuCircle.setOptions({'fillOpacity': 0.10});
 			}
 		}
-		if(firstFocus == true) {
-			showNotification('Getting more accurate location <br> wait for one minute or hit "Proceed"', NOTIFICATION_DURATION_LONG);
-			firstFocus = false;
-		}
 		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
 	});
 

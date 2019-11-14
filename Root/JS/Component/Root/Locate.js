@@ -4,6 +4,7 @@
 // var locate_button_pressed = false;
 // var watch_location_timer;
 // var watch_location_id;
+// var watch_location_notice_timer;
 
 function initLocate(override_dnd) {
 	if(!locationAccessInitCheck())
@@ -25,6 +26,7 @@ function locateExec(failure) {
 	if(!locating) {
 		var WATCH_LOCATION_MAX_TIMEOUT = 60000;
 		var WATCH_LOCATION_TIMEOUT = 45000;
+		var WATCH_LOCATION_NOTICE_TIMEOUT = 5000;
 
 		wait_loader.classList.remove('hide');
 		if (navigator.geolocation) {
@@ -36,6 +38,8 @@ function locateExec(failure) {
 			location_button.removeEventListener('touchend', processPositionButtonTouchEnd);
 			location_button.addEventListener('mouseup', processPositionButtonUp);
 			location_button.addEventListener('touchend', processPositionButtonTouchEnd);
+
+			watch_location_notice_timer = setTimeout(watch_location_notice, WATCH_LOCATION_NOTICE_TIMEOUT);
 			
 			watch_location_id = navigator.geolocation.watchPosition(
 				
@@ -193,4 +197,16 @@ function clearLocating() {
 	locating = false;
 	wait_loader.classList.add('hide');
 	hideNotication();
+	clearTimeout(watch_location_notice_timer);
+}
+
+function watch_location_notice() {
+	var wait_duration;
+	if(firstFocus == true) {
+		notification_duration = NOTIFICATION_DURATION_LONG;
+		firstFocus = false;
+	}
+	else
+		notification_duration = NOTIFICATION_DURATION_DEFAULT;
+	showNotification('Getting more accurate location <br> wait for a minute or choose "Proceed"', notification_duration);
 }

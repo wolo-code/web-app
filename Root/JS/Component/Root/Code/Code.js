@@ -92,6 +92,5 @@ function setCodeCoord(city, codeIndex, code) {
 		return;
 	}
 	getAddress(latLng);
-	firstFocus = true;
 	focus__(city, latLng, code);
 }

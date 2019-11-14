@@ -3,7 +3,8 @@ function suggestWrapper(event) {
 		cityNameList = [];
 		getCitiesFromNameId(document.getElementById('pac-input').value.toLowerCase(), function(cityList) {
 			for(let key in cityList)
-				cityNameList.push(getProperCityAccent(cityList[key]));
+				if(cityNameList.indexOf(getProperCityAccent(cityList[key])) == -1)
+					cityNameList.push(getProperCityAccent(cityList[key]));
 			city_styled_wordlist = cityNameList.concat(wordList.curList);
 			suggestComplete();
 		});

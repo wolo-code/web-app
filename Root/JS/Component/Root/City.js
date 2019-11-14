@@ -5,6 +5,13 @@ var multiple_city;
 var multiple_country;
 var multiple_group;
 
+function getCityAccent(city) {
+	if(typeof city.accent != 'undefined')
+		return city.accent;
+	else
+		return city.name;
+}
+
 function getProperCityAccent(city) {
 	if(typeof city.accent != 'undefined') {
 		var city_accent_normalized = city.accent.normalize('NFD').replace(/[\u0300-\u036f]/g, '');

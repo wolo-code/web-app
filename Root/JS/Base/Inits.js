@@ -11,8 +11,11 @@ var FIREBASE_CONFIG = {
 	databaseURL: "https://waddress-5f30b.firebaseio.com",
 	projectId: "waddress-5f30b",
 	storageBucket: "waddress-5f30b.appspot.com",
-	messagingSenderId: "744968913043"
+	messagingSenderId: "744968913043",
+	appId: "1:744968913043:web:b098f0ea8db562a33dcd66",
+	measurementId: "G-JF3R4LB0M3"
 };
+var analytics;
 var database;
 var refCityCenter;
 var geoFire;

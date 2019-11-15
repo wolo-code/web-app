@@ -16,6 +16,7 @@ var FIREBASE_CONFIG = {
 	measurementId: "G-JF3R4LB0M3"
 };
 var analytics;
+var perf;
 var database;
 var refCityCenter;
 var geoFire;

@@ -10,7 +10,8 @@ function syncInitMap() {
 			mapTypeControl: false,
 			fullscreenControl: false,
 			streetViewControl: false,
-			zoomControl: false
+			zoomControl: false,
+			backgroundColor: 'none'
 		});
 		initMap();
 		pendingInitMap = false;

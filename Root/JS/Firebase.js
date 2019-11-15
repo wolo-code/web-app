@@ -10,5 +10,9 @@ function firebaseInit() {
 		perf = firebase.performance();
 	database = firebase.database();
 	refCityCenter = database.ref('CityCenter');
-	geoFire = new GeoFire(refCityCenter);
+}
+
+function geoFireInit() {
+	if(geoFire == null)
+		geoFire = new GeoFire(refCityCenter);
 }

@@ -57,6 +57,7 @@ function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 		'group': group,
 		'country': country
 	});
+	geoFireInit();
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
 			if(typeof callback == 'function')
 				callback();

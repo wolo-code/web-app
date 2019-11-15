@@ -24,6 +24,7 @@ function getProperCityAccent(city) {
 function getCityFromPositionThenEncode(latLng) {
 	var nearCity = new Object;
 
+	geoFireInit();
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
 		radius: CITY_RANGE_RADIUS
@@ -58,6 +59,7 @@ function getCityFromIdThenEncode(city_id, city_center, latLng) {
 function getCityFromPositionThenDecode(latLng, wcode) {
 	var nearCity = new Object;
 
+	geoFireInit();
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
 		radius: CITY_RANGE_RADIUS

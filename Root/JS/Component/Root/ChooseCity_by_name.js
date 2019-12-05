@@ -3,8 +3,8 @@ var chooseCityList;
 
 function showChooseCityMessage() {
 	clearChooseCityList();
-	choose_city_message.classList.remove('hide');
-	var container = document.getElementById('choose_city_message_list');
+	choose_city_by_name_message.classList.remove('hide');
+	var container = document.getElementById('choose_city_by_name_message_list');
 	for(let key in chooseCityList) {
 		var row = document.createElement('div');
 		row.innerHTML = getFullCity(chooseCityList[key]);
@@ -15,12 +15,12 @@ function showChooseCityMessage() {
 }
 
 function hideChooseCityMessage() {
-	choose_city_message.classList.add('hide');
+	choose_city_by_name_message.classList.add('hide');
 	clearChooseCityList();
 }
 
 function clearChooseCityList() {
-	document.getElementById('choose_city_message_list').innerHTML = '';
+	document.getElementById('choose_city_by_name_message_list').innerHTML = '';
 }
 
 function chooseCity(list, callback) {

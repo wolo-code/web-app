@@ -32,6 +32,7 @@ function setupControls() {
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);
 	document.getElementById('address_text_copy').addEventListener('click', copyAddress);
 	document.getElementById('choose_city_message_close').addEventListener('click', hideChooseCityMessage);
+	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
 	document.getElementById('share_copy_button').addEventListener('click', shareWCodeCopy);
 	document.getElementById('share_link_button').addEventListener('click', shareWCodeLink);
 	document.getElementById('share_qr_button').addEventListener('click', showQR);

@@ -21,33 +21,77 @@ function getProperCityAccent(city) {
 	return city.name;
 }
 
-function getCityFromPositionThenEncode(latLng) {
-	var nearCity = new Object;
+var geoQuery_completed;
+var nearCity;
+var pending_encode_latLng;
 
+function getCity_by_perifery_list(latLng, continue_encode) {
+	geoQuery_completed = false;
+	if(continue_encode)
+		pending_encode_latLng = latLng;
+	else
+		pending_encode_latLng = null;
+	nearCity = null;
+	var nearCityList_coord = {};
+	var nearCityList_detail = {};
 	geoFireInit();
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
 		radius: CITY_RANGE_RADIUS
 	});
 
-	wait_loader.classList.remove('hide');;
+	wait_loader.classList.remove('hide');
 	geoQuery.on('ready', function() {
+		geoQuery_completed = true;
 		wait_loader.classList.add('hide');
 		geoQuery.cancel();
-		if(Object.keys(nearCity).length === 0)
-			encode_continue(null, latLng);
-		else
-			getCityFromIdThenEncode(nearCity.city.id, nearCity.city.center, latLng);
+
+		if(Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
+			syncNearCityList(nearCityList_coord, nearCityList_detail);
 	});
 
 	geoData = geoQuery.on('key_entered', function(key, location, distance) {
-		if(typeof nearCity.distance == 'undefined' || distance < nearCity.distance) {
-			nearCity.city = {id:key, center:{ lat: location[0], lng: location[1]} };
-			nearCity.distance = distance;
-		}
+		nearCityList_coord[key] = {city: {id: key, center: { lat: location[0], lng: location[1] } }, distance: distance};
+		getCityFromId(key, function(city) {
+			nearCityList_detail[key] = {city: city};
+			if(geoQuery_completed && Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
+					syncNearCityList(nearCityList_coord, nearCityList_detail);
+		});
 	});
-
 }
+
+function syncNearCityList(nearCityList_coord, nearCityList_detail) {
+	if(Object.keys(nearCityList_coord).length === 0) {
+		if(pending_encode_latLng)
+			encode_continue(null, pending_encode_latLng);
+	}
+	else {
+		var nearCityList = [];
+		var nearCity_distance;
+		nearCity = null;
+		for(aCity in nearCityList_coord) {
+			var xCity = new Object;
+			xCity = nearCityList_coord[aCity];
+			xCity.city.country = nearCityList_detail[aCity].city.country;
+			xCity.city.gp_id = nearCityList_detail[aCity].city.gp_id;
+			xCity.city.group = nearCityList_detail[aCity].city.group;
+			xCity.city.name = nearCityList_detail[aCity].city.name;
+			xCity.city.name_id = nearCityList_detail[aCity].city.name_id;
+			nearCityList.push(xCity);
+			if(nearCity == null || nearCityList_coord[aCity].distance < nearCity.distance) {
+				nearCity = xCity;
+				nearCity.distance = nearCityList_coord[aCity].distance;
+			}
+		}
+		chooseCity_by_periphery(nearCityList, function(city) {
+			encode_continue(city, resolveLatLng(marker.getPosition()));
+		});
+		if(pending_encode_latLng != null)
+			encode_continue(nearCity.city, pending_encode_latLng);
+	}
+}
+
+//			getCityFromIdThenEncode(nearCity.city.id, nearCity.city.center, latLng);
 
 function getCityFromIdThenEncode(city_id, city_center, latLng) {
 	getCityFromId(city_id, function(city) {

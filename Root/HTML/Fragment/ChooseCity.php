@@ -7,7 +7,7 @@
 	</div>
 	<div id='choose_city_message_prompt' class='message_dialog_body'>
 		<p>
-			There are multiple cities with this name<br>
+			There are multiple cities with this name.<br>
 			Please select the correct one:
 		</p>
 		<div id='choose_city_message_list'></div>

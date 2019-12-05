@@ -2,6 +2,7 @@
 	require '../../HTML/Fragment/NoCity.php';
 	require '../../HTML/Fragment/Copy_wcode.php';
 	require '../../HTML/Fragment/ChooseCity.php';
+	require '../../HTML/Fragment/ChooseCity_by_periphery.php';
 	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/Overlay.php';
 	require '../../HTML/Fragment/Incompatible_browser.html';

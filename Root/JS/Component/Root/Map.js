@@ -91,7 +91,7 @@ function initMap() {
 		clearURL();
 		var pos = resolveLatLng(event.latLng);
 		focus_(pos);
-		encode(pos);
+		encode(event.latLng);
 	});
 
 	decode_button.addEventListener('click', function() {

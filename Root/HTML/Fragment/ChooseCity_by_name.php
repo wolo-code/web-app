@@ -1,4 +1,4 @@
-<div id='choose_city_by_name_message' class="message_dialog hide">
+<div id='choose_city_by_name_message' class="choose_city_message message_dialog hide">
 	<h2 class='message_dialog_label'>
 		Choose the city
 	</h2>
@@ -10,6 +10,6 @@
 			There are multiple cities with this name.<br>
 			Please select the correct one:
 		</p>
-		<div id='choose_city_by_name_message_list'></div>
+		<div id='choose_city_by_name_message_list' class='choose_city_message_list'></div>
 	</div>
 </div>

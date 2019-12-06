@@ -12,6 +12,7 @@ function initLoad () {
 };
 
 function setupControls() {
+	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
 	document.getElementById('info_intro_close_button').addEventListener('click', hideOverlay);
 	document.getElementById('info_full_close_button').addEventListener('click', hideOverlay);

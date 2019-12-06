@@ -1,4 +1,5 @@
 <?php
+	require '../../HTML/Fragment/Redirect.php';
 	require '../../HTML/Fragment/NoCity.php';
 	require '../../HTML/Fragment/Copy_wcode.php';
 	require '../../HTML/Fragment/ChooseCity_by_name.php';

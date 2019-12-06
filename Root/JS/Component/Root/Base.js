@@ -70,6 +70,7 @@ function urlDecode() {
 		var code_string;
 		var end_flag_char = window.location.pathname.substr(-1);
 		if(end_flag_char == '/') {
+			redirect_showLoader();
 			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
 			initWCode_jumpToMap = true;
 		}

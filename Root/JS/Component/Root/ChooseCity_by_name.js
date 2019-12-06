@@ -36,11 +36,3 @@ function chooseCityContinue(e) {
 	city.id = id;
 	chooseCityCallback(city);
 }
-
-function getFullCity(city) {
-	var fullCity = city.country + ' \\ ';
-	if(typeof (city.group) != 'undefined' && city.group != null && city.group.length > 0)
-		fullCity += city.group + ' : ';
-	fullCity += getProperCityAccent(city);
-	return fullCity;
-}

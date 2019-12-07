@@ -197,6 +197,7 @@ function addCity(place_id, res) {
 function getAddressCity(place_id, address_components, geometry, res) {
 	var found_city_i;
 	var found_group_i;
+	var found_division_i;
 	var found_country_i;
 	for(var i = address_components.length-1; i >= 0; i--) {
 		if(address_components[i].types.includes('locality')) {
@@ -206,6 +207,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 			found_group_i = i;
 			found_city_i = i;
 		} else if (address_components[i].types.includes('administrative_area_level_2')) {
+			found_division_i = i;
 			found_city_i = i;
 		} else if ( found_city_i == null && (address_components[i].types.includes('sublocality') || address_components[i].types.includes('sublocality_level_1')) ) {
 			found_city_i = i;
@@ -225,8 +227,9 @@ function getAddressCity(place_id, address_components, geometry, res) {
 		city_lat = geometry['location']['lat'];
 		city_lng = geometry['location']['lng'];
 		var group = found_group_i != null? address_components[found_group_i].long_name : null;
+		var division = found_division_i != null? address_components[found_division_i].long_name : null
 		var country = found_country_i != null? address_components[found_country_i].long_name : null;
-		submit_city(place_id, city_lat, city_lng, city_name, city_accent, group, country, function(push_id) { res.send({'added' : push_id}) } );
+		submit_city(place_id, city_lat, city_lng, city_name, city_accent, group, division, country, function(push_id) { res.send({'added' : push_id}) } );
 	}
 	else {
 		console.err("Error: " + address_components + ' - ' + geometry);
@@ -234,7 +237,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	}
 }
 
-function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
+function submit_city(gp_id, lat, lng, name, accent, group, division, country, callback) {
 	try {
 		var refCityDetail = admin.database().ref('/CityDetail').push();
 		var geoFireCenter = new geoFire.GeoFire(admin.database().ref('/CityCenter'));
@@ -244,6 +247,7 @@ function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
 			'name': name,
 			'accent': accent,
 			'group': group,
+			'division': division,
 			'country': country
 		});
 		geoFireCenter.set(refCityDetail.key, [lat, lng]).then( function() {

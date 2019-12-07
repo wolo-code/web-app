@@ -40,7 +40,7 @@ function initMap() {
 			clearAddress();
 			var pos = resolveLatLng(places[0].geometry.location);
 			focus_(pos);
-			encode(pos);
+			encode(places[0].geometry.location);
 			clearAddress();
 			getAddress(pos);
 		}

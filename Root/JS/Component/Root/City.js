@@ -74,7 +74,10 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 			xCity = nearCityList_coord[aCity];
 			xCity.city.country = nearCityList_detail[aCity].city.country;
 			xCity.city.gp_id = nearCityList_detail[aCity].city.gp_id;
-			xCity.city.group = nearCityList_detail[aCity].city.group;
+			if(typeof nearCityList_detail[aCity].city.administrative_level_2 != 'undefined')
+				xCity.city.administrative_level_2 = nearCityList_detail[aCity].city.administrative_level_2;
+			else if(typeof nearCityList_detail[aCity].city.administrative_level_1 != 'undefined')
+				xCity.city.administrative_level_1 = nearCityList_detail[aCity].city.administrative_level_1;
 			xCity.city.name = nearCityList_detail[aCity].city.name;
 			xCity.city.name_id = nearCityList_detail[aCity].city.name_id;
 			nearCityList.push(xCity);
@@ -248,9 +251,5 @@ function tryDefaultCity() {
 }
 
 function getFullCity(city) {
-	var fullCity = city.country + ' \\ ';
-	if(typeof (city.group) != 'undefined' && city.group != null && city.group.length > 0)
-		fullCity += city.group + ': ';
-	fullCity += getProperCityAccent(city);
-	return fullCity;
+	return city.country + ' \\ ' + getCityGroupName(city) + ': ' + getProperCityAccent(city);
 }

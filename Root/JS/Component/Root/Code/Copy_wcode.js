@@ -28,7 +28,7 @@ function showCopyWcodeMessage() {
 		for(let key in cities) {
 			if(cities[key].country == country_name)
 				country_repeat_count++;
-			if(cities[key].group == group_name)
+			if(getCityGroupName(cities[key]) == group_name)
 				group_repeat_count++;
 			city_repeat_count++;
 		}

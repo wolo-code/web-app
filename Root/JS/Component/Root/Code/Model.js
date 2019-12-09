@@ -23,7 +23,7 @@ function getCodeFull() {
 	else
 		prefix = [code_city.country.toLowerCase()];
 	if(multiple_group)
-		prefix = prefix.concat([code_city.group.toLowerCase()]);
+		prefix = prefix.concat([getCodeCityGroupName().toLowerCase()]);
 
 	if(multiple_city)
 		return prefix.concat(codeFull_city_part);
@@ -40,7 +40,7 @@ function getCodeFull_capitalized() {
 	else
 		prefix = [code_city.country];
 	if(multiple_group)
-		prefix = prefix.concat([code_city.group]);
+		prefix = prefix.concat([getCodeCityGroupName()]);
 
 	if(multiple_city)
 		return prefix.concat(codeFull_city_part);
@@ -72,16 +72,20 @@ function getCodeCityNameId() {
 	return code_city.name_id;
 }
 
-function getCodeGroupName() {
-	return code_city.group;
-}
 
 function getCodeCityCountryName() {
 	return code_city.country;
 }
 
 function getCodeCityGroupName() {
-	return code_city.group;
+	return getCityGroupName(code_city);
+}
+
+function getCityGroupName(city) {
+	if(typeof city.administrative_level_2 != 'undefined')
+		return city.administrative_level_2;
+	else if(typeof city.administrative_level_1 != 'undefined')
+		return city.administrative_level_1;
 }
 
 function getCodeCity() {

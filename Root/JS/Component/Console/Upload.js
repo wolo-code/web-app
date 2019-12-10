@@ -29,10 +29,12 @@ function upload_entry() {
 			var accent = unquote(cells[2]);
 			if(accent.length == 0 || accent.localeCompare(name) == 0)
 				accent = null;
-			var group = null;
+			var administrative_level_3 = null;
+			var administrative_level_2 = null;
+			var administrative_level_1 = null;
 			var country_iso = unquote(cells[0]);
 			if(upload_on)
-				submit_city(gp_id, lat, lng, name, accent, group, country_iso, upload_entry);
+				submit_city(gp_id, lat, lng, name, accent, administrative_level_3, administrative_level_2, administrative_level_1, country_iso, upload_entry);
 			else {
 				if(upload_completed_id == country_iso+'_'+name)
 					upload_on = true;

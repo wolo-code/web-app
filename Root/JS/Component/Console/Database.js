@@ -47,22 +47,24 @@ function process_entry(key) {
 	ref.update(updates);
 }
 
-function submit_city(gp_id, lat, lng, name, accent, group, country, callback) {
+function submit_city(gp_id, lat, lng, name, accent, administrative_level_3, administrative_level_2, administrative_level_1, country, callback) {
 	var refCityDetail = database.ref('CityDetail').push();
 	refCityDetail.set({
 		'gp_id': gp_id,
-		'name': name,
 		'name_id': name.toLocaleLowerCase(),
-		'accent': accent == null? name : accent,
-		'group': group,
+		'name': name,
+		'accent': accent,
+		'administrative_level_3': administrative_level_3,
+		'administrative_level_2': administrative_level_2,
+		'administrative_level_1': administrative_level_1,
 		'country': country
 	});
 	geoFireInit();
 	geoFire.set(refCityDetail.key, [lat, lng]).then( function() {
 			if(typeof callback == 'function')
 				callback();
-		}, function(error) {
-			console.log("Error: " + error);
+		}, function(err) {
+			console.log("Error: " + err);
 		}
 	);
 }

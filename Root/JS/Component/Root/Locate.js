@@ -128,7 +128,7 @@ function endWatchLocation() {
 	if(!locate_button_pressed) {
 		var pos;
 		if(typeof myLocDot != 'undefined')
-			pos = myLocDot.getPosition();
+			pos = resolveLatLng(myLocDot.getPosition());
 		if(pos != null)
 			processPosition(pos);
 		else
@@ -139,7 +139,7 @@ function endWatchLocation() {
 function proceedPosition() {
 	var pos;
 	if(typeof myLocDot != 'undefined')
-		pos = myLocDot.getPosition();
+		pos = resolveLatLng(myLocDot.getPosition());
 	if(pos != null)
 		processPosition(pos);
 	else

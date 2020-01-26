@@ -20,10 +20,10 @@ function encode(position) {
 				}, function() {
 				encode_continue(null, position)
 				} );
-				getCity_by_perifery_list(resolveLatLng(position), false);
+				getCity_by_perifery_list(position, false);
 			}
 			else {
-				getCity_by_perifery_list(resolveLatLng(position), true);
+				getCity_by_perifery_list(position, true);
 			}
 		});
 }

@@ -40,7 +40,7 @@ function initMap() {
 			clearAddress();
 			var pos = resolveLatLng(places[0].geometry.location);
 			focus_(pos);
-			encode(places[0].geometry.location);
+			encode(pos);
 			clearAddress();
 			getAddress(pos);
 		}
@@ -91,7 +91,7 @@ function initMap() {
 		clearURL();
 		var pos = resolveLatLng(event.latLng);
 		focus_(pos);
-		encode(event.latLng);
+		encode(pos);
 	});
 
 	decode_button.addEventListener('click', function() {
@@ -153,7 +153,7 @@ function load(marker) {
 	marker.setVisible(false);
 	lastMarker = marker;
 	infoWindow_setContent(MESSAGE_LOADING);
-	encode(marker.position);
+	encode(resolveLatLng(marker.position));
 }
 
 function getPanByOffset() {

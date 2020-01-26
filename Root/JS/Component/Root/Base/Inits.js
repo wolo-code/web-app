@@ -59,3 +59,8 @@ var mode_preview_activated = false;
 // Notification
 var NOTIFICATION_DURATION_DEFAULT = 2500;
 var NOTIFICATION_DURATION_LONG = 10000;
+
+// Account Dialog
+var saveList;
+var lastActiveSaveEntry;
+var account_dialog_address_active_first;

@@ -22,10 +22,18 @@
 			font-size: 0.7em
 		}
 		
+		#account {
+			right: 6px !important;
+		}
+		
 }
 
 @media (max-width: 316px) {
 	#pac-input {
 		top: 126px !important;
+	}
+	
+	#account {
+		top: 180px !important;
 	}
 }

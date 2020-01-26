@@ -8,6 +8,8 @@
 	require '../../HTML/Fragment/Overlay.php';
 	require '../../HTML/Fragment/Incompatible_browser.html';
 	require '../../HTML/Fragment/QR.php'
+	require '../../HTML/Fragment/Authentication.php';
+	require '../../HTML/Fragment/Account_Dialog.php';
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>
@@ -17,6 +19,12 @@
 	</a><a id=logo_location class='blur_background' href='//location.wcodes.org' tabindex='2'>
 		<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
 	</a>
+</div>
+<div id='account' class="control">
+	<span class='image'>
+		<img id='account_user_image' class='hide'>
+		<span id='account_default_image' class="inactive hide"><?php includeSVG('', 'Account'); ?></span>
+	</span>
 </div>
 <input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 <div id='suggestion_result'></div>
@@ -39,3 +47,6 @@
 </div>
 <?php require '../../HTML/Fragment/Address.php'; ?>
 <?php require '../../HTML/Fragment/Firebase_includes.php'; ?>
+<script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>
+<script src='https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.js'></script>
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.css" />

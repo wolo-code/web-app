@@ -1,6 +1,7 @@
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
 		firebaseInit();
+		initApp();
 		dbInit();
 		versionCheck();
 		if(!urlDecode())
@@ -11,8 +12,48 @@ function initLoad () {
 	}
 };
 
+function initApp() {
+	firebase.auth().getRedirectResult().then(function(result) {
+		if (result.credential) {
+			signedIn();
+		}
+		else if (firebase.auth().currentUser) {
+			signedIn();
+		} else {
+			document.getElementById('account_default_image').classList.add('inactive');
+			document.getElementById('account_default_image').classList.remove('hide');
+		}
+	}).catch(function(error) {
+		Sentry.captureException(error);
+	});
+}
+
+function signedIn() {
+	document.getElementById('account_default_image').classList.remove('inactive');
+	document.getElementById('account_dialog_logout').classList.remove('hide');
+	document.getElementById('account_dialog_display_name').innerText = firebase.auth().currentUser.displayName;
+	document.getElementById('account_dialog_email').innerText = firebase.auth().currentUser.email;
+	if(typeof firebase.auth().currentUser.photoURL != null && firebase.auth().currentUser.photoURL.length) {
+		document.getElementById('account_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
+		document.getElementById('account_user_image').classList.remove('hide');
+		document.getElementById('account_default_image').classList.add('hide');
+	}
+	else {
+		document.getElementById('account_default_image').classList.remove('inactive');
+		document.getElementById('account_default_image').classList.remove('hide');
+	}
+	loadSaveList();
+}
+
 function setupControls() {
 	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
+	document.getElementById('account').addEventListener('click', showAccountDialog);
+	document.getElementById('authentication_header_close').addEventListener('click', hideAuthenticationDialog);
+	document.getElementById('account_dialog_close').addEventListener('click', hideAccountDialog);
+	document.getElementById('account').addEventListener('click', onAccount);
+	document.getElementById('account_dialog_logout').addEventListener('click', onLogout);
+	document.getElementById('save_address').addEventListener('focus', onAccountDialogAddressActive);
+	document.getElementById('account_dialog_save').addEventListener('click', onAccountDialogSave);
 	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
 	document.getElementById('info_intro_close_button').addEventListener('click', hideOverlay);
 	document.getElementById('info_full_close_button').addEventListener('click', hideOverlay);

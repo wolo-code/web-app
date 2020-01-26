@@ -1,0 +1,13 @@
+#authentication_header {
+	max-width: 360px;
+	background: white;
+}
+
+#authentication_header_close_container {
+	position: relative;
+}
+
+#authentication_header h2 {
+	margin: auto;
+	padding-top: 8px;
+}

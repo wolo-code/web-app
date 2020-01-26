@@ -15,3 +15,4 @@ sentry_version	5.7.0
 sentry_hash	sha384-pHnCJ3bbzJ+LzI19wAdyBvGAjJ5vNAC59uxeRpw5WpgkSlZUQstEADxkSbBnI95q
 google_api_key	AIzaSyCYD7Q0f4ZR0cH0EOi29wVV2Edgb_j5i_s
 firebase_version	7.4.0
+firebase_ui_version	4.3.0

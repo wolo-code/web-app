@@ -34,7 +34,6 @@ function locateExec(failure) {
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
 			
-			location_icon_dot.classList.add('blinking');
 			location_button.removeEventListener('mouseup', processPositionButtonUp);
 			location_button.removeEventListener('touchend', processPositionButtonTouchEnd);
 			location_button.addEventListener('mouseup', processPositionButtonUp);
@@ -171,10 +170,12 @@ function processPositionButtonDown() {
 }
 
 function processPositionButtonUp() {
-	locate_button_pressed = false;
 	var press_duration = locating && (new Date).getTime() - location_button_begin_time;
-	if(press_duration > location_button_PRESS_THRESHOLD)
-		proceedPosition();
+	if(press_duration > location_button_PRESS_THRESHOLD) {
+		location_icon_dot.classList.add('blinking');
+	}
+	else
+		locate_button_pressed = false;
 }
 
 function processPositionButtonTouchStart(e) {

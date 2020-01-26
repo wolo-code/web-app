@@ -99,7 +99,7 @@ function locateExec(failure) {
 					}
 					focus_(pos, accuCircle.getBounds());
 
-					if(position.coords.accuracy < WATCH_LOCATION_MIN_ACCURACY && !locate_button_pressed)
+					if(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY && !locate_button_pressed)
 						processPosition(pos);
 
 				},

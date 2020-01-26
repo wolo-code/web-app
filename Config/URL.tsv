@@ -1,6 +1,8 @@
 Path	Name	Extension
 	root	
 	console	
+	terms	
+	policy	
 	root	js
 	console	js
 	geofire.min	js

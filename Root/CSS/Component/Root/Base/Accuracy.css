@@ -46,10 +46,10 @@
 }
 
 #location_icon_dot.blinking {
-	animation:blinkingBlue 1.3s infinite;
+	animation:blinking_blue 1.3s infinite;
 }
 
-@keyframes blinkingBlue {
+@keyframes blinking_blue {
 	0%	{ fill: #FFFFFF; }
 	50%	{ fill: #69B7CF; }
 	100%{ fill: #FFFFFF; }

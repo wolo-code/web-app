@@ -34,6 +34,7 @@ function locateExec(failure) {
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
 			
+			accuracy_indicator.classList.add('blinking');
 			location_button.removeEventListener('mouseup', processPositionButtonUp);
 			location_button.removeEventListener('touchend', processPositionButtonTouchEnd);
 			location_button.addEventListener('mouseup', processPositionButtonUp);
@@ -203,6 +204,7 @@ function clearLocating() {
 	locating = false;
 	wait_loader.classList.add('hide');
 	location_icon_dot.classList.remove('blinking');
+	accuracy_indicator.classList.remove('blinking');
 	hideNotication();
 	clearTimeout(watch_location_notice_timer);
 }

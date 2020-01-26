@@ -49,8 +49,16 @@
 	animation:blinking_blue 1.3s infinite;
 }
 
+#accuracy_indicator.blinking {
+	animation:blinking_dot 1.3s infinite;
+}
+
 @keyframes blinking_blue {
 	0%	{ fill: #FFFFFF; }
 	50%	{ fill: #69B7CF; }
 	100%{ fill: #FFFFFF; }
+}
+
+@keyframes blinking_dot {
+	50%	{ background-color: #dddddd; }
 }

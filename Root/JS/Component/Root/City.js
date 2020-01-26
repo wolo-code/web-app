@@ -140,6 +140,7 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 }
 
+// only detail, not center
 function getCityFromId(id, callback) {
 	var ref = database.ref('CityDetail'+'/'+id);
 	wait_loader.classList.remove('hide');

@@ -7,7 +7,7 @@
 	require '../../HTML/Fragment/LocateRight.php';
 	require '../../HTML/Fragment/Overlay.php';
 	require '../../HTML/Fragment/Incompatible_browser.html';
-	require '../../HTML/Fragment/QR.php'
+	require '../../HTML/Fragment/QR.php';
 	require '../../HTML/Fragment/Authentication.php';
 	require '../../HTML/Fragment/Account_Dialog.php';
 ?>

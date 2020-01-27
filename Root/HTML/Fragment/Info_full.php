@@ -12,6 +12,17 @@
 			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'>&#x25C4;</span> return</button>
 		</div>
 	</div>
+	<div>
+		<p>
+			Terms of use: <a class='link' href='/terms'>location.wcodes.org/terms</a>
+		</p>
+		<p>
+			Privacy policy: <a class='link' href='/policy'>location.wcodes.org/policy</a>
+		</p>
+		<p>
+			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
+		</p>
+	</div>
 	<div id='software_info'>
 		<div id='version'>
 			Version: <span>0.1 beta</span>

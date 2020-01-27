@@ -15,6 +15,10 @@
 	color: #69B7CF;
 }
 
+#info_full > p:first-of-type {
+	padding-left: 40px;
+}
+
 #software_info {
 	padding: 6px 0 20px;
 }

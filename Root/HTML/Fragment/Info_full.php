@@ -4,7 +4,6 @@
 		Info
 	</h2>
 	<ul>
-		<li>Your precise location will NOT be recorded</li>
 		<li>Tested with Google Chrome</li>
 	</ul>
 	<div class='message_dialog_control_container'>

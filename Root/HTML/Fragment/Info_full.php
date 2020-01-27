@@ -4,7 +4,7 @@
 		Info
 	</h2>
 	<ul>
-		<li>Tested with Google Chrome</li>
+		<li>Tested to work with Google Chrome</li>
 	</ul>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>

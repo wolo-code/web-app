@@ -21,6 +21,9 @@
 		<p>
 			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
 		</p>
+		<p id='contact'>
+			contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
+		</p>
 	</div>
 	<div id='software_info'>
 		<div id='version'>
@@ -33,13 +36,5 @@
 	?>
 			</span> (UTC)
 		</div>
-	</div>
-	<div>
-		<p>
-			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
-		</p>
-		<p id='contact'>
-			contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
-		</p>
 	</div>
 </div>

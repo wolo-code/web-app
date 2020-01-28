@@ -4,9 +4,9 @@
 	"dependencies": {
 		"@google/maps": "^0.5.5",
 		"firebase-admin": "^5.12.1",
-		"firebase-functions": "^2.1.0",
-		"mailgun-js": "^0.22.0",
-		"geofire": "^5.0.1"
+		"firebase-functions": "^3.3.0",
+		"geofire": "^5.0.1",
+		"mailgun-js": "^0.22.0"
 	},
 	"private": true,
 	"engines": {

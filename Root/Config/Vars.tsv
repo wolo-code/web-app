@@ -1,8 +1,8 @@
 project_title	WCode location
 project_description	WCode based addressing system
-site_name	location.wcodes.org
-site_domain	location.wcodes.org
-base_url	https://location.wcodes.org
+site_name	wolo.codes
+site_domain	wolo.codes
+base_url	https://wolo.codes
 author	Ujjwal Singh
 twitter_owner	wcodesorg
 twitter_author	wcodesorg

@@ -16,7 +16,7 @@
 <div id='logo'>
 	<a id=logo_wcode class='blur_background' href='//wcodes.org' tabindex='1'>
 		<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
-	</a><a id=logo_location class='blur_background' href='//location.wcodes.org' tabindex='2'>
+	</a><a id=logo_location class='blur_background' href='//wolo.codes' tabindex='2'>
 		<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
 	</a>
 </div>

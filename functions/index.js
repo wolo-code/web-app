@@ -7,7 +7,7 @@ const geoFire = require('geofire');
 admin.initializeApp(functions.config().firebase);
 
 // mailgun variable names - 'apiKey' and 'domain' - MUST be same
-const domain = 'wcodes.org';
+const domain = 'wolo.codes';
 const apiKey = functions.config().mailgun.api_key;
 const mailgun = require('mailgun-js')({apiKey, domain});
 
@@ -132,13 +132,13 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 
 	const entry = data.after.val();
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
-	const id_link = "<a href='https://location.wcodes.org/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
+	const id_link = "<a href='https://wolo.codes/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
 	const mail_data = {
-		from: "WCode Location - app <app_location@wcodes.org>",
+		from: "WCode Location - app <app_location@wolo.codes>",
 		subject: "New City request",
 		html: `<p>New City request:</p>` + combine({'Id':id_link, 'Address':entry.address}),
-		'h:Reply-To': 'app_location@wcodes.org',
-		to: 'admin@wcodes.org'
+		'h:Reply-To': 'app_location@wolo.codes',
+		to: 'admin@wolo.codes'
 	}
 
 	mailgun.messages().send(mail_data, function (error, body) {

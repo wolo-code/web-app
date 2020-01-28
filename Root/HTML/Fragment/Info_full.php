@@ -13,16 +13,16 @@
 	</div>
 	<div>
 		<p>
-			Terms of use: <a class='link' href='/terms'>location.wcodes.org/terms</a>
+			Terms of use: <a class='link' href='/terms'>wolo.codes/terms</a>
 		</p>
 		<p>
-			Privacy policy: <a class='link' href='/policy'>location.wcodes.org/policy</a>
+			Privacy policy: <a class='link' href='/policy'>wolo.codes/policy</a>
 		</p>
 		<p>
 			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
 		</p>
 		<p id='contact'>
-			contact: <a class='link' href="mailto:ujjwal@wcodes.org?subject=WCode location">ujjwal@wcodes.org</a>
+			contact: <a class='link' href="mailto:ujjwal@wolo.codes?subject=WCode location">ujjwal@wolo.codes</a>
 		</p>
 	</div>
 	<div id='software_info'>

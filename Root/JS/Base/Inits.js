@@ -7,7 +7,7 @@ var pendingInitMap = true;
 // Firebase
 var FIREBASE_CONFIG = {
 	apiKey: "AIzaSyCYD7Q0f4ZR0cH0EOi29wVV2Edgb_j5i_s",
-	authDomain: "location.wcodes.org",
+	authDomain: "wolo.codes",
 	databaseURL: "https://waddress-5f30b.firebaseio.com",
 	projectId: "waddress-5f30b",
 	storageBucket: "waddress-5f30b.appspot.com",

@@ -21,7 +21,7 @@
 		<div id='logo'>
 			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
 				<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
-			</a><a id='logo_location' href='https://location.wcodes.org' tabindex='2'>
+			</a><a id='logo_location' href='https://wolo.codes' tabindex='2'>
 				<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
 			</a>
 		</div>

@@ -10,7 +10,7 @@
 	<meta name='theme-color' content='#ffffff' >
 	<link rel="shortcut icon" type='image/x-icon' href='/favicon.ico' >
 	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
-	<title><?php echo $config['project_description'].' - '.$config['project_title']; ?></title>
+	<title><?php echo $config['project_title'] ?></title>
 <?php
 	$component = $id;
 	require '../HTML/Fragment/Head.php';

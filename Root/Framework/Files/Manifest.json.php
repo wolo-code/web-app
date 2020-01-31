@@ -3,8 +3,8 @@
 	$config = loadConfig();
 ?>
 {
-	"name": "<?php echo $config['project_description'] ?>",
-	"short_name": "<?php echo $config['project_title'] ?>",
+	"name": "<?php echo $config['project_title'] ?>",
+	"short_name": "<?php echo $config['project_short_name'] ?>",
 	"icons": [
 		{
 			"src": "launcher-icon-0-75x.png",

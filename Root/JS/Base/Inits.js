@@ -6,14 +6,14 @@ var pendingInitMap = true;
 
 // Firebase
 var FIREBASE_CONFIG = {
-	apiKey: "AIzaSyCYD7Q0f4ZR0cH0EOi29wVV2Edgb_j5i_s",
+	apiKey: "AIzaSyC-ZxXuNOEEs5mNQD3Z8u4CSJtldtLztDE",
 	authDomain: "wolo.codes",
-	databaseURL: "https://waddress-5f30b.firebaseio.com",
-	projectId: "waddress-5f30b",
-	storageBucket: "waddress-5f30b.appspot.com",
-	messagingSenderId: "744968913043",
-	appId: "1:744968913043:web:b098f0ea8db562a33dcd66",
-	measurementId: "G-JF3R4LB0M3"
+	databaseURL: "https://wolo-codes.firebaseio.com",
+	projectId: "wolo-codes",
+	storageBucket: "wolo-codes.appspot.com",
+	messagingSenderId: "1073432021665",
+	appId: "1:1073432021665:web:29ab7635459c72c19bbee0",
+	measurementId: "G-882VJ942XZ"
 };
 var analytics;
 var perf;

@@ -134,7 +134,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
 	const id_link = "<a href='https://wolo.codes/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';
 	const mail_data = {
-		from: "WCode Location - app <app_location@wolo.codes>",
+		from: "Wolo codes - app <app_location@wolo.codes>",
 		subject: "New City request",
 		html: `<p>New City request:</p>` + combine({'Id':id_link, 'Address':entry.address}),
 		'h:Reply-To': 'app_location@wolo.codes',

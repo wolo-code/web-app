@@ -11,19 +11,24 @@
 			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'>&#x25C4;</span> return</button>
 		</div>
 	</div>
-	<div>
-		<p>
-			Terms of use: <a class='link' href='/terms'>wolo.codes/terms</a>
-		</p>
-		<p>
-			Privacy policy: <a class='link' href='/policy'>wolo.codes/policy</a>
-		</p>
-		<p>
-			website: <a class='link' href='//wcodes.org/location'>wcodes.org/location</a>
-		</p>
-		<p id='contact'>
-			contact: <a class='link' href="mailto:ujjwal@wolo.codes?subject=WCode location">ujjwal@wolo.codes</a>
-		</p>
+	<table>
+		<tr>
+			<td>Terms of use:</td>
+			<td><a class='link' href='/terms'>wolo.codes/terms</a></td>
+		</tr>
+		<tr>
+			<td>Privacy policy:</td>
+			<td><a class='link' href='/policy'>wolo.codes/policy</a></td>
+		</tr>
+		<tr>
+			<td>website:</td>
+			<td><a class='link' href='//wcodes.org/wolo'>wcodes.org/wolo</a></td>
+		</tr>
+		<tr>
+			<td>contact:</td>
+			<td><a class='link' href="mailto:ujjwal@wolo.codes?subject=Wolo">ujjwal@wolo.codes</a></td>
+		</tr>
+	</table>
 	</div>
 	<div id='software_info'>
 		<div id='version'>

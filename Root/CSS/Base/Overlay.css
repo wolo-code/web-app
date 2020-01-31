@@ -35,6 +35,18 @@
 	width: 152px;
 }
 
+.overlay h2 {
+	text-align: center;
+	margin-top: 8px;
+	margin-bottom: 12px;
+}
+
+.overlay h3 {
+	text-align: center;
+	margin-top: 12px;
+	color: #bbb;
+}
+
 #wcode_format > span {
 	background: #f7f7f7;
 	border-radius: 6px;

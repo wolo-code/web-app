@@ -10,8 +10,8 @@ function handleShareWCode() {
 
 function shareWCode() {
 	navigator.share( {
-		title: "WCode Location",
-		text: "WCode Location for: " + ' ' + address + ' ' + '|',
+		title: "Wolo",
+		text: "Wolo code for: " + ' ' + address + ' ' + '|',
 		url: '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/'
 	} )
 	.catch((error) => console.log('Error sharing', error));

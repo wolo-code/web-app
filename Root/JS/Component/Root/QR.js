@@ -126,7 +126,7 @@ function downloadQR() {
 		document.getElementById('qr_body').removeAttribute('style');
 		document.getElementById('qr_close').classList.remove('hide');			
 		var qrImage = canvas.toDataURL("image/png");
-		downloadURI('data:' + qrImage, "WCode Location - " + getCodeFull_text() + ".png");
+		downloadURI('data:' + qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
 	});
 }
 

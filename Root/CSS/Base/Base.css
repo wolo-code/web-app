@@ -81,15 +81,15 @@ button.border {
 	padding: 2px;
 }
 
-#logo_wcode > .image > svg {
+#logo_wolo > .image > svg {
 	height: 50px;
 }
 
-#logo_location {
+#logo_codes {
 	text-decoration: none;
 }
 
-#logo_location > .image > svg {
+#logo_codes > .image > svg {
 	padding-top: 4px;
 	height: 14px;
 	width: 152px;

@@ -4,11 +4,13 @@
 			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</div>
 		<div id='qr_label' class='center'>
-			<div id=qr_logo_wcode tabindex='1'>
-				<span class='image'><?php includeSVG('', 'QR_Logo_WCode'); ?></span>
-			</div>
-			<div id=qr_logo_location tabindex='2'>
-				<span class='image'><?php includeSVG('', 'QR_Logo_location'); ?></span>
+			<div id='logo_qr'>
+				<a id=logo_wolo_qr href='//wcodes.org' tabindex='1'>
+					<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
+				</a>
+				<a id=logo_codes_qr href='//wolo.codes' tabindex='2'>
+					<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
+				</a>
 			</div>
 		</div>
 		<div id='qr_title_container' class='center'>
@@ -32,7 +34,7 @@
 			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address&nbsp; &nbsp;(optional)</div>
 		</div>
 		<div id='qr_webapp_url' class='center'>
-			<div>wolo.codes</div>
+			<div>www.wolo.codes</div>
 		</div>
 		<div class="center message_dialog_control section-to-not-print">
 			<button id='qr_preview' class='border' type='button'>Preview</button>

@@ -3,7 +3,7 @@
 	right: 0px;
 	top: 0px;
 	bottom: 0px;
-	z-index: 2;
+	z-index: 101;
 	overflow-y: auto;
 	color: rgba(100, 100, 100, 1);
 	background-color: rgba(100, 100, 100, 0.75);

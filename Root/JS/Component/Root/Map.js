@@ -80,10 +80,8 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
-		locating = false;
-		wait_loader.classList.add('hide');
+		clearLocating(true);
 		navigator.geolocation.clearWatch(watch_location_id);
-		clearTimeout(watch_location_timer);
 		pendingPosition = null;
 		pendingCity = null;
 		notification_top.classList.add('hide');

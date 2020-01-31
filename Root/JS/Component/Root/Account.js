@@ -128,6 +128,7 @@ function loadSaveList() {
 }
 
 function processSaveEntry(e) {
+	hideNotication();
 	var row = e.target.parentElement.parentElement.parentElement;
 	getCityCenterFromId(row.data_city, function(city) {
 		decode_continue(city, saveList[row.data_key].code);

@@ -19,10 +19,10 @@
 			</span>
 		</div>
 		<div id='logo'>
-			<a id='logo_wcode' href='https://wcodes.org' tabindex='1'>
-				<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
-			</a><a id='logo_location' href='https://wolo.codes' tabindex='2'>
-				<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
+			<a id='logo_wolo' href='https://wcodes.org' tabindex='1'>
+				<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
+			</a><a id='logo_codes' href='https://wolo.codes' tabindex='2'>
+				<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 			</a>
 		</div>
 		<div id='map'></div>

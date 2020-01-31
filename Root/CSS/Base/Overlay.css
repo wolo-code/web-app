@@ -11,3 +11,26 @@
 	margin: auto;
 	text-align: center;
 }
+
+#logo_info {
+	text-align: center;
+}
+
+#logo_info > a {
+	display: inline-block;
+	border-radius: 6px;
+	border-width: thin;
+	border-color: #f0f7fa;
+	border-style: solid;
+	padding: 3px;
+}
+
+#logo_wolo_info > .image > svg {
+	height: 50px;
+}
+
+#logo_codes_info > .image > svg {
+	padding-top: 4px;
+	height: 14px;
+	width: 152px;
+}

@@ -15,7 +15,23 @@
 }
 
 #qr_label > div {
+#logo_qr > a {
 	display: inline-block;
+	border-radius: 6px;
+	border-width: thin;
+	border-color: #f0f7fa;
+	border-style: solid;
+	padding: 3px;
+}
+
+#logo_wolo_qr > .image > svg {
+	height: 50px;
+}
+
+#logo_codes_qr > .image > svg {
+	padding-top: 4px;
+	height: 14px;
+	width: 152px;
 }
 
 #qr_title_container {

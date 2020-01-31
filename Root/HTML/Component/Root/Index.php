@@ -14,10 +14,10 @@
 <div id='map'></div>
 <div id='wait_loader'></div>
 <div id='logo'>
-	<a id=logo_wcode class='blur_background' href='//wcodes.org' tabindex='1'>
-		<span class='image'><?php includeSVG('', 'Logo_WCode'); ?></span>
-	</a><a id=logo_location class='blur_background' href='//wolo.codes' tabindex='2'>
-		<span class='image'><?php includeSVG('', 'Logo_location'); ?></span>
+	<a id=logo_wolo class='blur_background' href='//wcodes.org' tabindex='1'>
+		<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
+	</a><a id=logo_codes class='blur_background' href='//wolo.codes' tabindex='2'>
+		<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 	</a>
 </div>
 <div id='account' class="control">

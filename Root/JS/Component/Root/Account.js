@@ -83,6 +83,7 @@ function loadSaveList() {
 					let row_code = document.createElement('div');
 					let row_delete = document.createElement('span');
 					let row_process = document.createElement('span');
+					let row_process_img = document.createElement('img');
 					row_header.setAttribute('class', 'row-header');
 					row_title.setAttribute('class', 'row-title');
 					row_title.innerText = saveList[key].title;
@@ -101,9 +102,10 @@ function loadSaveList() {
 					row_delete.innerText = 'Delete';
 					row_delete.addEventListener('click', deleteSaveEntry);
 					row_process.setAttribute('class', 'row-delete');
-					row_process.innerText = '►';
+					row_process_img.src = svg_front;
 					row_process.addEventListener('click', processSaveEntry);
 					row_controls.appendChild(row_delete);
+					row_process.appendChild(row_process_img);
 					row_controls.appendChild(row_process);
 					container.appendChild(row);
 					row.appendChild(row_header);

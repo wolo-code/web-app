@@ -8,7 +8,7 @@
 	</ul>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
-			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'>&#x25C4;</span> return</button>
+			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'><span class='image'><?php includeSVG('', 'Back'); ?></span></span> return</button>
 		</div>
 	</div>
 	<table>

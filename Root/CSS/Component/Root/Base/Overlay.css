@@ -42,6 +42,12 @@
 
 #contact {
 	padding-bottom: 16px;
+#overlay table {
+	margin-bottom: 16px;
+}
+
+#overlay table td {
+	padding-left: 10px;
 }
 
 #agency {

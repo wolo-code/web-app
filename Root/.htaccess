@@ -24,8 +24,8 @@ RewriteRule ^(.+)\.js$ Framework/JS/Component.php [L]
 RewriteRule ^manifest\.json$ /Framework/Files/Manifest.json.php [L]
 RewriteRule ^manifest-console\.json$ /Files/Manifest-console.json [L]
 
-RewriteRule ^policy$ HTML/Component/Privacy_policy.html [L]
-RewriteRule ^terms$ HTML/Component/Terms_of_service.html [L]
+RewriteRule ^policy$ HTML/Component/Privacy_policy.php [L]
+RewriteRule ^terms$ HTML/Component/Terms_of_service.php [L]
 
 rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]

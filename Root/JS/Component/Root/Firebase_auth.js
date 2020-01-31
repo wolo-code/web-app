@@ -18,9 +18,9 @@ function authInit() {
 			firebase.auth.FacebookAuthProvider.PROVIDER_ID,
 			firebase.auth.EmailAuthProvider.PROVIDER_ID,
 		],
-		tosUrl: 'https://wolo.codes/tos',
+		tosUrl: 'https://wolo.codes/terms',
 		privacyPolicyUrl: function() {
-			window.location.assign('https://wolo.codes/ppc');
+			window.location.assign('https://wolo.codes/policy');
 		}
 	};
 	

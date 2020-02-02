@@ -1,16 +1,13 @@
 <div id='info_full' class='hide'>
 	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
-	<h2>
-		Info
-	</h2>
-	<ul>
-		<li>Tested to work with Google Chrome</li>
-	</ul>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
 			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'><span class='image'><?php includeSVG('', 'Back'); ?></span></span> return</button>
 		</div>
 	</div>
+	<ul id='info_list'>
+		<li>Tested to work with Google Chrome</li>
+	</ul>
 	<table>
 		<tr>
 			<td>Terms of use:</td>

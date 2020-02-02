@@ -41,6 +41,7 @@
 }
 
 #overlay table {
+	margin-top: 24px;
 	margin-bottom: 16px;
 }
 
@@ -62,4 +63,8 @@
 .button_highlight .indicator {
 	margin-left: -5px;
 	margin-right: 4px;
+}
+
+#info_list {
+	list-style-type: square;
 }

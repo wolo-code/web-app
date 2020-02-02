@@ -230,3 +230,7 @@ button.border {
 .plain_background {
 	background: rgba(241, 241, 241, 0.75)
 }
+
+.front_arrow_white > svg > g > g > path {
+	fill: white !important;
+}

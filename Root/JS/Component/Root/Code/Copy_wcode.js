@@ -2,6 +2,10 @@
 // const WCODE_LINK_COPIED_MESSAGE;
 
 function handleShareWCode() {
+	setTimeout( function() {
+			showNotification("Long press share icon for advanced options");
+		}, 4000);
+	
 	if (navigator.share)
 		shareWCode();
 	else

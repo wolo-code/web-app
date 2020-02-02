@@ -46,9 +46,9 @@
 		</div>
 		<div id='updated'>Updated:
 			<span>
-	<?php
-			echo date('Y M d - H:i:s');
-	?>
+			<?php
+				echo date('Y M d - H:i:s');
+			?>
 			</span> (UTC)
 		</div>
 	</div>

@@ -5,6 +5,7 @@
 // var watch_location_timer;
 // var watch_location_id;
 // var watch_location_notice_timer;
+// var pendingFocusPos;
 
 function initLocate(override_dnd) {
 	if(!locationAccessInitCheck())
@@ -81,6 +82,10 @@ function locateExec(failure) {
 					document.getElementById('proceed_container').classList.remove('hide');
 					document.getElementById('accuracy_container').classList.remove('highlight');
 					document.getElementById('accuracy_container').classList.remove('hide');
+					if(!firstFocus || typeof myLocDot === 'undefined')
+						focus_(pos, accuCircle.getBounds());
+					else
+						pendingFocusPos = pos;
 					if(typeof myLocDot === 'undefined') {
 						myLocDot = new google.maps.Marker({
 							clickable: false,
@@ -97,7 +102,6 @@ function locateExec(failure) {
 					else {
 						myLocDot.setPosition(pos);
 					}
-					focus_(pos, accuCircle.getBounds());
 
 					if(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY && !locate_button_pressed)
 						processPosition(pos);

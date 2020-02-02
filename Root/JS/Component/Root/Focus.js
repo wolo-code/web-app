@@ -58,8 +58,15 @@ function smoothZoomToBounds(bounds, map, max, current) {
 		if(smoothZoomToBounds_callCount-- == 0) {
 			if(typeof bounds !== 'undefined')
 				setTimeout(function() {
-					map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-					map.panBy(0, getPanByOffset());
+					if(pendingFocusPos) {
+						var temPos = new Object.create(pendingFocusPos);
+						pendingFocusPos = null;
+						focus_(temPos);
+					}
+					else {
+						map.fitBounds(bounds, ZOOM_BOUND_PADDING);
+						map.panBy(0, getPanByOffset());
+					}
 				}, ZOOM_ANIMATION_SPEED);
 		}
 		return;

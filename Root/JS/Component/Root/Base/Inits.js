@@ -50,6 +50,7 @@ var locate_button_pressed = false;
 var watch_location_timer;
 var watch_location_id;
 var watch_location_notice_timer;
+var pendingFocusPos;
 
 // QR
 var mode_preview = false;

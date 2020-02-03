@@ -169,6 +169,7 @@ function processPosition(pos) {
 }
 
 function processPositionButtonDown() {
+	firstFocus = true;
 	locate_button_pressed = true;
 	location_button_begin_time = (new Date).getTime();
 	syncLocate(true);

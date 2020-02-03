@@ -52,6 +52,9 @@ var watch_location_id;
 var watch_location_notice_timer;
 var pendingFocusPos;
 
+// Focus
+var selfBoundsChangedCount = 1;
+
 // QR
 var mode_preview = false;
 var qr_address_active_first = true;

@@ -5,6 +5,8 @@ function focus__(city, pos, code) {
 
 const ZOOM_ANIMATION_SPEED = 250;
 var firstFocus = true;
+var userInteractionMapBoundsListener;
+var userInteractionMapDragListener;
 function focus_(pos, bounds) {
 
 	hideNoCityMessage();
@@ -50,9 +52,40 @@ function focus_(pos, bounds) {
 
 }
 
+function incMapInteractionCounter() {
+	if (selfBoundsChangedCount == 0)
+		stopZoom();
+	else
+		selfBoundsChangedCount--;
+}
+
+function decMapInteractionCounter() {
+	if(selfBoundsChangedCount == 0) {
+		stopZoom();
+		return false;
+	}
+	else {
+		selfBoundsChangedCount++;
+		return true;
+	}
+}
+
+function stopZoom() {
+	if(userInteractionMapBoundsListener != null)
+		userInteractionMapBoundsListener.remove();
+	if(userInteractionMapDragListener != null)
+		userInteractionMapDragListener.remove();
+	if(zoomChangedListener != null)
+		google.maps.event.removeListener(zoomChangedListener);
+	if(nextZoomTimer != null)
+		clearTimeout(nextZoomTimer);
+}
+
 const ZOOM_ANIMATION_INCREMENT = 1;
 const ZOOM_BOUND_PADDING = 36;
 var smoothZoomToBounds_callCount = 0;
+var zoomChangedListener;
+var nextZoomTimer;
 function smoothZoomToBounds(bounds, map, max, current) {
 	if (current >= max) {
 		if(smoothZoomToBounds_callCount-- == 0) {
@@ -64,8 +97,10 @@ function smoothZoomToBounds(bounds, map, max, current) {
 						focus_(temPos);
 					}
 					else {
-						map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-						map.panBy(0, getPanByOffset());
+						if(decMapInteractionCounter) {
+							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
+							map.panBy(0, getPanByOffset());
+						}
 					}
 				}, ZOOM_ANIMATION_SPEED);
 		}
@@ -73,12 +108,15 @@ function smoothZoomToBounds(bounds, map, max, current) {
 	}
 	else {
 		smoothZoomToBounds_callCount++;
-		var z = google.maps.event.addListener(map, 'zoom_changed', function(event) {
-			google.maps.event.removeListener(z);
+		zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
+			google.maps.event.removeListener(zoomChangedListener);
+			incMapInteractionCounter();
 			smoothZoomToBounds(bounds, map, max, current + ZOOM_ANIMATION_INCREMENT);
 		});
-		setTimeout(function() {
-			map.setZoom(current);
+		nextZoomTimer = setTimeout(function() {
+			if(decMapInteractionCounter()) {
+				map.setZoom(current);
+			}
 		}, ZOOM_ANIMATION_SPEED);
 	}
 }

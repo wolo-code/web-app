@@ -173,8 +173,10 @@ function getIntentURL(latLng, code_string) {
 }
 
 function clearMap() {
-	if(marker != null)
+	if(marker != null) {
 		marker.setMap(null);
+		marker = null;
+	}
 }
 
 function toggleMapType() {

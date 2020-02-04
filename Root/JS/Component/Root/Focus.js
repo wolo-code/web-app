@@ -16,7 +16,26 @@ function focus_(pos, bounds) {
 
 	hideNoCityMessage();
 
-	if(typeof marker === 'undefined') {
+	map.panTo(pos);
+
+	var idleListenerPan = map.addListener('idle', function() {
+		idleListenerPan.remove();
+		var newZoom;
+		if(typeof bounds !== 'undefined')
+			newZoom = getZoomByBounds(map, bounds);
+		else {
+			newZoom = DEFAULT_LOCATE_ZOOM;
+			if (typeof accuCircle !== 'undefined') {
+				accuCircle.setOptions({'fillOpacity': 0.10});
+			}
+		}
+		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
+	});
+
+}
+
+function showMarker(pos) {
+	if(!marker) {
 		marker = new google.maps.Marker({
 			position: pos,
 			map: map,
@@ -35,23 +54,6 @@ function focus_(pos, bounds) {
 
 	if(marker.getMap() == null)
 		marker.setMap(map);
-
-	map.panTo(pos);
-
-	var idleListenerPan = map.addListener('idle', function() {
-		idleListenerPan.remove();
-		var newZoom;
-		if(typeof bounds !== 'undefined')
-			newZoom = getZoomByBounds(map, bounds);
-		else {
-			newZoom = DEFAULT_LOCATE_ZOOM;
-			if (typeof accuCircle !== 'undefined') {
-				accuCircle.setOptions({'fillOpacity': 0.10});
-			}
-		}
-		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
-	});
-
 }
 
 function incMapInteractionCounter() {

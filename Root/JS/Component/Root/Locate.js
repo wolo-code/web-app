@@ -82,11 +82,11 @@ function locateExec(failure) {
 					document.getElementById('proceed_container').classList.remove('hide');
 					document.getElementById('accuracy_container').classList.remove('highlight');
 					document.getElementById('accuracy_container').classList.remove('hide');
-					if(!firstFocus || typeof myLocDot === 'undefined')
+					if(!firstFocus || !myLocDot)
 						focus_(pos, accuCircle.getBounds());
 					else
 						pendingFocusPos = pos;
-					if(typeof myLocDot === 'undefined') {
+					if(!myLocDot) {
 						myLocDot = new google.maps.Marker({
 							clickable: false,
 							icon: new google.maps.MarkerImage('https://maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
@@ -131,7 +131,7 @@ function locateExec(failure) {
 function endWatchLocation() {
 	if(!locate_button_pressed) {
 		var pos;
-		if(typeof myLocDot != 'undefined')
+		if(myLocDot)
 			pos = resolveLatLng(myLocDot.getPosition());
 		if(pos != null)
 			processPosition(pos);
@@ -142,7 +142,7 @@ function endWatchLocation() {
 
 function proceedPosition() {
 	var pos;
-	if(typeof myLocDot != 'undefined')
+	if(myLocDot)
 		pos = resolveLatLng(myLocDot.getPosition());
 	if(pos != null)
 		processPosition(pos);

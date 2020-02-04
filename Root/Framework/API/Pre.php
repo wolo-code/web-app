@@ -3,12 +3,16 @@
 	require_once '../API/Config.php';
 	require_once '../API/IncludeSVG.php';
 
-	$config = loadConfig();
-
-	if( isset($_GET['mode']) && ($_GET['mode'] === "publish") )
+	if( isset($_GET['mode']) && ($_GET['mode'] === "publish") ) {
 		$bPublish = TRUE;
-	else
+		$variant = 'prod';
+	}
+	else {
 		$bPublish = FALSE;
+		$variant = 'dev';
+	}
+
+	$config = loadConfig();
 
 	$id = getComponent();
 	if(strlen($id) == 0)

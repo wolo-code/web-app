@@ -1,7 +1,8 @@
 <?php
 
 function loadConfig() {
-	$fHandle = fopen(__DIR__.'\..\..\Config\Vars.tsv', 'r');
+	global $variant; 
+	$fHandle = fopen(__DIR__.'\..\..\Config\Vars_'.$variant.'.tsv', 'r');
 	while(($tsvLine = fgetcsv($fHandle, 0, "\t")) !== FALSE) {
 		$config[$tsvLine[0]] = $tsvLine[1];
 	}

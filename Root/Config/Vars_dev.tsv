@@ -1,0 +1,18 @@
+project_short_name	Wolo
+project_title	Wolo codes
+project_description	Words based Lacation codes
+site_name	wolo.codes
+site_domain	wolo.codes
+base_url	https://dev.wolo.codes
+author	Ujjwal Singh
+twitter_owner	wolocodes
+twitter_author	wolocodes
+fb_appId	1860152747451314
+fb_admins	100000014591845
+sentry_key	badf8db6081d40d48af771b728440050
+sentry_id	2045587
+sentry_version	5.11.2
+sentry_hash	sha384-FLzYisBa7tvsi/ZP1ISnzZJqBkmw5mvwk7KOmH82W9wdPZKG3bG9hSO8GQFVSlOu
+google_api_key	AIzaSyC-ZxXuNOEEs5mNQD3Z8u4CSJtldtLztDE
+firebase_version	7.4.0
+firebase_ui_version	4.3.0

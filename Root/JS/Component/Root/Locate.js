@@ -157,6 +157,8 @@ function processPosition(pos) {
 	document.getElementById('proceed_container').classList.add('hide');
 	document.getElementById('accuracy_container').classList.add('highlight');
 	
+	infoWindow_setContent(MESSAGE_LOADING);
+	showInfoWindow();
 	if(initWCode == false) {
 		encode(pos);
 		clearAddress();

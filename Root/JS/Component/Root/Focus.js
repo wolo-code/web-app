@@ -52,9 +52,6 @@ function focus_(pos, bounds) {
 		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
 	});
 
-	infoWindow_setContent(MESSAGE_LOADING);
-	infoWindow.open(map, marker);
-
 }
 
 function incMapInteractionCounter() {

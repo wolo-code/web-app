@@ -85,6 +85,7 @@ function initMap() {
 		pendingPosition = null;
 		pendingCity = null;
 		notification_top.classList.add('hide');
+		infoWindow_setContent(MESSAGE_LOADING);
 		clearAddress();
 		clearURL();
 		var pos = resolveLatLng(event.latLng);

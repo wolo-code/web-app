@@ -156,7 +156,7 @@ function processPosition(pos) {
 	clearTimeout(watch_location_timer);
 	document.getElementById('proceed_container').classList.add('hide');
 	document.getElementById('accuracy_container').classList.add('highlight');
-	
+	showMarker(pos);
 	infoWindow_setContent(MESSAGE_LOADING);
 	showInfoWindow();
 	if(initWCode == false) {

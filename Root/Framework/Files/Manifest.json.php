@@ -1,6 +1,5 @@
 <?php
-	require '../API/Config.php';
-	$config = loadConfig();
+	require '../API/Pre.php';
 ?>
 {
 	"name": "<?php echo $config['project_title'] ?>",

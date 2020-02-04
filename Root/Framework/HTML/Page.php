@@ -1,4 +1,4 @@
 <?php
-	require 'Pre.php';
+	require '../../Framework/API/Pre.php';
 	require '../../HTML/Template/Base.php';
 ?>

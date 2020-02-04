@@ -107,7 +107,7 @@ function decode(words) {
 				if(myLocDot == null) {
 					if(marker != null && marker.position != null) {
 						position = marker.position;
-						focus_(position);
+						focus___(position);
 						showNotification(PURE_WCODE_CITY_PICKED);
 					}
 					else

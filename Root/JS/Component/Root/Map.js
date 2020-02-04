@@ -39,7 +39,7 @@ function initMap() {
 		if(places.length == 1) {
 			clearAddress();
 			var pos = resolveLatLng(places[0].geometry.location);
-			focus_(pos);
+			focus___(pos);
 			encode(pos);
 			clearAddress();
 			getAddress(pos);
@@ -88,7 +88,7 @@ function initMap() {
 		clearAddress();
 		clearURL();
 		var pos = resolveLatLng(event.latLng);
-		focus_(pos);
+		focus___(pos);
 		encode(pos);
 	});
 
@@ -147,7 +147,7 @@ function execDecode(code) {
 
 var lastMarker;
 function load(marker) {
-	focus_(marker.position);
+	focus___(marker.position);
 	window.marker.title = marker.title;
 	infoWindow.open(map, window.marker);
 	marker.setVisible(false);

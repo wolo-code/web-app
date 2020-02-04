@@ -1,6 +1,11 @@
 function focus__(city, pos, code) {
-	focus_(pos);
+	focus___(pos);
 	setCode(city, code, pos);
+}
+
+function focus___(pos, bounds) {
+	showMarker(pos);
+	focus_(pos, bounds);
 }
 
 const ZOOM_ANIMATION_SPEED = 250;
@@ -94,7 +99,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 					if(pendingFocusPos) {
 						var temPos = new Object.create(pendingFocusPos);
 						pendingFocusPos = null;
-						focus_(temPos);
+						focus___(temPos);
 					}
 					else {
 						if(decMapInteractionCounter) {

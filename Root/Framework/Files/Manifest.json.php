@@ -42,7 +42,8 @@
 			"density": 4.0
 		}
 	],
-	"start_url": "/",
+	"start_url": "./",
+	"scope": ".",
 	"display": "standalone",
 	"related_applications": [{
 		"platform": "web",

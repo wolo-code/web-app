@@ -144,8 +144,13 @@ function proceedPosition() {
 	var pos;
 	if(myLocDot)
 		pos = resolveLatLng(myLocDot.getPosition());
-	if(pos != null)
+	if(pos != null) {
+		if(!selfBoundsChangedCount) {
+			map.panTo(pos);
+			map.panBy(0, getPanByOffset());
+		}
 		processPosition(pos);
+	}
 	else
 		handleLocationError(true);
 }

@@ -10,8 +10,6 @@ function focus___(pos, bounds) {
 
 const ZOOM_ANIMATION_SPEED = 250;
 var firstFocus = true;
-var userInteractionMapBoundsListener;
-var userInteractionMapDragListener;
 function focus_(pos, bounds) {
 
 	hideNoCityMessage();
@@ -76,10 +74,6 @@ function decMapInteractionCounter() {
 }
 
 function stopZoom() {
-	if(userInteractionMapBoundsListener != null)
-		userInteractionMapBoundsListener.remove();
-	if(userInteractionMapDragListener != null)
-		userInteractionMapDragListener.remove();
 	if(zoomChangedListener != null)
 		google.maps.event.removeListener(zoomChangedListener);
 	if(nextZoomTimer != null)

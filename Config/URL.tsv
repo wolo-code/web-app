@@ -8,6 +8,7 @@ Path	Name	Extension
 	geofire.min	js
 	qrcode.min	js
 	html2canvas.min	js
+	sw	js
 	favicon	ico
 	manifest	json
 	manifest-console	json

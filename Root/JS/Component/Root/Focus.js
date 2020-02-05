@@ -17,6 +17,7 @@ function focus_(pos, bounds) {
 	hideNoCityMessage();
 
 	map.panTo(pos);
+	map.panBy(0, getPanByOffset());
 
 	var idleListenerPan = map.addListener('idle', function() {
 		idleListenerPan.remove();

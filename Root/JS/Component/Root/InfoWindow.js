@@ -15,8 +15,12 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng) {
 }
 
 function isInfoWindowOpen() {
-	var map = infoWindow.getMap();
-	return (map !== null && typeof map !== "undefined");
+	if(infoWindow) {
+		var map = infoWindow.getMap();
+		return (map !== null && typeof map !== "undefined");
+	}
+	else
+		return false;
 }
 
 function showInfoWindow() {

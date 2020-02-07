@@ -1,10 +1,15 @@
-function infoWindow_setContent(string) {
+function initInfoWindow() {
 	if(typeof infoWindow == 'undefined')
 		infoWindow = new google.maps.InfoWindow({'map': map});
+}
+
+function infoWindow_setContent(string) {
+	initInfoWindow();
 	infoWindow.setContent(string);
 }
 
 function setInfoWindowText(city_accent, city_name, code_string, latLng) {
+	initInfoWindow();
 	var infoWindow_share_longpress_handle = google.maps.event.addListener(infoWindow, 'domready', function() {
 		google.maps.event.removeListener(infoWindow_share_longpress_handle);
 		if(document.getElementById('share_code_button') != null)
@@ -24,5 +29,6 @@ function isInfoWindowOpen() {
 }
 
 function showInfoWindow() {
+	initInfoWindow();
 	infoWindow.open(map, marker);
 }

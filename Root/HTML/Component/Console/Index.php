@@ -1,4 +1,5 @@
 <div id='container'>
+	<div id='wait_loader'></div>
 	<div id='restrict_block' class='hide'>
 		<h3>Restricted! You are not authorized to have access here.</h3>
 	</div>

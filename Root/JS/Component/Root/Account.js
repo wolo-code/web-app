@@ -114,8 +114,11 @@ function loadSaveList() {
 					row_controls_container.setAttribute('class', 'row-controls-container');
 					row_controls_container.appendChild(row_controls);
 					row.appendChild(row_controls_container);
+					row.data_process_continue_flag = false;
 					getCityFromId(saveList[key].city_id, function(city) {
 						row.data_city = city;
+						if(row.data_process_continue_flag)
+							processSaveEntry_continue(row);
 					});
 				}
 			}
@@ -129,11 +132,16 @@ function loadSaveList() {
 
 function processSaveEntry(e) {
 	hideNotication();
+	hideAccountDialog();
 	var row = e.target.parentElement.parentElement.parentElement;
+	if(typeof row.data_city == 'undefined')
+		row.data_process_continue_flag = true;
+	else
+		processSaveEntry_continue(row);
+function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
 		decode_continue(city, saveList[row.data_key].code);
-		hideAccountDialog();
-	});
+	});	
 }
 
 function deleteSaveEntry(e) {

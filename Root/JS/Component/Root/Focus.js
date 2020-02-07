@@ -97,7 +97,10 @@ function smoothZoomToBounds(bounds, map, max, current) {
 					else {
 						if(decMapInteractionCounter) {
 							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-							map.panBy(0, getPanByOffset());
+							var idleListenerPanBy = map.addListener('idle', function() {
+									idleListenerPanBy.remove();
+									map.panBy(0, getPanByOffset());
+								});
 						}
 					}
 				}, ZOOM_ANIMATION_SPEED);

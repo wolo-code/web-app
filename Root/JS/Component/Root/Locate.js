@@ -147,7 +147,10 @@ function proceedPosition() {
 	if(pos != null) {
 		if(!selfBoundsChangedCount) {
 			map.panTo(pos);
-			map.panBy(0, getPanByOffset());
+			var idleListenerPanBy = map.addListener('idle', function() {
+					idleListenerPanBy.remove();
+					map.panBy(0, getPanByOffset());
+				});
 		}
 		processPosition(pos);
 	}

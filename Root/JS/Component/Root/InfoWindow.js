@@ -20,6 +20,5 @@ function isInfoWindowOpen() {
 }
 
 function showInfoWindow() {
-	if(!isInfoWindowOpen())
-		infoWindow.open(map, marker);
+	infoWindow.open(map, marker);
 }

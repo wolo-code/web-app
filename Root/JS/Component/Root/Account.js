@@ -138,6 +138,8 @@ function processSaveEntry(e) {
 		row.data_process_continue_flag = true;
 	else
 		processSaveEntry_continue(row);
+}
+
 function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
 		decode_continue(city, saveList[row.data_key].code);

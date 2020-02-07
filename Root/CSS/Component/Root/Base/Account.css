@@ -101,7 +101,7 @@
 }
 
 .row-header, .row-title, .row-segment, .row-address, .row-code {
-	pointer-events:none;
+	pointer-events: none;
 }
 
 .row-title, .row-segment {

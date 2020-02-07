@@ -163,6 +163,10 @@
 	text-align: center;
 }
 
+.row-controls > span > * {
+	pointer-events: none;
+}
+
 #account_dialog_save_list > div {
 	border: 1px solid #69B7CF;
 }

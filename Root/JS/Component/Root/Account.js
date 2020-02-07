@@ -101,7 +101,7 @@ function loadSaveList() {
 					row_delete.setAttribute('class', 'row-delete');
 					row_delete.innerText = 'Delete';
 					row_delete.addEventListener('click', deleteSaveEntry);
-					row_process.setAttribute('class', 'row-delete');
+					row_process.setAttribute('class', 'row-process');
 					row_process_img.src = svg_front;
 					row_process.addEventListener('click', processSaveEntry);
 					row_controls.appendChild(row_delete);

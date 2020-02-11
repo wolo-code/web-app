@@ -33,7 +33,7 @@ function signedIn() {
 	document.getElementById('account_dialog_logout').classList.remove('hide');
 	document.getElementById('account_dialog_display_name').innerText = firebase.auth().currentUser.displayName;
 	document.getElementById('account_dialog_email').innerText = firebase.auth().currentUser.email;
-	if(typeof firebase.auth().currentUser.photoURL != null && firebase.auth().currentUser.photoURL.length) {
+	if(typeof firebase.auth().currentUser.photoURL != undefined && firebase.auth().currentUser.photoURL != null && firebase.auth().currentUser.photoURL.length) {
 		document.getElementById('account_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
 		document.getElementById('account_user_image').classList.remove('hide');
 		document.getElementById('account_default_image').classList.add('hide');

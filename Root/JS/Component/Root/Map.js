@@ -80,23 +80,16 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
-		clearLocating(true);
-		navigator.geolocation.clearWatch(watch_location_id);
-		pendingPosition = null;
-		pendingCity = null;
-		notification_top.classList.add('hide');
+		cleanUp();
 		infoWindow_setContent(MESSAGE_LOADING);
-		clearAddress();
-		clearURL();
 		var pos = resolveLatLng(event.latLng);
-		focus___(pos);
 		encode(pos);
+		focus___(pos);
 	});
 
 	decode_button.addEventListener('click', function() {
-		firstFocus = true;
-		selfBoundsChangedCount = 1;
-		clearMap();
+		cleanUp();
+		document.getElementById('accuracy_container').classList.add('hide');
 		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
@@ -174,10 +167,28 @@ function getIntentURL(latLng, code_string) {
 }
 
 function clearMap() {
-	if(marker != null) {
+	if(marker)
 		marker.setMap(null);
-		marker = null;
+}
+
+function cleanUp() {
+	clearTimeout(watch_location_timer);
+	clearLocating();
+	clearMap();
+	navigator.geolocation.clearWatch(watch_location_id);
+	pendingPosition = null;
+	pendingCity = null;
+	notification_top.classList.add('hide');
+	if(infoWindow) {
+		infoWindow.close();
+		infoWindow.setContent('');
 	}
+	clearAddress();
+	hideAddress();
+	clearURL();
+	document.getElementById('proceed_container').classList.add('hide');
+	firstFocus = true;
+	selfBoundsChangedCount = 1;
 }
 
 function toggleMapType() {

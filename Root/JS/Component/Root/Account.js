@@ -132,6 +132,7 @@ function loadSaveList() {
 
 function processSaveEntry(e) {
 	hideNotication();
+	cleanUp();
 	hideAccountDialog();
 	var row = e.target.parentElement.parentElement.parentElement;
 	if(typeof row.data_city == 'undefined')

@@ -209,7 +209,7 @@ function processPositionButtonTouchEnd(e) {
 }
 
 function handleLocationError(browserHasGeolocation) {
-	clearLocating(true);
+	cleanUp();
 	showNotification(browserHasGeolocation ?
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');

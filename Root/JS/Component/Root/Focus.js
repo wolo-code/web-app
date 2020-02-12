@@ -47,11 +47,12 @@ function showMarker(pos) {
 		});
 	}
 	else {
+		if(marker.getMap() == null)
+			marker.setMap(map);
 		marker.setPosition(pos);
 	}
 
-	if(marker.getMap() == null)
-		marker.setMap(map);
+	showInfoWindow();
 }
 
 function incMapInteractionCounter() {

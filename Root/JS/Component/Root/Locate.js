@@ -32,6 +32,10 @@ function locateExec(failure) {
 		wait_loader.classList.remove('hide');
 		if (navigator.geolocation) {
 			locating = true;
+			if(myLocDot)
+				myLocDot.setMap(null);
+			if(accuCircle)
+				accuCircle.setMap(null);
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
 			
@@ -53,7 +57,7 @@ function locateExec(failure) {
 						lat: position.coords.latitude,
 						lng: position.coords.longitude
 					};
-					if(typeof accuCircle === 'undefined') {
+					if(typeof accuCircle === 'undefined' || !accuCircle.getMap()) {
 						accuCircle = new google.maps.Circle({
 							strokeColor: '#69B7CF',
 							strokeOpacity: 0,
@@ -67,6 +71,7 @@ function locateExec(failure) {
 						});
 					}
 					else {
+						accuCircle.setMap(map);
 						accuCircle.setOptions({'fillOpacity': 0.35});
 						accuCircle.setCenter(pos);
 						accuCircle.setRadius(position.coords.accuracy);
@@ -82,7 +87,7 @@ function locateExec(failure) {
 					document.getElementById('proceed_container').classList.remove('hide');
 					document.getElementById('accuracy_container').classList.remove('highlight');
 					document.getElementById('accuracy_container').classList.remove('hide');
-					if(!firstFocus || !myLocDot)
+					if(!firstFocus || !myLocDot || !myLocDot.getMap())
 						focus_(pos, accuCircle.getBounds());
 					else
 						pendingFocusPos = pos;
@@ -100,6 +105,8 @@ function locateExec(failure) {
 						});
 					}
 					else {
+						if(!myLocDot.getMap())
+							myLocDot.setMap(map);
 						myLocDot.setPosition(pos);
 					}
 
@@ -164,8 +171,8 @@ function processPosition(pos) {
 	clearTimeout(watch_location_timer);
 	document.getElementById('proceed_container').classList.add('hide');
 	document.getElementById('accuracy_container').classList.add('highlight');
-	showMarker(pos);
 	infoWindow_setContent(MESSAGE_LOADING);
+	showMarker(pos);
 	infoWindow.open(map, marker);
 	if(initWCode == false) {
 		encode(pos);

@@ -63,11 +63,11 @@
 </head>
 <body>
 	<a id='logo' href='/'>
-		<div id='logo_info'>
-			<a id=logo_wolo_info class='blur_background_static' href='//wcodes.org' tabindex='1'>
+		<div id='logo_info' tabindex='1'>
+			<a id=logo_wolo_info class='blur_background_static' href='//wolo.codes'>
 				<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 			</a>
-			<a id=logo_codes_info class='blur_background_static' href='//wolo.codes' tabindex='2'>
+			<a id=logo_codes_info class='blur_background_static' href='//wolo.codes'>
 				<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 			</a>
 		</div>
@@ -80,7 +80,7 @@
 	<p>
 		&gt; return to the <a id='return' href='/'>app</a>
 	</p>
-	<a id='mail-link' href='mailto:webmaster@wolo.codes?subject=WCodes-Terms'>webmaster@wolo.codes</a>
+	<a id='mail-link' href='mailto:webmaster@wolo.codes?subject=Wolo_codes-Terms'>webmaster@wolo.codes</a>
 	<script src="https://www.gstatic.com/firebasejs/7.4.0/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/7.4.0/firebase-analytics.js"></script>
 </body>

@@ -13,10 +13,11 @@
 ?>
 <div id='map'></div>
 <div id='wait_loader'></div>
-<div id='logo'>
-	<a id=logo_wolo class='blur_background' href='//wcodes.org' tabindex='1'>
+<div id='logo' tabindex='1'>
+	<a id=logo_wolo class='blur_background' href='//wolo.codes'>
 		<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
-	</a><a id=logo_codes class='blur_background' href='//wolo.codes' tabindex='2'>
+	</a>
+	<a id=logo_codes class='blur_background' href='//wolo.codes'>
 		<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 	</a>
 </div>

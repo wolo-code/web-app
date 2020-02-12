@@ -4,11 +4,11 @@
 			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</div>
 		<div id='qr_label' class='center'>
-			<div id='logo_qr'>
-				<a id=logo_wolo_qr href='//wcodes.org' tabindex='1'>
+			<div id='logo_qr' tabindex='1'>
+				<a id=logo_wolo_qr href='//wolo.codes'>
 					<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 				</a>
-				<a id=logo_codes_qr href='//wolo.codes' tabindex='2'>
+				<a id=logo_codes_qr href='//wolo.codes'>
 					<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 				</a>
 			</div>

@@ -19,10 +19,11 @@
 				<span id='data_next' class='data_control'>▷</span>
 			</span>
 		</div>
-		<div id='logo'>
-			<a id='logo_wolo' href='https://wcodes.org' tabindex='1'>
+		<div id='logo' tabindex='1'>
+			<a id='logo_wolo' href='https://wolo.codes'>
 				<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
-			</a><a id='logo_codes' href='https://wolo.codes' tabindex='2'>
+			</a>
+			<a id='logo_codes' href='https://wolo.codes'>
 				<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
 			</a>
 		</div>

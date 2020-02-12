@@ -7,7 +7,24 @@ function onAccount() {
 
 function showAccountDialog() {
 	document.getElementById('account_dialog_container').classList.remove('hide');
-	account_dialog_address_active_first = true;
+	if(current_title)
+		document.getElementById('save_title_main').value = current_title;
+	else
+		document.getElementById('save_title_main').value = '';
+	if(current_segment)
+		document.getElementById('save_title_segment').value = current_segment;
+	else
+		document.getElementById('save_title_segment').value = '';
+	if(current_address) {
+		document.getElementById('save_address').innerText = current_address;
+		document.getElementById('save_address').classList.remove('initial');
+		account_dialog_address_active_first = false;
+	}
+	else {
+		document.getElementById('save_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
+		document.getElementById('save_address').classList.add('initial');
+		account_dialog_address_active_first = true;
+	}
 }
 
 function hideAccountDialog() {
@@ -143,8 +160,15 @@ function processSaveEntry(e) {
 
 function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
+		document.getElementById('address_text_title').innerText = saveList[row.data_key].title;
+		document.getElementById('address_text_segment').innerText = saveList[row.data_key].segment;
+		document.getElementById('address_text_content').innerText = saveList[row.data_key].address;
+		address_text.classList.remove('hide');
+		current_title = saveList[row.data_key].title;
+		current_segment = saveList[row.data_key].segment;
+		current_address = saveList[row.data_key].address;
 		decode_continue(city, saveList[row.data_key].code);
-	});	
+	});
 }
 
 function deleteSaveEntry(e) {

@@ -10,7 +10,8 @@ function getAddress(latLng, callback) {
 			if (address_components[0]) {
 				address = address_components[0].formatted_address;
 				gpId = address_components[0].place_id;
-				refreshAddress();
+				if(!current_title)
+					refreshAddress();
 				if(typeof callback != 'undefined')
 					callback(address_components);
 			} else {
@@ -34,6 +35,8 @@ function toggleAddress() {
 }
 
 function showAddress() {
+	document.getElementById('address_text_title').innerText = '';
+	document.getElementById('address_text_segment').innerText = '';
 	address_text_content.innerText = address;
 	address_text.classList.remove('hide');
 }

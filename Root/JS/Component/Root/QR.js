@@ -1,7 +1,23 @@
 function showQR() {
 	document.getElementById('qr_title_main').value = document.getElementById('qr_pre_title_main').value;
-	document.getElementById('qr_title_segment').value = '';
-	
+	if(current_title)
+		document.getElementById('qr_title_main').value = current_title;
+	else
+		document.getElementById('qr_title_main').value = '';
+	if(current_segment)
+		document.getElementById('qr_title_segment').value = current_segment;
+	else
+		document.getElementById('qr_title_segment').value = '';
+	if(current_address) {
+		document.getElementById('qr_address').innerText = current_address;
+		document.getElementById('qr_address').classList.remove('initial');
+		qr_address_active_first = false;
+	}
+	else {
+		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
+		document.getElementById('qr_address').classList.add('initial');
+		qr_address_active_first = true;
+	}
 	var city_accent = getProperCityAccent(code_city);
 	var code_string = code_wcode.join(' ');
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
@@ -25,12 +41,12 @@ function showQR() {
 function closeQR() {
 	document.getElementById('qr').classList.add('hide');
 	previewQR_deactivate()
-	document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
-	document.getElementById('qr_address').classList.add('initial');
-	qr_address_active_first = true;
-	
 	window.removeEventListener('afterprint', afterQRprint);
 	window.removeEventListener('beforeprint', beforeQRprint);
+	current_title = document.getElementById('qr_title_main').value;
+	current_segment = document.getElementById('qr_title_segment').value;
+	if(!qr_address_active_first)
+		current_address = document.getElementById('qr_address').innerText;
 }
 
 function previewQR_activate() {

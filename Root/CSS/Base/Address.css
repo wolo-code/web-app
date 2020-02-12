@@ -26,6 +26,12 @@
 	color: #69B7CF;
 }
 
+#address_text_header {
+	text-align: left;
+	font-family: 'Roboto';
+	padding-left: 5px;
+}
+
 #address_text_content {
 	display: block;
 	font-family: 'Roboto';

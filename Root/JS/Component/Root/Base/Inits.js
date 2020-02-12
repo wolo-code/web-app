@@ -68,3 +68,8 @@ var NOTIFICATION_DURATION_LONG = 10000;
 var saveList;
 var lastActiveSaveEntry;
 var account_dialog_address_active_first;
+
+// Title
+var current_title;
+var current_segment;
+var current_address;

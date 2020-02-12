@@ -189,6 +189,9 @@ function cleanUp() {
 	document.getElementById('proceed_container').classList.add('hide');
 	firstFocus = true;
 	selfBoundsChangedCount = 1;
+	current_title = null;
+	current_segment = null;
+	current_address = null;
 }
 
 function toggleMapType() {

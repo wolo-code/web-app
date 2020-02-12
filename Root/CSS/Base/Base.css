@@ -28,6 +28,10 @@ button.border {
 	border-color: #dcdcdc
 }
 
+*:focus {
+	outline: none;
+}
+
 #map {
 	height: 100%;
 }

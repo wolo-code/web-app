@@ -1,5 +1,4 @@
 function showQR() {
-	document.getElementById('qr_title_main').value = document.getElementById('qr_pre_title_main').value;
 	if(current_title)
 		document.getElementById('qr_title_main').value = current_title;
 	else

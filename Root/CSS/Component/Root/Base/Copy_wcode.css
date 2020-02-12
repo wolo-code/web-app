@@ -25,15 +25,3 @@
 #share_qr_button {
 	padding-right: 6px;
 }
-
-#qr_pre_title_main {
-	margin-left: 8px;
-	background-color: white;
-	color: #999999;
-	outline: 0;
-	outline-style: none;
-	border-top: 0;
-	border-left: none;
-	border-right: 0;
-	min-width: 202px;
-}

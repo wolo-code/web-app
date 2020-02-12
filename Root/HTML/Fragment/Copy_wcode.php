@@ -27,7 +27,6 @@
 		<hr>
 		<p>
 			<span>QR</span>
-			<input id='qr_pre_title_main' type='text' placeholder="&nbsp;Title e.g. Taj Mahal (optional)">
 			<span class='message_dialog_control_right'>
 				<img id='share_qr_button' class="center control" src="<?php getSVG('', 'qr'); ?>" >
 			</span>

@@ -28,13 +28,13 @@
 	</table>
 	<div id='social-links' class='center'>
 		<span class='social grow'>
-			<a href='https://twitter.com/wolocodes' id='site-twitter' onclick="trackOutboundLink('wcodes-twitter', 'https://twitter.com/wolocodes'); return false;"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
+			<a href='https://twitter.com/wolocodes' id='site-twitter' onclick="trackOutboundLink('wolo-twitter', 'https://twitter.com/wolocodes')"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
 		</span>
 		<span class='social grow'>
-			<a href='https://facebook.com/wolocodes' id='site-facebook' onclick="trackOutboundLink('wcodes-facebook', 'https://facebook.com/wolocodes'); return false;"><span class='image'><?php includeSVG('', 'Facebook'); ?></span></a>
+			<a href='https://facebook.com/wolocodes' id='site-facebook' onclick="trackOutboundLink('wolo-facebook', 'https://facebook.com/wolocodes')"><span class='image'><?php includeSVG('', 'Facebook'); ?></span></a>
 		</span>
 		<span class='social grow'>
-			<a href='https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg' id='site-youtube' onclick="trackOutboundLink('wcodes-youtube', 'https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg'); return false;"><span class='image'><?php includeSVG('', 'YouTube'); ?></span></a>
+			<a href='https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg' id='site-youtube' onclick="trackOutboundLink('wolo-youtube', 'https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg')"><span class='image'><?php includeSVG('', 'YouTube'); ?></span></a>
 		</span>
 	</div>
 	<div id='software_info'>

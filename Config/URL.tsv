@@ -1,17 +1,18 @@
 Path	Name	Extension
+	robots	txt
+	sitemap	xml	
+	favicon	ico
+	social	png
+	manifest	json
 	root	
-	sitemap.xml	
-	console	
 	root	js
-	console	js
+	sw	js
 	geofire.min	js
 	qrcode.min	js
 	html2canvas.min	js
-	sw	js
-	favicon	ico
-	manifest	json
+	console	
+	console	js
 	manifest-console	json
-	robots	txt
 	launcher-icon-0-75x	png
 	launcher-icon-1x	png
 	launcher-icon-1-5x	png

@@ -18,7 +18,3 @@ Path	Name	Extension
 	launcher-icon-2x	png
 	launcher-icon-3x	png
 	launcher-icon-4x	png
-resource\	copy	svg
-resource\	link	svg
-resource\	map	svg
-resource\	address	svg

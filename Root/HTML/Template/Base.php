@@ -8,6 +8,9 @@
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content='initial-scale=1.0, viewport-fit=cover' >
 	<meta name='theme-color' content='#ffffff' >
+	<?php require '../HTML/Fragment/OG_Meta.php' ?>
+	<?php require '../HTML/Fragment/FB_Meta.php' ?>
+	<?php require '../HTML/Fragment/Twitter_Meta.php' ?>
 	<link rel="shortcut icon" type='image/x-icon' href='/favicon.ico' >
 	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
 	<title><?php echo $config['project_title'] ?></title>

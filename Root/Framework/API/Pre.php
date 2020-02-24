@@ -1,5 +1,6 @@
 <?php
 	require_once '../API/API.php';
+	require_once '../API/ComponentDetails.php';
 	require_once '../API/Config.php';
 	require_once '../API/IncludeSVG.php';
 

@@ -38,12 +38,8 @@
 				"function": "add_city"
 			},
 			{
-				"source": "terms",
-				"destination": "/terms_of_service.html"
 			},
 			{
-				"source": "policy",
-				"destination": "/privacy_policy.html"
 			},
 			{
 				"source": "console",

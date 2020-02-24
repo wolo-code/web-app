@@ -10,16 +10,16 @@
 	</ul>
 	<table>
 		<tr>
+			<td>About:</td>
+			<td><a class='link' href='/about'>wolo.codes/about</a></td>
+		</tr>
+		<tr>
 			<td>Terms of use:</td>
 			<td><a class='link' href='/terms'>wolo.codes/terms</a></td>
 		</tr>
 		<tr>
 			<td>Privacy policy:</td>
 			<td><a class='link' href='/policy'>wolo.codes/policy</a></td>
-		</tr>
-		<tr>
-			<td>website:</td>
-			<td><a class='link' href='//wcodes.org/wolo'>wcodes.org/wolo</a></td>
 		</tr>
 		<tr>
 			<td>contact:</td>

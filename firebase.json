@@ -38,12 +38,24 @@
 				"function": "add_city"
 			},
 			{
-			},
-			{
-			},
-			{
 				"source": "console",
 				"destination": "/console.html"
+			},
+			{
+				"source": "about.json",
+				"destination": "/about/index.json"
+			},
+			{
+				"source": "case.json",
+				"destination": "/case/index.json"
+			},
+			{
+				"source": "competition.json",
+				"destination": "/competition/index.json"
+			},
+			{
+				"source": "presentation.json",
+				"destination": "/presentation/index.json"
 			},
 			{
 				"source": "**",

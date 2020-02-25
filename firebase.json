@@ -64,22 +64,22 @@
 		],
 		"redirects": [
 			{
-				"source": "facebook",
 				"source" : "/aboutme",
 				"destination" : "/about_me",
 				"type" : 301
 			},
 			{
+				"source": "/facebook",
 				"destination": "https://facebook.com/wolocodes",
 				"type": 302
 			},
 			{
-				"source": "twitter",
+				"source": "/twitter",
 				"destination": "https://twitter.com/wolocodes",
 				"type": 302
 			},
 			{
-				"source": "youtube",
+				"source": "/youtube",
 				"destination": "https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg",
 				"type": 302
 			}

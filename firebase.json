@@ -65,6 +65,11 @@
 		"redirects": [
 			{
 				"source": "facebook",
+				"source" : "/aboutme",
+				"destination" : "/about_me",
+				"type" : 301
+			},
+			{
 				"destination": "https://facebook.com/wolocodes",
 				"type": 302
 			},

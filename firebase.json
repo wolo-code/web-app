@@ -46,6 +46,10 @@
 				"destination": "/about/index.json"
 			},
 			{
+				"source": "features.json",
+				"destination": "/features/index.json"
+			},
+			{
 				"source": "case.json",
 				"destination": "/case/index.json"
 			},

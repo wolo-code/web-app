@@ -2,15 +2,24 @@ var pendingPosition;
 var pendingWords;
 var wordList;
 
+// var current_city_gp_id;
+// var is_current_city;
 // const PURE_WCODE_CITY_PICKED;
 // const PURE_WCODE_CITY_FAILED;
 
-function encode(position) {
+function encode(position, locating_encode) {
 	clearCode();
 	getAddress(position, function(address_components) {
 			var city_gp_id = getCityGpId(address_components);
 			if(city_gp_id != null) {
 				getCityFromCityGp_id( city_gp_id, function(city) {
+					if(typeof locating_encode != 'undefined' && locating_encode == true) {
+						current_city_gp_id = city_gp_id;
+						is_current_city = true;
+					}
+					else {
+						is_current_city = false;
+					}
 					getCityCenterFromId(city, function(city) {
 						if(city != null)
 							encode_continue(city, position);

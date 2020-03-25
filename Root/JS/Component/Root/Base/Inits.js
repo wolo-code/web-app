@@ -18,6 +18,8 @@ var WCODE_LINK_COPIED_MESSAGE = "Wolo code link copied to clipboard";
 // Code\Core
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
 var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the Wolo code with city name";
+var current_city_gp_id;
+var is_current_city;
 
 // Address
 var latLng_p = '';

@@ -175,7 +175,7 @@ function processPosition(pos) {
 	showMarker(pos);
 	infoWindow.open(map, marker);
 	if(initWCode == false) {
-		encode(pos);
+		encode(pos, true);
 		clearAddress();
 		getAddress(pos);
 	}

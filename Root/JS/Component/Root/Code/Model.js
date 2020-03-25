@@ -1,6 +1,6 @@
-var code_city;
-var code_wcode;
-var code_postition;
+// var code_city;
+// var code_wcode;
+// var code_postition;
 
 function setCode(city, wcode, latLng) {
 	code_city = city;

@@ -1,7 +1,6 @@
-var pendingPosition;
-var pendingWords;
-var wordList;
-
+// var pendingPosition;
+// var pendingWords;
+// var wordList;
 // var current_city_gp_id;
 // var is_current_city;
 // const PURE_WCODE_CITY_PICKED;

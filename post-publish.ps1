@@ -21,3 +21,6 @@ $text -replace '<script src="/console', ('<script src="/console-'+$crc) | Set-Co
 $file = ".\public\sw.js"
 $text = (Get-Content -Path $file -ReadCount 0) -join "`n"
 $text -replace './console', ('./console-'+$crc) | Set-Content -Path $file
+
+cd ..\..\Website\Project\
+deposit

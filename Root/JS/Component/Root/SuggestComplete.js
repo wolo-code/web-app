@@ -32,7 +32,7 @@ function suggestComplete() {
 		changeInput(curList, curWord);
 	}
 	else
-		suggestion_result.innerText = '';
+		document.getElementById('suggestion_result').innerText = '';
 };
 
 function getPossibleList(code) {
@@ -81,13 +81,13 @@ function matchWord(list, input) {
 
 function changeInput(list, val) {
 	var autoCompleteResult = matchWord(list, val);
-	suggestion_result.innerText = '';
+	document.getElementById('suggestion_result').innerText = '';
 	if(autoCompleteResult.length < 5 || val.length > 2)
 		for(var i = 0; i < autoCompleteResult.length && i < 10; i++) {
 			var option = document.createElement('div');
 			option.innerText = autoCompleteResult[i];
 			option.addEventListener('click', chooseWord);
-			suggestion_result.appendChild(option);
+			document.getElementById('suggestion_result').appendChild(option);
 		}
 }
 
@@ -96,5 +96,5 @@ function chooseWord(event) {
 	cur_word[cur_word.length-1] = this.innerText;
 	document.getElementById('pac-input').value = cur_word.join(' ') + ' ';
 	document.getElementById('pac-input').focus();
-	suggestion_result.innerText = '';
+	document.getElementById('suggestion_result').innerText = '';
 }

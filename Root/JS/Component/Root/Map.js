@@ -29,7 +29,7 @@ function initMap() {
 			return;
 		}
 
-		clearMap();
+		cleanUp();
 		markers.forEach(function(marker) {
 			marker.setMap(null);
 		});

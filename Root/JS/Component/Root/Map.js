@@ -90,7 +90,6 @@ function initMap() {
 	decode_button.addEventListener('click', function() {
 		cleanUp();
 		document.getElementById('accuracy_container').classList.add('hide');
-		suggestion_result.setInnerText = '';
 		var code = document.getElementById('pac-input').value;
 		execDecode(code);
 	});

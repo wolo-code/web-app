@@ -172,6 +172,9 @@ function clearMap() {
 }
 
 function cleanUp() {
+	document.getElementById('suggestion_result').innerText = '';
+	clearNotificationTimer();
+	clearTimeout(presstimer);
 	clearTimeout(watch_location_timer);
 	clearLocating();
 	clearMap();

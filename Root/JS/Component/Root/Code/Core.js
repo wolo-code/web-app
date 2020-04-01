@@ -16,9 +16,11 @@ function encode(position, locating_encode) {
 						current_city_gp_id = city_gp_id;
 						is_current_city = true;
 					}
-					else {
-						is_current_city = false;
+					else if(current_city_gp_id == city_gp_id){
+						is_current_city = true;
 					}
+					else
+						is_current_city = false;
 					getCityCenterFromId(city, function(city) {
 						if(city != null)
 							encode_continue(city, position);

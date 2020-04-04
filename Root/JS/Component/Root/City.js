@@ -216,9 +216,9 @@ function getCityFromCityGp_id(city_gp_id, callback_success, callback_failure) {
 }
 
 function noCity(position) {
-	showAddress();
 	showNoCityMessage();
-	infoWindow.setContent("Location not in database");
+	showAddress();
+	infoWindow.setContent("City not in database");
 }
 
 function submitCity() {

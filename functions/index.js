@@ -34,11 +34,8 @@ function lng_span_half(lat) {
 
 function encodeData(value, d) {
 	const i = Math.round(value/d);
-	if(i < 0 || i > N) {
-		console.log("Error: Out of data limit");
-		console.log("Value: " + value);
-		console.log("d: " + d);
-	}
+	if(i < 0 || i >= N)
+		return null;
 	else
 		return i;
 }
@@ -69,15 +66,14 @@ exports.encode = functions.https.onRequest((req, res) => {
 		res.send({'error' : "Version mismatch"});
 	else {
 		const code = encode(getCityBegin(req.body.city_center), req.body.position);
-		for(var i of code)
-			if(i < 0 || i > 1023) {
-				console.log("Error: Out of WCode index limit");
-				console.log(req.body.city_center);
-				console.log(req.body.position);
-				res.status(416).send('');
-				return;
-			}
-		res.send({'code' : code});
+		if(code == null) {
+			console.log("Error: Out of WCode index limit");
+			console.log(req.body.city_center);
+			console.log(req.body.position);
+			res.status(416).send('');
+		}
+		else
+			res.send({'code' : code});
 	}
 
 });
@@ -103,7 +99,12 @@ exports.decode = functions.https.onRequest((req, res) => {
 
 function encode(city_begin, position) {
 	const lat_diff = encodeData(position.lat - city_begin.lat, lat_span_half(city_begin.lat)*2);
+	if(lat_diff == null)
+		return null;
 	const lng_diff = encodeData(position.lng - city_begin.lng, lng_span_half(city_begin.lat)*2);
+	if(lng_diff == null)
+		return null;
+
 	const word_index_1 = lat_diff >> 5;
 	const word_index_2 = lng_diff >> 5;
 	const word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);

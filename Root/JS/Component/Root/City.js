@@ -221,6 +221,12 @@ function noCity(position) {
 	infoWindow.setContent("City not in database");
 }
 
+function notInRange(position) {
+	showNotification("Error: place out of range of selected city");
+	showAddress();
+	infoWindow.setContent("Location not in city range");
+}
+
 function submitCity() {
 	if(address == '')
 		pendingCitySubmit = true;

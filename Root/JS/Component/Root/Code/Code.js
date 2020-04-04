@@ -19,9 +19,8 @@ function encode_(city, position) {
 					setCodeWords(http.responseText, city, position);
 					wait_loader.classList.add('hide');
 				}
-				else if(http.status == 204) {
-					noCity(position);
-					notification_top.classList.remove('hide');
+				else if(http.status == 416) {
+					notInRange(position);
 					wait_loader.classList.add('hide');
 				}
 			}

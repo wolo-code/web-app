@@ -14,7 +14,7 @@ const mailgun = require('mailgun-js')({apiKey, domain});
 const googleMaps_apiKey = functions.config().google_maps.api_key;
 const googleMapsClient = require('@google/maps').createClient({key: googleMaps_apiKey});
 
-// 2^(10+5)
+// 2^(10+10/2)
 const N = 32768;
 const A = 6378137;
 const B = 6356752.314140;

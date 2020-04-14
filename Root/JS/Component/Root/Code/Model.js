@@ -72,7 +72,6 @@ function getCodeCityNameId() {
 	return code_city.name_id;
 }
 
-
 function getCodeCityCountryName() {
 	return code_city.country;
 }

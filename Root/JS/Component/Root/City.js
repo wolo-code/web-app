@@ -76,7 +76,7 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 			xCity.city.gp_id = nearCityList_detail[aCity].city.gp_id;
 			if(typeof nearCityList_detail[aCity].city.administrative_level_2 != 'undefined')
 				xCity.city.administrative_level_2 = nearCityList_detail[aCity].city.administrative_level_2;
-			else if(typeof nearCityList_detail[aCity].city.administrative_level_1 != 'undefined')
+			if(typeof nearCityList_detail[aCity].city.administrative_level_1 != 'undefined')
 				xCity.city.administrative_level_1 = nearCityList_detail[aCity].city.administrative_level_1;
 			xCity.city.name = nearCityList_detail[aCity].city.name;
 			xCity.city.name_id = nearCityList_detail[aCity].city.name_id;

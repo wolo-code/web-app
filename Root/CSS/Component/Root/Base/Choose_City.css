@@ -10,8 +10,17 @@
 	z-index: 1;
 }
 
-.choose_city_message_list {
+.choose_city_message_list, #choose_city_by_periphery_message_current_city {
 	padding-left: 6px;
+}
+
+#choose_city_by_periphery_message_current_city div {
+	background-color: #ffffff;
+	color: #ababab;
+	font-size: larger;
+	border-radius: 5px;
+	padding: 2px 0 2px 8px;
+	border: 1px solid #eeeeee;
 }
 
 .choose_city_message_list div {
@@ -20,9 +29,10 @@
 	font-size: larger;
 	border-radius: 5px;
 	padding: 2px 0 2px 8px;
+	border: 1px solid #69B7CF;
 }
 
-.choose_city_message_list div:hover {
+.choose_city_message_list div:hover, #choose_city_by_periphery_message_current_city div:hover {
 	cursor: pointer;
 }
 

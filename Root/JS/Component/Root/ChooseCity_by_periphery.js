@@ -31,6 +31,7 @@ function hideChooseCity_by_periphery_Message() {
 }
 
 function clearChooseCity_by_periphery_List() {
+	document.getElementById('choose_city_by_periphery_message_current_city').innerHTML = '';
 	document.getElementById('choose_city_by_periphery_message_list').innerHTML = '';
 }
 
@@ -51,6 +52,11 @@ function chooseCity_by_periphery_Continue(e) {
 }
 
 function showChooseCity_by_periphery_gpid() {
+	var container = document.getElementById('choose_city_by_periphery_message_current_city');
+	var row = document.createElement('div');
+	row.innerHTML = getFullCity(code_city);
+	row.addEventListener('click', hideChooseCity_by_periphery_Message);
+	container.appendChild(row);
 	
 	for(let key in chooseCity_by_periphery_gpid) {
 		chooseCity_by_periphery_List_gpids.push(chooseCity_by_periphery_gpid[key].city.gp_id);

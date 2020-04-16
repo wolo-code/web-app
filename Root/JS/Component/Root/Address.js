@@ -8,6 +8,7 @@ function getAddress(latLng, callback) {
 		latLng_p = latLng;
 		if (status === 'OK') {
 			if (address_components[0]) {
+				getCity_by_address_list(address_components);
 				address = address_components[0].formatted_address;
 				gpId = address_components[0].place_id;
 				if(!current_title)

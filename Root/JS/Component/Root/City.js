@@ -26,11 +26,15 @@ var nearCity;
 var pending_encode_latLng;
 
 function getCity_by_perifery_list(latLng, continue_encode) {
-	geoQuery_completed = false;
 	if(continue_encode)
 		pending_encode_latLng = latLng;
 	else
 		pending_encode_latLng = null;
+	getCity_by_perifery_list_fs(latLng);
+}
+
+function getCity_by_perifery_list_fs(latLng) {
+	geoQuery_completed = false;
 	nearCity = null;
 	var nearCityList_coord = {};
 	var nearCityList_detail = {};
@@ -67,6 +71,7 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 	}
 	else {
 		var nearCityList = [];
+		chooseCity_by_periphery_List_gpids = [];
 		var nearCity_distance;
 		nearCity = null;
 		for(aCity in nearCityList_coord) {
@@ -258,5 +263,37 @@ function tryDefaultCity() {
 }
 
 function getFullCity(city) {
-	return city.country + ' \\ ' + getCityGroupName(city) + ': ' + getProperCityAccent(city);
+	cityGroupName = getCityGroupName(city, ' \\ ');
+	properCityAccent = getProperCityAccent(city);
+	if(cityGroupName == null || cityGroupName == properCityAccent)
+		return city.country + ' \\ ' + properCityAccent;
+	else
+		return city.country + ' \\ ' + cityGroupName + ' : ' + properCityAccent;
+}
+
+function getCity_by_address_list(address_components) {
+	chooseCity_by_periphery_gpid = [];
+	for(let i in address_components) {
+		if(address_components[i].types.includes('administrative_area_level_1') || address_components[i].types.includes('administrative_area_level_2') || address_components[i].types.includes('locality')) {
+			let country = null;
+			let administrative_level_1 = null;
+			let administrative_level_2 = null;
+			for(let j in address_components[i].address_components) {
+				if(address_components[i].address_components[j].types.includes('country'))
+					country = address_components[i].address_components[j].long_name;
+				else if(address_components[i].address_components[j].types.includes('administrative_area_level_1'))
+					administrative_level_1 = address_components[i].address_components[j].long_name;
+				else if(address_components[i].address_components[j].types.includes('administrative_area_level_2'))
+					administrative_level_2 = address_components[i].address_components[j].long_name;
+			}
+			chooseCity_by_periphery_gpid[i] = new Object;
+			chooseCity_by_periphery_gpid[i].city = { 'gp_id': address_components[i].place_id,
+				'center' : resolveLatLng(address_components[i].geometry.location),
+				'name' : address_components[i].address_components[0].long_name,
+				'country' : country,
+				'administrative_level_1' : administrative_level_1,
+				'administrative_level_2' : administrative_level_2
+			}
+		}
+	}
 }

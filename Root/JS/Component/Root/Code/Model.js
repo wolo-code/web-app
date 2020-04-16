@@ -80,11 +80,15 @@ function getCodeCityGroupName() {
 	return getCityGroupName(code_city);
 }
 
-function getCityGroupName(city) {
-	if(typeof city.administrative_level_2 != 'undefined')
-		return city.administrative_level_2;
-	else if(typeof city.administrative_level_1 != 'undefined')
-		return city.administrative_level_1;
+function getCityGroupName(city, separator='.') {
+	if(typeof city.administrative_level_1 == 'undefined' || city.administrative_level_1 == null)
+		return '';
+	else {
+		if(typeof city.administrative_level_2 == 'undefined' || city.administrative_level_2 == null)
+			return city.administrative_level_1;
+		else
+			return city.administrative_level_1 + separator + city.administrative_level_2;
+	}
 }
 
 function getCodeCity() {

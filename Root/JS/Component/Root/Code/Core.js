@@ -93,8 +93,8 @@ function decode(words) {
 	var valid = true;
 
 	if(words.length >= 3) {
-		for (var i = 0; i < 3; i++) {
-			if (wordList.includes(words[city_words_length+i]) != true) {
+		for(var i = 0; i < 3; i++) {
+			if(wordList.includes(words[city_words_length+i]) != true) {
 				valid = false;
 				break;
 			}

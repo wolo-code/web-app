@@ -231,9 +231,9 @@ function getAddressCity(place_id, address_components, geometry, res) {
 			city_accent = null;
 		city_lat = geometry['location']['lat'];
 		city_lng = geometry['location']['lng'];
-		var administrative_level_3 = administrative_level_3_i != null? address_components[administrative_level_3_i].long_name : null
-		var administrative_level_2 = administrative_level_2_i != null? address_components[administrative_level_2_i].long_name : null
-		var administrative_level_1 = administrative_level_1_i != null? address_components[administrative_level_1_i].long_name : null
+		var administrative_level_3 = administrative_level_3_i != null? address_components[administrative_level_3_i].long_name : null;
+		var administrative_level_2 = administrative_level_2_i != null? address_components[administrative_level_2_i].long_name : null;
+		var administrative_level_1 = administrative_level_1_i != null? address_components[administrative_level_1_i].long_name : null;
 		var country = found_country_i != null? address_components[found_country_i].long_name : null;
 		submit_city(place_id, city_lat, city_lng, city_name, city_accent, administrative_level_3, administrative_level_2, administrative_level_1, country, function(push_id) { res.send({'added' : push_id}) } );
 	}

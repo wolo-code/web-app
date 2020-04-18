@@ -97,3 +97,7 @@
 	text-transform: uppercase;
 	color: rgb(255,64,129);
 }
+
+.city_tally_false #infowindow_code_left_code > span {
+	text-decoration: line-through;
+}

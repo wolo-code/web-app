@@ -14,13 +14,12 @@ function encode(position, locating_encode) {
 				getCityFromCityGp_id( city_gp_id, function(city) {
 					if(typeof locating_encode != 'undefined' && locating_encode == true) {
 						current_city_gp_id = city_gp_id;
-						is_current_city = true;
+						setCurrentCity_status(true);
 					}
-					else if(current_city_gp_id == city_gp_id) {
-						is_current_city = true;
-					}
+					else if(current_city_gp_id == city_gp_id)
+						setCurrentCity_status(true);
 					else
-						is_current_city = false;
+						setCurrentCity_status(false);
 					getCityCenterFromId(city, function(city) {
 						if(city != null)
 							encode_continue(city, position);
@@ -36,6 +35,17 @@ function encode(position, locating_encode) {
 				getCity_by_perifery_list(position, true);
 			}
 		});
+}
+
+function setCurrentCity_status(status) {
+	if(status) {
+		document.getElementById('map').classList.remove('different_city');
+		document.getElementById('map').classList.add('current_city');
+	}
+	else {
+		document.getElementById('map').classList.remove('current_city');
+		document.getElementById('map').classList.add('different_city');
+	}
 }
 
 function encode_continue(city, position) {

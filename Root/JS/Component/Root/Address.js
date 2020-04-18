@@ -10,7 +10,13 @@ function getAddress(latLng, callback) {
 			if (address_components[0]) {
 				getCity_by_address_list(address_components);
 				address = address_components[0].formatted_address;
-				gpId = address_components[0].place_id;
+				gpId = getCityGpId(address_components);
+				if(typeof code_city != 'undefined' && code_city.gp_id != null && gpId != code_city.gp_id) {
+					setCurrentCity_status(false);
+				}
+				else {
+					setCurrentCity_status(true);
+				}
 				if(!current_title)
 					refreshAddress();
 				if(typeof callback != 'undefined')

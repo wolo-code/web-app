@@ -197,6 +197,7 @@ function addCity(place_id, res) {
 
 function getAddressCity(place_id, address_components, geometry, res) {
 	var found_city_i;
+	var locality_level_i;
 	var administrative_level_3_i;
 	var administrative_level_2_i;
 	var administrative_level_1_i;
@@ -204,6 +205,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	for(var i = address_components.length-1; i >= 0; i--) {
 		if(address_components[i].types.includes('locality')) {
 			found_city_i = i;
+			locality_level_i = i;
 			break;
 		} else if ( found_city_i == null && (address_components[i].types.includes('sublocality') || address_components[i].types.includes('sublocality_level_1')) ) {
 			found_city_i = i;
@@ -231,11 +233,12 @@ function getAddressCity(place_id, address_components, geometry, res) {
 			city_accent = null;
 		city_lat = geometry['location']['lat'];
 		city_lng = geometry['location']['lng'];
+		var locality = locality_level_i != null? address_components[locality_level_i].long_name : null;
 		var administrative_level_3 = administrative_level_3_i != null? address_components[administrative_level_3_i].long_name : null;
 		var administrative_level_2 = administrative_level_2_i != null? address_components[administrative_level_2_i].long_name : null;
 		var administrative_level_1 = administrative_level_1_i != null? address_components[administrative_level_1_i].long_name : null;
 		var country = found_country_i != null? address_components[found_country_i].long_name : null;
-		submit_city(place_id, city_lat, city_lng, city_name, city_accent, administrative_level_3, administrative_level_2, administrative_level_1, country, function(push_id) { res.send({'added' : push_id}) } );
+		submit_city(place_id, city_lat, city_lng, city_name, city_accent, locality, administrative_level_3, administrative_level_2, administrative_level_1, country, function(push_id) { res.send({'added' : push_id}) } );
 	}
 	else {
 		console.err("Error: " + address_components + ' - ' + geometry);
@@ -243,7 +246,7 @@ function getAddressCity(place_id, address_components, geometry, res) {
 	}
 }
 
-function submit_city(gp_id, lat, lng, name, accent, administrative_level_3, administrative_level_2, administrative_level_1, country, callback) {
+function submit_city(gp_id, lat, lng, name, accent, locality, administrative_level_3, administrative_level_2, administrative_level_1, country, callback) {
 	try {
 		var refCityDetail = admin.database().ref('/CityDetail').push();
 		var geoFireCenter = new geoFire.GeoFire(admin.database().ref('/CityCenter'));
@@ -252,6 +255,7 @@ function submit_city(gp_id, lat, lng, name, accent, administrative_level_3, admi
 			'name_id': name.toLocaleLowerCase(),
 			'name': name,
 			'accent': accent,
+			'locality': locality,
 			'administrative_level_3': administrative_level_3,
 			'administrative_level_2': administrative_level_2,
 			'administrative_level_1': administrative_level_1,

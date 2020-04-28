@@ -21,7 +21,7 @@ function shareWCode() {
 	navigator.share( {
 		title: "Wolo",
 		text: "Wolo code for: " + ' ' + share_address + ' ' + '|',
-		url: '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/'
+		url: '/' + getCodeComplete().join('.').toLowerCase().replace(' ', '_') + '/'
 	} )
 	.catch((error) => console.log('Error sharing', error));
 }
@@ -83,14 +83,14 @@ function copyWcodeCode() {
 }
 
 function copyWcodeLink() {
-	var code_url = location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_');
+	var code_url = location.hostname + '/' + getCodeComplete().join('.').toLowerCase().replace(' ', '_');
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
 }
 
 function copyWcodeJumpLink() {
-	var code_url = location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_') + '/';
+	var code_url = location.hostname + '/' + getCodeComplete().join('.').toLowerCase().replace(' ', '_') + '/';
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();

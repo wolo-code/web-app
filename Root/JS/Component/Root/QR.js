@@ -22,7 +22,7 @@ function showQR() {
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
 	var qrcode = new QRCode({
-		content: "https://"+location.hostname + '/' + getCodeFull().join('.').toLowerCase().replace(' ', '_'),
+		content: "https://"+location.hostname + '/' + getCodeComplete().join('.').toLowerCase().replace(' ', '_'),
 		container: "svg",
 		join: true,
 		xmlDeclaration: false,

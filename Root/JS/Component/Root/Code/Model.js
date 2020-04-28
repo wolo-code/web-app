@@ -22,6 +22,10 @@ function clearCode() {
 	code_postition = null;
 }
 
+function getCodeComplete() {
+	return [].concat(code_city.country.toLowerCase(), [getCodeCityGroupName().toLowerCase()], code_city.name_id, code_wcode);
+}
+
 function getCodeFull() {
 	var codeFull_city_part = [code_city.name_id].concat(code_wcode);
 	var prefix;

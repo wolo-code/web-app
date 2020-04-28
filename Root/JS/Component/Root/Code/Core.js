@@ -114,8 +114,9 @@ function decode(words) {
 	if(valid) {
 
 			if(city_words_length > 0) {
-				var ipCityName = words.slice(0, city_words_length).join(' ');
-				getCityFromName(ipCityName, function(city) {
+				var ipGroup = words.slice(0, city_words_length-1);
+				var ipCity = words.slice(city_words_length-1, city_words_length)[0];
+				getCityFromName(ipGroup, ipCity, function(city) {
 					if(city == null)
 						decode_continue(null, words.slice(city_words_length, words.length));
 					else

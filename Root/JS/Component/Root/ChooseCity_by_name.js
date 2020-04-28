@@ -23,8 +23,12 @@ function clearChooseCityList() {
 	document.getElementById('choose_city_by_name_message_list').innerHTML = '';
 }
 
-function chooseCity(list, callback) {
-	chooseCityList = list;
+function chooseCity(list, matchCount, callback) {
+	chooseCityList = {};
+	for(let i in matchCount) {
+		let index = matchCount[i];
+		chooseCityList[index] = (list[index]);
+	}
 	chooseCityCallback = callback;
 	showChooseCityMessage();
 }

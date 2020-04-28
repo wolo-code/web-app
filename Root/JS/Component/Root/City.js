@@ -263,12 +263,17 @@ function tryDefaultCity() {
 }
 
 function getFullCity(city) {
+	locality = typeof city.locality != 'undefined'? city.locality : null; 
 	cityGroupName = getCityGroupName(city, ' \\ ');
 	properCityAccent = getProperCityAccent(city);
-	if(cityGroupName == null || cityGroupName == properCityAccent)
+	if(cityGroupName == null || (!locality && (cityGroupName == properCityAccent) ) )
 		return city.country + ' \\ ' + properCityAccent;
-	else
-		return city.country + ' \\ ' + cityGroupName + ' : ' + properCityAccent;
+	else {
+		if(locality)
+			return city.country + ' \\ ' + cityGroupName + ' : ' + properCityAccent;
+		else
+			return city.country + ' \\ ' + cityGroupName + ' \\ ' + properCityAccent;
+	}
 }
 
 function getCity_by_address_list(address_components) {

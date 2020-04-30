@@ -161,37 +161,37 @@ function getCityFromName(group, name, callback) {
 	ref.orderByChild('name_id').equalTo(name).once('value', function(snapshot) {
 		wait_loader.classList.add('hide');
 		var list = snapshot.val();
-		let matchCount;
-		matchCount = matchCityByGroup(list, group, name);
-		if(matchCount.length == 0)
+		let matchList;
+		matchList = matchCityByGroup(list, group, name);
+		if(matchList.length == 0)
 			decode_continue();
 		else {
-			if(matchCount.length == 1) {
-				let i = matchCount[0];
+			if(matchList.length == 1) {
+				let i = matchList[0];
 				var city = list[i];
 				city.id = i;
 				callback(city);
 			}
 			else	
-				chooseCity(list, matchCount, callback);
+				chooseCity(list, matchList, callback);
 		}
 	});
 }
 
 function matchCityByGroup(list, group, name) {
-	var matchCount = [];
+	var matchList = [];
 	var complete_id_list = [];
 	if(list != null) {
 		for(let i in list) {
 			let complete_id = (list[i].country+'-'+list[i].administrative_level_1+'-'+list[i].administrative_level_2).toLowerCase();
 			if(!complete_id_list.includes(complete_id)) {	
 				if(group.length == 0 || group.join('-') == complete_id)
-					matchCount.push(i);
 				complete_id_list.push(complete_id);
+					matchList.push(i);
 			}
 		}
 	}	
-	return matchCount;
+	return matchList;
 }
 
 function getCityCenterFromId(city, callback) {

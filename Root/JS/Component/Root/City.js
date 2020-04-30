@@ -183,11 +183,11 @@ function matchCityByGroup(list, group, name) {
 	var complete_id_list = [];
 	if(list != null) {
 		for(let i in list) {
-			let complete_id = (list[i].country+'-'+list[i].administrative_level_1+'-'+list[i].administrative_level_2).toLowerCase();
-			if(!complete_id_list.includes(complete_id)) {	
+			let complete_group_id = (list[i].country+'-'+list[i].administrative_level_1+'-'+list[i].administrative_level_2).toLowerCase();
+			if(!complete_group_id_list.includes(complete_group_id)) {	
 				if(group.length == 0 || group.join('-') == complete_id)
-				complete_id_list.push(complete_id);
 					matchList.push(i);
+				complete_id_list.push(complete_group_id);
 			}
 		}
 	}	

@@ -183,7 +183,7 @@ function matchCityByGroup(list, group, name) {
 	var complete_id_list = [];
 	if(list != null) {
 		for(let i in list) {
-			let complete_group_id = (list[i].country+'-'+list[i].administrative_level_1+'-'+list[i].administrative_level_2).toLowerCase();
+			let complete_group_id = (list[i].country+'-'+list[i].administrative_level_1+'-'+list[i].administrative_level_2).toLowerCase().replace('--', '-');
 			if(!complete_group_id_list.includes(complete_group_id)) {	
 				if(group.length == 0 || group.join('-') == complete_id)
 					matchList.push(i);

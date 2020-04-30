@@ -99,8 +99,6 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 	}
 }
 
-//			getCityFromIdThenEncode(nearCity.city.id, nearCity.city.center, latLng);
-
 function getCityFromIdThenEncode(city_id, city_center, latLng) {
 	getCityFromId(city_id, function(city) {
 		city.center = city_center;

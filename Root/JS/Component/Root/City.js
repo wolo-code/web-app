@@ -197,7 +197,7 @@ function matchCityByGroup(list, group, name) {
 function getCityCenterFromId(city, callback) {
 	refCityCenter.child(city.id).once('value', function(snapshot) {
 		var location = snapshot.val().l;
-		city.center = { lat: location[0], lng: location[1]};
+		city.center = { lat: location[0], lng: location[1] };
 		callback(city);
 	});
 }

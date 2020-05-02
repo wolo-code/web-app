@@ -83,10 +83,17 @@ function urlDecode() {
 			code_string = window.location.pathname.substr(1);
 			initWCode_jumpToMap = false;
 		}
-		var code = code_string.toLowerCase().replace('_', ' ');
-		pendingWords = code.split('.');
-		initWCode = true;
-		return true;
+		
+		if(!code_string.match(/^[A-Za-z0-9._]+$/)) {
+			window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
+			return false;
+		}
+		else {			
+			var code = code_string.toLowerCase().replace('_', ' ');
+			pendingWords = code.split('.');
+			initWCode = true;
+			return true;
+		}
 	}
 	else
 		return false;

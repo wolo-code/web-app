@@ -1,5 +1,7 @@
 DirectoryIndex index.html
 
+RewriteRule ^404$ /Framework/HTML/404.php [L]
+
 RewriteBase /
 RewriteEngine On
 DirectorySlash Off

@@ -31,7 +31,7 @@
 				measurementId: "G-882VJ942XZ"
 			};
 			var app = firebase.initializeApp(FIREBASE_CONFIG);
-			var analytics = firebase.aanalytics = nalytics();
+			var analytics = firebase.analytics();
 			</script>
 	<?php
 		}

@@ -100,9 +100,10 @@ function getCityGpId(address_components) {
 function decode(words) {
 	var city_words_length = words.length-3;
 
-	var valid = true;
+	var valid;
 
 	if(words.length >= 3) {
+		valid = true;
 		for(var i = 0; i < 3; i++) {
 			if(typeof wordList != 'undefined' && wordList.includes(words[city_words_length+i]) != true) {
 				valid = false;
@@ -110,6 +111,8 @@ function decode(words) {
 			}
 		}
 	}
+	else
+		valid = false;
 
 	if(valid) {
 

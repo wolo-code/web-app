@@ -16,13 +16,12 @@ function encode_(city, position) {
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
 			if(http.requestId == curEncRequestId) {
+				wait_loader.classList.add('hide');
 				if(http.status == 200) {
 					setCodeWords(http.responseText, city, position);
-					wait_loader.classList.add('hide');
 				}
 				else if(http.status == 416) {
 					notInRange(position);
-					wait_loader.classList.add('hide');
 				}
 			}
 		}

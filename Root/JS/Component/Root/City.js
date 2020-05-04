@@ -246,6 +246,7 @@ function notInRange(position) {
 	showNotification("Error: place out of range of selected city");
 	showAddress();
 	infoWindow.setContent("Not in selected city's range");
+	showChooseCity_by_periphery_Message();
 }
 
 function submitCity() {

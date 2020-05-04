@@ -245,7 +245,7 @@ function noCity(position) {
 function notInRange(position) {
 	showNotification("Error: place out of range of selected city");
 	showAddress();
-	infoWindow.setContent("Not in selected city's range");
+	infoWindow.setContent("<div class='control' onclick='showChooseCity_by_periphery_Message();'>Not in <span class='blue'>selected<span> city's range</div>");
 	showChooseCity_by_periphery_Message();
 }
 

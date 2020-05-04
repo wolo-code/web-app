@@ -4,6 +4,7 @@
 // var curAddCityRequestId;
 
 function encode_(city, position) {
+	code_city = city;
 	var http = new XMLHttpRequest();
 	http.open('POST', FUNCTIONS_BASE_URL+'/'+'encode', true);
 
@@ -50,6 +51,7 @@ function stringifyEncodeData(city_center, position) {
 
 function decode_(city, code) {
 
+	code_city = city;
 	var http = new XMLHttpRequest();
 	http.open('POST', FUNCTIONS_BASE_URL+'/'+'decode', true);
 

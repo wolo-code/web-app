@@ -3,7 +3,6 @@
 // var code_postition;
 
 function setCode(city, wcode, latLng) {
-	code_city = city;
 	if(typeof code_city != 'undefined' && code_city.gp_id != null && city.gp_id != code_city.gp_id) {
 		document.getElementById('map').classList.remove('city_tally_true');
 		document.getElementById('map').classList.add('city_tally_false');

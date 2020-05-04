@@ -30,6 +30,10 @@
 	font-family: monospace;
 }
 
+#accuracy_meter_unit {
+	padding-right: 4px;
+}
+
 .highlight #accuracy_meter {
 	font-weight: bold;
 }

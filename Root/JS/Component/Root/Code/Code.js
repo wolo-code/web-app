@@ -49,7 +49,6 @@ function stringifyEncodeData(city_center, position) {
 }
 
 function decode_(city, code) {
-
 	code_city = city;
 	var http = new XMLHttpRequest();
 	http.open('POST', FUNCTIONS_BASE_URL+'/'+'decode', true);
@@ -74,7 +73,6 @@ function decode_(city, code) {
 	data[1] = wordList.indexOf(code[1]);
 	data[2] = wordList.indexOf(code[2]);
 	http.send( stringifyDecodeData(city.center, data) );
-
 }
 
 function stringifyDecodeData(city_center, code) {

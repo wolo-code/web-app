@@ -9,7 +9,6 @@
 	margin: auto;
 	font-family: 'Abel';
 	background-color: #FFFFFF;
-	z-index: 1;
 }
 
 .choose_city_message_list, #choose_city_by_periphery_message_current_city {

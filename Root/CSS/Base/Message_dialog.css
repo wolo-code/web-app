@@ -4,7 +4,7 @@
 	left: 0;
 	right: 0;
 	max-width: 286px;
-	width: 286px;
+	min-width: 286px;
 	margin: auto;
 	border: 1px solid #ddd;
 	font-family: 'Abel';

@@ -3,6 +3,7 @@ var DEFAULT_LATLNG = {lat: -34.397, lng: 150.644};
 var DEFAULT_INIT_ZOOM = 2;
 var DEFAULT_LOCATE_ZOOM = 24;
 var pendingInitMap = true;
+var syncLocate_engage;
 
 // Firebase
 var analytics;

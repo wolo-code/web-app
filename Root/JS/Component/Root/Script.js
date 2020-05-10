@@ -1,11 +1,18 @@
+// var syncLocate_engage;
+
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
 		firebaseInit();
 		initApp();
 		dbInit();
-		versionCheck();
-		if(!urlDecode())
-			syncLocate();
+		syncLocate_engage = versionCheck();
+		if(!urlDecode()) {
+			if(syncLocate_engage)
+				syncLocate();
+		}
+		else
+			syncLocate_engage = true;
+			
 		syncInitMap();
 		setupControls();
 		initLoadDone = true;

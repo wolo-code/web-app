@@ -55,9 +55,12 @@ function versionCheck() {
 	if(set) {
 		localStorage.note_version = CURRENT_VERSION;
 		showInfo();
+		return false;
 	}
-	else
+	else {
 		activateOverlayInfo_full();
+		return true;
+	}
 }
 
 function activateOverlayInfo_full() {

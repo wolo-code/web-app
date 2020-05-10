@@ -4,9 +4,13 @@
 	require_once '../API/Config.php';
 	require_once '../API/IncludeSVG.php';
 
-	if( isset($_GET['mode']) && ($_GET['mode'] === "publish") ) {
+	if( isset($_GET['mode']) && ($_GET['mode'] === "prod") ) {
 		$bPublish = TRUE;
 		$variant = 'prod';
+	}
+	else if( isset($_GET['mode']) && ($_GET['mode'] === "dev") ) {
+		$bPublish = TRUE;
+		$variant = 'dev';
 	}
 	else {
 		$bPublish = FALSE;

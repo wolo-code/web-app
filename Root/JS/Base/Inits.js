@@ -12,7 +12,7 @@ var database;
 var refCityCenter;
 var geoFire;
 
-//Script
+// Script
 var initLoadDone = false;
 
 // UpdateMyBrowser

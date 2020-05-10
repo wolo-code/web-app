@@ -6,7 +6,7 @@
 	<meta name='title' content="<?php echo $config['project_title'] ?>" >
 	<meta itemprop='name' content="<?php echo $config['project_title'] ?>" >
 	<meta name='author' content="<?php echo $config['author'] ?>" >
-	<meta name='viewport' content='initial-scale=1.0, viewport-fit=cover' >
+	<meta name='viewport' content="initial-scale=1.0, viewport-fit=cover" >
 	<meta name='theme-color' content='#ffffff' >
 	<?php require '../HTML/Fragment/OG_Meta.php' ?>
 	<?php require '../HTML/Fragment/FB_Meta.php' ?>
@@ -27,22 +27,23 @@
 		<script src='/umb.js'></script>
 		<script src='/svgs.js'></script>
 <?php }
-	$component = "";
+	$component = '';
 	require '../JS/Fragment/JS.php';
 	$component = $id;
 	require '../JS/Fragment/JS.php';
 ?>
 <?php
-	$component = "";
+	$component = '';
 	require '../CSS/Fragment/CSS.php';
 	$component = $id;
 	require '../CSS/Fragment/CSS.php';
 ?>
+</head>
 <body>
 	<?php	require (getComponentPath($id)); ?>
-	<script src="/geofire.min.js" async defer></script>
-	<script src="/qrcode.min.js" async defer></script>
-	<script src="/html2canvas.min.js" async defer></script>
 	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script>
+	<script src='/geofire.min.js' async defer></script>
+	<script src='/qrcode.min.js' async defer></script>
+	<script src='/html2canvas.min.js' async defer></script>
 </body>
 </html>

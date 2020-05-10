@@ -12,11 +12,11 @@ function encode_(city, position) {
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curEncRequestId;
 
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
 			if(http.requestId == curEncRequestId) {
-				wait_loader.classList.add('hide');
+				document.getElementById('wait_loader').classList.add('hide');
 				if(http.status == 200) {
 					setCodeWords(http.responseText, city, position);
 				}
@@ -57,13 +57,13 @@ function decode_(city, code) {
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curDecRequestId;
 
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			if(http.requestId == curDecRequestId) {
 				setCodeCoord(city, http.responseText, code);
 				notification_top.classList.add('hide');
-				wait_loader.classList.add('hide');
+				document.getElementById('wait_loader').classList.add('hide');
 			}
 		}
 	}

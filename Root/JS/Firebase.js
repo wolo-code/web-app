@@ -4,7 +4,7 @@
 
 function firebaseInit() {
 	firebase.initializeApp(FIREBASE_CONFIG);
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	if(typeof authInit != 'undefined')
 		authInit();
 	if(typeof firebase.analytics != 'undefined')

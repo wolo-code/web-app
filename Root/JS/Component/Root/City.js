@@ -44,10 +44,10 @@ function getCity_by_perifery_list_fs(latLng) {
 		radius: CITY_RANGE_RADIUS
 	});
 
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	geoQuery.on('ready', function() {
 		geoQuery_completed = true;
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		geoQuery.cancel();
 
 		if(Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
@@ -115,9 +115,9 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 		radius: CITY_RANGE_RADIUS
 	});
 
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	geoQuery.on('ready', function() {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		geoQuery.cancel();
 		if(nearCity == null)
 			decode_continue(null, wcode);
@@ -146,9 +146,9 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 // only detail, not center
 function getCityFromId(id, callback) {
 	var ref = database.ref('CityDetail'+'/'+id);
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	ref.once('value').then(function(snapshot) {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		var city = snapshot.val();
 		city.id = id;
 		callback(city);
@@ -157,9 +157,9 @@ function getCityFromId(id, callback) {
 
 function getCityFromName(group, name, callback) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	ref.orderByChild('name_id').equalTo(name).once('value', function(snapshot) {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		var list = snapshot.val();
 		let matchList;
 		matchList = matchCityByGroup(list, group, name);
@@ -204,9 +204,9 @@ function getCityCenterFromId(city, callback) {
 
 function getCitiesFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value', function(snapshot) {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		callback(snapshot.val());
 	});
 }
@@ -214,18 +214,18 @@ function getCitiesFromNameId(name_id, callback) {
 // unused
 function getCityIdFromNameId(name_id, callback) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	ref.orderByChild('name_id').equalTo(name_id).once('value', function(snapshot) {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		callback(Object.keys(snapshot.val())[0]);
 	});
 }
 
 function getCityFromCityGp_id(city_gp_id, callback_success, callback_failure) {
 	var ref = database.ref('CityDetail');
-	wait_loader.classList.remove('hide');
+	document.getElementById('wait_loader').classList.remove('hide');
 	ref.orderByChild('gp_id').equalTo(city_gp_id).once('value', function(snapshot) {
-		wait_loader.classList.add('hide');
+		document.getElementById('wait_loader').classList.add('hide');
 		if (snapshot.exists()) {
 			var city = Object.values(snapshot.val())[0];
 			city.id = Object.keys(snapshot.val())[0];

@@ -1,8 +1,5 @@
 .message_dialog {
-	position: absolute;
-	top: 230px;
-	left: 0;
-	right: 0;
+	position: relative;
 	max-width: 286px;
 	min-width: 286px;
 	margin: auto;

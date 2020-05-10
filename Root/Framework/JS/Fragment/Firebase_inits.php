@@ -9,3 +9,7 @@ var FIREBASE_CONFIG = {
 	appId: "<?php echo $config['firebase_appId'] ?>",
 	measurementId: "<?php echo $config['firebase_measurementId'] ?>"
 };
+
+// Code\Code
+var FUNCTIONS_BASE_URL = "https://<?php echo $config['site_name'] ?>/api";
+//'http://localhost:5000/waddress-5f30b/us-central1';

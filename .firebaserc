@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "waddress-5f30b",
-    "production": "wolo-codes"
+    "dev": "waddress-5f30b",
+    "prod": "wolo-codes"
   }
 }

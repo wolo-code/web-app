@@ -5,8 +5,10 @@ function onLogin() {
 }
 
 function onLogout() {
+	document.getElementById('wait_loader').classList.remove('hide');
 	firebase.auth().signOut()
 	.then(function() {
+		document.getElementById('wait_loader').classList.add('hide');
 		hideOverlay(document.getElementById('firebaseui-auth-container'));
 		document.getElementById('account_dialog_container').classList.add('hide');
 		document.getElementById('account_user_image').classList.add('hide');

@@ -9,6 +9,12 @@
 	background-color: rgba(100, 100, 100, 0.75);
 	position: absolute;
 	margin: auto;
+	display: flex;
+	align-items: center;
+}
+
+.overlay > div {
+	max-height: 100%;
 }
 
 #logo_info {

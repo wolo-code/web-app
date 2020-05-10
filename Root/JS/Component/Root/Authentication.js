@@ -1,6 +1,6 @@
 function onLogin() {
-	showAuthenticationDialog();
 	hideAccountDialog();
+	showAuthenticationDialog();
 	ui.start('#firebaseui-auth', uiConfig);	
 }
 

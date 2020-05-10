@@ -141,7 +141,7 @@ button.border {
 
 .link-gray {
 	text-decoration: none;
-	color: #bbb!important;
+	color: #bbb !important;
 	transition: all ease-out .3s;
 }
 

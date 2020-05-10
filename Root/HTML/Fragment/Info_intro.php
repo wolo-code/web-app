@@ -1,5 +1,4 @@
 <div id='info_intro'>
-	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
 	<p>
 		This web app requires anonymous cookies and various third-party services to function properly<br>
 		To continue using Wolo codes you must consent to its <a class='link' href='/policy'>cookie & privacy policies</a>

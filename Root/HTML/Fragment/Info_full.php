@@ -1,5 +1,4 @@
 <div id='info_full' class='hide'>
-	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
 			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'><span class='image'><?php includeSVG('', 'Back'); ?></span></span> return</button>

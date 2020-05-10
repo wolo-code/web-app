@@ -13,6 +13,10 @@
 	<meta http-equiv='X-UA-Compatible' content='IE=edge' >
 	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
 	<title>Page Not Found<?php echo ' - '.$config['project_title'] ?></title>
+	<script>
+		var app = firebase.initializeApp(FIREBASE_CONFIG);
+		var analytics = firebase.analytics();
+	</script>
 	<?php
 		if($bPublish) {
 	?>
@@ -20,19 +24,6 @@
 			<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-analytics.js"></script>
 			<script src="https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-performance.js"></script>
 
-			<script>
-			var FIREBASE_CONFIG = {
-				apiKey: "AIzaSyC-ZxXuNOEEs5mNQD3Z8u4CSJtldtLztDE",
-				authDomain: "wolo.codes",
-				projectId: "wolo-codes",
-				storageBucket: "wolo-codes.appspot.com",
-				messagingSenderId: "1073432021665",
-				appId: "1:1073432021665:web:29ab7635459c72c19bbee0",
-				measurementId: "G-882VJ942XZ"
-			};
-			var app = firebase.initializeApp(FIREBASE_CONFIG);
-			var analytics = firebase.analytics();
-			</script>
 	<?php
 		}
 	?>

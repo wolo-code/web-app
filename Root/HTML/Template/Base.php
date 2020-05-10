@@ -17,6 +17,9 @@
 <?php
 	$component = $id;
 	require '../HTML/Fragment/Head.php';
+?>
+	<script><?php require '../JS/Fragment/Firebase_inits.php' ?></script>
+<?php
 	if($bPublish) { ?>
 		<script <?php require '../JS/Fragment/Sentry_version.php' ?>></script>
 		<script><?php require '../JS/Fragment/Sentry_exec.php' ?></script>

@@ -4,3 +4,5 @@ firebase_projectId	wolo-codes
 firebase_messagingSenderId	1073432021665
 firebase_appId	1:1073432021665:web:29ab7635459c72c19bbee0
 firebase_measurementId	G-882VJ942XZ
+sentry_key	badf8db6081d40d48af771b728440050
+sentry_id	2045587

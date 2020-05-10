@@ -9,9 +9,8 @@ twitter_author	wolocodes
 fb_appId	1860152747451314
 fb_admins	100000014591845
 google_cse_id	006667833380887598950:etruytzxbo4
-sentry_key	badf8db6081d40d48af771b728440050
-sentry_id	2045587
-sentry_version	5.11.2
-sentry_hash	sha384-FLzYisBa7tvsi/ZP1ISnzZJqBkmw5mvwk7KOmH82W9wdPZKG3bG9hSO8GQFVSlOu
+sentry_version	5.15.5
+sentry_hash	sha384-wF7Jc4ZlWVxe/L8Ji3hOIBeTgo/HwFuaeEfjGmS3EXAG7Y+7Kjjr91gJpJtr+PAT
 firebase_version	7.4.0
 firebase_ui_version	4.3.0
+sentry_ingest_sub_id	o85995

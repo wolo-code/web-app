@@ -33,6 +33,10 @@
 	padding-bottom: 4px;
 }
 
+#save_title_container {
+	text-align: left;
+}
+
 #save_title_main, #save_title_segment, #save_address {
 	background-color: white;
 	color: #999999;

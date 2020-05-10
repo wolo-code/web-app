@@ -4,9 +4,9 @@ function redirectCancel() {
 }
 
 function redirect_showLoader() {
-	document.getElementById('redirecting_message').classList.remove('hide');
+	showOverlay(document.getElementById('redirecting_message'));
 }
 
 function redirect_hideLoader() {
-	document.getElementById('redirecting_message').classList.add('hide');
+	hideOverlay(document.getElementById('redirecting_message'));
 }

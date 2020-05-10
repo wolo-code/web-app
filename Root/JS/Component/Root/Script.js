@@ -54,10 +54,10 @@ function setupControls() {
 	document.getElementById('account_dialog_logout').addEventListener('click', onLogout);
 	document.getElementById('save_address').addEventListener('focus', onAccountDialogAddressActive);
 	document.getElementById('account_dialog_save').addEventListener('click', onAccountDialogSave);
-	document.getElementById('overlay_message_close').addEventListener('click', hideOverlay);
-	document.getElementById('info_intro_close_button').addEventListener('click', hideOverlay);
-	document.getElementById('info_full_close_button').addEventListener('click', hideOverlay);
-	document.getElementById('info').addEventListener('click', showOverlay);
+	document.getElementById('overlay_message_close').addEventListener('click', closeInfo);
+	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
+	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
+	document.getElementById('info').addEventListener('click', showInfo);
 	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
 	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);

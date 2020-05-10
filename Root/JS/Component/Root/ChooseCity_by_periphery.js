@@ -7,7 +7,7 @@ function showChooseCity_by_periphery_Message() {
 	clearChooseCity_by_periphery_List();
 	showChooseCity_by_periphery_gpid();
 	showChooseCity_by_periphery_List();
-	choose_city_by_periphery_message.classList.remove('hide');
+	showOverlay(document.getElementById('choose_city_by_periphery_message'));
 }
 
 function showChooseCity_by_periphery_List() {
@@ -26,7 +26,7 @@ function showChooseCity_by_periphery_List() {
 }
 
 function hideChooseCity_by_periphery_Message() {
-	choose_city_by_periphery_message.classList.add('hide');
+	hideOverlay(document.getElementById('choose_city_by_periphery_message'));
 	clearChooseCity_by_periphery_List();
 }
 

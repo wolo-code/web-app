@@ -1,5 +1,5 @@
-<div id='account_dialog_container' class="hide overlay">
-	<div id='account_dialog' class="center message_dialog">
+<div id='account_dialog_container' class="center hide">
+	<div id='account_dialog' class='message_dialog'>
 		<h2 id='account_dialog_label' class='message_dialog_label'>
 			Account
 		</h2>

@@ -1,16 +1,19 @@
-<?php
-	require '../../HTML/Fragment/Redirect.php';
-	require '../../HTML/Fragment/NoCity.php';
-	require '../../HTML/Fragment/Copy_wcode.php';
-	require '../../HTML/Fragment/ChooseCity_by_name.php';
-	require '../../HTML/Fragment/ChooseCity_by_periphery.php';
-	require '../../HTML/Fragment/LocateRight.php';
-	require '../../HTML/Fragment/Overlay.php';
-	require '../../HTML/Fragment/Incompatible_browser.html';
-	require '../../HTML/Fragment/QR.php';
-	require '../../HTML/Fragment/Authentication.php';
-	require '../../HTML/Fragment/Account_Dialog.php';
-?>
+<div id='overlay' class="overlay hide">
+	<?php
+		require '../../HTML/Fragment/Redirect.php';
+		require '../../HTML/Fragment/NoCity.php';
+		require '../../HTML/Fragment/Copy_wcode.php';
+		require '../../HTML/Fragment/ChooseCity_by_name.php';
+		require '../../HTML/Fragment/ChooseCity_by_periphery.php';
+		require '../../HTML/Fragment/LocateRight.php';
+		require '../../HTML/Fragment/Info.php';
+		require '../../HTML/Fragment/Incompatible_browser.html';
+		require '../../HTML/Fragment/QR.php';
+		require '../../HTML/Fragment/Authentication.php';
+		require '../../HTML/Fragment/Account_Dialog.php';
+	?>
+</div>
+
 <div id='map'></div>
 <div id='wait_loader'></div>
 <div id='logo' tabindex='1'>

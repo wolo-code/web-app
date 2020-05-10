@@ -5,10 +5,9 @@ function onLogin() {
 }
 
 function onLogout() {
-	document.getElementById('firebaseui-auth-container').classList.remove('hide');
 	firebase.auth().signOut()
 	.then(function() {
-		document.getElementById('firebaseui-auth-container').classList.add('hide');
+		hideOverlay(document.getElementById('firebaseui-auth-container'));
 		document.getElementById('account_dialog_container').classList.add('hide');
 		document.getElementById('account_user_image').classList.add('hide');
 		document.getElementById('account_user_image').setAttribute('src', null);
@@ -25,9 +24,9 @@ function onLogout() {
 }
 
 function showAuthenticationDialog() {
-	document.getElementById('firebaseui-auth-container').classList.remove('hide');
+	showOverlay(document.getElementById('firebaseui-auth-container'));
 }
 
 function hideAuthenticationDialog() {
-	document.getElementById('firebaseui-auth-container').classList.add('hide');
+	hideOverlay(document.getElementById('firebaseui-auth-container'));
 }

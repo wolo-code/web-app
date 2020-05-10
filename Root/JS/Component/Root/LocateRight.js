@@ -3,11 +3,11 @@ function showLocateRightMessage(hide_dnd) {
 		locate_right_message_dnd.classList.add('hide');
 	else
 		locate_right_message_dnd.classList.remove('hide');
-	locate_right_message.classList.remove('hide');
+	showOverlay(document.getElementById('locate_right_message'));
 }
 
 function hideLocateRightMessage() {
-	locate_right_message.classList.add('hide');
+	hideOverlay(document.getElementById('locate_right_message'));
 }
 
 function locateRight_grant() {
@@ -18,7 +18,7 @@ function locateRight_grant() {
 }
 
 function locateRight_deny() {
-	wait_loader.classList.add('hide');
+	document.getElementById('wait_loader').classList.add('hide');
 	hideLocateRightMessage();
 	locateRight_DND_check();
 	showNotification("Choose a place on the map");

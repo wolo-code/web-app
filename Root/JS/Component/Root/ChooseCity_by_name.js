@@ -3,7 +3,7 @@ var chooseCityList;
 
 function showChooseCityMessage() {
 	clearChooseCityList();
-	choose_city_by_name_message.classList.remove('hide');
+	showOverlay(document.getElementById('choose_city_by_name_message'));
 	var container = document.getElementById('choose_city_by_name_message_list');
 	for(let key in chooseCityList) {
 		var row = document.createElement('div');
@@ -15,7 +15,7 @@ function showChooseCityMessage() {
 }
 
 function hideChooseCityMessage() {
-	choose_city_by_name_message.classList.add('hide');
+	hideOverlay(document.getElementById('choose_city_by_name_message'));
 	clearChooseCityList();
 }
 

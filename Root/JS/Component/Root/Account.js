@@ -6,7 +6,7 @@ function onAccount() {
 }
 
 function showAccountDialog() {
-	document.getElementById('account_dialog_container').classList.remove('hide');
+	showOverlay(document.getElementById('account_dialog_container'));
 	if(current_title)
 		document.getElementById('save_title_main').value = current_title;
 	else
@@ -28,7 +28,7 @@ function showAccountDialog() {
 }
 
 function hideAccountDialog() {
-	document.getElementById('account_dialog_container').classList.add('hide');
+	hideOverlay(document.getElementById('account_dialog_container'));
 	clearAccountDialogSaveForm();
 	clearSaveEntry();
 }

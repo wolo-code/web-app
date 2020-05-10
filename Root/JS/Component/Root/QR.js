@@ -1,4 +1,5 @@
 function showQR() {
+	hideOverlay(document.getElementById('copy_wcode_message'));
 	if(current_title)
 		document.getElementById('qr_title_main').value = current_title;
 	else
@@ -31,14 +32,14 @@ function showQR() {
 	});
 	var svg = qrcode.svg();
 	document.getElementById('qr_code').innerHTML = svg;
-	document.getElementById('qr').classList.remove('hide');
+	showOverlay(document.getElementById('qr_body'));
 	
 	window.addEventListener('beforeprint', beforeQRprint);
 	window.addEventListener('afterprint', afterQRprint);
 }
 
 function closeQR() {
-	document.getElementById('qr').classList.add('hide');
+	hideOverlay(document.getElementById('qr_body'));
 	previewQR_deactivate()
 	window.removeEventListener('afterprint', afterQRprint);
 	window.removeEventListener('beforeprint', beforeQRprint);
@@ -104,15 +105,15 @@ function beforeQRprint() {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
-	document.getElementById('qr').classList.remove('overlay');
-	document.getElementById('qr').classList.add('section-to-print');
+	document.getElementById('overlay').classList.remove('overlay');
+	document.getElementById('overlay').classList.add('section-to-print');
 	document.getElementById('qr_close').classList.add('hide');
 }
 
 function afterQRprint() {
 	document.body.classList.remove('print');
-	document.getElementById('qr').classList.add('overlay');
-	document.getElementById('qr').classList.remove('section-to-print');
+	document.getElementById('overlay').classList.add('overlay');
+	document.getElementById('overlay').classList.remove('section-to-print');
 	document.getElementById('qr_close').classList.remove('hide');
 	if(mode_preview_activated)
 		toggleQRpreview();

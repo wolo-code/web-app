@@ -6,7 +6,7 @@ function authInit() {
 		callbacks: {
 			signInSuccessWithAuthResult: function(authResult, redirectUrl) {
 				signedIn();
-				document.getElementById('firebaseui-auth-container').classList.add('hide');
+				hideOverlay(document.getElementById('firebaseui-auth-container'));
 			},
 			uiShown: function() {
 				wait_loader.classList.add('hide');

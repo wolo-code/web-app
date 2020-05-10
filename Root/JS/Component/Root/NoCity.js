@@ -1,9 +1,9 @@
 function showNoCityMessage() {
-	no_city_message.classList.remove('hide');
+	showOverlay(document.getElementById('no_city_message'));
 }
 
 function hideNoCityMessage() {
-	no_city_message.classList.add('hide');
+	hideOverlay(document.getElementById('no_city_message'));
 	noCity_hideLoader();
 }
 

@@ -1,8 +1,9 @@
-function hideOverlay() {
+function hideOverlay(e) {
 	document.getElementById('overlay').classList.add('hide');
-	activateOverlayInfo_full();
+	e.classList.add('hide');
 }
 
-function showOverlay() {
+function showOverlay(e) {
 	document.getElementById('overlay').classList.remove('hide');
+	e.classList.remove('hide');
 }

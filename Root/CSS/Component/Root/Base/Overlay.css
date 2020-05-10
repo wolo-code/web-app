@@ -1,4 +1,4 @@
-#overlay_message {
+#info_message {
 	position: relative;
 	font-family: Abel;
 	margin: 0 auto;
@@ -10,7 +10,7 @@
 	max-width: 400px;
 }
 
-#overlay_message h1 {
+#info_message h1 {
 	text-align: center;
 	color: #69B7CF;
 }

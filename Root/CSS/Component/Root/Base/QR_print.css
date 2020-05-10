@@ -1,5 +1,9 @@
 @media print {
 
+	html {
+		background: none;
+	}
+	
 	#qr_webapp_url {
 		-webkit-print-color-adjust: exact;
 	}

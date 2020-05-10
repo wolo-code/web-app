@@ -146,7 +146,7 @@ button.border {
 }
 
 .hide {
-	display: none;
+	display: none !important;
 }
 
 .invisible {

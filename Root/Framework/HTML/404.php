@@ -8,6 +8,7 @@
 	<meta http-equiv='X-UA-Compatible' content='IE=edge' >
 	<meta http-equiv='Content-Type' content="text/html; charset=UTF-8" >
 	<title>Page Not Found<?php echo ' - '.$config['project_title'] ?></title>
+	<script><?php require '../JS/Fragment/Firebase_inits.php' ?></script>
 	<script>
 		var app = firebase.initializeApp(FIREBASE_CONFIG);
 		var analytics = firebase.analytics();

@@ -21,6 +21,10 @@
 	text-align: center;
 }
 
+#info_message > p {
+	padding-left: 40px;
+}
+
 #logo_info > a {
 	display: inline-block;
 	border-radius: 6px;

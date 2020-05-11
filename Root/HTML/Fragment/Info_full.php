@@ -41,11 +41,13 @@
 			Version: <span>0.1 beta</span>
 		</div>
 		<div id='updated'>Updated:
-			<span>
+			<span id='updated-timestamp'>
 			<?php
-				echo date('Y M d - H:i:s');
+				echo date('Y M d H:i:s').' '.'UTC';
 			?>
-			</span> (UTC)
+			</span>
+			 ~ 
+			<span id='updated-timediff'></span> ago
 		</div>
 	</div>
 </div>

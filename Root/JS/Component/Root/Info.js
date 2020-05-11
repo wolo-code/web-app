@@ -3,6 +3,7 @@ function hideInfo() {
 }
 
 function showInfo() {
+	document.getElementById('updated-timediff').innerText = getTimeDiff(document.getElementById('updated-timestamp').innerText);
 	showOverlay(document.getElementById('info_message'));
 }
 

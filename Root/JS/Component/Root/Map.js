@@ -80,7 +80,7 @@ function initMap() {
 	});
 
 	map.addListener('click', function(event) {
-		cleanUp();
+		cleanUp(true);
 		infoWindow_setContent(MESSAGE_LOADING);
 		var pos = resolveLatLng(event.latLng);
 		encode(pos);
@@ -170,12 +170,12 @@ function clearMap() {
 		marker.setMap(null);
 }
 
-function cleanUp() {
+function cleanUp(full = false) {
 	document.getElementById('suggestion_result').innerText = '';
 	clearNotificationTimer();
 	clearTimeout(presstimer);
 	clearTimeout(watch_location_timer);
-	clearLocating();
+	clearLocating(full);
 	clearMap();
 	navigator.geolocation.clearWatch(watch_location_id);
 	pendingPosition = null;

@@ -25,7 +25,10 @@ function getAddress(latLng, callback) {
 				console.log('No geoCoding results found');
 			}
 		} else {
-			console.log('Geocoder failed due to: ' + status);
+			if(status == 'ZERO_RESULTS')
+				noCity(latLng_p);
+			else
+				console.log('Geocoder failed due to: ' + status);
 		}
 		if(pendingCitySubmit) {
 			execSubmitCity();

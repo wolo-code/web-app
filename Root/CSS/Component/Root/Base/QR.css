@@ -105,11 +105,6 @@
 	text-align: left;
 }
 
-#qr_address.initial {
-	margin-left: 88px !important;
-	margin-right: 88px !important;
-}
-
 #qr_webapp_url {
 	color: #ffffff;
 	background-color: #69B7CF;

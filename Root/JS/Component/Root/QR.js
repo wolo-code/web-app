@@ -10,12 +10,10 @@ function showQR() {
 		document.getElementById('qr_title_segment').value = '';
 	if(current_address) {
 		document.getElementById('qr_address').innerText = current_address;
-		document.getElementById('qr_address').classList.remove('initial');
 		qr_address_active_first = false;
 	}
 	else {
 		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
-		document.getElementById('qr_address').classList.add('initial');
 		qr_address_active_first = true;
 	}
 	var city_accent = getProperCityAccent(code_city);
@@ -75,7 +73,6 @@ function previewQR_deactivate() {
 function qr_address_active() {
 	if (qr_address_active_first) {
 		qr_address_active_first = false;
-		document.getElementById('qr_address').classList.remove('initial');
 		document.getElementById('qr_address').innerHTML = address;
 	}
 }

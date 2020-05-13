@@ -116,7 +116,7 @@ function locateExec(failure) {
 				},
 				function(error) {
 					if(error.code = error.PERMISSION_DENIED) {
-						clearTimeout(watch_location_timer);
+						clearLocating(true);
 						showNotification(LOCATION_PERMISSION_DENIED);
 						setLocationAccess(false);
 						document.getElementById('wait_loader').classList.add('hide');

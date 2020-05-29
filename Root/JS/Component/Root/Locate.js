@@ -38,6 +38,13 @@ function locateExec(failure) {
 				accuCircle.setMap(null);
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
+			document.getElementById('proceed_container').classList.remove('hide');
+			document.getElementById('accuracy_container').classList.remove('hide');
+			document.getElementById('proceed_progress').style.transition = 'none';
+			document.getElementById('proceed_progress').style.width = "0%";
+			document.getElementById('proceed_progress').offsetWidth;
+			document.getElementById('proceed_progress').style.transition = 'width' + ' ' + WATCH_LOCATION_MAX_TIMEOUT/1000 + 's' + ' ' + 'linear';
+			document.getElementById('proceed_progress').style.width = "100%";
 			
 			accuracy_indicator.classList.add('blinking');
 			location_button.removeEventListener('mouseup', processPositionButtonUp);

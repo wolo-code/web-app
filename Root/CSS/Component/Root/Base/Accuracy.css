@@ -4,7 +4,7 @@
 }
 
 #accuracy_container > div {
-	padding: 4px 0 4px 12px;
+	padding: 0px 0 0px 12px;
 	background: rgba(237, 240, 233, 0.75);
 	border-radius: 25px;
 	color: #707070;
@@ -12,7 +12,6 @@
 	text-align: center;
 	font-size: large;
 	display: inline-block;
-	line-height: 30px;
 }
 
 #accuracy_container.highlight > div {
@@ -28,6 +27,7 @@
 
 #accuracy_meter {
 	font-family: monospace;
+	line-height: 32px;
 }
 
 #accuracy_meter_unit {
@@ -39,14 +39,33 @@
 }
 
 #proceed_button {
+	position: relative;
+	overflow: hidden;
+	display: inline-flex;
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
+	color: #444;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
 	background-color: rgb(255, 255, 255);
 	padding: 8px 12px;
 	border: none;
 	border-radius: 28px;	
+}
+
+#proceed_progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 0%;
+	background: #3b93ff;
+}
+
+#proceed_label {
+	position: absolute;
+	left: 0;
+	right: 0;
 }
 
 #location_icon_dot.blinking {

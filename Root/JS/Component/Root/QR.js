@@ -137,7 +137,7 @@ function downloadQR() {
 		if(mode_preview_activated)
 			toggleQRpreview();
 		document.getElementById('qr_body').removeAttribute('style');
-		document.getElementById('qr_close').classList.remove('hide');			
+		document.getElementById('qr_close').classList.remove('hide');
 		var qrImage = canvas.toDataURL("image/png");
 		downloadURI('data:' + qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
 	});

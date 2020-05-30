@@ -129,10 +129,10 @@ function downloadQR() {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
+	document.getElementById('qr_close').classList.add('hide');
 	document.getElementById('qr_body').setAttribute( 'style',
 	 "height: "+(document.getElementById('qr_body').offsetHeight-6)+"px"+"; "+
 	 "width: "+document.getElementById('qr_body').offsetWidth+"px" );
-	document.getElementById('qr_close').classList.add('hide');
 	html2canvas(document.querySelector('#qr_body')).then(canvas => {
 		if(mode_preview_activated)
 			toggleQRpreview();

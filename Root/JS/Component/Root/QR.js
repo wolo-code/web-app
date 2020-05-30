@@ -130,6 +130,7 @@ function downloadQR() {
 		mode_preview_activated = true;
 	}
 	document.getElementById('qr_close').classList.add('hide');
+	document.getElementById('qr_controls').classList.add('hide');
 	document.getElementById('qr_body').setAttribute( 'style',
 	 "height: "+(document.getElementById('qr_body').offsetHeight-6)+"px"+"; "+
 	 "width: "+document.getElementById('qr_body').offsetWidth+"px" );
@@ -138,6 +139,7 @@ function downloadQR() {
 			toggleQRpreview();
 		document.getElementById('qr_body').removeAttribute('style');
 		document.getElementById('qr_close').classList.remove('hide');
+		document.getElementById('qr_controls').classList.remove('hide');
 		var qrImage = canvas.toDataURL("image/png");
 		downloadURI('data:' + qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
 	});

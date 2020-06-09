@@ -22,7 +22,28 @@
 		"UserData": {
 			"$user_id": {
 				".write": "$user_id === auth.uid",
-				".read": "$user_id === auth.uid"
+				".read": "$user_id === auth.uid",
+									
+				"$key": {
+					"address": {
+						".validate": "newData.isString() && newData.val().length < 1000"
+					},
+					"city_id": {
+						".validate": "newData.isString() && newData.val().length < 500"
+					},
+					"code" : {
+						".validate": "newData.child('0').exists() && newData.child('0').val().length < 100 &&
+						 newData.child('1').exists() && newData.child('1').val().length < 100 &&
+						 newData.child('2').exists() && newData.child('2').val().length < 100 "
+					},
+					"segment": {
+						".validate": "newData.isString() && newData.val().length < 500"
+					},
+					"title": {
+						".validate": "newData.isString() && newData.val().length < 500"
+					}
+				}
+				
 			}
 		}
 	}

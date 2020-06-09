@@ -1,0 +1,29 @@
+{
+	"rules": {
+		"WordList": {
+			".read": true,
+			".write": "auth.token.admin === true"
+		},
+		"CityRequest": {
+			".read": "auth.token.admin === true",
+			".write": true,
+			".indexOn": "processed"
+		},
+		"CityDetail": {
+			".read": true,
+			".write": "auth.token.admin === true",
+			".indexOn": ["name_id", "gp_id"]
+		},
+		"CityCenter": {
+			".read": true,
+			".write": "auth.token.admin === true",
+			".indexOn": "g"
+		},
+		"UserData": {
+			"$user_id": {
+				".write": "$user_id === auth.uid",
+				".read": "$user_id === auth.uid"
+			}
+		}
+	}
+}

@@ -20,3 +20,4 @@ Path	Name	Extension
 	launcher-icon-2x	png
 	launcher-icon-3x	png
 	launcher-icon-4x	png
+.well-known/	assetlinks	json

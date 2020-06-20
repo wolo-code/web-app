@@ -46,27 +46,27 @@
 				"function": "add_city"
 			},
 			{
-				"source": "console",
+				"source": "/console",
 				"destination": "/console.html"
 			},
 			{
-				"source": "about.json",
+				"source": "/about.json",
 				"destination": "/about/index.json"
 			},
 			{
-				"source": "features.json",
+				"source": "/features.json",
 				"destination": "/features/index.json"
 			},
 			{
-				"source": "case.json",
+				"source": "/case.json",
 				"destination": "/case/index.json"
 			},
 			{
-				"source": "competition.json",
+				"source": "/competition.json",
 				"destination": "/competition/index.json"
 			},
 			{
-				"source": "presentation.json",
+				"source": "/presentation.json",
 				"destination": "/presentation/index.json"
 			},
 			{

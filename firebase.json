@@ -4,6 +4,7 @@
 		"ignore": [
 			".htaccess"
 		],
+		"appAssociation": "AUTO",
 		"headers": [
 			{
 				"source": "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
@@ -68,6 +69,10 @@
 			{
 				"source": "/presentation.json",
 				"destination": "/presentation/index.json"
+			},
+			{
+				"source": "/get/**",
+				"dynamicLinks": true
 			},
 			{
 				"source": "**",

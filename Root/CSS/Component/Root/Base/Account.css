@@ -2,6 +2,8 @@
 	position: absolute;
 	right: 188px;
 	top: 18px;
+	padding: 8px;
+	margin: -8px;
 }
 
 #account_default_image.inactive > svg > path:first-child {

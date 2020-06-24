@@ -37,6 +37,8 @@
 	position: absolute;
 	bottom: 26px;
 	left: 11px;
+	padding: 8px;
+	margin: -8px;
 }
 
 #info svg {

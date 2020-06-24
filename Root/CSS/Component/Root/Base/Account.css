@@ -13,6 +13,7 @@
 	background: white;
 	font-family: 'Abel';
 	background-color: #FFFFFF;
+	border: 1px solid transparent;
 }
 
 #account svg {

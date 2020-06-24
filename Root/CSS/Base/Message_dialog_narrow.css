@@ -7,11 +7,5 @@
 	.dialog_message_secondary {
 		float: left;
 	}
-
-	.message_dialog_close {
-		position: absolute;
-		top: 0px;
-		right: 0px;
-	}
 	
 }

@@ -52,8 +52,21 @@
 	padding: 2px 6px;
 }
 
-#wcode_format > span:first-child {
+#wcode_example {
+	margin-top: 8px;
+}
+
+#wcode_example > span {
+	padding: 2px 2px;
+}
+
+#wcode_example > span:first-child {
 	margin-right: 4px;
+	color: gray;
+}
+
+#wcode_example > span:nth-child(2), #wcode_example > span:last-child, #wcode_format > span:first-child, #wcode_format > span:last-child {
+	background: none;
 }
 
 .download > a {

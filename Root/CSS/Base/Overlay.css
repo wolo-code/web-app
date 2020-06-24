@@ -19,12 +19,14 @@
 	margin-right: auto;
 }
 
+.overlay > div {
+	margin-top: 80px !important;
 }
 
 .overlay h2 {
 	text-align: center;
 	margin-top: 8px;
-	margin-bottom: 12px;
+	margin-bottom: 18px;
 }
 
 .overlay h3 {
@@ -33,4 +35,6 @@
 	color: #bbb;
 }
 
+.overlay li, ul {
+	margin-bottom: 8px;
 }

@@ -1,4 +1,5 @@
 <div id='overlay' class="overlay hide">
+	<div>
 	<?php
 		require '../../HTML/Fragment/Redirect.php';
 		require '../../HTML/Fragment/NoCity.php';
@@ -12,6 +13,7 @@
 		require '../../HTML/Fragment/Authentication.php';
 		require '../../HTML/Fragment/Account_Dialog.php';
 	?>
+	</div>
 </div>
 
 <div id='map'></div>

@@ -1,5 +1,11 @@
 @media (max-width: 662px) {
+	
 	#overlay {
 		background-color: white;
 	}
+	
+	#overlay > div {
+		margin-top: 20px !important;
+	}
+	
 }

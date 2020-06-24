@@ -15,8 +15,49 @@
 	color: #69B7CF;
 }
 
+#logo_info {
+	text-align: center;
+}
+
+#info_message > p {
+	padding-left: 40px;
+}
+
+#logo_info > a {
+	display: inline-block;
+	border-radius: 6px;
+	border-width: thin;
+	border-color: #f0f7fa;
+	border-style: solid;
+	padding: 3px;
+}
+
+#logo_wolo_info > .image > svg {
+	height: 50px;
+}
+
+#logo_codes_info > .image > svg {
+	padding-top: 4px;
+	height: 14px;
+	width: 152px;
+}
+
 #info_full > p:first-of-type {
 	padding-left: 40px;
+}
+
+#wcode_format > span {
+	background: #f7f7f7;
+	border-radius: 6px;
+	padding: 2px 6px;
+}
+
+#wcode_format > span:first-child {
+	margin-right: 4px;
+}
+
+.download > a {
+	display: block;
 }
 
 #software_info {
@@ -67,4 +108,7 @@
 
 #info_list {
 	list-style-type: square;
+
+#download-unified-url {
+	padding-bottom: 6px;
 }

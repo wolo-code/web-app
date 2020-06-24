@@ -2,7 +2,9 @@ Path	Name	Extension
 	404	
 	robots	txt
 	sitemap	xml	
+	favicon	svg
 	favicon	ico
+	apple-touch-icon	png
 	social	png
 	manifest	json
 	root	

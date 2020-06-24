@@ -104,6 +104,11 @@
 				"source": "/get",
 				"destination": "/get/app",
 				"type": 301
+			},
+			{
+				"source": "/droid",
+				"destination": "https://play.google.com/store/apps/details?id=codes.wolo.droid",
+				"type": 301
 			}
 		],
 		"cleanUrls": true,

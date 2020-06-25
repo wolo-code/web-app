@@ -43,6 +43,10 @@
 	overflow: hidden
 }
 
+button.gm-ui-hover-effect {
+	display: none !important;
+}
+
 #show_address_button {
 	width: 26px;
 	vertical-align: bottom

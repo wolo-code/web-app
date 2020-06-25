@@ -276,7 +276,8 @@ function execSubmitCity() {
 function tryDefaultCity() {
 	decode(DEFAULT_WCODE);
 	notification_top.classList.add('hide');
-	infoWindow.close();
+	if(typeof infoWindow != undefined)
+		infoWindow.close();
 }
 
 function getFullCity(city) {

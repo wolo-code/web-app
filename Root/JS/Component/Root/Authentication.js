@@ -10,7 +10,7 @@ function onLogout() {
 	.then(function() {
 		document.getElementById('wait_loader').classList.add('hide');
 		hideOverlay(document.getElementById('firebaseui-auth-container'));
-		document.getElementById('account_dialog_container').classList.add('hide');
+		hideOverlay(document.getElementById('account_dialog_container'));
 		document.getElementById('account_user_image').classList.add('hide');
 		document.getElementById('account_user_image').setAttribute('src', null);
 		document.getElementById('account_default_image').classList.remove('hide');

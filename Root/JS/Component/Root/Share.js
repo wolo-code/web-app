@@ -3,13 +3,13 @@
 
 function handleShareWCode() {
 	setTimeout( function() {
-			showNotification("Long press share icon for advanced options");
+			showNotification("Long press share icon to directly share link");
 		}, 4000);
 	
 	if (navigator.share)
 		shareWCode();
 	else
-		copyWcodeJumpLink();
+		showCopyWcodeMessage();
 }
 
 function shareWCode() {

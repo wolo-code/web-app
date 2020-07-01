@@ -38,7 +38,7 @@ var start = function(e) {
 
 	if (presstimer === null) {
 		presstimer = setTimeout(function() {
-			showCopyWcodeMessage();
+			copyWcodeJumpLink();
 			longpress = true;
 		}, 500);
 	}

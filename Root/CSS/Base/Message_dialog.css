@@ -94,3 +94,20 @@ h2.message_dialog_label {
 	background: #69B7CF !important;
 	border-color: #69b7cf !important;
 }
+
+.message_dialog_subtitle {
+	overflow: hidden;
+}
+
+.message_dialog_subtitle_icon {
+	float: left;
+}
+
+.message_dialog_subtitle_label {
+	float: left;
+	padding: 3px 0 0 6px;
+}
+
+.message_dialog_subtitle_text {
+	padding: 10px 0 10px 14px;
+}

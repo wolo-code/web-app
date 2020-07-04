@@ -7,29 +7,53 @@
 	</div>
 	<div class='message_dialog_body'>
 		<p>
-			<span>Text</span>
-			<input id='share_include_city' type='checkbox'>
-			include 
-			<span id='copy_wcode_message_city_name'></span>
-			<span class='message_dialog_control_right'>
-				<img id='share_copy_button' class="center control" src="<?php getSVG('', 'code'); ?>" >
-			</span>
+			<div class='message_dialog_subtitle'>
+				<span class='message_dialog_subtitle_icon'>
+					<img id='share_copy_button' class="center control" src="<?php getSVG('', 'code'); ?>" >
+				</span>
+				<span class='message_dialog_subtitle_label'>Text</span>
+			</div>
+			<div class='message_dialog_subtitle_text'>
+				<span>include</span> <span id='copy_wcode_message_city_name'></span> ?
+			</div>
+			<div class='message_dialog_control_container'>
+				<div class="center message_dialog_control">
+					<button id='share_copy_button_text_city' class="border dialog_message_primary button_highlight" type='button'>Yes</button>
+					<button id='share_copy_button_text_nocity' class="border dialog_message_secondary" type='button'>No</button>
+				</div>
+			</div>
 		</p>
 		<hr>
 		<p>
-			<span>Link</span>
-			<input id='share_jumto_map' type='checkbox'>
-			jump directly to map
-			<span class='message_dialog_control_right'>
-				<img id='share_link_button' class="center control" src="<?php getSVG('', 'link'); ?>" >
-			</span>
+			<div class='message_dialog_subtitle'>
+				<span class='message_dialog_subtitle_icon'>
+					<img id='share_link_button' class="center control" src="<?php getSVG('', 'link'); ?>" >
+				</span>
+				<span class='message_dialog_subtitle_label'>Link</span>
+			</div>
+			<div id='share_jumto_map' class='message_dialog_subtitle_text'>
+				jump directly to map ?
+			</div>
+			<div class='message_dialog_control_container'>
+				<div class="center message_dialog_control">
+					<button id='share_copy_button_link_jump' class="border dialog_message_primary button_highlight" type='button'>Yes</button>
+					<button id='share_copy_button_link_nojump' class="border dialog_message_secondary" type='button'>No</button>
+				</div>
+			</div>
 		</p>
 		<hr>
 		<p>
-			<span>QR</span>
-			<span class='message_dialog_control_right'>
-				<img id='share_qr_button' class="center control" src="<?php getSVG('', 'qr'); ?>" >
-			</span>
+			<div class='message_dialog_subtitle'>
+				<span class='message_dialog_subtitle_icon'>
+					<img id='share_qr_button' class="center control" src="<?php getSVG('', 'qr'); ?>" >
+				</span>
+				<span class='message_dialog_subtitle_label'>QR</span>
+			</div>
+			<div class='message_dialog_control_container'>
+				<div class="center message_dialog_control">
+					<button id='share_copy_button_qr' class="border dialog_message_primary button_highlight" type='button'>Go</button>
+				</div>
+			</div>
 		</p>
 	</div>
 </div>

@@ -1,6 +1,5 @@
-#share_include_city, #share_jumto_map {
-	-webkit-appearance: checkbox !important;
-	margin-left: 6px;
+#copy_wcode_message {
+	border: 1px solid transparent;
 }
 
 #copy_wcode_message_city_name {
@@ -19,9 +18,9 @@
 }
 
 #share_link_button {
-	padding-top: 8px
+	padding-top: 6px
 }
 
 #share_qr_button {
-	padding-right: 6px;
+	padding: 4px 4px 4px 5px;
 }

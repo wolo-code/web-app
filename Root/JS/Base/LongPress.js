@@ -23,7 +23,7 @@ var click = function(e) {
 		return false;
 	}
 
-	handleShareWCode();
+	showCopyWcodeMessage();
 };
 
 var start = function(e) {
@@ -38,7 +38,7 @@ var start = function(e) {
 
 	if (presstimer === null) {
 		presstimer = setTimeout(function() {
-			copyWcodeJumpLink();
+			handleShareWCode();
 			longpress = true;
 		}, 500);
 	}

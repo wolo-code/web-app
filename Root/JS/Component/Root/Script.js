@@ -82,9 +82,11 @@ function setupControls() {
 	document.getElementById('address_text_copy').addEventListener('click', copyAddress);
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
-	document.getElementById('share_copy_button').addEventListener('click', shareWCodeCopy);
-	document.getElementById('share_link_button').addEventListener('click', shareWCodeLink);
-	document.getElementById('share_qr_button').addEventListener('click', showQR);
+	document.getElementById('share_copy_button_text_city').addEventListener('click', copyWcodeFull);
+	document.getElementById('share_copy_button_text_nocity').addEventListener('click', copyWcodeCode);
+	document.getElementById('share_copy_button_link_jump').addEventListener('click', copyWcodeJumpLink);
+	document.getElementById('share_copy_button_link_nojump').addEventListener('click', copyWcodeLink);
+	document.getElementById('share_copy_button_qr').addEventListener('click', showQR);
 	document.getElementById('qr_close').addEventListener('click', closeQR);
 	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
 	document.getElementById('qr_print').addEventListener('click', printQR);

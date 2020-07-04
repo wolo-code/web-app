@@ -2,14 +2,10 @@
 // const WCODE_LINK_COPIED_MESSAGE;
 
 function handleShareWCode() {
-	setTimeout( function() {
-			showNotification("Long press share icon to directly share link");
-		}, 4000);
-	
 	if (navigator.share)
 		shareWCode();
 	else
-		showCopyWcodeMessage();
+		copyWcodeJumpLink();
 }
 
 function shareWCode() {
@@ -94,13 +90,6 @@ function copyWcodeJumpLink() {
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
-}
-
-function shareWCodeCopy() {
-	if(share_include_city.checked)
-		copyWcodeFull();
-	else
-		copyWcodeCode();
 }
 
 function shareWCodeLink() {

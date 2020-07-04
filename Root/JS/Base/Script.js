@@ -26,3 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.getElementById('footer-content').classList.add('plain_background');
 	}
 });
+
+window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+	alert("Oops! Something went wrong. Make sure you are using updated Google Chrome Browser - if this issue persists");
+	return false;
+}

@@ -50,7 +50,7 @@
 	
 	<div id='software_info'>
 		<div id='version'>
-			Version: <span>0.1 beta</span>
+			Version: <span><?php echo $config['version'] ?></span>
 		</div>
 		<div id='updated'>Updated:
 			<span id='updated-timestamp'>

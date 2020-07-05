@@ -13,3 +13,4 @@ sentry_hash	sha384-wF7Jc4ZlWVxe/L8Ji3hOIBeTgo/HwFuaeEfjGmS3EXAG7Y+7Kjjr91gJpJtr+
 firebase_version	7.14.2
 firebase_ui_version	4.5.0
 sentry_ingest_sub_id	o85995
+version	1.1

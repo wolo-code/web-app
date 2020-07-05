@@ -61,6 +61,12 @@
 			<input id='submit_city_button' class='control' type='submit' value='Submit' tabindex='9'>
 		</form>
 		<div id='notification_bottom' class="notification_bar hide"></div>
+		<div id='footer-content-container' class='center'>
+			<div id='footer-content' class='blur_background'>
+				<a class='link-gray' href='/license'>Copyright &copy; 2020</a>
+				<a class='link' href='/about_me' rel='author'>Ujjwal Singh</a>
+			</div>
+		</div>
 		<div id='file_container'>
 			<input id='file_input' type='file'>
 			<button id='file_upload' type='button' class='border' onclick="upload_data();">Upload</button>

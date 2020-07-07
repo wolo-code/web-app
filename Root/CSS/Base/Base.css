@@ -238,3 +238,9 @@ button.border {
 .front_arrow_white > svg > g > g > path {
 	fill: white !important;
 }
+
+.raster {
+	margin: auto;
+	height: 100%;
+	width: 100%;
+}

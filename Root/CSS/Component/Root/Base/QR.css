@@ -8,6 +8,10 @@
 	color: #999999;
 }
 
+.raster #qr_body {
+	width: 420px;	
+}
+
 #qr_label {
 	padding-top: 20px;
 	padding-bottom: 12px;

@@ -121,6 +121,7 @@
 #info_list {
 	list-style-type: square;
 	padding-left: 16px;
+	color: #d0d0d0;
 }
 
 #download-unified-url {

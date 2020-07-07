@@ -134,7 +134,7 @@ function downloadQR() {
 	document.getElementById('qr_body').setAttribute( 'style',
 	 "height: "+(document.getElementById('qr_body').offsetHeight-6)+"px"+"; "+
 	 "width: "+document.getElementById('qr_body').offsetWidth+"px" );
-	html2canvas(document.querySelector('#qr_body')).then(canvas => {
+	html2canvas( document.querySelector('#qr_body'), {scale:1} ).then( canvas => {
 		if(mode_preview_activated)
 			toggleQRpreview();
 		document.getElementById('qr_body').removeAttribute('style');

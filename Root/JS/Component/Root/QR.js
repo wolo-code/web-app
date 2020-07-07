@@ -142,7 +142,7 @@ function downloadQR() {
 		document.getElementById('qr_controls').classList.remove('hide');
 		var qrImage = canvas.toDataURL("image/png");
 		downloadURI('data:' + qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
-	});
+	} );
 }
 
 function downloadURI(uri, name) {

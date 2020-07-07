@@ -46,6 +46,8 @@
 	border-bottom-style: inset;
 	border-bottom-width: 2px;
 	min-width: 240px;
+	display: block;
+	margin: auto;
 }
 
 #qr_title_main {
@@ -62,7 +64,8 @@
 
 #qr_code {
 	margin-top: 12px;
-	margin-bottom: 4px;
+	margin-bottom: 13px;
+	padding: 2px 20px;
 }
 
 .preview#qr_title_main, .preview#qr_title_segment, .preview#qr_address {
@@ -75,7 +78,7 @@
 }
 
 #qr_wcode {
-	padding-top: 20px;
+	padding-top: 15px;
 }
 
 #qr_sticker_title {
@@ -97,15 +100,20 @@
 
 #qr_wcode_left {
 	text-align: left;
+	margin-bottom: 4px;
 }
 
 #qr_wcode_code {
-	font-size: x-large;
+	font-size: xx-large;
+	font-weight: bold;
 }
 
 #qr_address {
-	margin: 0 66px 20px 66px;
 	text-align: left;
+	width: 240px;
+	margin-top: 6px;
+	margin-bottom: 20px;
+	padding: 2px 2px;
 }
 
 #qr_webapp_url {

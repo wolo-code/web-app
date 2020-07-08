@@ -27,7 +27,7 @@
 
 	<div id='social-links' class='center'>
 		<span class='social grow'>
-			<a href='https://twitter.com/wolocodes' id='site-twitter' onclick="trackOutboundLink('wolo-twitter', 'https://twitter.com/wolocodes')"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
+			<a href='https://twitter.com/wolo_codes' id='site-twitter' onclick="trackOutboundLink('wolo-twitter', 'https://twitter.com/wolo_codes')"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
 		</span>
 		<span class='social grow'>
 			<a href='https://facebook.com/wolocodes' id='site-facebook' onclick="trackOutboundLink('wolo-facebook', 'https://facebook.com/wolocodes')"><span class='image'><?php includeSVG('', 'Facebook'); ?></span></a>

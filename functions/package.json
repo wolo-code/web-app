@@ -13,6 +13,6 @@
 	},
 	"devDependencies": {
 		"firebase": "^5.11.1",
-		"firebase-admin": "^8.0.0"
+		"firebase-admin": "^9.0.0"
 	}
 }

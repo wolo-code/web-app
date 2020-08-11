@@ -1,4 +1,6 @@
-<svg width="20" height="20" version="1.1" viewBox="0 0 6.35 6.35" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg xmlns="http://www.w3.org/2000/svg"
+	 width="20" height="20"
+	 viewBox="0 0 6.35 6.35">
 	<g transform="translate(.0236235 -290.681)">
 		<rect id="rect3738" x="-.0236235" y="290.681" width="2.11667" height="2.11667" style="fill-opacity:.941176;fill:#69b7cf;stroke-width:.264583"/>
 		<rect x="2.80842" y="293.541" width="1.33668" height="1.33668" style="fill-opacity:.941176;fill:#69b7cf;stroke-width:.167084"/>

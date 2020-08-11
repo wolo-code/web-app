@@ -40,7 +40,7 @@
 	<div id='download-unified-url' class='center'>
 		<span>app:</span> <a class='link' href="https://wolo.codes/get">wolo.codes/get</a>
 	</div>
-	<div id='download-android-bottom' class="download coming-soon center">
+	<div id='download-android-bottom' class="download center">
 		<a href='https://play.google.com/store/apps/details?id=codes.wolo.droid' id='site-google-play' onclick="trackOutboundLink('wolo-appandroid', 'https://play.google.com/store/apps/details?id=codes.wolo.droid')"><span class='image'><?php includeSVG('', 'Google-Play-badge'); ?></span></a>
 	</div>
 		

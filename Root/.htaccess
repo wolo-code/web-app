@@ -12,7 +12,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{DOCUMENT_ROOT}/Files%{REQUEST_URI} -f
 RewriteRule ^(.+)$ files/$1 [L]
 
-RewriteRule ^umb.js$ Modules/UMB/JS/Script.php [L]
+RewriteRule ^umb.js$ Modules/umb-wrapper/Script.php [L]
 RewriteRule ^svgs.js$ Framework/JS/SVGs.php [L]
 
 RewriteRule ^style.css$ Framework/CSS/Style.php [L]

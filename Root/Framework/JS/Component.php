@@ -8,6 +8,6 @@
 	includeDir('../../JS/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, 'base');
 	$component_id = getOrigCallComponent();
 	includeDir('../../JS/Component/'.$component_id.'/', $INCLUDE_TYPE_JS, $INCLUDE_MODE_EMBED, 'base');
-	require '../../Modules/UMB/JS/Script.php';
+	require '../../Modules/umb-wrapper/Script.php';
 	require '../../JS/SVGs.php';
 ?>

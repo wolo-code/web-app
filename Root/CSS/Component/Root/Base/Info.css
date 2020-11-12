@@ -73,6 +73,10 @@
 	display: block;
 }
 
+#credits {
+    padding: 20px 0;
+}
+
 #software_info {
 	padding: 6px 0 20px;
 }

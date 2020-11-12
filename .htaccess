@@ -12,9 +12,6 @@ RewriteRule ^facebook$ https://facebook.com/ujnotes [R=307,L]
 RewriteRule ^twitter$ https://twitter.com/ujnotesx [R=307,L]
 RewriteRule ^gplus$ https://plus.google.com/+ujnotesx [R=307,L]
 
-RewriteRule ^policy$ policy.html [L]
-RewriteRule ^terms$ terms.html [L]
-
 rewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^(.+)$ $1/index.html [L]
 

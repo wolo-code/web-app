@@ -14,7 +14,7 @@ function showChooseCity_by_periphery_List() {
 	var container = document.getElementById('choose_city_by_periphery_message_list');
 	var chooseCity_by_periphery_List_gpids_ = [];
 	for(let key in chooseCity_by_periphery_List) {
-		if(!chooseCity_by_periphery_List_gpids_.includes(chooseCity_by_periphery_List[key].city.gp_id) && !chooseCity_by_periphery_List_gpids.includes(chooseCity_by_periphery_List[key].city.gp_id)) {
+		if(!chooseCity_by_periphery_List_gpids_.includes(chooseCity_by_periphery_List[key].city.gp_id) && !chooseCity_by_periphery_List_gpids.includes(chooseCity_by_periphery_List[key].city.gp_id) && !(chooseCity_by_periphery_List[key].city.id == code_city.id)) {
 			var row = document.createElement('div');
 			row.innerHTML = getFullCity(chooseCity_by_periphery_List[key].city);
 			container.appendChild(row);

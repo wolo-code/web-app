@@ -27,8 +27,7 @@ function percantageToColor(perc) {
 	return '#' + ('000000' + h.toString(16)).slice(-6);
 }
 
-function getTimeDiff(join, lastSeen)
-{
+function getTimeDiff(join, lastSeen) {
 	let milliseconds = 0, time = '';
 	let t1 = new Date(join).getTime(), t2;
 	if (lastSeen)

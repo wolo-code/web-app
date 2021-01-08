@@ -5,13 +5,18 @@
 // var is_current_city;
 // const PURE_WCODE_CITY_PICKED;
 // const PURE_WCODE_CITY_FAILED;
+// var encode_session_id
 
 function encode(position, locating_encode) {
+	var session_id;
+	session_id = encode_session_id = Date.now();
 	clearCode();
-	getAddress(position, function(address_components) {
+	getAddress(position, session_id, function(address_components) {
+	
 			var city_gp_id = getCityGpId(address_components);
 			if(city_gp_id != null) {
-				getCityFromCityGp_id( city_gp_id, function(city) {
+				
+				getCityFromCityGp_id( city_gp_id, session_id, function(city) {
 					if(typeof locating_encode != 'undefined' && locating_encode == true) {
 						current_city_gp_id = city_gp_id;
 						setCurrentCity_status(true);
@@ -20,7 +25,7 @@ function encode(position, locating_encode) {
 						setCurrentCity_status(true);
 					else
 						setCurrentCity_status(false);
-					getCityCenterFromId(city, function(city) {
+					getCityCenterFromId_session(city, session_id, function(city) {
 						if(city != null)
 							encode_continue(city, position);
 						else
@@ -29,11 +34,14 @@ function encode(position, locating_encode) {
 				}, function() {
 				encode_continue(null, position)
 				} );
-				getCity_by_perifery_list(position, false);
+				
+				getCity_by_perifery_list(position, session_id, false);
+				
 			}
 			else {
-				getCity_by_perifery_list(position, true);
+				getCity_by_perifery_list(position, session_id, true);
 			}
+			
 		});
 }
 
@@ -49,20 +57,30 @@ function setCurrentCity_status(status) {
 }
 
 function encode_continue(city, position) {
+	encode_session_id = Date.now
+	var session_id = encode_session_id;
 	if(city == null) {
 		if(!pendingCity) {
 			pendingPosition = position;
-			getAddress(position, function(address_components) {
-				var city_gp_id = getCityGpId(address_components);
-				if(city_gp_id != null)
-					addCity(city_gp_id, function(city_id) {
-						getCityFromId(city_id, function(city) {
-							getCityCenterFromId(city, function(city) {
-								encode_(city, position);
-							});
-						});
-					});
-			});
+			getAddress(position, session_id, function(address_components) {
+				 var city_gp_id = getCityGpId(address_components);
+				 if(city_gp_id != null)
+					 sessionForwarder(session_id, function() {
+						 addCity(city_gp_id, function(city_id) {
+							 sessionForwarder(session_id, function() {
+								 getCityFromId(city_id, function(city) {
+									 sessionForwarder(session_id, function() {
+										 getCityCenterFromId(city, function(city) {
+											 sessionForwarder(session_id, function() {
+												 encode_(city, position, session_id);
+											 });
+										 });
+									 });
+								 });
+							 });
+						 });
+					 });
+			 });
 		}
 	}
 	else {
@@ -71,7 +89,7 @@ function encode_continue(city, position) {
 			infoWindow_setContent(MESSAGE_LOADING);
 			pendingCity = false;
 		}
-		encode_(city, position);
+		encode_(city, position, session_id);
 	}
 }
 

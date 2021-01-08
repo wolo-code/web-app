@@ -25,15 +25,15 @@ var geoQuery_completed;
 var nearCity;
 var pending_encode_latLng;
 
-function getCity_by_perifery_list(latLng, continue_encode) {
+function getCity_by_perifery_list(latLng, session_id, continue_encode) {
 	if(continue_encode)
 		pending_encode_latLng = latLng;
 	else
 		pending_encode_latLng = null;
-	getCity_by_perifery_list_fs(latLng);
+	getCity_by_perifery_list_fs(latLng, session_id);
 }
 
-function getCity_by_perifery_list_fs(latLng) {
+function getCity_by_perifery_list_fs(latLng, session_id) {
 	geoQuery_completed = false;
 	nearCity = null;
 	var nearCityList_coord = {};
@@ -46,20 +46,24 @@ function getCity_by_perifery_list_fs(latLng) {
 
 	document.getElementById('wait_loader').classList.remove('hide');
 	geoQuery.on('ready', function() {
-		geoQuery_completed = true;
-		document.getElementById('wait_loader').classList.add('hide');
 		geoQuery.cancel();
-
-		if(Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
-			syncNearCityList(nearCityList_coord, nearCityList_detail);
+		sessionForwarder(session_id, function() {
+			geoQuery_completed = true;
+			document.getElementById('wait_loader').classList.add('hide');
+			
+			if(Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
+				syncNearCityList(nearCityList_coord, nearCityList_detail);
+		});
 	});
 
 	geoData = geoQuery.on('key_entered', function(key, location, distance) {
-		nearCityList_coord[key] = {city: {id: key, center: { lat: location[0], lng: location[1] } }, distance: distance};
-		getCityFromId(key, function(city) {
-			nearCityList_detail[key] = {city: city};
-			if(geoQuery_completed && Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
-					syncNearCityList(nearCityList_coord, nearCityList_detail);
+		sessionForwarder(session_id, function() {	
+			nearCityList_coord[key] = {city: {id: key, center: { lat: location[0], lng: location[1] } }, distance: distance};
+			getCityFromId(key, function(city) {
+				nearCityList_detail[key] = {city: city};
+				if(geoQuery_completed && Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
+						syncNearCityList(nearCityList_coord, nearCityList_detail);
+			});
 		});
 	});
 }
@@ -194,6 +198,14 @@ function matchCityByGroup(list, group, name) {
 	return matchList;
 }
 
+function getCityCenterFromId_session(city, session_id, callback) {
+	sessionForwarder(session_id, function(city, callback) {
+			 getCityCenterFromId(city, callback);
+		 }, [city, function() {
+			 sessionForwarder(session_id, callback, [city]);
+		}] );
+}
+
 function getCityCenterFromId(city, callback) {
 	refCityCenter.child(city.id).once('value', function(snapshot) {
 		var location = snapshot.val().l;
@@ -221,7 +233,7 @@ function getCityIdFromNameId(name_id, callback) {
 	});
 }
 
-function getCityFromCityGp_id(city_gp_id, callback_success, callback_failure) {
+function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, callback_failure) {
 	var ref = database.ref('CityDetail');
 	document.getElementById('wait_loader').classList.remove('hide');
 	ref.orderByChild('gp_id').equalTo(city_gp_id).once('value', function(snapshot) {
@@ -229,10 +241,11 @@ function getCityFromCityGp_id(city_gp_id, callback_success, callback_failure) {
 		if (snapshot.exists()) {
 			var city = Object.values(snapshot.val())[0];
 			city.id = Object.keys(snapshot.val())[0];
-			callback_success(city);
+			sessionForwarder(encode_session_id, callback_success, [city]);
 		}
-		else
-			callback_failure();
+		else {
+			sessionForwarder(encode_session_id, callback_failure);
+		}
 	});	
 }
 

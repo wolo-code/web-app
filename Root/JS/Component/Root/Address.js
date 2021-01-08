@@ -2,7 +2,7 @@
 // var address;
 // var gpId;
 
-function getAddress(latLng, callback) {
+function getAddress(latLng, session_id, callback) {
 	var geocoder = new google.maps.Geocoder;
 	geocoder.geocode({'location': latLng}, function(address_components, status) {
 		latLng_p = latLng;
@@ -19,8 +19,9 @@ function getAddress(latLng, callback) {
 				}
 				if(!current_title)
 					refreshAddress();
-				if(typeof callback != 'undefined')
-					callback(address_components);
+				if(typeof callback != 'undefined') {
+					sessionForwarder(session_id, callback, [address_components]);
+				}
 			} else {
 				console.log('No geoCoding results found');
 			}

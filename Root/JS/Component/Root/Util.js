@@ -49,3 +49,12 @@ function getTimeDiff(join, lastSeen) {
 	if (date_diff.getSeconds() > 0) time += date_diff.getSeconds() + 's ';
 	return time;
 }
+
+function sessionForwarder(session_id, fwd_function, ar_param) {
+	if(session_id == encode_session_id) {
+		if(typeof ar_param === "undefined")
+			fwd_function();
+		else
+			fwd_function(...ar_param);			
+	}
+}

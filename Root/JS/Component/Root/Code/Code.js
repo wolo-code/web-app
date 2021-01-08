@@ -3,8 +3,11 @@
 // var curDecRequestId;
 // var curAddCityRequestId;
 
-function encode_(city, position) {
-	code_city = city;
+function encode_(city, position, session_id) {
+	if(typeof session_id != undefined && session_id == encode_session_id)
+		code_city = city;
+	else
+		code_city = null;
 	var http = new XMLHttpRequest();
 	http.open('POST', FUNCTIONS_BASE_URL+'/'+'encode', true);
 
@@ -15,15 +18,16 @@ function encode_(city, position) {
 	document.getElementById('wait_loader').classList.remove('hide');
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
-			if(http.requestId == curEncRequestId) {
-				document.getElementById('wait_loader').classList.add('hide');
-				if(http.status == 200) {
-					setCodeWords(http.responseText, city, position);
+			if(http.requestId == curEncRequestId)
+				if(typeof session_id != undefined && session_id == encode_session_id) {
+					document.getElementById('wait_loader').classList.add('hide');
+					if(http.status == 200) {
+						setCodeWords(http.responseText, city, position);
+					}
+					else if(http.status == 416) {
+						notInRange(position);
+					}
 				}
-				else if(http.status == 416) {
-					notInRange(position);
-				}
-			}
 		}
 	}
 

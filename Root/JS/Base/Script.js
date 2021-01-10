@@ -28,6 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
-	alert("Oops! Something went wrong. Make sure you are using updated Google Chrome Browser - if this issue persists");
+	alert("Oops! Something went wrong. Make sure you are connected to the Internet and are using latest Google Chrome Browser - if this issue persists");
 	return false;
 }

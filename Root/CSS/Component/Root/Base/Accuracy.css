@@ -28,6 +28,7 @@
 #accuracy_meter {
 	font-family: monospace;
 	line-height: 32px;
+	min-width: 18px;
 }
 
 #accuracy_meter_unit {

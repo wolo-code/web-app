@@ -34,7 +34,9 @@
 </div>
 <input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
 <div id='suggestion_result'></div>
-<input id='decode_button' class='control' type='button' value='Decode' tabindex='4' >
+<div id='decode_button' class='control' tabindex='4'>
+	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+</div>
 <div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php includeSVG('', 'Location'); ?></span>
 </div>

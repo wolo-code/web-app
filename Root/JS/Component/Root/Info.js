@@ -10,8 +10,8 @@ function showInfo() {
 function closeInfo() {
 	hideInfo();
 	activateOverlayInfo_full();
-	if(!syncLocate_engage) {
-		syncLocate();
-		syncLocate_engage = true;
-	}
+	// if(!syncLocate_engage) {
+	// 	syncLocate();
+	// 	syncLocate_engage = true;
+	// }
 }

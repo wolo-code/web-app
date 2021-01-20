@@ -1,0 +1,89 @@
+#decode_interface_overlay {
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	font-family: 'Abel';
+	z-index: 0;
+	display: none;
+}
+
+.decode #decode_interface_overlay {
+	background-color: #efefef;
+	display: block;
+}
+
+.decode #decode_input_container {
+	margin: auto;
+}
+
+.decode #map_type_button {
+	color: rgba(0,0,0,.14);
+} 
+
+.decode #account {
+	left: 12px;
+}
+
+#decode_input_container {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	max-width: 468px;
+	max-height: 166px;
+}
+
+.decode #decode_input {
+	display: block;
+	position: absolute;
+	left: 0px !important;
+	right: 0px !important;
+	top: 36px !important;
+	height: 26px;
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 1.38em;
+	font-weight: 300;
+	margin-left: 12px;
+	margin-right: 12px;
+	padding: 8px;
+	border: none;
+	text-overflow: ellipsis;
+	width: 82%;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+#decode_input {
+	display: none;
+}
+
+#decode_input_button {
+	z-index: 1;
+	position: absolute;
+	right: 0;
+	top: 36px;
+	height: 26px;
+	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	color: #69B7CF;
+	font-family: Roboto, Arial, sans-serif;
+	font-size: 0.9375em;
+	background-color: rgb(255, 255, 255);
+	padding: 8px 10px;
+	border: none;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	margin-right: 12px;
+}
+
+.decode #wait_loader {
+	display: none;
+}
+
+.decode #decode_button, .decode #map_input_suggestion_result {
+	display: none;
+}

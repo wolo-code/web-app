@@ -1,3 +1,18 @@
+<div id='map'></div>
+<div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input'></div>
+<input id='pac-input' data-suggest='map_input_suggestion_result' class='controls' type='text' placeholder='Search' tabindex='3' >
+<div id='decode_button' class='control' tabindex='4'>
+	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+</div>
+<div id='decode_interface_overlay'>
+	<div id='decode_input_container'>
+		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input'></div>
+		<input id='decode_input' data-suggest='decode_input_suggestion_result' type='text' placeholder="&nbsp;&nbsp;\ Wolo code /&nbsp; &nbsp;e.g. cat apple tomato">
+		<div id='decode_input_button' class='control' tabindex='4'>
+			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+		</div>
+	</div>
+</div>
 <div id='overlay' class="overlay hide">
 	<div>
 	<?php
@@ -15,8 +30,6 @@
 	?>
 	</div>
 </div>
-
-<div id='map'></div>
 <div id='wait_loader'></div>
 <div id='logo' tabindex='1'>
 	<a id=logo_wolo class='blur_background' href='//wolo.codes'>
@@ -31,11 +44,6 @@
 		<img id='account_user_image' class='hide'>
 		<span id='account_default_image' class="inactive hide"><?php includeSVG('', 'Account'); ?></span>
 	</span>
-</div>
-<input id='pac-input' class='controls' type='text' placeholder='Search' tabindex='3' >
-<div id='suggestion_result'></div>
-<div id='decode_button' class='control' tabindex='4'>
-	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 </div>
 <div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php includeSVG('', 'Location'); ?></span>

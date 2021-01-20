@@ -195,6 +195,8 @@ function processPosition(pos) {
 function processPositionButtonDown() {
 	firstFocus = true;
 	clearMap();
+	if(document.body.classList.contains('decode'))
+		toggleMapType();
 	selfBoundsChangedCount = 1;
 	locate_button_pressed = true;
 	location_button_begin_time = (new Date).getTime();

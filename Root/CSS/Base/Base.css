@@ -99,6 +99,10 @@ button.border {
 	width: 152px;
 }
 
+body > #pac-input {
+	display: none;
+}
+
 #pac-input {
 	position: absolute;
 	left: 0px !important;

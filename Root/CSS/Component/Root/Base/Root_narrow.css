@@ -6,7 +6,7 @@
 		right: 10px !important;
 	}
 
-	#suggestion_result {
+	.suggestion_result {
 		top: 74px !important;
 	}
 
@@ -25,7 +25,7 @@
 		top: 126px !important;
 	}
 
-	#suggestion_result {
+	.suggestion_result {
 		top: 100px !important;
 	}
 

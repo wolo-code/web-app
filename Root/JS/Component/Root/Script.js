@@ -7,8 +7,8 @@ function initLoad () {
 		dbInit();
 		syncLocate_engage = versionCheck();
 		if(!urlDecode()) {
-			if(syncLocate_engage)
-				syncLocate();
+			//if(syncLocate_engage)
+				//syncLocate();
 		}
 		else
 			syncLocate_engage = true;

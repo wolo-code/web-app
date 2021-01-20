@@ -88,10 +88,12 @@ function initMap() {
 	});
 
 	decode_button.addEventListener('click', function() {
-		cleanUp();
-		document.getElementById('accuracy_container').classList.add('hide');
-		var code = document.getElementById('pac-input').value;
-		execDecode(code);
+		beginDecode(document.getElementById('pac-input').value);
+	});
+	
+	decode_input_button.addEventListener('click', function() {
+		toggleMapType();
+		beginDecode(document.getElementById('decode_input').value);
 	});
 
 	map_type_button.addEventListener('click', function() {
@@ -102,6 +104,8 @@ function initMap() {
 	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
 
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
+	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
+	
 	clickHandler = new ClickEventHandler(map);
 
 	if(init_map_mode == 'satellite')
@@ -109,6 +113,12 @@ function initMap() {
 
 	postMap();
 
+}
+
+function beginDecode(code) {
+	cleanUp();
+	document.getElementById('accuracy_container').classList.add('hide');
+	execDecode(code);
 }
 
 function resolveLatLng(latLng) {
@@ -171,7 +181,8 @@ function clearMap() {
 }
 
 function cleanUp(full = false) {
-	document.getElementById('suggestion_result').innerText = '';
+	document.getElementById('map_input_suggestion_result').innerText = '';
+	document.getElementById('decode_input_suggestion_result').innerText = '';
 	clearNotificationTimer();
 	clearTimeout(presstimer);
 	clearTimeout(watch_location_timer);
@@ -197,12 +208,17 @@ function cleanUp(full = false) {
 }
 
 function toggleMapType() {
-	if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
+	if(document.body.classList.contains('decode')) {
+		document.body.classList.remove('decode');
+		map_type_button.value = 'Map';
+	}
+	else if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
+		document.body.classList.add('decode');
+		document.body.classList.remove('satellite');
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		map_type_button.value = 'Map';
-		document.body.classList.remove('satellite');
 	}
-	else {
+	else if(map.getMapTypeId() == google.maps.MapTypeId.ROADMAP.toLowerCase()){
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
 		map_type_button.value = 'Sattelite';
 		document.body.classList.add('satellite');

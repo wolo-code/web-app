@@ -95,7 +95,7 @@ function initMap() {
 	});
 
 	map_type_button.addEventListener('click', function() {
-		toggleMapType(true);
+		toggleMapType();
 	});
 
 	location_button.addEventListener('mousedown', processPositionButtonDown);

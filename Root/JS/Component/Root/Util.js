@@ -58,3 +58,10 @@ function sessionForwarder(session_id, fwd_function, ar_param) {
 			fwd_function(...ar_param);			
 	}
 }
+
+function enterHandler(event) {
+	if (event.keyCode === 13) {
+		event.preventDefault();
+		document.getElementById(event.srcElement.getAttribute('data-handler')).click();
+	}
+}

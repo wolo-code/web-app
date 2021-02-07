@@ -1,17 +1,18 @@
 <div id='map'></div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input'></div>
-<input id='pac-input' data-suggest='map_input_suggestion_result' class='controls' type='text' placeholder='Search' tabindex='3' >
+<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='Search' tabindex='3' >
 <div id='decode_button' class='control' tabindex='4'>
 	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 </div>
 <div id='decode_interface_overlay'>
 	<div id='decode_input_container'>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input'></div>
-		<input id='decode_input' data-suggest='decode_input_suggestion_result' type='text' placeholder="&nbsp;&nbsp;\ Wolo code /&nbsp; &nbsp;e.g. cat apple tomato">
+		<input id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' type='text' placeholder="\ Wolo code /" >
 		<div id='decode_input_button' class='control' tabindex='4'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 		</div>
 	</div>
+	<span id='decode_input_shadow'></span>
 </div>
 <div id='overlay' class="overlay hide">
 	<div>

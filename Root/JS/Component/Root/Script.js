@@ -92,6 +92,13 @@ function setupControls() {
 	document.getElementById('qr_print').addEventListener('click', printQR);
 	document.getElementById('qr_download').addEventListener('click', downloadQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
+	
+	decode_input.addEventListener('input', resizeInput);
+}
+
+function resizeInput() {
+	document.getElementById('decode_input_shadow').innerText = this.value;
+	this.style.width = document.getElementById('decode_input_shadow').offsetWidth+'px';
 }
 
 function showAndCopy(message) {

@@ -104,7 +104,9 @@ function initMap() {
 	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
 
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
+	document.getElementById('pac-input').addEventListener('keyup', enterHandler);
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
+	document.getElementById('decode_input').addEventListener('keyup', enterHandler);
 	
 	clickHandler = new ClickEventHandler(map);
 

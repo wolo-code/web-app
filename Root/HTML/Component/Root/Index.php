@@ -12,7 +12,7 @@
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input'></div>
 	</div>
-	<span id='decode_input_shadow'></span>
+	<input id='decode_input_shadow'></input>
 </div>
 <div id='overlay' class="overlay hide">
 	<div>

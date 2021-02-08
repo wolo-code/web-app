@@ -6,7 +6,7 @@
 </div>
 <div id='decode_interface_overlay'>
 	<div id='decode_input_container'>
-		<input id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' type='text' placeholder="\ Wolo code /" >
+		<input id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' type='text' placeholder="\ Wolo code /" autocomplete='off'>
 		<div id='decode_input_button' class='control' tabindex='4'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 		</div>

@@ -37,29 +37,28 @@
 	max-height: 166px;
 }
 
-.decode #decode_input {
-	min-width: 262px;
-	display: inline-block;
-	height: 26px;
-	background-color: transparent;
+.decode #decode_input, #decode_input_shadow {
 	font-family: Roboto;
 	font-size: 1.38em;
 	font-weight: 300;
+	display: inline-block;
+	border: none;
+	min-width: 262px;
 	margin-left: 12px;
 	margin-right: 12px;
-	padding: 8px;
-	border: none;
-	text-overflow: ellipsis;
 	max-width: 92%;
+}
+
+.decode #decode_input {
+	padding: 8px;
+	display: inline-block;
+	height: 26px;
+	background-color: transparent;
+	text-overflow: ellipsis;
 	border-bottom: 1px solid #8e8e8e;
 }
 
 #decode_input_shadow {
-	font-family: Roboto;
-	font-size: 1.38em;
-	font-weight: 300;
-	display: inline-block;
-	border: none;
 	visibility: hidden;
 	position: absolute;
 	bottom: 36px;

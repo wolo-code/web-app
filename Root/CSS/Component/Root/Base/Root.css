@@ -9,6 +9,18 @@
 	border: 1px solid #CDCDCD
 }
 
+#decode_input_suggestion_result {
+	min-height: 2em;
+	margin-left: 78px;
+	text-align: left;	
+}
+
+#map_input_suggestion_result {
+	position: absolute;
+	top: 73px;
+	left: 12px;
+}
+
 #decode_button {
 	z-index: 1;
 	position: absolute;

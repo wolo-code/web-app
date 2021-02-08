@@ -46,6 +46,7 @@
 	margin-left: 12px;
 	margin-right: 12px;
 	max-width: 92%;
+	text-transform: lowercase;
 }
 
 .decode #decode_input {

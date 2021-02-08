@@ -6,10 +6,6 @@
 		right: 10px !important;
 	}
 
-	.suggestion_result {
-		top: 74px !important;
-	}
-
 }
 
 @media (max-width: 390px) {
@@ -23,10 +19,6 @@
 
 	#decode_button {
 		top: 126px !important;
-	}
-
-	.suggestion_result {
-		top: 100px !important;
 	}
 
 }

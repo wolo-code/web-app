@@ -1,7 +1,5 @@
 .suggestion_result {
-	position: absolute;
-	top: 8px;
-	left: 12px;
+	padding-top: 8px;
 }
 
 .suggestion_result > div {

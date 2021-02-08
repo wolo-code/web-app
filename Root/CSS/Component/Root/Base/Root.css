@@ -1,7 +1,3 @@
-.suggestion_result {
-	padding-top: 8px;
-}
-
 .suggestion_result > div {
 	display: inline-block;
 	background-color: #FFFFFF;
@@ -28,7 +24,6 @@
 	border: none;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
-	margin-right: 12px;
 }
 
 #info {

@@ -6,11 +6,11 @@
 </div>
 <div id='decode_interface_overlay'>
 	<div id='decode_input_container'>
+		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input'></div>
 		<input id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' type='text' placeholder="\ Wolo code /" autocomplete='off'>
 		<div id='decode_input_button' class='control' tabindex='4'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 		</div>
-		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input'></div>
 	</div>
 	<input id='decode_input_shadow'></input>
 </div>

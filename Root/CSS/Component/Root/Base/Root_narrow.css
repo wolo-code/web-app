@@ -6,13 +6,23 @@
 		right: 10px !important;
 	}
 
+	#map_input_suggestion_result {
+		top: 74px !important;
+	}
+	
 }
 
 @media (max-width: 390px) {
+	
 	#decode_button {
 		left: auto !important;
 		right: 10px !important;
 	}
+	
+	#map_input_suggestion_result {
+		top: 100px !important;
+	}
+	
 }
 
 @media (max-width: 316px) {

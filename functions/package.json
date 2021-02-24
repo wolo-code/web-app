@@ -3,7 +3,7 @@
 	"description": "Cloud Functions for Firebase",
 	"dependencies": {
 		"@google/maps": "^0.5.5",
-		"firebase-functions": "^3.6.1",
+		"firebase-functions": "^3.13.2",
 		"geofire": "^5.0.1",
 		"mailgun-js": "^0.22.0"
 	},

@@ -96,7 +96,7 @@ function chooseWord(event) {
 	cur_word[cur_word.length-1] = this.innerText;
 	document.getElementById(event.srcElement.parentElement.getAttribute('data-input')).value = cur_word.join(' ') + ' ';
 	document.getElementById(event.srcElement.parentElement.getAttribute('data-input')).focus();
-	if( document.getElementById(event.srcElement.parentElement.getAttribute('data-resize_input')) == 'true')
+	if( document.getElementById(event.srcElement.parentElement.getAttribute('data-resize_input')) == 'true' )
 		resizeInput.call( document.getElementById(event.srcElement.parentElement.getAttribute('data-input')) );
 	event.srcElement.parentElement.innerText = '';
 }

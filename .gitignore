@@ -3,7 +3,9 @@
 **/Thumbs.db
 .firebase/*.cache
 functions/node_modules
+functions/.runtimeconfig.json
 firebase-debug.log
+ui-debug.log
 public
 interim
 Manage

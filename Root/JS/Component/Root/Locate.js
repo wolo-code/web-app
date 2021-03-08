@@ -254,3 +254,27 @@ function watch_location_notice() {
 		notification_duration = NOTIFICATION_DURATION_DEFAULT;
 	showNotification('Getting more accurate location <br> wait for a minute or choose "Proceed"', notification_duration);
 }
+
+function getCityFromPositionViaGMap(position, callback_success) {
+	encode_session_id = Date.now;
+	var session_id = encode_session_id;
+	getAddress( {'lat':position.coords.latitude, 'lng':position.coords.longitude}, session_id, function(address_components) {
+			var city_gp_id = getCityGpId(address_components);
+			if(city_gp_id != null) {
+				getCityFromCityGp_id( city_gp_id, session_id, function(city) {
+						current_city_gp_id = city_gp_id;
+						setCurrentCity_status(true);
+						callback_success(city);
+				} );
+			}
+	} );
+}
+
+function getCoarseLocation(callback_success, callback_failure) {
+	if(navigator.geolocation) {
+		var options = { timeout: 60000 };
+		navigator.geolocation.getCurrentPosition (callback_success, callback_failure, options);
+	} else {
+		alert("Sorry, browser does not support geolocation!");
+	}
+}

@@ -145,23 +145,35 @@ function decode(words) {
 				});
 			}
 			else if (words.length == 3) {
-				var position;
-				if(myLocDot == null) {
-					if(marker != null && marker.position != null) {
-						position = marker.position;
-						focus___(position);
-						showNotification(PURE_WCODE_CITY_PICKED);
+				if(typeof(current_city_gp_id) != undefined && current_city_gp_id != null)
+					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
+				else {
+					var position;
+					if(myLocDot == null) {
+						if(marker != null && marker.position != null) {
+							position = marker.position;
+							focus___(position);
+							showNotification(PURE_WCODE_CITY_PICKED);
+						}
+						else {
+							getCoarseLocation(function(position) {
+								getCityFromPositionViaGMap(position, function(city) {
+									getCityCenterFromId(city, function() {
+										decode_continue(city, words);
+									} );
+								}) }, handleLocationError);
+							return;
+						}
 					}
+					else {
+						position = myLocDot.position;
+					}
+					
+					if(position != null)
+						getCityFromPositionThenDecode(resolveLatLng(position), words);
 					else
 						showNotification(PURE_WCODE_CITY_FAILED);
-					return;
 				}
-				else {
-					position = myLocDot.position;
-				}
-
-				if(position != null)
-					getCityFromPositionThenDecode(resolveLatLng(position), words);
 			}
 
 	}

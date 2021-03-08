@@ -147,6 +147,20 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 }
 
+function getCityFromCityGp_idThenDecode(city_gp_id, wcode) {
+	function callback_success(city) {
+		getCityCenterFromId(city, function() {
+			decode_continue(city, wcode);
+		} );
+	};
+	function callback_failure() {
+		decode_continue(null, wcode);
+	};
+	var session_id;
+	session_id = dencode_session_id = Date.now();
+	getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, callback_failure )
+}
+
 // only detail, not center
 function getCityFromId(id, callback) {
 	var ref = database.ref('CityDetail'+'/'+id);

@@ -23,6 +23,7 @@ var current_city_gp_id;
 var is_current_city;
 
 var encode_session_id;
+var dencode_session_id;
 
 // Code\Model
 var code_city;

@@ -186,7 +186,9 @@ function cleanUp(full = false) {
 	document.getElementById('map_input_suggestion_result').innerText = '';
 	document.getElementById('decode_input_suggestion_result').innerText = '';
 	clearNotificationTimer();
-	clearTimeout(presstimer);
+	listPressTimer.forEach(
+			 function(presstimer) {clearTimeout(presstimer);}
+		);
 	clearTimeout(watch_location_timer);
 	clearLocating(full);
 	clearMap();

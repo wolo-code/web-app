@@ -1,29 +1,27 @@
-var longpress = false;
-var presstimer = null;
-var longtarget = null;
+var listPressTimer = [];
 
 var cancel = function(e) {
-	if (presstimer !== null) {
-		clearTimeout(presstimer);
-		presstimer = null;
+	if (this.presstimer !== null) {
+		clearTimeout(this.presstimer);
+		listPressTimer[this.pressTimerIndex] = this.presstimer = null;
 	}
 
 	this.classList.remove('longpress');
 };
 
 var click = function(e) {
-	if (presstimer !== null) {
-		clearTimeout(presstimer);
-		presstimer = null;
+	if (this.presstimer !== null) {
+		clearTimeout(this.presstimer);
+		listPressTimer[this.pressTimerIndex] = this.presstimer = null;
 	}
 
 	this.classList.remove('longpress');
 
-	if (longpress) {
+	if (this.longpress) {
 		return false;
 	}
 
-	showCopyWcodeMessage();
+	this.fnShort();
 };
 
 var start = function(e) {
@@ -32,21 +30,22 @@ var start = function(e) {
 		return;
 	}
 
-	longpress = false;
+	this.longpress = false;
 
 	this.classList.add('longpress');
 
-	if (presstimer === null) {
-		presstimer = setTimeout(function() {
-			handleShareWCode();
-			longpress = true;
+	var parent = this;
+	if (this.presstimer === null) {
+		listPressTimer[this.pressTimerIndex] = this.presstimer = setTimeout(function() {
+			parent.fnLong();
+			parent.longpress = true;
 		}, 500);
 	}
 
 	return false;
 };
 
-function addLongpressListener(node) {
+function addLongpressListener(node, fnShort, fnLong) {
 	node.addEventListener('mousedown', start);
 	node.addEventListener('touchstart', start);
 	node.addEventListener('click', click);
@@ -54,4 +53,10 @@ function addLongpressListener(node) {
 	node.addEventListener('touchend', cancel);
 	node.addEventListener('touchleave', cancel);
 	node.addEventListener('touchcancel', cancel);
+	node.longpress = false;
+	node.presstimer = null;
+	node.longtarget = null;
+	node.fnShort = fnShort;
+	node.fnLong = fnLong;
+	node.pressTimerIndex = listPressTimer.length;
 }

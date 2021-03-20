@@ -87,14 +87,8 @@ function initMap() {
 		focus___(pos);
 	});
 
-	decode_button.addEventListener('click', function() {
-		beginDecode(document.getElementById('pac-input').value);
-	});
-	
-	decode_input_button.addEventListener('click', function() {
-		toggleMapType();
-		beginDecode(document.getElementById('decode_input').value);
-	});
+	addLongpressListener(document.getElementById('decode_button'), decode_input_from_map, decode_input_from_map_external);
+	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form);
 
 	map_type_button.addEventListener('click', function() {
 		toggleMapType();
@@ -115,6 +109,25 @@ function initMap() {
 
 	postMap();
 
+}
+
+function decode_input_from_map() {
+	beginDecode(document.getElementById('pac-input').value);
+}
+
+function decode_input_from_map_external() {
+	initWCode_jumpToMap = true;
+	decode_input_from_map();
+}
+
+function decode_input_from_form() {
+	toggleMapType();
+	beginDecode(document.getElementById('decode_input').value);
+}
+
+function decode_input_from_form_external() {
+	initWCode_jumpToMap = true;
+	decode_input_from_form();
 }
 
 function beginDecode(code) {

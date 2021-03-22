@@ -98,6 +98,14 @@ function urlDecode() {
 			return true;
 		}
 	}
-	else
+	else {
+		var urlParams = new URLSearchParams(window.location.search);
+		var qParam = urlParams.get('q');
+		if(qParam != null && qParam != '') {
+			toggleMapType();
+			var lat_lng = qParam.split(',');
+			pendingPosition = {lat: parseFloat(lat_lng[0]), lng: parseFloat(lat_lng[1])};
+		}
 		return false;
+	}
 }

@@ -28,7 +28,6 @@
 			</div>
 		</div>
 	</div>
-	<div id='qr_code' class='center'></div>
 	<div id='qr_address_container' class='center'>
 		<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address&nbsp; &nbsp;(optional)</div>
 	</div>

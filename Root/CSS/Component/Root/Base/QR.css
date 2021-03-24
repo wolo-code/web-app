@@ -94,8 +94,15 @@
 }
 
 #qr_wcode_container {
-	max-width: 240px;
+	max-width: 260px;
 	color: #69b7cf;
+	padding-left: 12px;
+	padding-top: 8px;
+	padding-bottom: 12px;
+	padding-right: 4px;
+	border: 1px solid;
+	border-radius: 10px;
+	margin-bottom: 8px;
 }
 
 #qr_wcode_left {

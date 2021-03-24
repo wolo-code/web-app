@@ -145,7 +145,7 @@ function decode(words) {
 				});
 			}
 			else if (words.length == 3) {
-				if(typeof(current_city_gp_id) != undefined && current_city_gp_id != null)
+				if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
 					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
 				else {
 					var position;

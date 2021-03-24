@@ -4,7 +4,7 @@
 // var curAddCityRequestId;
 
 function encode_(city, position, session_id) {
-	if(typeof session_id != undefined && session_id == encode_session_id)
+	if(typeof session_id != 'undefined' && session_id == encode_session_id)
 		code_city = city;
 	else
 		code_city = null;
@@ -19,7 +19,7 @@ function encode_(city, position, session_id) {
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
 			if(http.requestId == curEncRequestId)
-				if(typeof session_id != undefined && session_id == encode_session_id) {
+				if(typeof session_id != 'undefined' && session_id == encode_session_id) {
 					document.getElementById('wait_loader').classList.add('hide');
 					if(http.status == 200) {
 						setCodeWords(http.responseText, city, position);

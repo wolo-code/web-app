@@ -303,7 +303,7 @@ function execSubmitCity() {
 function tryDefaultCity() {
 	decode(DEFAULT_WCODE);
 	notification_top.classList.add('hide');
-	if(typeof infoWindow != undefined)
+	if(typeof infoWindow != 'undefined')
 		infoWindow.close();
 }
 

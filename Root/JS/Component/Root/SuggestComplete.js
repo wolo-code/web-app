@@ -1,5 +1,5 @@
 function suggestWrapper(event) {
-	if(typeof wordList != undefined && wordList != null) {
+	if(typeof wordList != 'undefined' && wordList != null) {
 		cityNameList = [];
 		getCitiesFromNameId(event.srcElement.value.toLowerCase(), function(cityList) {
 			for(let key in cityList)

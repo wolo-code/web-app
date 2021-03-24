@@ -45,9 +45,9 @@
 		<p>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
-					<img id='share_qr_button' class='center' src="<?php getSVG('', 'qr'); ?>" >
+					<img id='share_qr_button' class='center' src="<?php getSVG('', 'label'); ?>" >
 				</span>
-				<span class='message_dialog_subtitle_label'>QR</span>
+				<span class='message_dialog_subtitle_label'>Label</span>
 			</div>
 			<div class='message_dialog_control_container'>
 				<div class="center message_dialog_control">

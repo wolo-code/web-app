@@ -71,6 +71,10 @@
 				"destination": "/presentation/index.json"
 			},
 			{
+				"source": "/press_release/launch.json",
+				"destination": "/press_release/launch/index.json"
+			},
+			{
 				"source": "/get/**",
 				"dynamicLinks": true
 			},

@@ -24,6 +24,7 @@
 		
 		#account {
 			right: 10px !important;
+			left: unset !important;
 		}
 		
 }

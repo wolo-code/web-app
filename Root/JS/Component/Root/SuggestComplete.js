@@ -1,14 +1,14 @@
 function suggestWrapper(event) {
 	if(typeof wordList != 'undefined' && wordList != null) {
 		cityNameList = [];
-		getCitiesFromNameId(event.srcElement.value.toLowerCase(), function(cityList) {
+		getCitiesFromNameId(event.target.value.toLowerCase(), function(cityList) {
 			for(let key in cityList)
 				if(cityNameList.indexOf(getProperCityAccent(cityList[key])) == -1)
 					cityNameList.push(getProperCityAccent(cityList[key]));
 			city_styled_wordlist = cityNameList.concat(wordList.curList);
-			suggestComplete(event.srcElement);
+			suggestComplete(event.target);
 		});
-		suggestComplete(event.srcElement);
+		suggestComplete(event.target);
 	}
 }
 
@@ -92,11 +92,11 @@ function changeInput(e, list, val) {
 }
 
 function chooseWord(event) {
-	var cur_word = document.getElementById(event.srcElement.parentElement.getAttribute('data-input')).value.split(' ');
+	var cur_word = document.getElementById(event.target.parentElement.getAttribute('data-input')).value.split(' ');
 	cur_word[cur_word.length-1] = this.innerText;
-	document.getElementById(event.srcElement.parentElement.getAttribute('data-input')).value = cur_word.join(' ') + ' ';
-	document.getElementById(event.srcElement.parentElement.getAttribute('data-input')).focus();
-	if( document.getElementById(event.srcElement.parentElement.getAttribute('data-resize_input')) == 'true' )
-		resizeInput.call( document.getElementById(event.srcElement.parentElement.getAttribute('data-input')) );
-	event.srcElement.parentElement.innerText = '';
+	document.getElementById(event.target.parentElement.getAttribute('data-input')).value = cur_word.join(' ') + ' ';
+	document.getElementById(event.target.parentElement.getAttribute('data-input')).focus();
+	if( document.getElementById(event.target.parentElement.getAttribute('data-resize_input')) == 'true' )
+		resizeInput.call( document.getElementById(event.target.parentElement.getAttribute('data-input')) );
+	event.target.parentElement.innerText = '';
 }

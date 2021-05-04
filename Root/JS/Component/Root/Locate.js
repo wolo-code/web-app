@@ -174,7 +174,8 @@ function proceedPosition() {
 
 function processPosition(pos) {
 	clearLocating(false);
-	navigator.geolocation.clearWatch(watch_location_id);
+	if(typeof navigator.geolocation !== 'undefined')
+		navigator.geolocation.clearWatch(watch_location_id);
 	clearTimeout(watch_location_timer);
 	document.getElementById('proceed_container').classList.add('hide');
 	document.getElementById('accuracy_container').classList.add('highlight');
@@ -271,7 +272,7 @@ function getCityFromPositionViaGMap(position, callback_success) {
 }
 
 function getCoarseLocation(callback_success, callback_failure) {
-	if(navigator.geolocation) {
+	if(typeof navigator.geolocation !== 'undefined') {
 		var options = { timeout: 60000 };
 		navigator.geolocation.getCurrentPosition (callback_success, callback_failure, options);
 	} else {

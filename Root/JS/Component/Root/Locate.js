@@ -256,7 +256,7 @@ function watch_location_notice() {
 	showNotification('Getting more accurate location <br> wait for a minute or choose "Proceed"', notification_duration);
 }
 
-function getCityFromPositionViaGMap(position, callback_success) {
+function getCityFromPositionViaGMap(position, callback_success, callback_failure) {
 	encode_session_id = Date.now;
 	var session_id = encode_session_id;
 	getAddress( {'lat':position.coords.latitude, 'lng':position.coords.longitude}, session_id, function(address_components) {
@@ -266,7 +266,7 @@ function getCityFromPositionViaGMap(position, callback_success) {
 						current_city_gp_id = city_gp_id;
 						setCurrentCity_status(true);
 						callback_success(city);
-				} );
+				}, callback_failure );
 			}
 	} );
 }

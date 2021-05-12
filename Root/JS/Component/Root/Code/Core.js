@@ -161,7 +161,7 @@ function decode(words) {
 									getCityCenterFromId(city, function() {
 										decode_continue(city, words);
 									} );
-								}) }, handleLocationError);
+								}, handleLocationError) }, handleLocationError);
 							return;
 						}
 					}

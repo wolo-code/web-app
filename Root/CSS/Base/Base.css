@@ -229,7 +229,7 @@ body > #pac-input {
 
 .blur_background {
 	backdrop-filter: blur(8px);
-	background-color: #fbfbfb60
+	background-color: #fbfbfb60;
 }
 
 .satellite .blur_background {

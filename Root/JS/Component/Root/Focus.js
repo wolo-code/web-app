@@ -91,7 +91,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 			if(typeof bounds !== 'undefined')
 				setTimeout(function() {
 					if(pendingFocusPos) {
-						var temPos = {...pendingFocusPos};
+						var temPos = Object.assign({}, pendingFocusPos);
 						pendingFocusPos = null;
 						focus___(temPos);
 					}

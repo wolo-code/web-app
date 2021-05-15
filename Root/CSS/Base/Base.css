@@ -89,6 +89,10 @@ button.border {
 	height: 50px;
 }
 
+#logo_wolo {
+	box-shadow: rgb(0 0 0 / 13%) 0px 1px;
+}
+
 #logo_codes {
 	text-decoration: none;
 }

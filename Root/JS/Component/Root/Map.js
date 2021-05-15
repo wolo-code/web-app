@@ -225,19 +225,21 @@ function cleanUp(full = false) {
 }
 
 function toggleMapType() {
+	// Mode = 'Map'
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
-		map_type_button.value = 'Map';
+		document.body.classList.add('map');
 	}
+	// Mode = 'Decode'
 	else if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
-		document.body.classList.add('decode');
 		document.body.classList.remove('satellite');
+		document.body.classList.add('decode');
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-		map_type_button.value = 'Map';
 	}
+	// Mode = 'Sattelite'
 	else if(map.getMapTypeId() == google.maps.MapTypeId.ROADMAP.toLowerCase()){
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
-		map_type_button.value = 'Sattelite';
+		document.body.classList.remove('map');
 		document.body.classList.add('satellite');
 	}
 }

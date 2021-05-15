@@ -49,7 +49,9 @@
 <div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php includeSVG('', 'Location'); ?></span>
 </div>
-<input id='map_type_button' class='control' type='button' value='Map' tabindex='6' >
+<div id='map_type_button' class='control' tabindex='6'>
+	<span class='image'><?php includeSVG('', 'Map'); ?></span>
+</div>
 <div id='info' class='control' tabindex='7'>
 	<span class='image'><?php includeSVG('', 'Info'); ?></span>
 </div>

@@ -108,3 +108,19 @@
 	border-color: #f0f7fa;
 	border-style: solid;
 }
+
+.decode #map_type_button > span > svg > g:first-of-type > path:first-of-type {
+	    fill: #adadad;
+}
+
+.decode #map_type_button > span > svg > g:last-of-type {
+	    display: none
+}
+
+.map #map_type_button > span > svg > g:last-of-type {
+	    display: none
+}
+
+.satellite #map_type_button > span > svg > g:first-of-type {
+	    display: none
+}

@@ -121,6 +121,10 @@
 	filter: url(#dropshadow);
 }
 
+.decode #address_text {
+	display: none;
+}
+
 .map #map_type_button > span > svg > g:last-of-type {
 	display: none
 }

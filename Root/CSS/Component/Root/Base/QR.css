@@ -7,7 +7,6 @@
 	border-top: 6px solid #69b7cf;
 	font-family: Abel;
 	margin: 0 auto;
-	padding-bottom: 11px;
 	text-align: left;
 	background-color: #FFFFFF;
 	color: #999999;
@@ -134,4 +133,9 @@
 	font-size: large;
 	padding-top: 7px;
 	padding-bottom: 10px;
+}
+
+
+#qr_controls {
+    margin-top: 10px;
 }

@@ -1,5 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg"
 	 height="26" width="24"
 	 viewBox="0 0 24 24">
-	<path d="M8 5v14l11-7z" fill="#69B7CF"/>
+	<filter id="dropshadow">
+		<feGaussianBlur in="SourceAlpha" stdDeviation="0.70"/>
+			<feOffset dx="0" dy="0" result="offsetblur"/>
+			<feComponentTransfer>
+			<feFuncA type="linear" slope="0.45"/>
+		</feComponentTransfer>
+		<feMerge>
+			<feMergeNode/>
+			<feMergeNode in="SourceGraphic"/>
+		</feMerge>
+	</filter>
+	<path id='proceed_button_shape' d="M8 5v14l11-7z" fill="#69B7CF"/>
 </svg>

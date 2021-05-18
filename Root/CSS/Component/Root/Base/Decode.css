@@ -117,6 +117,10 @@
 	display: none
 }
 
+.decode #proceed_button_shape {
+	filter: url(#dropshadow);
+}
+
 .map #map_type_button > span > svg > g:last-of-type {
 	display: none
 }

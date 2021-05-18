@@ -20,14 +20,14 @@ function showQR() {
 	var code_string = code_wcode.join(' ');
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
-	showOverlay(document.getElementById('qr_body'));
+	showOverlay(document.getElementById('qr_container'));
 	
 	window.addEventListener('beforeprint', beforeQRprint);
 	window.addEventListener('afterprint', afterQRprint);
 }
 
 function closeQR() {
-	hideOverlay(document.getElementById('qr_body'));
+	hideOverlay(document.getElementById('qr_container'));
 	previewQR_deactivate()
 	window.removeEventListener('afterprint', afterQRprint);
 	window.removeEventListener('beforeprint', beforeQRprint);

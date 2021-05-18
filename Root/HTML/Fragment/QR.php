@@ -1,4 +1,4 @@
-<div id='qr_body' class='hide'>
+<div id='qr_container' class='hide'>
 	<div id='qr_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
@@ -21,10 +21,12 @@
 			<div id='qr_wcode_left'>
 				<span class='slash'>\</span>
 				<span class='infowindow_code' id='qr_wcode_city'></span>
+	<div id='qr_body'>
 			</div>
 			<div id='qr_wcode_right'>
 				<span class='infowindow_code' id='qr_wcode_code'></span>
 				<span class='slash'>/</span>
+		</div>
 			</div>
 		</div>
 	</div>

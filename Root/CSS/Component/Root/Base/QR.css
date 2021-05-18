@@ -1,3 +1,7 @@
+#qr_container {
+	position: relative;
+}
+
 #qr_body {
 	position: relative;
 	border-top: 6px solid #69b7cf;

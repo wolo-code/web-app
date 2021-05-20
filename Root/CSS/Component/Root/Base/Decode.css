@@ -118,7 +118,7 @@
 }
 
 .decode #proceed_button_shape {
-	filter: url(#dropshadow);
+	filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.30));
 }
 
 .decode #address_text {

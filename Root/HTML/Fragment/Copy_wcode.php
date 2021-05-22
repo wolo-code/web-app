@@ -9,7 +9,7 @@
 		<p>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
-					<img id='share_copy_button' class='center' src="<?php getSVG('', 'code'); ?>" >
+					<img id='share_copy_button' alt='Copy Wolo Code text button' class='center' src="<?php getSVG('', 'code'); ?>" >
 				</span>
 				<span class='message_dialog_subtitle_label'>Text</span>
 			</div>
@@ -27,7 +27,7 @@
 		<p>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
-					<img id='share_link_button' class='center' src="<?php getSVG('', 'link'); ?>" >
+					<img id='share_link_button' alt='Copy Wolo code link button' class='center' src="<?php getSVG('', 'link'); ?>" >
 				</span>
 				<span class='message_dialog_subtitle_label'>Link</span>
 			</div>
@@ -45,7 +45,7 @@
 		<p>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
-					<img id='share_qr_button' class='center' src="<?php getSVG('', 'label'); ?>" >
+					<img id='share_qr_button' alt='Generate Wolo Code label' class='center' src="<?php getSVG('', 'label'); ?>" >
 				</span>
 				<span class='message_dialog_subtitle_label'>Label</span>
 			</div>

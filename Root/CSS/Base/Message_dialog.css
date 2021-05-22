@@ -99,6 +99,11 @@ h2.message_dialog_label {
 	border-color: #69b7cf !important;
 }
 
+.message_dialog_section {
+	margin-block-start: 1.2em;
+	margin-block-end: 1.2em;
+}
+
 .message_dialog_subtitle {
 	overflow: hidden;
 }

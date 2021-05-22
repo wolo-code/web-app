@@ -6,7 +6,7 @@
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div class='message_dialog_body'>
-		<p>
+		<div class='message_dialog_section'>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
 					<img id='share_copy_button' alt='Copy Wolo Code text button' class='center' src="<?php getSVG('', 'code'); ?>" >
@@ -22,9 +22,9 @@
 					<button id='share_copy_button_text_nocity' class="border dialog_message_secondary" type='button'>No</button>
 				</div>
 			</div>
-		</p>
+		</div>
 		<hr>
-		<p>
+		<div class='message_dialog_section'>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
 					<img id='share_link_button' alt='Copy Wolo code link button' class='center' src="<?php getSVG('', 'link'); ?>" >
@@ -40,9 +40,9 @@
 					<button id='share_copy_button_link_nojump' class="border dialog_message_secondary" type='button'>No</button>
 				</div>
 			</div>
-		</p>
+		</div>
 		<hr>
-		<p>
+		<div class='message_dialog_section'>
 			<div class='message_dialog_subtitle'>
 				<span class='message_dialog_subtitle_icon'>
 					<img id='share_qr_button' alt='Generate Wolo Code label' class='center' src="<?php getSVG('', 'label'); ?>" >
@@ -54,6 +54,6 @@
 					<button id='share_copy_button_qr' class="border dialog_message_primary button_highlight" type='button'>Go</button>
 				</div>
 			</div>
-		</p>
+		</div>
 	</div>
 </div>

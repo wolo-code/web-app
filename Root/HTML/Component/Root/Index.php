@@ -18,6 +18,7 @@
 	<div>
 	<?php
 		require '../../HTML/Fragment/Redirect.php';
+		require '../../HTML/Fragment/External.php';
 		require '../../HTML/Fragment/NoCity.php';
 		require '../../HTML/Fragment/Copy_wcode.php';
 		require '../../HTML/Fragment/ChooseCity_by_name.php';
@@ -42,7 +43,7 @@
 </div>
 <div id='account' class="control">
 	<span class='image'>
-		<img id='account_user_image' class='hide'>
+		<img id='account_user_image' alt='Account user image' class='hide' src='data:,'>
 		<span id='account_default_image' class="inactive hide"><?php includeSVG('', 'Account'); ?></span>
 	</span>
 </div>

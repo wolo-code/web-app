@@ -121,7 +121,8 @@ function decode_input_from_map_external() {
 }
 
 function decode_input_from_form() {
-	toggleMapType();
+	if(!initWCode_jump_ask)
+		toggleMapType();
 	beginDecode(document.getElementById('decode_input').value);
 }
 

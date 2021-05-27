@@ -112,6 +112,7 @@ function initMap() {
 }
 
 function decode_input_from_map() {
+	document.activeElement.blur();
 	beginDecode(document.getElementById('pac-input').value);
 }
 
@@ -123,6 +124,7 @@ function decode_input_from_map_external() {
 function decode_input_from_form() {
 	if(!initWCode_jump_ask)
 		toggleMapType();
+	document.activeElement.blur();
 	beginDecode(document.getElementById('decode_input').value);
 }
 

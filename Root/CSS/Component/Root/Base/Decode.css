@@ -1,3 +1,7 @@
+.decode #logo {
+	z-index: 101;
+}
+
 #decode_interface_overlay {
 	top: 0;
 	left: 0;

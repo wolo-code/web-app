@@ -1,6 +1,10 @@
 <svg xmlns='http://www.w3.org/2000/svg'
 	 height='28' width='28'
 	 viewBox="0 0 24 24">
-	<path d="m14 15.83h-10v2.1068h10zm-10-2.8009h16v-2.1068h-16zm0-6.9662v2.1068h16v-2.1068z" fill="#69b7cf"/>
-	<path d="M0 0h24v24H0z" fill="none"/>
+	<path
+	 d="M 14,16.390776 H 4 v 2.1068 H 14 Z M 4,13.042602 h 16 v -2.1068 H 4 Z M 4,5.5024244 v 2.1068 h 16 v -2.1068 z"
+	 fill="#69b7cf" />
+	<path
+	 d="M0 0h24v24H0z"
+	 fill="none" />
 </svg>

@@ -11,6 +11,7 @@ function initData() {
 		encode(pendingPosition);
 	}
 	else if(pendingWords != null) {
+		initWCode_jump_ask = true;
 		decode(pendingWords);
 	}
 }

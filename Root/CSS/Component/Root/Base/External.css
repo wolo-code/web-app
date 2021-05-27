@@ -1,0 +1,62 @@
+#external_wcode {
+	padding-top: 15px;
+}
+
+#external_sticker_title {
+	width: 188px;
+}
+
+#external_sticker_title_segment {
+	width: 188px;	
+}
+
+#external_label > a {
+	text-decoration: none;
+}
+
+#external_wcode_container {
+	max-width: 260px;
+	color: #69b7cf;
+	padding-left: 12px;
+	padding-top: 8px;
+	padding-bottom: 12px;
+	padding-right: 4px;
+	border: 1px solid;
+	border-radius: 10px;
+	margin-bottom: 16px;
+}
+
+#external_wcode_left {
+	text-align: left;
+	margin-bottom: 4px;
+}
+
+#external_wcode_code {
+	font-size: xx-large;
+	font-weight: bold;
+}
+
+#external_down_arrow {
+	width: 32px;
+	margin-top: 20px;
+}
+
+#external_address {
+	text-align: center;
+	width: 240px;
+	margin-top: 6px;
+	margin-bottom: 20px;
+	padding: 2px 2px;
+}
+
+#external_webapp_url {
+	color: #ffffff;
+	background-color: #69B7CF;
+	font-size: large;
+	padding-top: 7px;
+	padding-bottom: 10px;
+}
+
+#external_controls {
+	margin-top: 10px;
+}

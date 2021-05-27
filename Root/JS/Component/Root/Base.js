@@ -1,6 +1,7 @@
 // const CURRENT_VERSION;
 // var initWCode;
 // var initWCode_jumpToMap;
+// var initWCode_jump_ask;
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {

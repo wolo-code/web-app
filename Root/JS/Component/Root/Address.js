@@ -65,6 +65,7 @@ function clearAddress() {
 
 function refreshAddress() {
 	address_text_content.innerText = address;
+	external_address.innerText = address;
 }
 
 function copyAddress() {

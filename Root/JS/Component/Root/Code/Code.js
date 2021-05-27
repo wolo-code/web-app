@@ -93,6 +93,10 @@ function setCodeCoord(city, codeIndex, code) {
 		window.location.replace(getIntentURL(latLng, city.name + ' ' + code.join(' ')));
 	}
 	else {
+		if(initWCode_jump_ask) {
+			initWCode_jump_ask = false;
+			external_show(latLng, city.name, code.join(' '));
+		}
 		getAddress(latLng);
 		focus__(city, latLng, code);
 	}

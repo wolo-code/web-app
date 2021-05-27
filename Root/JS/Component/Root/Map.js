@@ -126,7 +126,7 @@ function decode_input_from_form() {
 }
 
 function decode_input_from_form_external() {
-	initWCode_jumpToMap = true;
+	initWCode_jump_ask = true;
 	decode_input_from_form();
 }
 

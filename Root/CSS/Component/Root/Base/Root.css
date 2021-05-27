@@ -85,3 +85,8 @@
 	border: none;
 	border-radius: 25px;
 }
+
+.satellite #logo_wolo, .satellite #logo_codes {
+	border-color: #a09f9fc7;
+	border-style: solid;
+}

@@ -91,7 +91,7 @@ function urlDecode() {
 			window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
 			return false;
 		}
-		else {			
+		else {
 			var code = code_string.toLowerCase().replace('_', ' ');
 			pendingWords = code.split('.');
 			initWCode = true;

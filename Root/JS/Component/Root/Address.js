@@ -64,9 +64,7 @@ function clearAddress() {
 }
 
 function refreshAddress() {
-	if(!address_text.classList.contains('hide')) {
-		address_text_content.innerText = address;
-	}
+	address_text_content.innerText = address;
 }
 
 function copyAddress() {

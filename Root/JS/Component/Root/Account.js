@@ -167,6 +167,7 @@ function processSaveEntry_continue(row) {
 		current_title = saveList[row.data_key].title;
 		current_segment = saveList[row.data_key].segment;
 		current_address = saveList[row.data_key].address;
+		initWCode_jumpToMap = true;
 		decode_continue(city, saveList[row.data_key].code);
 	});
 }

@@ -1,0 +1,7 @@
+@media (max-width: 662px) {
+
+	.external #logo {
+		z-index: 101;
+	}
+
+}

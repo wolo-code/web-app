@@ -1,3 +1,4 @@
+<div id='wait_loader'></div>
 <div id='map'></div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
 <input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='Search' tabindex='3' >
@@ -32,7 +33,6 @@
 	?>
 	</div>
 </div>
-<div id='wait_loader'></div>
 <div id='logo' tabindex='1'>
 	<a id=logo_wolo class='blur_background' href='//wolo.codes'>
 		<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>

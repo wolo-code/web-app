@@ -227,6 +227,13 @@ function cleanUp(full = false) {
 	current_address = null;
 }
 
+function activateMapType() {
+	if(document.body.classList.contains('decode')) {
+		document.body.classList.remove('decode');
+		document.body.classList.add('map');
+	}
+}
+
 function toggleMapType() {
 	// Mode = 'Map'
 	if(document.body.classList.contains('decode')) {

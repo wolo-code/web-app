@@ -120,7 +120,7 @@ function loadSaveList() {
 					row_delete.addEventListener('click', deleteSaveEntry);
 					row_process.setAttribute('class', 'row-process');
 					row_process_img.src = svg_front;
-					row_process.addEventListener('click', processSaveEntry);
+					addLongpressListener(row_process, processSaveEntry_external, processSaveEntry_internal);
 					row_controls.appendChild(row_delete);
 					row_process.appendChild(row_process_img);
 					row_controls.appendChild(row_process);
@@ -147,6 +147,16 @@ function loadSaveList() {
 	}
 }
 
+function processSaveEntry_internal(e) {
+	activateMapType();
+	processSaveEntry(e);
+}
+
+function processSaveEntry_external(e) {
+	initWCode_jumpToMap = true;
+	processSaveEntry(e);
+}
+
 function processSaveEntry(e) {
 	hideNotication();
 	cleanUp();
@@ -167,7 +177,6 @@ function processSaveEntry_continue(row) {
 		current_title = saveList[row.data_key].title;
 		current_segment = saveList[row.data_key].segment;
 		current_address = saveList[row.data_key].address;
-		initWCode_jumpToMap = true;
 		decode_continue(city, saveList[row.data_key].code);
 	});
 }

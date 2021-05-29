@@ -240,7 +240,7 @@ function toggleMapType() {
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 	}
 	// Mode = 'Sattelite'
-	else if(map.getMapTypeId() == google.maps.MapTypeId.ROADMAP.toLowerCase()){
+	else if(map.getMapTypeId() == google.maps.MapTypeId.ROADMAP.toLowerCase()) {
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
 		document.body.classList.remove('map');
 		document.body.classList.add('satellite');

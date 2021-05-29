@@ -18,7 +18,7 @@ function locateRight_grant() {
 }
 
 function locateRight_deny() {
-	document.getElementById('wait_loader').classList.add('hide');
+	popLoader();
 	hideLocateRightMessage();
 	locateRight_DND_check();
 	showNotification("Choose a place on the map");

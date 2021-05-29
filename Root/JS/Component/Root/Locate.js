@@ -18,7 +18,7 @@ function initLocate(override_dnd) {
 					showLocateRightMessage(hide_dnd);
 				}
 				else
-					document.getElementById('wait_loader').classList.add('hide');
+					popLoader();
 			}
 		});
 }
@@ -29,7 +29,7 @@ function locateExec(failure) {
 		var WATCH_LOCATION_TIMEOUT = 45000;
 		var WATCH_LOCATION_NOTICE_TIMEOUT = 5000;
 
-		document.getElementById('wait_loader').classList.remove('hide');
+		pushLoader();
 		if (navigator.geolocation) {
 			locating = true;
 			if(myLocDot)
@@ -126,7 +126,7 @@ function locateExec(failure) {
 						clearLocating(true);
 						showNotification(LOCATION_PERMISSION_DENIED);
 						setLocationAccess(false);
-						document.getElementById('wait_loader').classList.add('hide');
+						popLoader();
 						failure();
 					}
 					else
@@ -238,7 +238,7 @@ function clearLocating(hideAccuracyContainer) {
 	if(hideAccuracyContainer)
 		document.getElementById('accuracy_container').classList.add('hide');
 	locating = false;
-	document.getElementById('wait_loader').classList.add('hide');
+	popLoader();
 	location_icon_dot.classList.remove('blinking');
 	accuracy_indicator.classList.remove('blinking');
 	hideNotication();

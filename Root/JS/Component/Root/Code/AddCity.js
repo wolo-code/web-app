@@ -7,12 +7,12 @@ function addCity(gp_id, callback) {
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curAddCityRequestId;
 
-	document.getElementById('wait_loader').classList.remove('hide');
+	pushLoader();
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			if(http.requestId == curAddCityRequestId) {
 				callback(JSON.parse(http.responseText).added);
-				document.getElementById('wait_loader').classList.add('hide');
+				popLoader();
 			}
 		}
 	}

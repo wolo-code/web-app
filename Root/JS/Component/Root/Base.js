@@ -93,7 +93,7 @@ function urlDecode() {
 			return false;
 		}
 		else {
-			document.getElementById('wait_loader').classList.remove('hide');
+			pushLoader();
 			var code = code_string.toLowerCase().replace('_', ' ');
 			pendingWords = code.split('.');
 			initWCode = true;

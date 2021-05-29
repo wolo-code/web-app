@@ -15,12 +15,12 @@ function encode_(city, position, session_id) {
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curEncRequestId;
 
-	document.getElementById('wait_loader').classList.remove('hide');
+	pushLoader();
 	http.onreadystatechange = function() {
 		if(http.readyState == 4) {
 			if(http.requestId == curEncRequestId)
 				if(typeof session_id != 'undefined' && session_id == encode_session_id) {
-					document.getElementById('wait_loader').classList.add('hide');
+					popLoader();
 					if(http.status == 200) {
 						setCodeWords(http.responseText, city, position);
 					}
@@ -61,13 +61,13 @@ function decode_(city, code) {
 	http.setRequestHeader('version', '1');
 	http.requestId = ++curDecRequestId;
 
-	document.getElementById('wait_loader').classList.remove('hide');
+	pushLoader();
 	http.onreadystatechange = function() {
 		if(http.readyState == 4 && http.status == 200) {
 			if(http.requestId == curDecRequestId) {
 				setCodeCoord(city, http.responseText, code);
 				notification_top.classList.add('hide');
-				document.getElementById('wait_loader').classList.add('hide');
+				popLoader();
 			}
 		}
 	}

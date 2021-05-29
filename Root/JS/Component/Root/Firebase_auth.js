@@ -9,7 +9,7 @@ function authInit() {
 				hideOverlay(document.getElementById('firebaseui-auth-container'));
 			},
 			uiShown: function() {
-				document.getElementById('wait_loader').classList.add('hide');
+				popLoader();
 			}
 		},
 		signInFlow: 'popup',

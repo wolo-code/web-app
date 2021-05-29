@@ -83,7 +83,7 @@
 }
 
 .decode #wait_loader {
-	display: none;
+	/* display: none; */
 }
 
 .decode #decode_button, .decode #map_input_suggestion_result {

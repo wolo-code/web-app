@@ -5,8 +5,13 @@ function external_close() {
 	external_hide();
 }
 
-function external_proceed() {
+function external_proceed_external() {
 	window.location.replace(getIntentURL(external_latLng, external_wolo_code_string));
+}
+
+function external_proceed_internal() {
+	toggleMapType();
+	external_hide();
 }
 
 function external_show(latLng, city_string, wcode_string) {

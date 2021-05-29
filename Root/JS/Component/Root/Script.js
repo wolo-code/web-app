@@ -94,7 +94,7 @@ function setupControls() {
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
 	document.getElementById('external_close').addEventListener('click', external_close);
-	document.getElementById('external_proceed').addEventListener('click', external_proceed);
+	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
 }
 
 function resizeInput() {

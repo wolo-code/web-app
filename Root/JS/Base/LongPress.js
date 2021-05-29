@@ -21,7 +21,7 @@ var click = function(e) {
 		return false;
 	}
 
-	this.fnShort();
+	this.fnShort(e);
 };
 
 var start = function(e) {
@@ -37,7 +37,7 @@ var start = function(e) {
 	var parent = this;
 	if (this.presstimer === null) {
 		listPressTimer[this.pressTimerIndex] = this.presstimer = setTimeout(function() {
-			parent.fnLong();
+			parent.fnLong(e);
 			parent.longpress = true;
 		}, 500);
 	}

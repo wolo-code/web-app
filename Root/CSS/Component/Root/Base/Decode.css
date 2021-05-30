@@ -82,8 +82,6 @@
 	margin-left: -10px;
 }
 
-.decode #wait_loader {
-	/* display: none; */
 }
 
 .decode #decode_button, .decode #map_input_suggestion_result {

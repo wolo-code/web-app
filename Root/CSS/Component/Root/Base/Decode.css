@@ -79,9 +79,13 @@
 	font-size: 0.9375em;
 	border: none;
 	vertical-align: middle;
-	margin-left: -10px;
+	margin: -8px;
+	padding: 8px;
+	margin-left: -18px;
 }
 
+#decode_input_button > svg {
+	margin-left: -10px;
 }
 
 .decode #decode_button, .decode #map_input_suggestion_result {

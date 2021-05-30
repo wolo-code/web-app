@@ -76,7 +76,7 @@
 #location_button {
 	z-index: 1;
 	position: absolute;
-	right: 16px;
+	right: 0px;
 	bottom: 30px;
 	height: 24px;
 	margin: 8px;

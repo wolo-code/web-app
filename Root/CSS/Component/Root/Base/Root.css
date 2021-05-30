@@ -61,16 +61,12 @@
 	margin-right: auto;
 	left: 0;
 	right: 0;
-	bottom: 28px;
-	width: 32px;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	bottom: 18px;
+	width: 48px;
 	color: #69B7CF;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
-	background-color: rgb(255, 255, 255);
-	padding: 8px 4px;
-	border: none;
-	border-radius: 22px;
+	padding: 8px;
 }
 
 #location_button {
@@ -93,4 +89,11 @@
 .satellite #logo_wolo, .satellite #logo_codes {
 	border-color: #a09f9fc7;
 	border-style: solid;
+}
+
+#map_type_button svg {
+	background-color: rgb(255, 255, 255);
+	border-radius: 25px;
+	padding: 8px;
+	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 }

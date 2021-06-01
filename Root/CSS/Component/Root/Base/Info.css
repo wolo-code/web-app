@@ -44,6 +44,8 @@
 
 #info_intro > p:first-of-type {
 	text-align: justify;
+	margin-top: 2em;
+	margin-bottom: 2em;
 }
 
 #info_full > p:first-of-type {
@@ -137,5 +139,10 @@
 }
 
 #info_full_close_button {
-	margin-top: 14px;
+	margin-top: 16px;
+}
+
+#info_intro_close_button {
+	margin-top: 2px;
+	margin-bottom: 18px;
 }

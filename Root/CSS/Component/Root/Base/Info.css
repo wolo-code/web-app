@@ -42,6 +42,10 @@
 	width: 152px;
 }
 
+#info_intro > p:first-of-type {
+	text-align: justify;
+}
+
 #info_full > p:first-of-type {
 	padding-left: 40px;
 }

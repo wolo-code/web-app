@@ -1,5 +1,5 @@
 <div id='info_message' class='hide'>
-	<div id='overlay_message_close' class="message_dialog_close control">
+	<div id='info_message_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='logo_info'>

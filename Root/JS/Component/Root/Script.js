@@ -61,7 +61,7 @@ function setupControls() {
 	document.getElementById('account_dialog_logout').addEventListener('click', onLogout);
 	document.getElementById('save_address').addEventListener('focus', onAccountDialogAddressActive);
 	document.getElementById('account_dialog_save').addEventListener('click', onAccountDialogSave);
-	document.getElementById('overlay_message_close').addEventListener('click', closeInfo);
+	document.getElementById('info_message_close').addEventListener('click', closeInfo);
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info').addEventListener('click', showInfo);

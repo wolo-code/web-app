@@ -9,4 +9,14 @@
 		margin-bottom: 20px !important;
 	}
 	
+	#overlay > div > div {
+		max-width: none;
+		padding: 16px 10px;
+	}
+	
+	#overlay > div > div > div > ol {
+		margin-block-start: 0.5em;
+		margin-block-end: 0.5em;
+	}
+
 }

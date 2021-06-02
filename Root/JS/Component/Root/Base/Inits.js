@@ -1,6 +1,3 @@
-// Loader
-var loaderCount = 0;
-
 // .\Script
 var pendingLocate = false;
 

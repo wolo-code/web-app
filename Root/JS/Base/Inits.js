@@ -25,3 +25,6 @@ var _umb = {
 		safari: 29
 	}
 };
+
+// Loader
+var loaderCount = 0;

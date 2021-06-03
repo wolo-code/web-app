@@ -180,9 +180,9 @@
 }
 
 #account > span.image {
-    box-shadow: rgb(0 0 0 / 46%) 0px 0px 3px;
-    height: 42px;
-    display: inline-block;
-    border-radius: 20px;
-    background: #a7a7a7;
+	box-shadow: rgb(0 0 0 / 46%) 0px 0px 3px;
+	height: 42px;
+	display: inline-block;
+	border-radius: 20px;
+	background: #a7a7a7;
 }

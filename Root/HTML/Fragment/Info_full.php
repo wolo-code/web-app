@@ -12,7 +12,7 @@
 		</li>
 		<li>
 			The last <strong>three words</strong> specify exactly 'where' in that city.<br>
-			They are from a limited <a class='link' href='https://wcodes.org/wordlist'>list</a>  of 1,024 easy common words.
+			They are from a limited <a class='link' href='https://wcodes.org/wordlist'>list</a> of 1,024 easy common words.
 		</li>
 	</ol>
 

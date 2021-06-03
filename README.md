@@ -5,8 +5,8 @@ Communicate exact location points within a city with just 3 simple words
 
 Technology:
 
-Backend:  
+Backend:
 Firebase
 
-API:  
+API:
 Firebase functions

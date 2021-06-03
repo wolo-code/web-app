@@ -41,7 +41,7 @@
 	}
 	@media screen and (min-width: 40em) {
 		body {
-		  width: 40em;
+			width: 40em;
 		}
 	}
 	h1 {

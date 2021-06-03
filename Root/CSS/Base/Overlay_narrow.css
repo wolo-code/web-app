@@ -14,9 +14,9 @@
 		padding: 16px 10px;
 	}
 	
-	#overlay > div > div > div > ol {
-		margin-block-start: 0.5em;
-		margin-block-end: 0.5em;
+	#overlay > div > div > div > ol, #overlay > div > div > div > ul {
+		padding-inline-start: 22px;
+		padding-inline-end: 20px;
 	}
-
+	
 }

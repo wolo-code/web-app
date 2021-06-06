@@ -1,6 +1,6 @@
 <div id='external_message' class="message_dialog hide">
 	<h2 class='message_dialog_label'>
-		Redirecting
+		Proceed
 	</h2>
 	<div id='external_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>

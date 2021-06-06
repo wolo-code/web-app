@@ -156,13 +156,15 @@ function decode(words) {
 							showNotification(PURE_WCODE_CITY_PICKED);
 						}
 						else {
-							getCoarseLocation(function(position) {
-								getCityFromPositionViaGMap(position, function(city) {
-									getCityCenterFromId(city, function() {
-										decode_continue(city, words);
-									} );
-								}, handleLocationError) }, handleLocationError);
-							return;
+							initLocate(false, function() {
+								getCoarseLocation(function(position) {
+									getCityFromPositionViaGMap(position, function(city) {
+										getCityCenterFromId(city, function() {
+											decode_continue(city, words);
+										} );
+									}, handleLocationError) }, handleLocationError);
+								return;
+							});
 						}
 					}
 					else {

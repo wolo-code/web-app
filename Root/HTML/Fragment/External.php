@@ -25,8 +25,8 @@
 		<div id='external_address_container' class='center'>
 			<div id='external_address' class='initial' contentEditable>Address</div>
 		</div>
-		<div class="center message_dialog_control">
-			<button id='external_proceed' class="border button_active control" type='button'>Proceed <span class="image front_arrow_white"> <?php includeSVG('', 'Front'); ?></span></button>
+		<div id='external_controls_container' class="center message_dialog_control">
+			<button id='external_proceed' class="border button_active control" type='button'><span class="image front_arrow_white"> <?php includeSVG('', 'Front'); ?></span></button>
 		</div>
 	</div>
 </div>

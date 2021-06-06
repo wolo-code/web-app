@@ -63,6 +63,7 @@ var watch_location_timer;
 var watch_location_id;
 var watch_location_notice_timer;
 var pendingFocusPos;
+var locateRight_callback;
 
 // Focus
 var selfBoundsChangedCount = 1;

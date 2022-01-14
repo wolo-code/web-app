@@ -21,7 +21,7 @@ exports.emailOnCitySubmit = functions.database.ref('/CityRequest/{pushId}').onWr
 		subdomain_part = functions.config().app.subdomain+'.';
 	else
 		subdomain_part = '';
-		
+	
 	const entry = data.after.val();
 	console.log('CityRequest - entry : ', context.params.pushId, entry);
 	const id_link = "<a href='https://"+subdomain_part+"wolo.codes/console#"+context.params.pushId+"'>"+context.params.pushId+'</a>';

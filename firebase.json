@@ -48,6 +48,10 @@
 				"function": "add_city"
 			},
 			{
+				"source": "/api/cityByIp",
+				"function": "cityByIp"
+			},
+			{
 				"source": "/console",
 				"destination": "/console.html"
 			},

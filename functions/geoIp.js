@@ -21,9 +21,9 @@ exports.getCity = functions.https.onRequest((req, res) => {
 	if(req.headers.version != 1)
 		res.send({'error' : "Version mismatch"});
 	else {
-		client.city(req.headers['x-forwarded-for']).then(response => {
+		const ip = req.headers['x-forwarded-for'].split(',')[0];
+		client.city(ip).then(response => {
 		 res.send({
-		 	'status' : "success",
 		 	'city': response.city.names.en,
 		 	'country': response.country.isoCode
 		 });

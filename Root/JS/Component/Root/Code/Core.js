@@ -148,33 +148,44 @@ function decode(words) {
 				if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
 					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
 				else {
-					var position;
-					if(myLocDot == null) {
-						if(marker != null && marker.position != null) {
-							position = marker.position;
-							focus___(position);
-							showNotification(PURE_WCODE_CITY_PICKED);
-						}
-						else {
-							initLocate(false, function() {
-								getCoarseLocation(function(position) {
-									getCityFromPositionViaGMap(position, function(city) {
-										getCityCenterFromId(city, function() {
-											decode_continue(city, words);
-										} );
-									}, handleLocationError) }, handleLocationError);
-								return;
-							});
-						}
+					if(!locationAccessCheck()) {
+						if(geoIp_city_name && geoIp_city_name != '')
+							decodeWithIpCity(words);
 					}
 					else {
-						position = myLocDot.position;
-					}
+						var position;
+						if(myLocDot == null) {
+							if(marker != null && marker.position != null) {
+								position = marker.position;
+								focus___(position);
+								showNotification(PURE_WCODE_CITY_PICKED);
+							}
+							else {
+								initLocate(false, function() {
+									getCoarseLocation(function(position) {
+										getCityFromPositionViaGMap(position, function(city) {
+											getCityCenterFromId(city, function() {
+												decode_continue(city, words);
+											} );
+										}, handleLocationError) }, handleLocationError);
+									return;
+								});
+							}
+						}
+						else {
+							position = myLocDot.position;
+						}
 					
-					if(position != null)
-						getCityFromPositionThenDecode(resolveLatLng(position), words);
-					else
-						showNotification(PURE_WCODE_CITY_FAILED);
+						if(position != null)
+							getCityFromPositionThenDecode(resolveLatLng(position), words);
+						else {
+							if(!geoIp_city_name && geoIp_city_name != '')
+								decodeWithIpCity(words);
+							else
+								showNotification(PURE_WCODE_CITY_FAILED);
+						}
+							
+					}
 				}
 			}
 
@@ -188,4 +199,9 @@ function decode_continue(city, wcode) {
 		decode_(city, wcode);
 	else
 		showNotification(INCORRECT_WCODE);
+}
+
+function decodeWithIpCity(words) {
+	decode([geoIp_city_name.toLowerCase()].concat(words));
+	showNotification(IP_CITY_DECODE);
 }

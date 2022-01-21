@@ -23,7 +23,10 @@ function locateRight_deny() {
 	popLoader();
 	hideLocateRightMessage();
 	locateRight_DND_check();
-	showNotification("Choose a place on the map");
+	if(!geoIp_city_name && geoIp_city_name != '')
+		getCityByIp();
+	else
+		showNotification("Choose a place on the map");
 }
 
 function locateRight_DND_check() {

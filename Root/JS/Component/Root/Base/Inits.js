@@ -5,6 +5,7 @@ var pendingLocate = false;
 var curEncRequestId = 0;
 var curDecRequestId = 0;
 var curAddCityRequestId = 0;
+var curGeoIpRequestId = 0;
 
 // Code\Copy_wcode
 var city_styled_wordlist = [];
@@ -16,6 +17,7 @@ var WCODE_LINK_COPIED_MESSAGE = "Wolo code link copied to clipboard";
 // Code\Core
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
 var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the Wolo code with city name";
+var IP_CITY_DECODE = "Current city determined using your connection - verify";
 var pendingPosition;
 var pendingWords;
 var wordList;
@@ -90,3 +92,7 @@ var account_dialog_address_active_first;
 var current_title;
 var current_segment;
 var current_address;
+
+// GeoIp
+var geoIp_country_code;
+var geoIp_city_name;

@@ -16,6 +16,7 @@ function initLoad () {
 		syncInitMap();
 		setupControls();
 		initLoadDone = true;
+		getCityByIp();
 	}
 };
 

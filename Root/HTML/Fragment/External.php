@@ -1,7 +1,4 @@
 <div id='external_message' class="message_dialog hide">
-	<div id='external_close' class="message_dialog_close control">
-		<span class='image'><?php includeSVG('', 'Close'); ?></span>
-	</div>
 	<div class='message_dialog_body'>
 		<div id= 'external_message_loader' class="center"></div>
 		<div id='external_wcode'>
@@ -25,5 +22,8 @@
 		<div id='external_controls_container' class="center message_dialog_control">
 			<button id='external_proceed' class="border button_active control" type='button'><span class="image front_arrow_white"> <?php includeSVG('', 'Front'); ?></span></button>
 		</div>
+	</div>
+	<div id='external_close' class="message_dialog_close control">
+		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 </div>

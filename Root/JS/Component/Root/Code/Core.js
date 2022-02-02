@@ -204,8 +204,12 @@ function decode_continue(city, wcode) {
 }
 
 function decodeWithIpCity(words) {
-	document.getElementById('decode_input').value = [geoIp_city_name].concat(words).join(' ');
-	popLoader();
-	decode([geoIp_city_name.toLowerCase()].concat(words));
-	showNotification(IP_CITY_DECODE);
+	if(geoIp_city_name) {
+		document.getElementById('decode_input').value = [geoIp_city_name].concat(words).join(' ');
+		popLoader();		
+		decode([geoIp_city_name.toLowerCase()].concat(words));
+		showNotification(IP_CITY_DECODE);
+	}
+	else
+		pendingWords_geo = words;
 }

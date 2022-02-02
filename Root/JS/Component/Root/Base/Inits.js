@@ -96,3 +96,4 @@ var current_address;
 // GeoIp
 var geoIp_country_code;
 var geoIp_city_name;
+var pendingWords_geo;

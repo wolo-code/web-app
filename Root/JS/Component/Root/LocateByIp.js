@@ -19,6 +19,8 @@ function getCityByIp() {
 						else {
 							geoIp_country_code = JSON.parse(http.responseText).country;
 							geoIp_city_name = JSON.parse(http.responseText).city;
+							if(pendingWords_geo)
+								decodeWithIpCity(pendingWords_geo);
 						}
 				}
 				else if(http.status == 416) {

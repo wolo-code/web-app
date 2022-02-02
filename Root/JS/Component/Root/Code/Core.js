@@ -116,6 +116,7 @@ function getCityGpId(address_components) {
 }
 
 function decode(words) {
+	pushLoader();
 	var city_words_length = words.length-3;
 
 	var valid;
@@ -195,6 +196,7 @@ function decode(words) {
 }
 
 function decode_continue(city, wcode) {
+	popLoader();
 	if(city != null)
 		decode_(city, wcode);
 	else
@@ -202,6 +204,7 @@ function decode_continue(city, wcode) {
 }
 
 function decodeWithIpCity(words) {
+	popLoader();
 	decode([geoIp_city_name.toLowerCase()].concat(words));
 	showNotification(IP_CITY_DECODE);
 }

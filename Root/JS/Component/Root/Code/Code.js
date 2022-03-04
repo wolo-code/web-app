@@ -98,5 +98,16 @@ function decode__(city_begin, code) {
 }
 
 function setCodeCoord(city, position, code) {
-	focus__(city, position, code);
+	if(initWCode_jumpToMap) {
+		initWCode_jumpToMap = false;
+		window.location.replace(getIntentURL(position, city.name + ' ' + code.join(' ')));
+	}
+	else {
+		if(initWCode_jump_ask) {
+			initWCode_jump_ask = false;
+			external_show(position, city.name, code.join(' '));
+		}
+		getAddress(position);
+		focus__(city, position, code);
+	}
 }

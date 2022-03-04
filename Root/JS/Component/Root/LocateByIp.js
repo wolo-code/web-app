@@ -19,6 +19,7 @@ function getCityByIp() {
 						else {
 							geoIp_country_code = JSON.parse(http.responseText).country;
 							geoIp_city_name = JSON.parse(http.responseText).city;
+							document.getElementById('decode_input_city').innerText = geoIp_city_name;
 							if(pendingWords_geo)
 								decodeWithIpCity(pendingWords_geo);
 						}
@@ -32,4 +33,5 @@ function getCityByIp() {
 
 	http.send( );
 	return '';
+	
 }

@@ -7,6 +7,7 @@
 </div>
 <div id='decode_interface_overlay'>
 	<div id='decode_input_container'>
+		<div id='decode_input_city'>&nbsp;</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
 		<input id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' type='text' placeholder="\ Wolo code /" autocomplete='off'>
 		<div id='decode_input_button' class='control' tabindex='4'>

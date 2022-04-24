@@ -41,6 +41,7 @@ function getCityBegin(cityCenter) {
 }
 
 function encode_(city, position) {
+	code_city = city;
 	const code = encode__(getCityBegin(city.center), position);
 	for(var i of code)
 		if(i < 0 || i > 1023) {

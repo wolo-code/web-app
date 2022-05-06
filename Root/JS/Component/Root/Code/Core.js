@@ -146,14 +146,17 @@ function decode(words) {
 				});
 			}
 			else if (words.length == 3) {
+				
 				if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
 					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
 				else {
+					
 					if(!locationAccessCheck()) {
 						if(geoIp_city_name && geoIp_city_name != '')
 							decodeWithIpCity(words);
 					}
 					else {
+						
 						var position;
 						if(myLocDot == null) {
 							if(marker != null && marker.position != null) {
@@ -187,7 +190,9 @@ function decode(words) {
 						}
 							
 					}
+					
 				}
+				
 			}
 
 	}
@@ -205,9 +210,11 @@ function decode_continue(city, wcode) {
 
 function decodeWithIpCity(words) {
 	if(geoIp_city_name) {
-		document.getElementById('decode_input').value = [geoIp_city_name].concat(words).join(' ');
-		popLoader();		
-		decode([geoIp_city_name.toLowerCase()].concat(words));
+		popLoader();
+		if(geoIP_city)
+			decode_(geoIP_city, words);
+		else
+			decode([geoIp_city_name.toLowerCase()].concat(words));
 		showNotification(IP_CITY_DECODE);
 	}
 	else

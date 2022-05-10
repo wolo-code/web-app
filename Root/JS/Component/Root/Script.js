@@ -16,26 +16,6 @@ function initLoad () {
 		syncInitMap();
 		setupControls();
 		initLoadDone = true;
-		
-		if(!locationAccessCheck()) {
-			getCityByIp();
-		}
-		else {
-			
-			var position;
-			initLocate(false, function() {
-				getCoarseLocation(function(position) {
-					getCityFromPositionViaGMap(position, function(city) {
-						document.getElementById('decode_input_city').innerText = city.name;
-						getCityCenterFromId(city, function() {
-							geoIP_city = city;
-						} );
-					}, handleLocationError) }, handleLocationError);
-				return;
-			});
-				
-		}
-
 	}
 };
 

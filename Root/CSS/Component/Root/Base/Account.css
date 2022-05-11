@@ -69,7 +69,8 @@
 	background-color: #69B7CF;
 	color: #ffffff;
 	font-size: larger;
-	border-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
 	margin: 6px 8px;
 	cursor: pointer;
 }
@@ -98,7 +99,6 @@
 }
 
 .row-header {
-	border: 1px solid #69B7CF;
 	background: #69B7CF !important;
 	color: white !important;
 }
@@ -170,7 +170,7 @@
 	pointer-events: none;
 }
 
-#account_dialog_save_list > div {
+#account_dialog_save_list > div.active {
 	border: 1px solid #69B7CF;
 }
 

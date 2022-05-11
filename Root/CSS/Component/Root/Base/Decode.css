@@ -134,3 +134,7 @@
 .satellite #map_type_button > span > svg > g:first-of-type {
 	display: none
 }
+
+#decode_input_city {
+	color: #7f7f7f;
+}

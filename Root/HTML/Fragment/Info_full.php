@@ -21,14 +21,14 @@
 	</h2>
 	<ul>
 		<li>
-			Enter a Wolo code address and hit the proceed button to go to that location. Or,
+			Enter a Wolo code address to go to that location. Or,
 		</li>
 		<li>
-			Point a location on the map to generate the corresponding Wolo code address.
+			Switch modes using the map icon and point a location on the map to generate the corresponding Wolo code address.
 		</li>
 		<li>
 			You may also search for a particular place. Or,<br>
-			let the system pick your current location automatically.
+			let the app pick your current location automatically.
 		</li>
 	</ul>
 	

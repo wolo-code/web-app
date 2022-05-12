@@ -63,7 +63,7 @@
 <div id='footer-content-container' class='center'>
 	<div id='footer-content' class='blur_background'>
 		<a class='link-gray' href='/license'>&copy; <?php echo date('Y'); ?> </a>
-		<a class='link' href='/about_me' rel='author'>Ujjwal Singh</a>
+		<span id='footer_author' class='link'>Wolo Codes</span>
 	</div>
 </div>
 <?php require '../../HTML/Fragment/Address.php'; ?>

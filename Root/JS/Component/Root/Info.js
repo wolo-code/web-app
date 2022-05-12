@@ -15,3 +15,8 @@ function closeInfo() {
 	// 	syncLocate_engage = true;
 	// }
 }
+
+function showInfoLinks() {
+	activateOverlayInfo_links();
+	showInfo();
+}

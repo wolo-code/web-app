@@ -65,6 +65,7 @@ function setupControls() {
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info').addEventListener('click', showInfo);
+	document.getElementById('footer_author').addEventListener('click', showInfoLinks);
 	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
 	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);

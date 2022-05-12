@@ -14,8 +14,9 @@
 	<?php
 		require '../../HTML/Fragment/Info_intro.php';
 		require '../../HTML/Fragment/Info_full.php';
+		require '../../HTML/Fragment/Info_links.php';
 	?>
-	<div id='agency'>
+	<div id='info_agency'>
 		by <a class='link' href='https://wcodes.org/about_me'>Ujjwal Singh</a>
 	</div>
 </div>

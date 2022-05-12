@@ -227,6 +227,10 @@ body > #pac-input {
 	border-radius: 5px;
 }
 
+#footer_author {
+	cursor: pointer;
+}
+
 .blur_background {
 	backdrop-filter: blur(8px);
 	background-color: #fbfbfb60;

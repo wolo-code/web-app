@@ -66,8 +66,16 @@ function versionCheck() {
 
 function activateOverlayInfo_full() {
 	info_intro.classList.add('hide');
+	info_links.classList.add('hide');
 	info_message_close.classList.remove('hide');
 	info_full.classList.remove('hide');
+	info_agency.classList.add('hide');
+}
+
+function activateOverlayInfo_links() {
+	info_full.classList.add('hide');
+	info_links.classList.remove('hide');
+	info_agency.classList.remove('hide');
 }
 
 function urlDecode() {

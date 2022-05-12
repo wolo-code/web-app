@@ -10,6 +10,11 @@
 	max-width: 400px;
 }
 
+#wolo_about {
+	text-align: center;
+	margin-top: 15px;
+}
+
 #info_message h1 {
 	text-align: center;
 	color: #69B7CF;
@@ -118,7 +123,7 @@
 	padding-left: 10px;
 }
 
-#agency {
+#info_agency {
 	text-align: right;
 }
 

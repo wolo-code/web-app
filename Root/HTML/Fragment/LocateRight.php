@@ -8,11 +8,8 @@
 	<div class='message_dialog_body'>
 		<div>
 			<p>
-				Your current city has been determined to be: <span id='ip_city'></span>
-			</p>
-			<p>
-				You may change the city manually next, or:<br>
-				for accurate city detection - please grant location access.
+				For automatic location detection - please grant location access. Or,<br>
+				you may pick a location manually next.
 			</p>
 		</div>
 		<div>

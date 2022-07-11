@@ -49,6 +49,7 @@ var pendingCity = false;
 var pendingCitySubmit = false;
 
 var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 Wolo code words, optionally preceded by a city. E.g: "Bengaluru cat apple tomato"';
+var INCORRECT_CITY = "City not found - check the Wolo code";
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 

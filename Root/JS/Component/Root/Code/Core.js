@@ -205,7 +205,7 @@ function decode_continue(city, wcode) {
 	if(city != null)
 		decode_(city, wcode);
 	else
-		showNotification(INCORRECT_WCODE);
+		showNotification(INCORRECT_CITY);
 }
 
 function decodeWithIpCity(words) {

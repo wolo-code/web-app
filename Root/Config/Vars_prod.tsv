@@ -1,6 +1,7 @@
 base_url	https://wolo.codes
 site_name	wolo.codes
 google_api_key	AIzaSyC-ZxXuNOEEs5mNQD3Z8u4CSJtldtLztDE
+google_maps_api_key	AIzaSyAeEV2fXhER2f4EP8OBn6ydDVjfkg9h8rE
 firebase_projectId	wolo-codes
 firebase_messagingSenderId	1073432021665
 firebase_appId	1:1073432021665:web:29ab7635459c72c19bbee0

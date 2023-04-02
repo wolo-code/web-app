@@ -43,7 +43,7 @@
 </head>
 <body <?php if($id == 'root') { ?>class='decode'<?php } ?>>
 	<?php	require (getComponentPath($id)); ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_maps_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script>
 	<script src='/geofire.min.js' async defer></script>
 	<script src='/html2canvas.min.js' async defer></script>
 </body>

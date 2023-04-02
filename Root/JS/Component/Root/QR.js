@@ -139,6 +139,31 @@ function downloadQR() {
 	} );
 }
 
+function downloadQR_minimal() {
+	if(!mode_preview) {
+		toggleQRpreview();
+		mode_preview_activated = true;
+	}
+	document.getElementById('qr_close').classList.add('hide');
+	document.getElementById('qr_controls').classList.add('hide');
+	document.getElementById('overlay').classList.add('raster');
+	document.getElementById('overlay').classList.add('qr_minimal');
+	document.getElementById('qr_label').classList.add('hide');
+	document.getElementById('qr_webapp_url').classList.add('hide');
+	html2canvas( document.querySelector('#qr_body'), {scale:1} ).then( canvas => {
+		if(mode_preview_activated)
+			toggleQRpreview();
+		document.getElementById('overlay').classList.remove('raster');
+		document.getElementById('overlay').classList.remove('qr_minimal');
+		document.getElementById('qr_label').classList.remove('hide');
+		document.getElementById('qr_webapp_url').classList.remove('hide');
+		document.getElementById('qr_close').classList.remove('hide');
+		document.getElementById('qr_controls').classList.remove('hide');
+		var qrImage = canvas.toDataURL("image/png");
+		downloadURI(qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
+	} );
+}
+
 function downloadURI(uri, name) {
 	var link = document.createElement('a');
 	link.download = name;

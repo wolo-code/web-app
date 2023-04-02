@@ -138,3 +138,18 @@
 #qr_controls {
 	margin-top: 10px;
 }
+
+.qr_minimal #qr_body {
+	height: auto;
+	width: auto;
+	border-top: none;
+}
+
+.qr_minimal #qr_wcode_container {
+	border: none;
+	color: black;
+}
+
+.qr_minimal #qr_wcode {
+	padding-top: unset;
+}

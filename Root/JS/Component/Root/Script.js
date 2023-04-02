@@ -96,6 +96,7 @@ function setupControls() {
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
 	document.getElementById('external_close').addEventListener('click', external_close);
 	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
+	addLongpressListener(document.getElementById('qr_download'), downloadQR, downloadQR_minimal);
 }
 
 function resizeInput() {

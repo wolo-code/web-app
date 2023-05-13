@@ -91,7 +91,6 @@ function setupControls() {
 	document.getElementById('qr_close').addEventListener('click', closeQR);
 	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
 	document.getElementById('qr_print').addEventListener('click', printQR);
-	document.getElementById('qr_download').addEventListener('click', downloadQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
 	document.getElementById('external_close').addEventListener('click', external_close);

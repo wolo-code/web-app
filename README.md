@@ -39,3 +39,10 @@ Programs:
 		
 Fonts:
 	Abel
+
+Debugging:
+Local network debug:
+
+http redirects to https://local.app.wolo.codes  
+https goes through directly.  
+Hence, for local debugging go to: https://&lt;ip&gt;

@@ -140,6 +140,7 @@ function downloadQR() {
 }
 
 function downloadQR_minimal() {
+	
 	if(!mode_preview) {
 		toggleQRpreview();
 		mode_preview_activated = true;
@@ -159,9 +160,56 @@ function downloadQR_minimal() {
 		document.getElementById('qr_webapp_url').classList.remove('hide');
 		document.getElementById('qr_close').classList.remove('hide');
 		document.getElementById('qr_controls').classList.remove('hide');
-		var qrImage = canvas.toDataURL("image/png");
-		downloadURI(qrImage, "Wolo codes - " + getCodeFull_text() + ".png");
+
+		window.jsPDF = window.jspdf.jsPDF;
+		const doc = new jsPDF({orientation: "l", unit: "mm", format: [50, 75]});
+		
+		// offset - printer specific
+		const xPadding = 6;
+		const xStart = 6;
+		const yStart = 12;
+		const xSlashMargin = 4;
+		const yMargin = 4;
+		const sizeSlash = 14;
+		const sizeWCode = 28;
+		const wCodeHeight = 14;
+		
+		var text;
+		var textWidth;
+		
+		doc.addFileToVFS('Abel-regular.ttf', font_abel_normal);
+		doc.addFont('Abel-regular.ttf', 'Abel', 'normal');
+		doc.addFileToVFS('Abel-bold.ttf', font_abel_bold);
+		doc.addFont('Abel-bold.ttf', 'Abel', 'bold');
+		
+		x = xStart;
+		y = yStart;
+		doc.setFont('Abel', 'normal');
+		doc.setFontSize(sizeSlash);
+		text = '\\';
+		doc.text(text, x, y);
+		
+		x += doc.getTextWidth(text) + xSlashMargin;
+		doc.text(getCodeCityName(), x, y);
+		
+		doc.setFont('Abel', 'bold');
+		doc.setFontSize(sizeWCode);
+		x = (xPadding + doc.internal.pageSize.width) / 2;
+		y += wCodeHeight + yMargin;
+		text = getCodeWCode().join(' ');
+		textWidth = doc.getTextWidth(text);
+		doc.text(text, x, y, {align:'center', maxWidth:70});
+		
+		x += textWidth/2 + xSlashMargin;
+		doc.setFont('Abel', 'normal');
+		doc.setFontSize(sizeSlash);
+		doc.text('/', x, y);
+
+		doc.save("Wolo codes - " + getCodeFull_text() + ".pdf");
 	} );
+	
+	hideCopyCodeMessage();
+	
 }
 
 function downloadURI(uri, name) {

@@ -72,3 +72,4 @@
 <script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>
 <script src='https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.js'></script>
 <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.css" />
+<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/<?php echo $config['jspdf_version'] ?>/jspdf.umd.min.js"></script>

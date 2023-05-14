@@ -153,3 +153,7 @@
 .qr_minimal #qr_wcode {
 	padding-top: unset;
 }
+
+#qr_preview.button_active > span > svg > path {
+	fill: white;
+}

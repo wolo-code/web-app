@@ -69,5 +69,8 @@ function refreshAddress() {
 }
 
 function copyAddress() {
+	if(address_text.classList.contains('hide')) {
+		showAddress();
+	}
 	copyNodeText(address_text_content);
 }

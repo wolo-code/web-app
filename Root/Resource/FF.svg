@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+	 height="16" width="24"
+	 viewBox="0 0 24 14">
+	<path
+		 class="proceed_button_shape"
+		 d="m 0.01113596,0.97772833 v 13.99997567 l 11.00001204,-6.9999774 z"
+		 fill="#69b7cf"
+		 id="path335" />
+	<path
+		 class="proceed_button_shape"
+		 d="m 12.988852,0.97772833 v 13.99997567 l 11,-6.9999774 z"
+		 fill="#69b7cf"
+		 id="path337" />
+</svg>

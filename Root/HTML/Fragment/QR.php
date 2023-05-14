@@ -40,8 +40,8 @@
 		</div>
 	</div>
 	<div id='qr_controls' class="center message_dialog_control section-to-not-print">
-		<button id='qr_preview' class='border' type='button'>Preview</button>
-		<button id='qr_download' class='border' type='button'>Download</button>
-		<button id='qr_print' class='border' type='button'>Print</button>
+		<button id='qr_preview' class='border' type='button'><span class='image'><?php includeSVG('', 'Preview'); ?></span></button>
+		<button id='qr_download' class='border' type='button'><span class='image'><?php includeSVG('', 'Download'); ?></span></button>
+		<button id='qr_print' class='border' type='button'><span class='image'><?php includeSVG('', 'Print'); ?></span></button>
 	</div>
 </div>

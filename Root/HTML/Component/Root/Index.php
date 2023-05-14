@@ -1,7 +1,8 @@
 <div id='wait_loader'></div>
 <div id='map'></div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
-<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='Search' tabindex='3' >
+<span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
+<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' >
 <div id='decode_button' class='control' tabindex='4'>
 	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 </div>

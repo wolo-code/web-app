@@ -21,6 +21,12 @@
 	left: 12px;
 }
 
+#search_icon {
+	position: absolute;
+	left: 20px;
+	top: 46px;
+}
+
 #decode_button {
 	z-index: 1;
 	position: absolute;

@@ -1,5 +1,10 @@
 @media (max-width: 662px) {
 
+	#search_icon {
+		left: 12px;
+		top: 110px;
+	}
+	
 	#decode_button {
 		top: 100px !important;
 		left: auto !important;
@@ -26,7 +31,12 @@
 }
 
 @media (max-width: 316px) {
-
+	
+	#search_icon {
+		left: 12px;
+		top: 136px;
+	}
+	
 	#decode_button {
 		top: 126px !important;
 	}

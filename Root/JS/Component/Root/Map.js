@@ -18,7 +18,16 @@ function initMap() {
 	map.addListener('bounds_changed', function() {
 		searchBox.setBounds(map.getBounds());
 	});
+	
+	input.addEventListener("focus", function() {
+		document.getElementById('search_icon').classList.add('hide');
+	});
 
+	input.addEventListener("change", function() {
+		if(input.value == '')
+			document.getElementById('search_icon').classList.remove('hide');
+	});
+	
 	var markers = [];
 	// Listen for the event fired when the user selects a prediction and retrieve
 	// more details for that place.

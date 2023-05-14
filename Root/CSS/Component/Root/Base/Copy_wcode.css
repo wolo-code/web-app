@@ -18,13 +18,9 @@
 }
 
 #share_link_button {
-	padding-top: 6px
+	padding-top: 4px
 }
 
 #share_qr_button {
-}
-
-#share_copy_button_qr {
-	margin-top: 8px;
-	width: 220px;
+	padding-top: 4px
 }

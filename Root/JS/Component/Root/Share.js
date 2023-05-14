@@ -56,14 +56,12 @@ function showCopyWcodeMessage() {
 		else
 			multiple_city = false;
 
-		copy_wcode_message_city_name.innerText = prefix+getCodeCityProperCityAccent();
 		showOverlay(document.getElementById('copy_wcode_message'));
 	} );
 }
 
 function hideCopyCodeMessage() {
 	hideOverlay(document.getElementById('copy_wcode_message'));
-	copy_wcode_message_city_name.innerText = '';
 }
 
 function copyWcodeFull() {

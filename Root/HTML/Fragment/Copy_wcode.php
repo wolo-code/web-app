@@ -7,51 +7,17 @@
 	</div>
 	<div class='message_dialog_body'>
 		<div class='message_dialog_section'>
-			<div class='message_dialog_subtitle'>
-				<span class='message_dialog_subtitle_icon'>
-					<img id='share_copy_button' alt='Copy Wolo Code text button' class='center' src="<?php getSVG('', 'code'); ?>" >
-				</span>
-				<span class='message_dialog_subtitle_label'>Text</span>
-			</div>
-			<div class='message_dialog_subtitle_text'>
-				<span>include</span> <span id='copy_wcode_message_city_name'></span> ?
-			</div>
 			<div class='message_dialog_control_container'>
 				<div class="center message_dialog_control">
-					<button id='share_copy_button_text_city' class="border dialog_message_primary button_highlight" type='button'>Yes</button>
-					<button id='share_copy_button_text_nocity' class="border dialog_message_secondary" type='button'>No</button>
-				</div>
-			</div>
-		</div>
-		<hr>
-		<div class='message_dialog_section'>
-			<div class='message_dialog_subtitle'>
-				<span class='message_dialog_subtitle_icon'>
-					<img id='share_link_button' alt='Copy Wolo code link button' class='center' src="<?php getSVG('', 'link'); ?>" >
-				</span>
-				<span class='message_dialog_subtitle_label'>Link</span>
-			</div>
-			<div id='share_jumto_map' class='message_dialog_subtitle_text'>
-				jump directly to map ?
-			</div>
-			<div class='message_dialog_control_container'>
-				<div class="center message_dialog_control">
-					<button id='share_copy_button_link_jump' class="border dialog_message_primary button_highlight" type='button'>Yes</button>
-					<button id='share_copy_button_link_nojump' class="border dialog_message_secondary" type='button'>No</button>
-				</div>
-			</div>
-		</div>
-		<hr>
-		<div class='message_dialog_section'>
-			<div class='message_dialog_subtitle'>
-				<span class='message_dialog_subtitle_icon'>
-					<img id='share_qr_button' alt='Generate Wolo Code label' class='center' src="<?php getSVG('', 'label'); ?>" >
-				</span>
-				<span class='message_dialog_subtitle_label'>Label</span>
-			</div>
-			<div class='message_dialog_control_container'>
-				<div class="center message_dialog_control">
-					<button id='share_copy_button_qr' class="border dialog_message_primary button_highlight" type='button'>Go</button>
+					<button id='share_copy_button_link' class="border dialog_message_primary button_highlight" type='button'>
+						<img id='share_link_button' alt='Copy Wolo code link button' class='center' src="<?php getSVG('', 'link'); ?>" >
+					</button>
+					<button id='share_copy_button_text' class="border dialog_message_primary button_highlight" type='button'>
+						<img id='share_copy_button' alt='Copy Wolo code text button' class='center' src="<?php getSVG('', 'code'); ?>" >
+					</button>
+					<button id='share_copy_button_qr' class="border dialog_message_primary button_highlight" type='button'>
+						<img id='share_qr_button' alt='Show Wolo code label button' class='center' src="<?php getSVG('', 'label'); ?>" >
+					</button>
 				</div>
 			</div>
 		</div>

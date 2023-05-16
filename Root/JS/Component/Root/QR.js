@@ -8,6 +8,7 @@ function showQR() {
 		document.getElementById('qr_title_segment').value = current_segment;
 	else
 		document.getElementById('qr_title_segment').value = '';
+		
 	if(current_address) {
 		document.getElementById('qr_address').innerText = current_address;
 		qr_address_active_first = false;
@@ -16,6 +17,7 @@ function showQR() {
 		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address";
 		qr_address_active_first = true;
 	}
+	
 	var city_accent = getProperCityAccent(code_city);
 	var code_string = code_wcode.join(' ');
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;

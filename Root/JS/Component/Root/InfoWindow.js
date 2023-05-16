@@ -16,6 +16,7 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng) {
 			addLongpressListener(document.getElementById('share_qr_button'), showQR, downloadQR_minimal);
 	});
 	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'><span class='control' onclick='showChooseCity_by_periphery_Message();'>" + city_accent + "</span></span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code_string + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' src=" + svg_address + " ><a href='"+ getIntentURL(latLng, city_name + ' ' + code_string) + "'><img id='external_launch_button' class='control' src=" + svg_launch + " ></a><div id='share_qr_button' class='control'><div class='shield'></div><img src=" + svg_label + " ></div></div>");
+	addLongpressListener(document.getElementById('infowindow_code_right_code'), copyWcodeFull, copyWcodeCode);
 	addLongpressListener(document.getElementById('show_address_button'), toggleAddress, handleShareWCode);
 	showInfoWindow();
 }

@@ -21,7 +21,7 @@ function showAccountDialog() {
 		account_dialog_address_active_first = false;
 	}
 	else {
-		document.getElementById('save_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
+		document.getElementById('save_address').innerHTML = "&nbsp;&nbsp;Address";
 		document.getElementById('save_address').classList.add('initial');
 		account_dialog_address_active_first = true;
 	}
@@ -65,7 +65,7 @@ function onAccountDialogSave() {
 function clearAccountDialogSaveForm() {
 	document.getElementById('save_title_main').value = '';
 	document.getElementById('save_title_segment').value = '';
-	document.getElementById('save_address').innerText = "\xa0\xa0Address (optional)";
+	document.getElementById('save_address').innerText = "\xa0\xa0Address";
 	account_dialog_address_active_first = true;
 }
 

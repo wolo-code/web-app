@@ -27,11 +27,11 @@
 			</h3>
 			<div id='account_dialog_options'>
 				<div id='save_title_container' class='center'>
-					<input id='save_title_main' type='text' placeholder="&nbsp;&nbsp;Title&nbsp; &nbsp;e.g. Taj Mahal">
-					<input id='save_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment&nbsp; &nbsp;e.g. West gate (optional)">
+					<input id='save_title_main' type='text' placeholder="&nbsp;&nbsp;Title">
+					<input id='save_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment">
 				</div>
 				<div id='save_address_container'>
-					<div id='save_address' class='initial' contentEditable>&nbsp;&nbsp;Address (optional)</div>
+					<div id='save_address' class='initial' contentEditable>&nbsp;&nbsp;Address</div>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_save' class="message_dialog_control center">

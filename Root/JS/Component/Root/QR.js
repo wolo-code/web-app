@@ -13,7 +13,7 @@ function showQR() {
 		qr_address_active_first = false;
 	}
 	else {
-		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address (optional)";
+		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address";
 		qr_address_active_first = true;
 	}
 	var city_accent = getProperCityAccent(code_city);

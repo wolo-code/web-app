@@ -18,8 +18,8 @@
 			</div>
 		</div>
 		<div id='qr_title_container' class='center'>
-			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title&nbsp; &nbsp;e.g. Taj Mahal">
-			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment&nbsp; &nbsp;e.g. West gate">
+			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title">
+			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment">
 		</div>
 		<div id='qr_wcode'>
 			<div id='qr_wcode_container' class='center'>
@@ -34,7 +34,7 @@
 			</div>
 		</div>
 		<div id='qr_address_container' class='center'>
-			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address&nbsp; &nbsp;(optional)</div>
+			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address</div>
 		</div>
 		<div id='qr_webapp_url' class='center'>
 			<div>www.wolo.codes</div>

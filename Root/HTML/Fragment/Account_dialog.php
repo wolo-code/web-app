@@ -7,9 +7,6 @@
 			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</div>
 		<div class='message_dialog_body'>
-			<h3 class='dialog-sub-label'>
-				Logged in as
-			</h3>
 			<div id='account_dialog_main'>
 				<div class='span-left'>
 					<div id='account_dialog_display_name'></div>
@@ -23,7 +20,7 @@
 			</div>
 			<div class='hr-separator'></div>
 			<h3 class='dialog-sub-label'>
-				Save current location
+				Current
 			</h3>
 			<div id='account_dialog_options'>
 				<div id='save_title_container' class='center'>
@@ -42,7 +39,7 @@
 			</div>
 			<div class='hr-separator'></div>
 			<h3 class='dialog-sub-label'>
-				Saved locations
+				Saved
 			</h3>
 			<div id='account_dialog_save_list_container'>
 				<div id='account_dialog_save_list_loader' class='center'>-loading-</div>

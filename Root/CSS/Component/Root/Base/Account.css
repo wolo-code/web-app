@@ -41,6 +41,7 @@
 }
 
 #save_title_main, #save_title_segment, #save_address {
+	font-family: Abel;
 	background-color: white;
 	color: #999999;
 	outline: 0;

@@ -30,6 +30,7 @@
 
 #infowindow_code_right_code {
 	font-size: x-large;
+	cursor: pointer;
 }
 
 .gm-style-iw {
@@ -77,7 +78,11 @@ button.gm-ui-hover-effect {
 
 #external_launch_button {
 	width: 26px;
-	vertical-align: bottom;
+	display: inline-block;
+}
+
+#external_launch_button > img {
+	margin-bottom: -2px;
 }
 
 #infowindow_actions {

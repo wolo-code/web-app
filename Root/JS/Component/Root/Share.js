@@ -96,3 +96,7 @@ function shareWCodeLink() {
 	else
 		copyWcodeLink();
 }
+
+function gotoCoordinate() {
+	window.location.assign(getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' ')));
+}

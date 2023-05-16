@@ -1,3 +1,4 @@
+
 <div id='qr_container' class='hide'>
 	<h2 class='message_dialog_label section-to-not-print'>
 		Label

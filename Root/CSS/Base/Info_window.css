@@ -61,7 +61,7 @@ button.gm-ui-hover-effect {
 	z-index: 1;
 }
 
-#share_code_button {
+#share_qr_button {
 	position: relative;
 	width: 24px;
 	display: inline-block;
@@ -94,6 +94,7 @@ button.gm-ui-hover-effect {
 
 #infowindow_actions > :last-child {
 	margin-right: 0;
+	padding-left: 2px;
 }
 
 .different_city #infowindow_code_left_code > span {

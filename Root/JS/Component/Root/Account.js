@@ -21,7 +21,7 @@ function showAccountDialog() {
 		account_dialog_address_active_first = false;
 	}
 	else {
-		document.getElementById('save_address').innerHTML = "&nbsp;&nbsp;Address";
+		document.getElementById('save_address').innerHTML = "&nbsp;Address";
 		document.getElementById('save_address').classList.add('initial');
 		account_dialog_address_active_first = true;
 	}

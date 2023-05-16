@@ -28,7 +28,7 @@
 					<input id='save_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment">
 				</div>
 				<div id='save_address_container'>
-					<div id='save_address' class='initial' contentEditable>&nbsp;&nbsp;Address</div>
+					<div id='save_address' class='initial' contentEditable>&nbsp;Address</div>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_save' class="message_dialog_control center">

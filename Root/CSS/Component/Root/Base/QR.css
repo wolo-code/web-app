@@ -54,6 +54,15 @@
 	margin: auto;
 }
 
+#qr_title_main, #qr_title_segment {
+	border-bottom: 1px solid #999999;
+}
+
+#qr_title_main::placeholder, #qr_title_segment::placeholder {
+	color: #999999;
+	font-size: small;
+}
+
 #qr_title_main {
 	font-size: larger;
 }

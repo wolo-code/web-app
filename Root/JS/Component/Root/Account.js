@@ -46,7 +46,6 @@ function onAccountDialogSave() {
 	var user = firebase.auth().currentUser;
 	if(user != null) {
 		uid = user.uid;
-		debugger;
 		if(document.getElementById('save_address').innerText == '\xa0\xa0Address (optional)' || document.getElementById('save_address').innerText == '')
 			document.getElementById('save_address').innerText = address;
 		firebase.database().ref('/UserData/'+uid).push({

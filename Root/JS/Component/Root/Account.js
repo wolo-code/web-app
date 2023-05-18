@@ -48,17 +48,26 @@ function onAccountDialogSave() {
 		uid = user.uid;
 		if(document.getElementById('save_address').innerText == '\xa0\xa0Address (optional)' || document.getElementById('save_address').innerText == '')
 			document.getElementById('save_address').innerText = address;
-		firebase.database().ref('/UserData/'+uid).push({
-			city_id: getCodeCity().id,
-			code: getCodeWCode(),
-			title: document.getElementById('save_title_main').value,
-			segment: document.getElementById('save_title_segment').value,
-			address: document.getElementById('save_address').innerText,
-			time: firebase.database.ServerValue.TIMESTAMP
-		}, function() {
-			clearAccountDialogSaveForm();
-		});
+		saveAddress( document.getElementById('save_title_main').value,
+			 document.getElementById('save_title_segment').value,
+			 document.getElementById('save_address').innerText, 
+			 clearAccountDialogSaveForm );
 	}
+}
+
+function saveAddress(title, segment, address, callback) {
+	firebase.database().ref('/UserData/'+uid).push({
+		city_id: getCodeCity().id,
+		code: getCodeWCode(),
+		title: title,
+		segment: segment,
+		address: address,
+		time: firebase.database.ServerValue.TIMESTAMP
+	}, function() {
+		if(typeof callback != 'undefined')
+			callback();
+		showNotification('Address saved');
+	});
 }
 
 function clearAccountDialogSaveForm() {

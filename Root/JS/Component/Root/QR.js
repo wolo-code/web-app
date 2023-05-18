@@ -220,3 +220,17 @@ function downloadURI(uri, name) {
 	link.href = uri;
 	link.click();
 }
+
+function onQRDialogSave() {
+	if(!document.getElementById('qr_title_main').value.length) {
+		showNotification("Title is required");
+		return;
+	}
+	if(locating) {
+		showNotification("Still locating..");
+		return;
+	}
+	saveAddress( document.getElementById('qr_title_main').value,
+		 document.getElementById('qr_title_segment').value,
+		 document.getElementById('qr_address').innerText );
+}

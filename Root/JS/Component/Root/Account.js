@@ -56,18 +56,22 @@ function onAccountDialogSave() {
 }
 
 function saveAddress(title, segment, address, callback) {
-	firebase.database().ref('/UserData/'+uid).push({
-		city_id: getCodeCity().id,
-		code: getCodeWCode(),
-		title: title,
-		segment: segment,
-		address: address,
-		time: firebase.database.ServerValue.TIMESTAMP
-	}, function() {
-		if(typeof callback != 'undefined')
-			callback();
-		showNotification('Address saved');
-	});
+	if(firebase.auth().currentUser) {
+		firebase.database().ref('/UserData/'+uid).push({
+			city_id: getCodeCity().id,
+			code: getCodeWCode(),
+			title: title,
+			segment: segment,
+			address: address,
+			time: firebase.database.ServerValue.TIMESTAMP
+		}, function() {
+			if(typeof callback != 'undefined')
+				callback();
+			showNotification('Address saved');
+		});
+	}
+	else
+		showNotification('Please login first to save address');
 }
 
 function clearAccountDialogSaveForm() {

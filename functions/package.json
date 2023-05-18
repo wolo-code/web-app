@@ -7,7 +7,7 @@
 		"firebase-admin": "^10.0.1",
 		"firebase-functions": "^3.16.0",
 		"geofire": "^5.0.1",
-		"mailgun-js": "^0.6.7"
+		"mailgun-js": "^0.22.0"
 	},
 	"private": true,
 	"engines": {

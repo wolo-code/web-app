@@ -14,6 +14,6 @@
 		"node": "10"
 	},
 	"devDependencies": {
-		"firebase": "^8.2.10"
+		"firebase": "^8.10.1"
 	}
 }

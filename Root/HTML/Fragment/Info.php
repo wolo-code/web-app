@@ -7,7 +7,7 @@
 			<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 		</a>
 		<a id=logo_codes_info href='//wolo.codes' tabindex='2'>
-			<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
+			<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 		</a>
 	</div>
 	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>

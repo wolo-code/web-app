@@ -106,7 +106,7 @@
 			<?php require '../../Resource/Logo_wolo.svg' ?>
 		</a>
 		<a id='logo_codes' href='/'>
-			<?php require '../../Resource/Logo_codes.svg' ?>
+			<?php require '../../Resource/Logo_code.svg' ?>
 		</a>
 	</div>
 	<a id='mail-link' href='mailto:<?php echo $webMasterId ?>?subject=<?php echo $config['project_title'] ?>-404'><?php echo $webMasterId ?></a>

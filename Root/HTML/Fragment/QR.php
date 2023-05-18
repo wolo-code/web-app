@@ -13,7 +13,7 @@
 					<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 				</a>
 				<a id=logo_codes_qr href='//wolo.codes'>
-					<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
+					<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 				</a>
 			</div>
 		</div>

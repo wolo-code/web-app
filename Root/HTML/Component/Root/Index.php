@@ -39,7 +39,7 @@
 		<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 	</a>
 	<a id=logo_codes class='blur_background' href='//wolo.codes'>
-		<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
+		<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 	</a>
 </div>
 <div id='account' class="control">
@@ -63,7 +63,7 @@
 <div id='footer-content-container' class='center'>
 	<div id='footer-content' class='blur_background'>
 		<a class='link-gray' href='/license'>&copy; <?php echo date('Y'); ?> </a>
-		<span id='footer_author' class='link'>Wolo Codes</span>
+		<span id='footer_author' class='link'>Wolo Code</span>
 	</div>
 </div>
 <?php require '../../HTML/Fragment/Address.php'; ?>

@@ -24,7 +24,7 @@
 				<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 			</a>
 			<a id='logo_codes' href='https://wolo.codes'>
-				<span class='image'><?php includeSVG('', 'logo_codes'); ?></span>
+				<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 			</a>
 		</div>
 		<div id='map'></div>

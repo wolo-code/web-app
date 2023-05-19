@@ -48,9 +48,7 @@
 		<?php
 			echo date('Y M d H:i:s').' '.'UTC';
 		?>
-		</span>
-		 ~ 
-		<span id='updated-timediff'></span> ago
+		</span> ~<span id='updated-timediff'></span> ago
 	</div>
 </div>
 

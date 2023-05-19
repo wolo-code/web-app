@@ -38,7 +38,7 @@
 	<a href='https://play.google.com/store/apps/details?id=codes.wolo.droid' id='site-google-play' onclick="trackOutboundLink('wolo-appandroid', 'https://play.google.com/store/apps/details?id=codes.wolo.droid')"><span class='image'><?php includeSVG('', 'Google-Play-badge'); ?></span></a>
 </div>
 
-<div id='credits'>Wolo codes makes use of these opensource projects: <a class='link' href="https://wolo.codes/credits">wolo.codes/credits</a></div>
+<div id='credits'>Wolo Code makes use of these opensource projects: <a class='link' href="https://wolo.codes/credits">wolo.codes/credits</a></div>
 <div id='software_info'>
 	<div id='version'>
 		Version: <span><?php echo $config['version'] ?></span>

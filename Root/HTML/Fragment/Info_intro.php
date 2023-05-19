@@ -1,7 +1,7 @@
 <div id='info_intro'>
 	<p>
 		This web app requires anonymous cookies and various third-party services to function properly.
-		By continuing to use Wolo Codes you are agreeing to its <a class='link' href='/policy'>cookie & privacy policies</a>
+		By continuing to use Wolo Code you are agreeing to its <a class='link' href='/policy'>cookie & privacy policies</a>
 	</p>
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>

@@ -46,3 +46,11 @@ Local network debug:
 http redirects to https://local.app.wolo.codes  
 https goes through directly.  
 Hence, for local debugging go to: https://&lt;ip&gt;
+
+Build:
+Commands:
+	clean | publish prod
+	firebase.cmd deploy --only hosting -P prod
+	
+For website portion - publish it first separately
+That build is included automatically on deploy

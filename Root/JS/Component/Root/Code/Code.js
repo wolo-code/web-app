@@ -63,6 +63,7 @@ function setCodeWords(code, city, position) {
 }
 
 function decode_(city, code) {
+	code_city = city;
 	var data = [];
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);

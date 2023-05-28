@@ -21,10 +21,10 @@
 	</h2>
 	<ul>
 		<li>
-			Enter a Wolo code address to go to that location. Or,
+			Enter a Wolo Code address to go to that location. Or,
 		</li>
 		<li>
-			Switch modes using the map icon and point a location on the map to generate the corresponding Wolo code address.
+			Switch modes using the map icon and point a location on the map to generate the corresponding Wolo Code address.
 		</li>
 		<li>
 			You may also search for a particular place. Or,<br>

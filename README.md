@@ -1,4 +1,4 @@
-Wolo codes - WebApp
+Wolo Code - WebApp
 =========================
 
 Communicate exact location points within a city with just 3 simple words

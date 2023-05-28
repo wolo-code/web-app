@@ -16,7 +16,7 @@ function shareWCode() {
 		share_address = address;
 	navigator.share( {
 		title: "Wolo",
-		text: "Wolo code for: " + ' ' + share_address + ' ' + '|',
+		text: "Wolo Code for: " + ' ' + share_address + ' ' + '|',
 		url: '/' + getCodeComplete().join('.').toLowerCase().replace(' ', '_') + '/'
 	} )
 	.catch((error) => console.log('Error sharing', error));

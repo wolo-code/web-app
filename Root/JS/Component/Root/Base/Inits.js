@@ -11,12 +11,12 @@ var curGeoIpRequestId = 0;
 var city_styled_wordlist = [];
 var cityNameList;
 
-var WCODE_CODE_COPIED_MESSAGE = "Wolo code copied to clipboard";
-var WCODE_LINK_COPIED_MESSAGE = "Wolo code link copied to clipboard";
+var WCODE_CODE_COPIED_MESSAGE = "Wolo Code copied to clipboard";
+var WCODE_LINK_COPIED_MESSAGE = "Wolo Code link copied to clipboard";
 
 // Code\Core
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
-var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the Wolo code with city name";
+var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the Wolo Code with city name";
 var IP_CITY_DECODE = "Current city determined using your connection - verify";
 var pendingPosition;
 var pendingWords;
@@ -48,8 +48,8 @@ var DEFAULT_WCODE = ['bengaluru', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
 var pendingCitySubmit = false;
 
-var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 Wolo code words, optionally preceded by a city. E.g: "Bengaluru cat apple tomato"';
-var INCORRECT_CITY = "City not found - check the Wolo code";
+var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 Wolo Code words, optionally preceded by a city. E.g: "Bengaluru cat apple tomato"';
+var INCORRECT_CITY = "City not found - check the Wolo Code";
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";
 

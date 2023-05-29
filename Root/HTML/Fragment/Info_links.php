@@ -21,10 +21,10 @@
 
 <div id='social-links' class='center'>
 	<span class='social grow'>
-		<a href='https://twitter.com/wolocodes' id='site-twitter' onclick="trackOutboundLink('wolo-twitter', 'https://twitter.com/wolocodes')"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
+		<a href='https://twitter.com/wolocode' id='site-twitter' onclick="trackOutboundLink('wolo-twitter', 'https://twitter.com/wolocode')"><span class='image'><?php includeSVG('', 'Twitter'); ?></span></a>
 	</span>
 	<span class='social grow'>
-		<a href='https://facebook.com/wolocodes' id='site-facebook' onclick="trackOutboundLink('wolo-facebook', 'https://facebook.com/wolocodes')"><span class='image'><?php includeSVG('', 'Facebook'); ?></span></a>
+		<a href='https://facebook.com/wolocode' id='site-facebook' onclick="trackOutboundLink('wolo-facebook', 'https://facebook.com/wolocode')"><span class='image'><?php includeSVG('', 'Facebook'); ?></span></a>
 	</span>
 	<span class='social grow'>
 		<a href='https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg' id='site-youtube' onclick="trackOutboundLink('wolo-youtube', 'https://www.youtube.com/channel/UCnKSws8Lro8U9Ewtf1Xi5jg')"><span class='image'><?php includeSVG('', 'YouTube'); ?></span></a>

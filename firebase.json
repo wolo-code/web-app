@@ -96,12 +96,12 @@
 			},
 			{
 				"source": "/facebook",
-				"destination": "https://facebook.com/wolocodes",
+				"destination": "https://facebook.com/wolocode",
 				"type": 302
 			},
 			{
 				"source": "/twitter",
-				"destination": "https://twitter.com/wolocodes",
+				"destination": "https://twitter.com/wolocode",
 				"type": 302
 			},
 			{

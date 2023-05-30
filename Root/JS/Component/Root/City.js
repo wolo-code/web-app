@@ -168,8 +168,12 @@ function getCityFromId(id, callback) {
 	ref.once('value').then(function(snapshot) {
 		popLoader();
 		var city = snapshot.val();
-		city.id = id;
-		callback(city);
+		if(city) {
+			city.id = id;
+			callback(city);			
+		} else {
+			showNotification("Error: City not found!")
+		}
 	});
 }
 

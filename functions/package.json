@@ -11,7 +11,7 @@
 	},
 	"private": true,
 	"engines": {
-		"node": "10"
+		"node": "16"
 	},
 	"devDependencies": {
 		"firebase": "^8.10.1"

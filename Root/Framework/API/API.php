@@ -25,17 +25,17 @@
 	function getComponent() {
 		$component = getOrigCallComponent();
 		while(true) {
-			if( $component == '' || is_dir('..\\..\\HTML\\component\\'.$component) == 1 || is_file('..\\..\\HTML\\component\\'.$component.'.php') == 1 || is_file('..\\..\\HTML\\component\\'.$component.'.html') == 1 )
+			if( $component == '' || is_dir('../../HTML/component/'.$component) == 1 || is_file('../../HTML/component/'.$component.'.php') == 1 || is_file('../../HTML/component/'.$component.'.html') == 1 )
 				return $component;
 			else
-				$component = substr($component, 0, strpos('\\', $component));
+				$component = substr($component, 0, strpos('/', $component));
 		}
 	}
 	
 	function getComponentPath($id) {
-		$s = "..\\..\\HTML\\Component\\".str_replace(' ','_', $id);
+		$s = "../../HTML/Component/".str_replace(' ','_', $id);
 		if(file_exists($s)) {
-			$s = $s."\Index";
+			$s = $s."/Index";
 		}
 		if(file_exists($s.".php"))
 			return ($s.".php");

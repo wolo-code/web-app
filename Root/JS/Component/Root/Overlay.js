@@ -1,6 +1,6 @@
 function hideOverlay(e) {
 	var visible_div;
-	for(var child= document.getElementById('overlay').childNodes[1].firstChild; child!==null; child=child.nextSibling)
+	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
 		if(child.nodeType == 1 && !child.classList.contains('hide'))
 			visible_div = child;
 	if(!document.getElementById('overlay').classList.contains('hide'))
@@ -11,7 +11,7 @@ function hideOverlay(e) {
 }
 
 function showOverlay(e) {
-	for(var child= document.getElementById('overlay').childNodes[1].firstChild; child!==null; child=child.nextSibling)
+	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
 		if(child.nodeType == 1 && !child.classList.contains('hide') && child != e)
 			child.classList.add('hide');
 	if(document.getElementById('overlay').classList.contains('hide'))

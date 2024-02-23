@@ -17,6 +17,10 @@
 		<td>contact:</td>
 		<td><a class='link' href="mailto:ujjwal@wolo.codes?subject=Wolo">ujjwal@wolo.codes</a></td>
 	</tr>
+	<tr>
+		<td>source code:</td>
+		<td><a class='link' href="https://github.com/wolo-code" onclick="trackOutboundLink('wolo-github', 'https://github.com/wolo-code')">github.com/wolo-code</a></td>
+	</tr>
 </table>
 
 <div id='social-links' class='center'>

@@ -100,7 +100,7 @@ function initMap() {
 	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form);
 
 	map_type_button.addEventListener('click', function() {
-		toggleMapType();
+		toggleMapViewType();
 	});
 
 	location_button.addEventListener('mousedown', processPositionButtonDown);
@@ -260,5 +260,33 @@ function toggleMapType() {
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
 		document.body.classList.remove('map');
 		document.body.classList.add('satellite');
+	}
+}
+
+function toggleMapViewType() {
+	if(document.body.classList.contains('decode')) {
+		activateMapType();
+	}
+	else if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
+		document.body.classList.remove('satellite');
+		document.body.classList.add('map');
+		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+	}
+	else if(map.getMapTypeId() == google.maps.MapTypeId.ROADMAP.toLowerCase()) {
+		document.body.classList.remove('map');
+		document.body.classList.add('satellite');
+		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+	}
+}
+
+function toggleDecodeView() {
+	if(document.body.classList.contains('decode')) {
+		activateMapType();
+	}
+	else {
+		document.body.classList.remove('map');
+		document.body.classList.remove('satellite');
+		document.body.classList.add('decode');
+		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 	}
 }

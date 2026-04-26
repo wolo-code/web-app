@@ -19,10 +19,6 @@
 	text-align: center;
 }
 
-.decode #map_type_button {
-	color: rgba(0,0,0,.14);
-} 
-
 .decode #account {
 	left: 12px;
 }
@@ -92,15 +88,11 @@
 	display: none;
 }
 
-.decode #info svg {
+.decode #action_menu svg {
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 
 .decode #location_button svg {
-	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
-}
-
-.decode #map_type_button svg {
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 
@@ -111,14 +103,6 @@
 	border-style: solid;
 }
 
-.decode #map_type_button > span > svg > g:first-of-type > path:first-of-type {
-	fill: #adadad;
-}
-
-.decode #map_type_button > span > svg > g:last-of-type {
-	display: none
-}
-
 #decode_input_button .proceed_button_shape {
 	filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.30));
 }
@@ -127,12 +111,34 @@
 	display: none;
 }
 
-.map #map_type_button > span > svg > g:last-of-type {
-	display: none
+.map_type_icon,
+.view_toggle_icon {
+	display: block;
+	height: 39px;
+	position: relative;
+	width: 39px;
 }
 
-.satellite #map_type_button > span > svg > g:first-of-type {
-	display: none
+.map_type_icon > span,
+.view_toggle_icon > span {
+	display: none;
+	inset: 0;
+	position: absolute;
+}
+
+body:not(.satellite) .map_type_icon_terrain,
+.satellite .map_type_icon_satellite,
+body:not(.decode) .view_toggle_icon_code,
+.decode .view_toggle_icon_map {
+	display: block;
+}
+
+.decode #action_menu_map .map_type_icon_terrain {
+	display: none;
+}
+
+.decode #action_menu_map .map_type_icon_satellite {
+	display: block;
 }
 
 #decode_input_city {

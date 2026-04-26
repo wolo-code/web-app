@@ -51,11 +51,33 @@
 <div id='location_button' class='control' tabindex='5'>
 	<span class='image'><?php includeSVG('', 'Location'); ?></span>
 </div>
-<div id='map_type_button' class='control' tabindex='6'>
-	<span class='image'><?php includeSVG('', 'Map'); ?></span>
+<div id='map_type_button' class='control hide' tabindex='6'>
+	<span class='image map_type_icon'>
+		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
+	</span>
 </div>
-<div id='info' class='control' tabindex='7'>
-	<span class='image'><?php includeSVG('', 'Info'); ?></span>
+<div id='action_menu' class='control' tabindex='7'>
+	<div id='action_menu_items'>
+		<button id='action_menu_map' class='action_menu_item' type='button' tabindex='-1' aria-label='Map view'>
+			<span class='image map_type_icon'>
+				<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+				<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
+			</span>
+		</button>
+		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info'>
+			<span class='image'><?php includeSVG('', 'Info'); ?></span>
+		</button>
+		<button id='action_menu_decode' class='action_menu_item' type='button' tabindex='-1' aria-label='Wolo Code input'>
+			<span class='image view_toggle_icon'>
+				<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
+				<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
+			</span>
+		</button>
+	</div>
+	<button id='action_menu_toggle' type='button' aria-label='Actions' aria-expanded='false'>
+		<span class='image'><?php includeSVG('', 'More'); ?></span>
+	</button>
 </div>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <?php require '../../HTML/Fragment/Accuracy.php' ?>

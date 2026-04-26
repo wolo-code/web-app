@@ -45,19 +45,81 @@
 	background-color: #ffffff22;
 }
 
-#info {
+#action_menu {
 	z-index: 1;
 	position: absolute;
 	bottom: 26px;
 	left: 11px;
+	width: 39px;
+	height: 39px;
 	padding: 8px;
 	margin: -8px;
 }
 
-#info svg {
+#action_menu button {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	display: block;
+	padding: 0;
+}
+
+#action_menu a {
+	display: block;
+}
+
+#action_menu svg {
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 	background-color: rgb(255 255 255 / 50%);
 	border-radius: 25px;
+	display: block;
+	height: 39px;
+	width: 39px;
+}
+
+#action_menu_toggle svg {
+	transform-origin: center;
+	transition: transform 180ms ease;
+}
+
+#action_menu.open #action_menu_toggle svg {
+	transform: rotate(45deg);
+}
+
+#action_menu_items {
+	bottom: 8px;
+	left: 8px;
+	position: absolute;
+	pointer-events: none;
+}
+
+.action_menu_item {
+	bottom: 0;
+	left: 0;
+	margin: 0;
+	position: absolute;
+	opacity: 0;
+	transform: translate(0, 0) scale(.86);
+	transition: opacity 160ms ease, transform 160ms ease;
+}
+
+#action_menu.open #action_menu_items {
+	pointer-events: auto;
+}
+
+#action_menu.open .action_menu_item {
+	opacity: 1;
+	transform: translate(56px, 0) scale(1);
+}
+
+#action_menu.open .action_menu_item:nth-child(2) {
+	transform: translate(40px, -40px) scale(1);
+	transition-delay: 35ms;
+}
+
+#action_menu.open .action_menu_item:nth-child(3) {
+	transform: translate(0, -56px) scale(1);
+	transition-delay: 70ms;
 }
 
 #map_type_button {
@@ -79,12 +141,15 @@
 #location_button {
 	z-index: 1;
 	position: absolute;
-	right: 0px;
+	left: 0;
+	right: 0;
 	bottom: 30px;
 	height: 24px;
-	margin: 8px 4px 8px 8px;
+	margin: 8px auto;
 	padding: 8px;
 	border: none;
+	text-align: center;
+	width: 48px;
 }
 
 #location_button svg {

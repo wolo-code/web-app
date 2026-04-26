@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" version="1.1" viewBox="0 0 28.8 28.8" xmlns="http://www.w3.org/2000/svg">
+	<g transform="scale(1.2)" fill="none" stroke="#69b7cf" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7">
+		<g transform="matrix(1.3847 0 0 1.3847 -7.2987 -4.6163)">
+			<path d="m18.174 14.5 2.2-5"/>
+			<path d="m11 10 1.4 4.5 1.6-3.3 1.6 3.3 1.4-4.5"/>
+			<path d="m9.7 14.5-2.2-5"/>
+		</g>
+	</g>
+</svg>

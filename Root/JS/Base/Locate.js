@@ -197,6 +197,7 @@ function processPosition(pos) {
 }
 
 function processPositionButtonDown() {
+	armPositionButtonReleaseHandlers();
 	firstFocus = true;
 	clearMap();
 	if(document.body.classList.contains('decode'))
@@ -214,6 +215,25 @@ function processPositionButtonUp() {
 	}
 	else
 		locate_button_pressed = false;
+	disarmPositionButtonReleaseHandlers();
+}
+
+function processPositionButtonCancel() {
+	locate_button_pressed = false;
+	disarmPositionButtonReleaseHandlers();
+}
+
+function armPositionButtonReleaseHandlers() {
+	disarmPositionButtonReleaseHandlers();
+	document.addEventListener('mouseup', processPositionButtonUp);
+	document.addEventListener('touchend', processPositionButtonUp);
+	document.addEventListener('touchcancel', processPositionButtonCancel);
+}
+
+function disarmPositionButtonReleaseHandlers() {
+	document.removeEventListener('mouseup', processPositionButtonUp);
+	document.removeEventListener('touchend', processPositionButtonUp);
+	document.removeEventListener('touchcancel', processPositionButtonCancel);
 }
 
 function processPositionButtonTouchStart(e) {
@@ -246,6 +266,7 @@ function clearLocating(hideAccuracyContainer) {
 	accuracy_indicator.classList.remove('blinking');
 	hideNotication();
 	clearTimeout(watch_location_notice_timer);
+	disarmPositionButtonReleaseHandlers();
 }
 
 function watch_location_notice() {

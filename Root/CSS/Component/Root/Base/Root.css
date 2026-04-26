@@ -69,12 +69,21 @@
 }
 
 #action_menu svg {
+	box-sizing: border-box;
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 	background-color: rgb(255 255 255 / 50%);
 	border-radius: 25px;
 	display: block;
 	height: 39px;
 	width: 39px;
+}
+
+#action_menu_map svg {
+	padding: 5px;
+}
+
+#action_menu_decode svg {
+	padding: 5px;
 }
 
 #action_menu_toggle svg {
@@ -109,7 +118,7 @@
 
 #action_menu.open .action_menu_item {
 	opacity: 1;
-	transform: translate(56px, 0) scale(1);
+	transform: translate(0, -56px) scale(1);
 }
 
 #action_menu.open .action_menu_item:nth-child(2) {
@@ -118,7 +127,7 @@
 }
 
 #action_menu.open .action_menu_item:nth-child(3) {
-	transform: translate(0, -56px) scale(1);
+	transform: translate(56px, 0) scale(1);
 	transition-delay: 70ms;
 }
 

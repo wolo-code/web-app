@@ -59,12 +59,6 @@
 </div>
 <div id='action_menu' class='control' tabindex='7'>
 	<div id='action_menu_items'>
-		<button id='action_menu_map' class='action_menu_item' type='button' tabindex='-1' aria-label='Map view'>
-			<span class='image map_type_icon'>
-				<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
-				<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
-			</span>
-		</button>
 		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info'>
 			<span class='image'><?php includeSVG('', 'Info'); ?></span>
 		</button>
@@ -72,6 +66,12 @@
 			<span class='image view_toggle_icon'>
 				<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
 				<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
+			</span>
+		</button>
+		<button id='action_menu_map' class='action_menu_item' type='button' tabindex='-1' aria-label='Map view'>
+			<span class='image map_type_icon'>
+				<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+				<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
 			</span>
 		</button>
 	</div>

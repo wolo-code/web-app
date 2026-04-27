@@ -1,9 +1,30 @@
 @media (max-width: 662px) {
 	
 		#pac-input {
+			box-sizing: border-box;
 			top: 100px !important;
-			left: -4px !important;
-			width: 88% !important
+			left: 8px !important;
+			height: 42px !important;
+			margin-left: 0;
+			width: calc(100vw - 66px) !important
+		}
+
+		#decode_button {
+			box-sizing: border-box;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			top: 100px !important;
+			left: auto !important;
+			right: 8px !important;
+			width: 48px !important;
+			height: 42px !important;
+			padding: 8px;
+		}
+
+		#search_icon {
+			top: 110px !important;
+			left: 20px !important;
 		}
 	
 		#logo {
@@ -43,6 +64,14 @@
 @media (max-width: 316px) {
 	#pac-input {
 		top: 126px !important;
+	}
+
+	#decode_button {
+		top: 126px !important;
+	}
+
+	#search_icon {
+		top: 136px !important;
 	}
 	
 	#account {

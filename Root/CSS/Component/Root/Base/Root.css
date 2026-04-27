@@ -57,6 +57,7 @@
 }
 
 #action_menu button {
+	-webkit-tap-highlight-color: transparent;
 	background: transparent;
 	border: none;
 	cursor: pointer;

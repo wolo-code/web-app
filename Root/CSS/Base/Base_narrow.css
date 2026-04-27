@@ -8,9 +8,20 @@
 	
 		#logo {
 			width: auto !important;
-			left: 0;
-			right: 0;
-			text-align: center;
+			left: 50%;
+			right: auto;
+			text-align: left;
+			transform: translateX(-50%);
+		}
+
+		#logo_surface {
+			align-items: flex-end;
+			flex-direction: row;
+			vertical-align: top;
+		}
+
+		#logo_codes {
+			padding-bottom: 4px;
 		}
 		
 		#notification_top {

@@ -76,13 +76,20 @@ button.border {
 	width: 160px;
 }
 
-#logo a {
-	display: inline-block;
+#logo_surface {
 	border-radius: 6px;
 	border-width: thin;
 	border-color: #e5e5e5;
 	border-style: solid;
+	display: inline-flex;
+	flex-direction: column;
+	overflow: hidden;
 	padding: 2px;
+}
+
+#logo a {
+	display: block;
+	line-height: 0;
 }
 
 #logo_wolo > .image > svg {
@@ -90,6 +97,7 @@ button.border {
 }
 
 #logo_codes {
+	padding-bottom: 2px;
 	text-decoration: none;
 }
 
@@ -243,6 +251,14 @@ body > #pac-input {
 
 .plain_background {
 	background: rgba(241, 241, 241, 0.75)
+}
+
+#logo.plain_background {
+	background: transparent;
+}
+
+#logo.plain_background #logo_surface {
+	background: rgba(241, 241, 241, 0.75);
 }
 
 .front_arrow_white > svg > g > g > path {

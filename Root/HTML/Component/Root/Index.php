@@ -35,12 +35,14 @@
 	</div>
 </div>
 <div id='logo' tabindex='1'>
-	<a id=logo_wolo class='blur_background' href='//wolo.codes'>
-		<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
-	</a>
-	<a id=logo_codes class='blur_background' href='//wolo.codes'>
-		<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
-	</a>
+	<div id='logo_surface' class='blur_background'>
+		<a id=logo_wolo href='//wolo.codes'>
+			<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
+		</a>
+		<a id=logo_codes href='//wolo.codes'>
+			<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
+		</a>
+	</div>
 </div>
 <div id='account' class="control">
 	<span class='image'>

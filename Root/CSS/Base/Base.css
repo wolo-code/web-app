@@ -111,9 +111,6 @@ body.satellite #map {
 
 #logo_surface {
 	border-radius: 6px;
-	border-width: thin;
-	border-color: #e5e5e5;
-	border-style: solid;
 	display: inline-flex;
 	flex-direction: column;
 	overflow: hidden;

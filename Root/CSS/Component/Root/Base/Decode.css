@@ -98,9 +98,6 @@
 
 .decode #logo_surface {
 	border-radius: 6px;
-	border-width: thin;
-	border-color: #cecece;
-	border-style: solid;
 }
 
 #decode_input_button .proceed_button_shape {

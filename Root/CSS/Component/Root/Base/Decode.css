@@ -17,6 +17,7 @@
 .decode #decode_input_container {
 	margin: auto;
 	text-align: center;
+	/* padding-top: 20px !important; */
 }
 
 .decode #account {
@@ -57,6 +58,7 @@
 	overflow: hidden;
 	resize: none;
 	vertical-align: bottom;
+	margin-bottom: 10px;
 }
 
 #decode_input_shadow {
@@ -82,7 +84,7 @@
 	border: none;
 	vertical-align: middle;
 	margin: -8px;
-	padding: 8px;
+	padding: 25px;
 	margin-left: -18px;
 	vertical-align: bottom;
 }

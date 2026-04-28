@@ -129,8 +129,14 @@ function toggleDecodeViewFromActionMenu() {
 }
 
 function resizeInput() {
-	document.getElementById('decode_input_shadow').innerText = this.value;
-	this.style.width = document.getElementById('decode_input_shadow').offsetWidth+'px';
+	var shadow = document.getElementById('decode_input_shadow');
+	var longest_line = this.value.split(/\r?\n/).reduce(function(longest, line) {
+		return line.length > longest.length ? line : longest;
+	}, '');
+	shadow.innerText = longest_line || this.getAttribute('placeholder');
+	this.style.width = shadow.offsetWidth+'px';
+	this.style.height = '26px';
+	this.style.height = Math.min(this.scrollHeight - 16, 112)+'px';
 }
 
 function showAndCopy(message) {

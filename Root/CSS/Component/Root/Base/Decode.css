@@ -38,6 +38,7 @@
 	font-size: 1.38em;
 	font-weight: 300;
 	border: none;
+	line-height: 1.18;
 	min-width: 262px;
 	margin-left: 12px;
 	margin-right: 12px;
@@ -48,10 +49,14 @@
 .decode #decode_input {
 	padding: 8px;
 	display: inline-block;
-	height: 26px;
+	box-sizing: content-box;
+	min-height: 26px;
+	max-height: 112px;
 	background-color: transparent;
-	text-overflow: ellipsis;
 	border-bottom: 1px solid #8e8e8e;
+	overflow: hidden;
+	resize: none;
+	vertical-align: bottom;
 }
 
 #decode_input_shadow {
@@ -60,6 +65,7 @@
 	bottom: 36px;
 	max-width: 92%;
 	overflow: hidden;
+	white-space: pre;
 }
 
 #decode_input {
@@ -78,6 +84,7 @@
 	margin: -8px;
 	padding: 8px;
 	margin-left: -18px;
+	vertical-align: bottom;
 }
 
 #decode_input_button > svg {

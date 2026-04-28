@@ -6,7 +6,7 @@
 	<meta name='title' content="<?php echo $config['project_title'] ?>" >
 	<meta itemprop='name' content="<?php echo $config['project_title'] ?>" >
 	<meta name='author' content="<?php echo $config['author'] ?>" >
-	<meta name='viewport' content="initial-scale=1.0, viewport-fit=cover" >
+	<meta name='viewport' content="width=device-width, initial-scale=1.0, viewport-fit=cover" >
 	<meta id='app_theme_color' name='theme-color' content='#efefef' >
 	<meta name='mobile-web-app-capable' content='yes' >
 	<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' >

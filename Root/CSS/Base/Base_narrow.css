@@ -1,3 +1,11 @@
+@media (max-width: 734px) and (min-width: 662px) {
+		.satellite #account, .map #account {
+				right: unset !important;
+				left: 10px !important;
+				top: 84px !important;
+		}
+}
+
 @media (max-width: 662px) {
 
 		body.map #map,
@@ -38,6 +46,7 @@
 		#logo {
 			width: auto !important;
 			left: 50%;
+			max-width: calc(100vw - 16px);
 			right: auto;
 			text-align: left;
 			transform: translateX(-50%);
@@ -46,6 +55,7 @@
 		#logo_surface {
 			align-items: flex-end;
 			flex-direction: row;
+			max-width: 100%;
 			vertical-align: top;
 		}
 
@@ -65,11 +75,21 @@
 		#account {
 			right: 10px !important;
 			left: unset !important;
+			top: 10px !important;
 		}
 		
 }
 
 @media (max-width: 316px) {
+	#logo_surface {
+		align-items: center;
+		flex-direction: column;
+	}
+
+	#logo_codes {
+		padding-bottom: 2px;
+	}
+
 	#pac-input {
 		top: 126px !important;
 	}
@@ -83,7 +103,8 @@
 	}
 	
 	#account {
-		top: 180px !important;
+		left: 4px !important;
+		top: 84px !important;
 	}
 }
 

@@ -31,6 +31,10 @@
 }
 
 @media (max-width: 316px) {
+	#account {
+		padding-top: 0px;
+		padding-left: 8px;
+	}
 	
 	#search_icon {
 		left: 12px;

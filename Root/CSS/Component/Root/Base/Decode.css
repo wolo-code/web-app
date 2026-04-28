@@ -178,3 +178,13 @@ body:not(.decode) .view_toggle_icon_code,
 	padding: 5px;
 	width: 39px;
 }
+
+@media (max-width: 316px) {
+	.decode #decode_input,
+	#decode_input_shadow {
+		box-sizing: border-box;
+		max-width: calc(100vw - 24px);
+		min-width: 0;
+		width: calc(100vw - 24px) !important;
+	}
+}

@@ -3,10 +3,37 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
+var APP_MODE_BACKGROUND = {
+	wcode: '#efefef',
+	map: '#60d0e5',
+	satellite: '#1b2f62'
+};
 
 // const INCORRECT_WCODE;
 // const MESSAGE_LOADING;
 // const LOCATION_PERMISSION_DENIED;
+
+function getAppMode() {
+	if(document.body.classList.contains('satellite'))
+		return 'satellite';
+	else if(document.body.classList.contains('map'))
+		return 'map';
+	else
+		return 'wcode';
+}
+
+function syncAppModeBackground() {
+	var mode = getAppMode();
+	var background = APP_MODE_BACKGROUND[mode];
+	var themeColor = document.querySelector('meta[name="theme-color"]');
+	document.body.dataset.appMode = mode;
+	if(themeColor)
+		themeColor.setAttribute('content', background);
+	document.documentElement.style.backgroundColor = background;
+	document.body.style.backgroundColor = background;
+	if(typeof map == 'object' && map)
+		map.setOptions({backgroundColor: background});
+}
 
 function initMap() {
 
@@ -115,6 +142,8 @@ function initMap() {
 
 	if(init_map_mode == 'satellite')
 		toggleMapType();
+	else
+		syncAppModeBackground();
 
 	postMap();
 
@@ -240,7 +269,17 @@ function activateMapType() {
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
 		document.body.classList.add('map');
+		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 	}
+	syncAppModeBackground();
+}
+
+function activateSatelliteMapType() {
+	document.body.classList.remove('decode');
+	document.body.classList.remove('map');
+	document.body.classList.add('satellite');
+	map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+	syncAppModeBackground();
 }
 
 function toggleMapType() {
@@ -261,11 +300,12 @@ function toggleMapType() {
 		document.body.classList.remove('map');
 		document.body.classList.add('satellite');
 	}
+	syncAppModeBackground();
 }
 
 function toggleMapViewType() {
 	if(document.body.classList.contains('decode')) {
-		activateMapType();
+		activateSatelliteMapType();
 	}
 	else if(map.getMapTypeId() == google.maps.MapTypeId.SATELLITE.toLowerCase()) {
 		document.body.classList.remove('satellite');
@@ -277,6 +317,7 @@ function toggleMapViewType() {
 		document.body.classList.add('satellite');
 		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
 	}
+	syncAppModeBackground();
 }
 
 function toggleDecodeView() {
@@ -289,4 +330,5 @@ function toggleDecodeView() {
 		document.body.classList.add('decode');
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 	}
+	syncAppModeBackground();
 }

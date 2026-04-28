@@ -10,7 +10,7 @@
 }
 
 .decode #decode_interface_overlay {
-	background-color: #efefef;
+	background-color: var(--app-background-current);
 	display: block;
 }
 

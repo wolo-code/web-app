@@ -7,7 +7,9 @@
 	<meta itemprop='name' content="<?php echo $config['project_title'] ?>" >
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content="initial-scale=1.0, viewport-fit=cover" >
-	<meta name='theme-color' content='#ffffff' >
+	<meta id='app_theme_color' name='theme-color' content='#efefef' >
+	<meta name='mobile-web-app-capable' content='yes' >
+	<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' >
 	<?php require '../HTML/Fragment/OG_Meta.php' ?>
 	<?php require '../HTML/Fragment/FB_Meta.php' ?>
 	<?php require '../HTML/Fragment/Twitter_Meta.php' ?>
@@ -43,7 +45,7 @@
 </head>
 <body <?php if($id == 'root') { ?>class='decode'<?php } ?>>
 	<?php	require (getComponentPath($id)); ?>
-	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_maps_api_key'] ?>&libraries=places&callback=syncInitMap' async defer></script>
+	<script src='https://maps.googleapis.com/maps/api/js?key=<?php echo $config['google_maps_api_key'] ?>&libraries=places&callback=syncInitMap&loading=async' async defer></script>
 	<script src='/geofire.min.js' async defer></script>
 	<script src='/html2canvas.min.js' async defer></script>
 </body>

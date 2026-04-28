@@ -1,11 +1,34 @@
+:root {
+	--app-background-wcode: #efefef;
+	--app-background-map: #60d0e5;
+	--app-background-satellite: #1b2f62;
+	--app-background-current: var(--app-background-wcode);
+}
+
 html {
-	background: rgb(170, 218, 255);
+	background: var(--app-background-current);
 }
 
 html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
+}
+
+body {
+	background: var(--app-background-current);
+}
+
+body.decode {
+	--app-background-current: var(--app-background-wcode);
+}
+
+body.map {
+	--app-background-current: var(--app-background-map);
+}
+
+body.satellite {
+	--app-background-current: var(--app-background-satellite);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -34,6 +57,16 @@ button.border {
 
 #map {
 	height: 100%;
+	background: var(--app-background-current);
+}
+
+body.map #map,
+body.satellite #map {
+	background-color: var(--app-background-current);
+	background-image:
+		linear-gradient(rgba(80,90,80,.10) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(80,90,80,.10) 1px, transparent 1px);
+	background-size: 48px 48px;
 }
 
 #description {

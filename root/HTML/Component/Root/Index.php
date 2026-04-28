@@ -91,7 +91,7 @@
 <div id='footer-content-container' class='center'>
 	<div id='footer-content' class='blur_background'>
 		<a class='link-gray' href='/license'>&copy; <?php echo date('Y'); ?> </a>
-		<span id='footer_author' class='link'>Wolo Code</span>
+		<span id='footer_author' class='link'>Wolo</span>
 	</div>
 </div>
 <?php require '../../HTML/Fragment/Address.php'; ?>

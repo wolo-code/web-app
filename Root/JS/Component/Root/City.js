@@ -178,15 +178,34 @@ function getCityFromId(id, callback) {
 }
 
 function getCityFromName(group, name, callback) {
+	var city_name_part = group.concat([name]);
+	var query_list = [];
+	for(var i = 0; i < city_name_part.length; i++) {
+		query_list.push({
+			group: city_name_part.slice(0, i),
+			name: city_name_part.slice(i).join(' ')
+		});
+	}
+
+	getCityFromNameQuery(query_list, 0, callback);
+}
+
+function getCityFromNameQuery(query_list, index, callback) {
+	if(index >= query_list.length) {
+		decode_continue();
+		return;
+	}
+
+	var query = query_list[index];
 	var ref = database.ref('CityDetail');
 	pushLoader();
-	ref.orderByChild('name_id').equalTo(name).once('value', function(snapshot) {
+	ref.orderByChild('name_id').equalTo(query.name).once('value', function(snapshot) {
 		popLoader();
 		var list = snapshot.val();
 		let matchList;
-		matchList = matchCityByGroup(list, group, name);
+		matchList = matchCityByGroup(list, query.group, query.name);
 		if(matchList.length == 0)
-			decode_continue();
+			getCityFromNameQuery(query_list, index+1, callback);
 		else {
 			if(matchList.length == 1) {
 				let i = matchList[0];

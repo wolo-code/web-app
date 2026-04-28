@@ -120,3 +120,50 @@ h2.message_dialog_label {
 .message_dialog_subtitle_text {
 	padding: 10px 0 10px 14px;
 }
+
+.exception_summary {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.message_dialog_body > .exception_summary > span:first-child {
+	flex: 1;
+	min-width: 0;
+	color: inherit;
+}
+
+.exception_log_toggle {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	margin: 0;
+	border: 1px solid #dcdcdc;
+	border-radius: 50%;
+	background: white;
+	color: #69B7CF;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
+	font-size: 1.1em;
+	font-weight: bold;
+	line-height: 1;
+	box-shadow: rgba(0, 0, 0, 0.285) 0px 1px 4px -1px;
+}
+
+.exception_log {
+	box-sizing: border-box;
+	max-height: 180px;
+	margin: 0;
+	padding: 10px;
+	overflow: auto;
+	border: 1px solid #e0e0e0;
+	background: #f8f8f8;
+	color: #777;
+	font-family: Consolas, 'Courier New', monospace;
+	font-size: 0.78em;
+	line-height: 1.35;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

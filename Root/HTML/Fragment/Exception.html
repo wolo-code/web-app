@@ -1,0 +1,18 @@
+<div id='exception_message' class="message_dialog hide">
+	<h2 class='message_dialog_label'>
+		Unexpected Error
+	</h2>
+	<div id='exception_message_close' class="message_dialog_close control">
+		<span class='image'><?php includeSVG('', 'Close'); ?></span>
+	</div>
+	<div class='message_dialog_body'>
+		<p class='exception_summary'>
+			<span>Error occurred. View details?</span>
+			<button id='exception_log_toggle' class='exception_log_toggle control' type='button' aria-expanded='false' aria-controls='exception_log' aria-label='Show technical log'>i</button>
+		</p>
+		<div id='exception_prompt_controls' class="center message_dialog_control">
+			<button id='exception_message_continue' class="border dialog_message_secondary" type='button'>Continue</button>
+		</div>
+		<pre id='exception_log' class='exception_log hide'></pre>
+	</div>
+</div>

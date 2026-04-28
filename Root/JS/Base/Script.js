@@ -24,13 +24,17 @@ function syncInitMap() {
 				
 				var position;
 				initLocate(false, function() {
+					function fallbackToCityByIp() {
+						getCityByIp();
+					}
+
 					getCoarseLocation(function(position) {
 						getCityFromPositionViaGMap(position, function(city) {
 							document.getElementById('decode_input_city').innerText = city.name;
 							getCityCenterFromId(city, function() {
 								geoIP_city = city;
 							} );
-						}, handleLocationError) }, handleLocationError);
+						}, fallbackToCityByIp) }, fallbackToCityByIp);
 					return;
 				});
 

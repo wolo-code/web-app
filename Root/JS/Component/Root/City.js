@@ -289,13 +289,13 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 function noCity(position) {
 	showNoCityMessage();
 	showAddress();
-	infoWindow.setContent("City not in database");
+	infoWindow_setContent("City not in database");
 }
 
 function notInRange(position) {
 	showNotification("Error: place out of range of selected city");
 	showAddress();
-	infoWindow.setContent("<div class='control' onclick='showChooseCity_by_periphery_Message();'>Not in <span class='blue'>selected<span> city's range</div>");
+	infoWindow_setContent("<div class='control' onclick='showChooseCity_by_periphery_Message();'>Not in <span class='blue'>selected<span> city's range</div>");
 	showChooseCity_by_periphery_Message();
 }
 

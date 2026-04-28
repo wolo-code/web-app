@@ -295,11 +295,38 @@ function getCityFromPositionViaGMap(position, callback_success, callback_failure
 	} );
 }
 
-function getCoarseLocation(callback_success, callback_failure) {
-	if(typeof navigator.geolocation !== 'undefined') {
-		var options = { timeout: 60000 };
-		navigator.geolocation.getCurrentPosition (callback_success, callback_failure, options);
-	} else {
-		alert("Sorry, browser does not support geolocation!");
-	}
+function isBadGeoPosition(pos) {
+	if (!pos || !pos.coords) return true;
+
+	const c = pos.coords;
+
+	return (
+		!Number.isFinite(c.latitude) ||
+		!Number.isFinite(c.longitude) ||
+		(c.latitude === 0 && c.longitude === 0) ||
+		c.accuracy === 0
+	);
+}
+
+function getCoarseLocation(success, failure) {
+	if (!navigator.geolocation) return failure?.("unsupported");
+
+	navigator.geolocation.getCurrentPosition(
+		(pos) => {
+			if (isBadGeoPosition(pos)) {
+				return failure?.({
+					code: "INVALID_POSITION",
+					message: "Browser returned 0,0 with zero accuracy"
+				});
+			}
+
+			success(pos);
+		},
+		failure,
+		{
+			enableHighAccuracy: false,
+			timeout: 10000,
+			maximumAge: 0
+		}
+	);
 }

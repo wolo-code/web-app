@@ -57,7 +57,7 @@ function setCurrentCity_status(status) {
 }
 
 function encode_continue(city, position) {
-	encode_session_id = Date.now
+	encode_session_id = Date.now();
 	var session_id = encode_session_id;
 	if(city == null) {
 		if(!pendingCity) {

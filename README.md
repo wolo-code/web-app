@@ -43,7 +43,7 @@ Fonts:
 Debugging:
 Local network debug:
 
-http redirects to https://local.app.wolo.codes  
+http redirects to https://local.wolo.codes  
 https goes through directly.  
 Hence, for local debugging go to: https://&lt;ip&gt;
 

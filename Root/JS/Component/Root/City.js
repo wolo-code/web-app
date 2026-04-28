@@ -252,6 +252,25 @@ function getCityIdFromNameId(name_id, callback) {
 }
 
 function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, callback_failure) {
+	if(typeof encode_session_id == 'function') {
+		callback_failure = callback_success;
+		callback_success = encode_session_id;
+		encode_session_id = null;
+	}
+
+	function forwardCityCallback(callback, ar_param) {
+		if(typeof callback == 'undefined')
+			return;
+		if(encode_session_id == null) {
+			if(typeof ar_param === "undefined")
+				callback();
+			else
+				callback(...ar_param);
+		}
+		else
+			sessionForwarder(encode_session_id, callback, ar_param);
+	}
+
 	var ref = database.ref('CityDetail');
 	pushLoader();
 	ref.orderByChild('gp_id').equalTo(city_gp_id).once('value', function(snapshot) {
@@ -259,10 +278,10 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 		if (snapshot.exists()) {
 			var city = Object.values(snapshot.val())[0];
 			city.id = Object.keys(snapshot.val())[0];
-			sessionForwarder(encode_session_id, callback_success, [city]);
+			forwardCityCallback(callback_success, [city]);
 		}
 		else {
-			sessionForwarder(encode_session_id, callback_failure);
+			forwardCityCallback(callback_failure);
 		}
 	});	
 }

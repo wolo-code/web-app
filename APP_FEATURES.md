@@ -10,8 +10,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Map View | `body.map`, `#map`, `#pac-input` | Interactive Google Maps state for search, location selection, encoding, and viewing decoded places. |
 | Satellite View | `body.satellite`, Google Maps `SATELLITE` map type | Visual variant of Map View. |
 | Action Menu | `#action_menu`, `toggleActionMenu()` | Bottom-left expandable control for secondary actions. |
-| Map Type Toggle | `#action_menu_map`, `#map_type_button`, `toggleMapViewType()` | Toggles in place between Terrain/Roadmap and Satellite map icons using `Map-terrain.svg` and `Map-satellite.svg`. |
-| Wolo Code Input Toggle | `#action_menu_decode`, `toggleDecodeView()` | Replaces the previous mail action in the Action Menu. Toggles in place between the map icon and `Wolo-code.svg` to switch between Map View and Decode View. |
+| Map Type Toggle | `#action_menu_map`, `#map_type_button`, `toggleMapViewType()` | Toggles in place between Terrain/Roadmap and Satellite map icons using `Map-terrain.svg` and `Map-satellite.svg`; from Decode View, the Action Menu map-type action opens Satellite View directly. |
+| Wolo Code Input Toggle | `#action_menu_decode`, `toggleDecodeView()` | Replaces the previous mail action in the Action Menu. Toggles in place between the map icon and `Wolo-code.svg`; from Decode View, it opens the terrain/roadmap Map View. |
 | Info Entry | `#action_menu_info`, `showInfoFromActionMenu()` | Opens the app information flow from the Action Menu. |
 
 ## Wolo Code Workflows
@@ -81,5 +81,6 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 
 - `toggleMapType()` remains as the legacy three-state cycle used by older flows: Decode View, Map View, and Satellite View.
 - `toggleMapViewType()` is the newer map-only toggle used by the visible map type controls.
+- `activateSatelliteMapType()` is used when the Decode View Action Menu satellite icon needs to enter Satellite View directly.
 - `toggleDecodeView()` is the newer view toggle used by the Action Menu Wolo Code input control.
 - Toggle icons are rendered as paired inline SVG resources, stacked in one fixed-size slot, and switched by `body.decode` and `body.satellite` state classes.

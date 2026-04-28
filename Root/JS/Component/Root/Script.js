@@ -68,6 +68,7 @@ function setupControls() {
 	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
 	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);
 	document.getElementById('action_menu_decode').addEventListener('click', toggleDecodeViewFromActionMenu);
+	document.getElementById('decode_map_view_button').addEventListener('click', toggleDecodeView);
 	document.getElementById('footer_author').addEventListener('click', showInfoLinks);
 	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);

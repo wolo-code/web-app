@@ -37,6 +37,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | City hint row | Input City Hint | `#decode_input_city` | Above centered Wolo Code Input | Shows the current or inferred city context for decoding. |
 | Input suggestions | Wolo Code Suggestions | `#decode_input_suggestion_result` | Above or near centered Wolo Code Input | Shows suggested Wolo Code tokens and resizes the input as needed. |
 | Submit control | Wolo Code Proceed Button | `#decode_input_button` | Immediately right of Wolo Code Input | Starts decode from the input page. |
+| Terrain map control | Terrain Map View Button | `#decode_map_view_button`, `toggleDecodeView()` | Bottom-right | Switches from Wolo Code Input View to Terrain Map View. |
 
 ## Terrain Map View
 

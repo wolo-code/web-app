@@ -88,6 +88,10 @@
 	display: none;
 }
 
+.decode #decode_map_view_button {
+	display: block;
+}
+
 .decode #action_menu svg {
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
@@ -140,4 +144,28 @@ body:not(.decode) .view_toggle_icon_code,
 
 #decode_input_city {
 	color: #7f7f7f;
+}
+
+#decode_map_view_button {
+	background: transparent;
+	border: none;
+	bottom: 26px;
+	cursor: pointer;
+	display: none;
+	margin: -8px;
+	padding: 8px;
+	position: absolute;
+	right: 11px;
+	z-index: 1;
+}
+
+#decode_map_view_button svg {
+	background-color: rgb(255 255 255 / 50%);
+	border-radius: 25px;
+	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
+	box-sizing: border-box;
+	display: block;
+	height: 39px;
+	padding: 5px;
+	width: 39px;
 }

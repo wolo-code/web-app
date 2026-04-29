@@ -23,12 +23,16 @@ function getAppMode() {
 		return 'wcode';
 }
 
+function getAppModeBackground(mode) {
+	if(typeof APP_MODE_BACKGROUND != 'object' || !APP_MODE_BACKGROUND || !APP_MODE_BACKGROUND[mode])
+		return APP_MODE_BACKGROUND_DEFAULT || '#efefef';
+	return APP_MODE_BACKGROUND[mode];
+}
+
 function syncAppModeBackground() {
 	var mode = getAppMode();
-	var background = typeof APP_MODE_BACKGROUND == 'object' && APP_MODE_BACKGROUND ? APP_MODE_BACKGROUND[mode] : null;
+	var background = getAppModeBackground(mode);
 	var themeColor = document.querySelector('meta[name="theme-color"]');
-	if(!background)
-		background = APP_MODE_BACKGROUND_DEFAULT || '#efefef';
 	document.body.dataset.appMode = mode;
 	if(themeColor)
 		themeColor.setAttribute('content', background);

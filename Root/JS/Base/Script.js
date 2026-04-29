@@ -117,8 +117,20 @@ function deferExceptionPrompt(callback) {
 }
 
 function showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error) {
-	pendingExceptionLogs.push(normalizeException(errorMsg, url, lineNumber, columnNumber, error));
+	var exception = normalizeException(errorMsg, url, lineNumber, columnNumber, error);
+	pendingExceptionLogs.push(exception);
+	reportExceptionPrompt(error || errorMsg || exception.msg, exception);
 	deferExceptionPrompt(flushExceptionPrompt);
+}
+
+function reportExceptionPrompt(error, exception) {
+	if(typeof Sentry == 'undefined' || typeof Sentry.captureException != 'function')
+		return;
+
+	if(error instanceof Error)
+		Sentry.captureException(error);
+	else
+		Sentry.captureException(new Error(exception.msg));
 }
 
 function flushExceptionPrompt() {

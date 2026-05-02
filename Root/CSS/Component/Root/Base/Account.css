@@ -110,6 +110,10 @@
 	left: auto;
 }
 
+#account_dialog_main {
+	padding-top: 8px;
+}
+
 #account_dialog_main > .message_dialog_control_container,
 #account_dialog_options > .message_dialog_control_container {
 	display: flex;
@@ -141,6 +145,7 @@
 }
 
 #account_dialog_save_list_end {
+	padding-top: 18px;
 	color: #c7c7c7;
 	font-size: small;
 	letter-spacing: 2px;

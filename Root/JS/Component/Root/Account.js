@@ -88,6 +88,20 @@ function onAccountDialogAddressActive() {
 	}
 }
 
+function updateSaveListEndIndicator() {
+	var listContainer = document.getElementById('account_dialog_save_list_container');
+	var endIndicator = document.getElementById('account_dialog_save_list_end');
+	if(!listContainer || !endIndicator)
+		return;
+	endIndicator.classList.add('hide');
+	if(listContainer.scrollHeight > listContainer.clientHeight)
+		endIndicator.classList.remove('hide');
+}
+
+function queueSaveListEndIndicatorUpdate() {
+	setTimeout(updateSaveListEndIndicator, 0);
+}
+
 function loadSaveList() {
 	saveList = [];
 	lastActiveSaveEntry = null;
@@ -97,6 +111,7 @@ function loadSaveList() {
 		var container = document.getElementById('account_dialog_save_list');
 		firebase.database().ref('/UserData/'+uid).on('value', function(snapshot) {
 			document.getElementById('account_dialog_save_list').innerHTML = '';
+			document.getElementById('account_dialog_save_list_end').classList.add('hide');
 			saveList = snapshot.val();
 			if(saveList && Object.keys(saveList).length) {
 				document.getElementById('account_dialog_save_list_loader').classList.add('hide');
@@ -150,10 +165,12 @@ function loadSaveList() {
 							processSaveEntry_continue(row);
 					});
 				}
+				queueSaveListEndIndicatorUpdate();
 			}
 			else {
 				document.getElementById('account_dialog_save_list_loader').classList.add('hide');
 				document.getElementById('account_dialog_save_list_placeholder').classList.remove('hide');
+				queueSaveListEndIndicatorUpdate();
 			}
 		})
 	}
@@ -217,7 +234,8 @@ function toggleSaveEntry(e) {
 	else {
 		e.classList.add('active');
 		lastActiveSaveEntry = e;
-	}	
+	}
+	queueSaveListEndIndicatorUpdate();
 }
 
 function clearSaveEntry() {
@@ -226,3 +244,5 @@ function clearSaveEntry() {
 		lastActiveSaveEntry = null;
 	}
 }
+
+window.addEventListener('resize', queueSaveListEndIndicatorUpdate);

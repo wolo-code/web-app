@@ -18,6 +18,7 @@ function onLogout() {
 		document.getElementById('account_default_image').classList.remove('hide');
 		document.getElementById('account_dialog_save_list_loader').classList.remove('hide');
 		document.getElementById('account_dialog_save_list_placeholder').classList.add('hide');
+		document.getElementById('account_dialog_save_list_end').classList.add('hide');
 		document.getElementById('account_dialog_save_list').innerHTML = '';
 	})
 	.catch(function(error) {

@@ -45,7 +45,7 @@
 				<div id='account_dialog_save_list_loader' class='account_dialog_save_list_indicator'>loading...</div>
 				<div id='account_dialog_save_list_placeholder' class="account_dialog_save_list_indicator hide">-empty-</div>
 				<div id=account_dialog_save_list></div>
-				<div id='account_dialog_save_list_end' class="account_dialog_save_list_indicator hide">-end-</div>
+				<div id='account_dialog_save_list_end' class="account_dialog_save_list_indicator hide">.*.</div>
 			</div>
 		</div>
 	</div>

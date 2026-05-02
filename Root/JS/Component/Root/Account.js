@@ -143,7 +143,7 @@ function loadSaveList() {
 					row_code.innerText = '\\' + ' ' + saveList[key].code.join(' ') + ' ' + '/';
 					row_controls.setAttribute('class', 'row-controls');
 					row_delete.setAttribute('class', 'row-delete');
-					row_delete.innerText = 'Delete';
+					row_delete.innerText = 'delete';
 					row_delete.addEventListener('click', deleteSaveEntry);
 					row_process.setAttribute('class', 'row-process');
 					row_process_img.src = svg_front;

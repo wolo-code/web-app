@@ -104,6 +104,18 @@
 	left: auto;
 }
 
+#account_dialog_main > .message_dialog_control_container,
+#account_dialog_options > .message_dialog_control_container {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+}
+
+#account_dialog_logout, #account_dialog_save {
+	margin-left: 0;
+	margin-right: 0;
+}
+
 #account_dialog_save button, #account_dialog_logout button {
 	background: transparent;
 	border: none;

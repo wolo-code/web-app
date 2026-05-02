@@ -14,7 +14,7 @@
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_logout' class='message_dialog_control'>
-						<button id='account_dialog_logout_button' class="control" type='button'>Logout</button>
+						<button id='account_dialog_logout_button' class="control" type='button'>logout</button>
 					</div>
 				</div>
 			</div>
@@ -32,7 +32,7 @@
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_save' class="message_dialog_control center">
-						<button id='account_dialog_save_button' class="control" type='button'>Save</button>
+						<button id='account_dialog_save_button' class="control" type='button'>save</button>
 					</div>
 				</div>
 				<div id='waddress_list_container'></div>
@@ -42,7 +42,7 @@
 				Saved
 			</h3>
 			<div id='account_dialog_save_list_container'>
-				<div id='account_dialog_save_list_loader' class='account_dialog_save_list_indicator'>-loading-</div>
+				<div id='account_dialog_save_list_loader' class='account_dialog_save_list_indicator'>loading...</div>
 				<div id='account_dialog_save_list_placeholder' class="account_dialog_save_list_indicator hide">-empty-</div>
 				<div id=account_dialog_save_list></div>
 				<div id='account_dialog_save_list_end' class="account_dialog_save_list_indicator hide">-end-</div>

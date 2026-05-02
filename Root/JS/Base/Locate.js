@@ -310,6 +310,12 @@ function isBadGeoPosition(pos) {
 
 function getCoarseLocation(success, failure) {
 	if (!navigator.geolocation) return failure?.("unsupported");
+	if (navigator.userActivation && !navigator.userActivation.isActive) {
+		return failure?.({
+			code: "USER_GESTURE_REQUIRED",
+			message: "Geolocation must be requested from a user gesture"
+		});
+	}
 
 	navigator.geolocation.getCurrentPosition(
 		(pos) => {

@@ -49,6 +49,15 @@
 	width: 152px;
 }
 
+#info_version_indicator {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	color: #bbbbbb;
+	font-size: 0.78em;
+	line-height: 1;
+}
+
 #info_intro {
 	margin: 30% 6%;
 }

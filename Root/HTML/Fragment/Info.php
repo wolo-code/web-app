@@ -10,6 +10,7 @@
 			<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 		</a>
 	</div>
+	<div id='info_version_indicator'>v<?php echo htmlspecialchars($config['version'], ENT_QUOTES, 'UTF-8') ?></div>
 	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
 	<?php
 		require '../../HTML/Fragment/Info_intro.php';

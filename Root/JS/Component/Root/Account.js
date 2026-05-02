@@ -7,6 +7,9 @@ function onAccount() {
 
 function showAccountDialog() {
 	showOverlay(document.getElementById('account_dialog_container'));
+	var dialogBody = document.querySelector('#account_dialog > .message_dialog_body');
+	if(dialogBody)
+		dialogBody.scrollTop = 0;
 	if(current_title)
 		document.getElementById('save_title_main').value = current_title;
 	else
@@ -90,11 +93,12 @@ function onAccountDialogAddressActive() {
 
 function updateSaveListEndIndicator() {
 	var listContainer = document.getElementById('account_dialog_save_list_container');
+	var scrollContainer = document.querySelector('#account_dialog > .message_dialog_body') || listContainer;
 	var endIndicator = document.getElementById('account_dialog_save_list_end');
 	if(!listContainer || !endIndicator)
 		return;
 	endIndicator.classList.add('hide');
-	if(listContainer.scrollHeight > listContainer.clientHeight)
+	if(scrollContainer.scrollHeight > scrollContainer.clientHeight)
 		endIndicator.classList.remove('hide');
 }
 

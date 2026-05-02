@@ -73,4 +73,5 @@ function copyAddress() {
 		showAddress();
 	}
 	copyNodeText(address_text_content);
+	showNotification(ADDRESS_COPIED_MESSAGE);
 }

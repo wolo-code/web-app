@@ -15,8 +15,8 @@
 
 #address_text_main {
 	display: inline-block;
-	float: left;
-	min-width: 89%;
+	/* float: left; */
+	/* min-width: 89%; */
 }
 
 #address_text_label {
@@ -38,7 +38,7 @@
 	min-height: 48px;
 	max-width: 306px;
 	text-align: left;
-	padding: 6px 0 6px 6px;
+	padding: 6px 4px;
 	color: #888888;
 }
 

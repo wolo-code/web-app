@@ -92,13 +92,12 @@ function onAccountDialogAddressActive() {
 }
 
 function updateSaveListEndIndicator() {
-	var listContainer = document.getElementById('account_dialog_save_list_container');
-	var scrollContainer = document.querySelector('#account_dialog > .message_dialog_body') || listContainer;
+	var list = document.getElementById('account_dialog_save_list');
 	var endIndicator = document.getElementById('account_dialog_save_list_end');
-	if(!listContainer || !endIndicator)
+	if(!list || !endIndicator)
 		return;
 	endIndicator.classList.add('hide');
-	if(scrollContainer.scrollHeight > scrollContainer.clientHeight)
+	if(list.children.length)
 		endIndicator.classList.remove('hide');
 }
 

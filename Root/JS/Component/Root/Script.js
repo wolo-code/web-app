@@ -31,6 +31,10 @@ function initApp() {
 			document.getElementById('account_default_image').classList.remove('hide');
 		}
 	}).catch(function(error) {
+		if(isFirebaseIndexedDbClosingError(error)) {
+			recoverFirebaseIndexedDbConnection(error);
+			return;
+		}
 		Sentry.captureException(error);
 	});
 }

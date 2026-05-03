@@ -12,7 +12,7 @@ function authInit() {
 				popLoader();
 			}
 		},
-		signInFlow: 'popup',
+		signInFlow: 'redirect',
 		signInOptions: [
 			firebase.auth.GoogleAuthProvider.PROVIDER_ID,
 			firebase.auth.FacebookAuthProvider.PROVIDER_ID,

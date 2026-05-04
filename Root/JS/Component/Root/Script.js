@@ -1,4 +1,6 @@
 // var syncLocate_engage;
+var actionMenuTimeout = null;
+var actionMenuTimeoutDuration = 5000;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
@@ -69,6 +71,10 @@ function setupControls() {
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
 	document.getElementById('action_menu_toggle').addEventListener('click', toggleActionMenu);
+	document.getElementById('action_menu').addEventListener('pointerdown', refreshActionMenuTimeout);
+	document.getElementById('action_menu').addEventListener('pointermove', refreshActionMenuTimeout);
+	document.getElementById('action_menu').addEventListener('focusin', refreshActionMenuTimeout);
+	document.getElementById('action_menu').addEventListener('keydown', refreshActionMenuTimeout);
 	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
 	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);
 	document.getElementById('action_menu_decode').addEventListener('click', toggleDecodeViewFromActionMenu);
@@ -107,6 +113,10 @@ function toggleActionMenu() {
 	document.getElementById('action_menu_info').tabIndex = is_open ? 0 : -1;
 	document.getElementById('action_menu_map').tabIndex = is_open ? 0 : -1;
 	document.getElementById('action_menu_decode').tabIndex = is_open ? 0 : -1;
+	if(is_open)
+		refreshActionMenuTimeout();
+	else
+		clearActionMenuTimeout();
 }
 
 function closeActionMenu() {
@@ -115,6 +125,21 @@ function closeActionMenu() {
 	document.getElementById('action_menu_info').tabIndex = -1;
 	document.getElementById('action_menu_map').tabIndex = -1;
 	document.getElementById('action_menu_decode').tabIndex = -1;
+	clearActionMenuTimeout();
+}
+
+function refreshActionMenuTimeout() {
+	if(!document.getElementById('action_menu').classList.contains('open'))
+		return;
+	clearActionMenuTimeout();
+	actionMenuTimeout = setTimeout(closeActionMenu, actionMenuTimeoutDuration);
+}
+
+function clearActionMenuTimeout() {
+	if(actionMenuTimeout) {
+		clearTimeout(actionMenuTimeout);
+		actionMenuTimeout = null;
+	}
 }
 
 function showInfoFromActionMenu() {

@@ -34,7 +34,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- | --- |
 | Full-screen input surface | Wolo Code Input Surface | `#decode_interface_overlay` | Full viewport | Covers the map with the plain input-focused state. |
 | Code entry field | Wolo Code Input | `#decode_input` | Center of viewport | Accepts a Wolo Code such as `\ Wolo Code /`. |
-| City hint row | Input City Hint | `#decode_input_city` | Above centered Wolo Code Input | Shows the current or inferred city context for decoding. |
+| City hint row | Input City Hint | `#decode_input_city` | Above centered Wolo Code Input | Shows the current or inferred city context for decoding after the city value is validated; it can remain blank while IP city lookup retries. |
 | Input suggestions | Wolo Code Suggestions | `#decode_input_suggestion_result` | Above or near centered Wolo Code Input | Shows suggested Wolo Code tokens and resizes the input as needed. |
 | Submit control | Wolo Code Proceed Button | `#decode_input_button` | Immediately right of Wolo Code Input | Starts decode from the input page. |
 | Terrain map control | Terrain Map View Button | `#decode_map_view_button`, `toggleDecodeView()` | Bottom-right | Switches from Wolo Code Input View to Terrain Map View. |

@@ -20,7 +20,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- | --- |
 | Encode Location | `encode()`, map click listener, `focus___()` | Selecting a map position generates the corresponding Wolo Code. |
 | Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()` | A typed Wolo Code resolves to a place and can jump back to the map. |
-| City Resolution | `getCityGpId()`, `decodeWithIpCity()`, city chooser fragments | Codes can include city context, infer city from IP, or ask the user to choose a matching city. |
+| City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, city chooser fragments | Codes can include city context, infer city from IP, or ask the user to choose a matching city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
 | Suggestions | `suggestWrapper`, `#map_input_suggestion_result`, `#decode_input_suggestion_result` | Search and decode inputs share suggestion UI with different sizing behavior. |
 | Default Try Prompt | `#notification_top`, `tryDefaultCity()` | Top notification offers a starter city example. |
 

@@ -100,3 +100,6 @@ var geoIp_country_code;
 var geoIp_city_name;
 var pendingWords_geo;
 var geoIP_city;
+var selected_decode_city;
+var selected_decode_city_source;
+var decode_city_history;

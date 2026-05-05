@@ -147,7 +147,13 @@ function decode(words) {
 			}
 			else if (words.length == 3) {
 				
-				if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
+				if(selected_decode_city && selected_decode_city_source == 'ip') {
+					decodeWithIpCity(words);
+				}
+				else if(selected_decode_city && selected_decode_city.center) {
+					decode_continue(selected_decode_city, words);
+				}
+				else if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
 					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
 				else {
 					

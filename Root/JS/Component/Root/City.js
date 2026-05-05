@@ -21,6 +21,223 @@ function getProperCityAccent(city) {
 	return city.name;
 }
 
+function initDecodeCityContext() {
+	decode_city_history = getDecodeCityHistory();
+	syncDecodeCityHistoryControl();
+
+	if(decode_city_history.length > 0)
+		setDecodeCity(decode_city_history[0], 'history', false);
+	else
+		setDecodeCityLabel('');
+
+	getCityByIp(function() {
+		if(!selected_decode_city)
+			selectIpDecodeCity();
+	});
+}
+
+function setDecodeCityFromIp(city_name) {
+	geoIp_city_name = city_name;
+	if(selected_decode_city_source == 'ip' || !selected_decode_city)
+		selectIpDecodeCity();
+}
+
+function selectIpDecodeCity() {
+	if(!geoIp_city_name) {
+		getCityByIp();
+		return;
+	}
+
+	selected_decode_city = {
+		name: geoIp_city_name
+	};
+	selected_decode_city_source = 'ip';
+	setDecodeCityLabel(geoIp_city_name);
+	syncDecodeCitySourceButtons();
+}
+
+function requestDecodeCityGeolocation() {
+	selected_decode_city = null;
+	selected_decode_city_source = 'geolocation';
+	setDecodeCityLabel('loading...');
+	syncDecodeCitySourceButtons();
+
+	initLocate(true, function(failure) {
+		function fail() {
+			selected_decode_city_source = null;
+			setDecodeCityLabel('');
+			syncDecodeCitySourceButtons();
+			if(typeof failure == 'function')
+				failure();
+			else
+				popLoader();
+			showNotification(PURE_WCODE_CITY_FAILED);
+		}
+
+		getCoarseLocation(function(position) {
+			getCityFromPositionViaGMap(position, function(city) {
+				getCityCenterFromId(city, function(city) {
+					setDecodeCity(city, 'geolocation', true);
+				});
+			}, fail);
+		}, fail);
+	});
+}
+
+function setDecodeCity(city, source, save_history) {
+	if(!city)
+		return;
+
+	selected_decode_city = city;
+	selected_decode_city_source = source;
+
+	if(city.gp_id)
+		current_city_gp_id = city.gp_id;
+	if(source == 'ip') {
+		geoIP_city = city;
+		geoIp_city_name = city.name;
+	}
+
+	setDecodeCityLabel(getDecodeCityDisplayName(city));
+	if(save_history)
+		saveDecodeCity(city);
+	syncDecodeCitySourceButtons();
+}
+
+function setDecodeCityLabel(label) {
+	var city_label = document.getElementById('decode_input_city');
+	if(city_label)
+		city_label.innerText = label || '\u00a0';
+}
+
+function getDecodeCityDisplayName(city) {
+	if(!city)
+		return '';
+	if(city.name)
+		return getProperCityAccent(city);
+	return '';
+}
+
+function getDecodeCityStorageKey() {
+	return 'decode_city_history';
+}
+
+function getDecodeCityHistory() {
+	if(typeof(Storage) === 'undefined' || typeof localStorage[getDecodeCityStorageKey()] == 'undefined')
+		return [];
+
+	try {
+		var history = JSON.parse(localStorage[getDecodeCityStorageKey()]);
+		if(Array.isArray(history))
+			return history.filter(function(city) { return city && city.name; });
+	}
+	catch(error) {}
+
+	return [];
+}
+
+function saveDecodeCity(city) {
+	if(typeof(Storage) === 'undefined' || !city || !city.name)
+		return;
+
+	var saved_city = cloneDecodeCity(city);
+	var history = getDecodeCityHistory().filter(function(entry) {
+		return getDecodeCityHistoryKey(entry) != getDecodeCityHistoryKey(saved_city);
+	});
+	history.unshift(saved_city);
+	history = history.slice(0, 8);
+	localStorage[getDecodeCityStorageKey()] = JSON.stringify(history);
+	decode_city_history = history;
+	syncDecodeCityHistoryControl();
+}
+
+function cloneDecodeCity(city) {
+	var saved_city = {
+		id: city.id,
+		gp_id: city.gp_id,
+		name: city.name,
+		name_id: city.name_id,
+		accent: city.accent,
+		country: city.country,
+		administrative_level_1: city.administrative_level_1,
+		administrative_level_2: city.administrative_level_2,
+		locality: city.locality
+	};
+	if(city.center)
+		saved_city.center = {
+			lat: city.center.lat,
+			lng: city.center.lng
+		};
+	return saved_city;
+}
+
+function getDecodeCityHistoryKey(city) {
+	return city.id || city.gp_id || city.name;
+}
+
+function syncDecodeCityHistoryControl() {
+	decode_city_history = getDecodeCityHistory();
+
+	var toggle = document.getElementById('decode_city_history_toggle');
+	if(toggle)
+		toggle.disabled = decode_city_history.length == 0;
+}
+
+function showDecodeCityHistoryMessage() {
+	var toggle = document.getElementById('decode_city_history_toggle');
+	var container = document.getElementById('decode_city_history_message_list');
+	if(!toggle || !container || decode_city_history.length == 0)
+		return;
+
+	clearDecodeCityHistoryList();
+	for(var i = 0; i < decode_city_history.length; i++) {
+		var row = document.createElement('div');
+		row.innerText = getDecodeCityDisplayName(decode_city_history[i]);
+		row.data_id = i;
+		row.addEventListener('click', chooseDecodeCityFromHistory);
+		container.appendChild(row);
+	}
+	toggle.setAttribute('aria-expanded', true);
+	showOverlay(document.getElementById('decode_city_history_message'));
+}
+
+function hideDecodeCityHistoryMessage() {
+	hideOverlay(document.getElementById('decode_city_history_message'));
+	clearDecodeCityHistoryList();
+	var toggle = document.getElementById('decode_city_history_toggle');
+	if(toggle)
+		toggle.setAttribute('aria-expanded', false);
+}
+
+function clearDecodeCityHistoryList() {
+	var container = document.getElementById('decode_city_history_message_list');
+	if(container)
+		container.innerHTML = '';
+}
+
+function chooseDecodeCityFromHistory(e) {
+	var id = e.currentTarget.data_id;
+	var city = decode_city_history[parseInt(id, 10)];
+
+	if(city) {
+		setDecodeCity(city, 'history', true);
+		hideDecodeCityHistoryMessage();
+	}
+}
+
+function syncDecodeCitySourceButtons() {
+	var controls = {
+		geolocation: document.getElementById('decode_city_geolocation'),
+		ip: document.getElementById('decode_city_ip'),
+		history: document.getElementById('decode_city_history_toggle')
+	};
+
+	for(var source in controls) {
+		if(controls[source])
+			controls[source].classList.toggle('active', selected_decode_city_source == source);
+	}
+}
+
 var geoQuery_completed;
 var nearCity;
 var pending_encode_latLng;

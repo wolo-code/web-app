@@ -1,4 +1,8 @@
-function getCityByIp(retry_count) {
+function getCityByIp(retry_count, callback) {
+	if(typeof retry_count == 'function') {
+		callback = retry_count;
+		retry_count = 0;
+	}
 
 	var http = new XMLHttpRequest();
 	http.open('POST', FUNCTIONS_BASE_URL+'/'+'cityByIp', true);
@@ -16,26 +20,28 @@ function getCityByIp(retry_count) {
 				if(http.status == 200) {
 
 						if(http.responseText == '')
-							retryCityByIp(retry_count);
+							retryCityByIp(retry_count, callback);
 						else {
 							var response;
 							try {
 								response = JSON.parse(http.responseText);
 							}
 							catch(error) {
-								retryCityByIp(retry_count);
+								retryCityByIp(retry_count, callback);
 								return;
 							}
 							var city_name = normalizeIpCityName(response.city);
 
 							if(city_name == null) {
-								retryCityByIp(retry_count);
+								retryCityByIp(retry_count, callback);
 								return;
 							}
 
 							geoIp_country_code = response.country;
 							geoIp_city_name = city_name;
-							document.getElementById('decode_input_city').innerText = city_name;
+							setDecodeCityFromIp(city_name);
+							if(typeof callback == 'function')
+								callback(city_name);
 							if(pendingWords_geo) {
 								var pending_words = pendingWords_geo;
 								pendingWords_geo = null;
@@ -66,13 +72,13 @@ function normalizeIpCityName(city_name) {
 	return city_name;
 }
 
-function retryCityByIp(retry_count) {
+function retryCityByIp(retry_count, callback) {
 	var MAX_CITY_BY_IP_RETRIES = 2;
 	var CITY_BY_IP_RETRY_DELAY = 750;
 
 	if(retry_count < MAX_CITY_BY_IP_RETRIES) {
 		setTimeout(function() {
-			getCityByIp(retry_count + 1);
+			getCityByIp(retry_count + 1, callback);
 		}, CITY_BY_IP_RETRY_DELAY);
 	}
 	else {

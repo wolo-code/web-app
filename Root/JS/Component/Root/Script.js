@@ -94,6 +94,7 @@ function setupControls() {
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);
 	document.getElementById('address_text_main').addEventListener('click', copyAddress);
+	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
 	document.getElementById('qr_close').addEventListener('click', closeQR);
@@ -101,6 +102,9 @@ function setupControls() {
 	document.getElementById('qr_print').addEventListener('click', printQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
+	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
+	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
+	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
 	document.getElementById('external_close').addEventListener('click', external_close);
 	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
 	addLongpressListener(document.getElementById('qr_download'), downloadQR, onQRDialogSave);

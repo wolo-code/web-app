@@ -17,28 +17,7 @@ function syncInitMap() {
 			});
 			initMap();
 
-			if(!locationAccessCheck()) {
-				getCityByIp();
-			}
-			else {
-				
-				var position;
-				initLocate(false, function() {
-					function fallbackToCityByIp() {
-						getCityByIp();
-					}
-
-					getCoarseLocation(function(position) {
-						getCityFromPositionViaGMap(position, function(city) {
-							document.getElementById('decode_input_city').innerText = city.name;
-							getCityCenterFromId(city, function() {
-								geoIP_city = city;
-							} );
-						}, fallbackToCityByIp) }, fallbackToCityByIp);
-					return;
-				});
-
-			}
+			initDecodeCityContext();
 
 			pendingInitMap = false;
 		}

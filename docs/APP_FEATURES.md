@@ -20,7 +20,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- | --- |
 | Encode Location | `encode()`, map click listener, `focus___()` | Selecting a map position generates the corresponding Wolo Code. |
 | Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()` | A typed Wolo Code resolves to a place and can jump back to the map. |
-| City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, city chooser fragments | Codes can include city context, infer city from IP, or ask the user to choose a matching city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
+| City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, `#decode_city_context`, city chooser fragments | Codes can include city context, reuse a previous city, infer city from IP, or ask the user to choose a matching city. Initial load never requests browser geolocation; it defaults to the previous city when available, otherwise the IP city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
 | Suggestions | `suggestWrapper`, `#map_input_suggestion_result`, `#decode_input_suggestion_result` | Search and decode inputs share suggestion UI with different sizing behavior. |
 | Default Try Prompt | `#notification_top`, `tryDefaultCity()` | Top notification offers a starter city example. |
 
@@ -30,6 +30,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- | --- |
 | Search Place Input | `#pac-input`, Google Places-style controls | Search input is shown in Map View. |
 | Current Location | `#location_button`, locate permission dialog | Location control can request permission, locate the user, and optionally remember "do not ask again". |
+| Decode City Source | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle`, `#decode_city_history_message` | Wolo Code Input View exposes city-source controls above the city name for coarse geolocation on click, IP city, and previously used city history in a popup list. Geolocation clears the current city label, shows `Loading...`, and then fills the city from the reverse-geocoded locality. |
 | Address Display | `#address_text`, `showAddress`, `copyAddress()` | Generated or resolved address can be shown, closed, and copied. |
 | External Navigation | `External.php`, `external_proceed_external()`, `external_proceed_internal()` | External app/link flow can either continue outward or stay inside the web app. |
 | Redirect Handling | `Redirect.php`, `redirectCancel()` | Redirect flow has cancel/loading states. |
@@ -75,6 +76,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `More.svg` | Action Menu launcher. |
 | `Info.svg` | Info action. |
 | `Location.svg` | Current-location action. |
+| `Globe.svg` | IP-derived city source action. |
+| `Hamburger.svg` | Previous-city popup action. |
 | `Proceed.svg` | Submit/proceed action for map and decode inputs. |
 
 ## Implementation Notes

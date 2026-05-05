@@ -49,7 +49,7 @@ function locateExec(failure) {
 			document.getElementById('proceed_progress').style.transition = 'width' + ' ' + WATCH_LOCATION_MAX_TIMEOUT/1000 + 's' + ' ' + 'linear';
 			document.getElementById('proceed_progress').style.width = "100%";
 			
-			accuracy_indicator.classList.add('blinking');
+			addClassIfPresent(typeof accuracy_indicator == 'undefined' ? null : accuracy_indicator, 'blinking');
 			location_button.removeEventListener('mouseup', processPositionButtonUp);
 			location_button.removeEventListener('touchend', processPositionButtonTouchEnd);
 			location_button.addEventListener('mouseup', processPositionButtonUp);
@@ -210,10 +210,8 @@ function processPositionButtonDown() {
 
 function processPositionButtonUp() {
 	var press_duration = locating && (new Date).getTime() - location_button_begin_time;
-	if(press_duration > location_button_PRESS_THRESHOLD) {
-		location_icon_dot.classList.add('blinking');
-	}
-	else
+	var location_dot = typeof location_icon_dot == 'undefined' ? null : location_icon_dot;
+	if(!(press_duration > location_button_PRESS_THRESHOLD && addClassIfPresent(location_dot, 'blinking')))
 		locate_button_pressed = false;
 	disarmPositionButtonReleaseHandlers();
 }
@@ -262,11 +260,25 @@ function clearLocating(hideAccuracyContainer) {
 		document.getElementById('accuracy_container').classList.add('hide');
 	locating = false;
 	popLoader();
-	location_icon_dot.classList.remove('blinking');
-	accuracy_indicator.classList.remove('blinking');
+	removeClassIfPresent(typeof location_icon_dot == 'undefined' ? null : location_icon_dot, 'blinking');
+	removeClassIfPresent(typeof accuracy_indicator == 'undefined' ? null : accuracy_indicator, 'blinking');
 	hideNotication();
 	clearTimeout(watch_location_notice_timer);
 	disarmPositionButtonReleaseHandlers();
+}
+
+function addClassIfPresent(element, className) {
+	if(typeof element == 'undefined' || !element || !element.classList)
+		return false;
+	element.classList.add(className);
+	return true;
+}
+
+function removeClassIfPresent(element, className) {
+	if(typeof element == 'undefined' || !element || !element.classList)
+		return false;
+	element.classList.remove(className);
+	return true;
 }
 
 function watch_location_notice() {
@@ -281,7 +293,7 @@ function watch_location_notice() {
 }
 
 function getCityFromPositionViaGMap(position, callback_success, callback_failure) {
-	encode_session_id = Date.now;
+	encode_session_id = Date.now();
 	var session_id = encode_session_id;
 	getAddress( {'lat':position.coords.latitude, 'lng':position.coords.longitude}, session_id, function(address_components) {
 			var city_gp_id = getCityGpId(address_components);
@@ -292,6 +304,8 @@ function getCityFromPositionViaGMap(position, callback_success, callback_failure
 						callback_success(city);
 				}, callback_failure );
 			}
+			else if(typeof callback_failure == 'function')
+				callback_failure();
 	} );
 }
 

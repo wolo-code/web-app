@@ -42,6 +42,7 @@ function getCityBegin(cityCenter) {
 
 function encode_(city, position) {
 	code_city = city;
+	setDecodeCity(city, 'history', true);
 	const code = encode__(getCityBegin(city.center), position);
 	for(var i of code)
 		if(i < 0 || i > 1023) {
@@ -64,6 +65,7 @@ function setCodeWords(code, city, position) {
 
 function decode_(city, code) {
 	code_city = city;
+	setDecodeCity(city, selected_decode_city_source || 'history', true);
 	var data = [];
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);

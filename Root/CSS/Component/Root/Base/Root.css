@@ -15,6 +15,52 @@
 	text-align: left;	
 }
 
+#decode_city_context {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	gap: 5px;
+	justify-content: center;
+	min-height: 30px;
+}
+
+#decode_city_source_controls {
+	display: inline-flex;
+	gap: 3px;
+}
+
+.decode_city_source_button {
+	-webkit-tap-highlight-color: transparent;
+	align-items: center;
+	background: rgb(255 255 255 / 50%);
+	border: 1px solid rgb(105 183 207 / 35%);
+	border-radius: 50%;
+	color: #69B7CF;
+	cursor: pointer;
+	display: inline-flex;
+	height: 24px;
+	justify-content: center;
+	padding: 0;
+	width: 24px;
+}
+
+.decode_city_source_button svg {
+	display: block;
+	height: 16px;
+	opacity: .55;
+	width: 16px;
+}
+
+.decode_city_source_button.active svg {
+	opacity: 1;
+}
+
+.decode_city_source_button:disabled {
+	cursor: default;
+	opacity: .35;
+}
+
 #map_input_suggestion_result {
 	position: absolute;
 	top: 10px;

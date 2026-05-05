@@ -54,3 +54,6 @@ Commands:
 	
 For website portion - publish it first separately
 That build is included automatically on deploy
+
+Architecture:
+		docs/PROJECT_ARCHITECTURE.md

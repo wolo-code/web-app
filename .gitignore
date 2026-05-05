@@ -1,6 +1,8 @@
 **/Archive
 /Database/Backup
 **/Thumbs.db
+functions/
+
 .firebase/*.cache
 functions/node_modules
 functions/.runtimeconfig.json

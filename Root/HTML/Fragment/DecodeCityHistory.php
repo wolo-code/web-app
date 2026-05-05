@@ -6,9 +6,6 @@
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='decode_city_history_message_prompt' class='message_dialog_body'>
-		<p>
-			Please select a previous city:
-		</p>
 		<div id='decode_city_history_message_list' class='choose_city_message_list'></div>
 	</div>
 </div>

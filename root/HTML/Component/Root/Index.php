@@ -10,11 +10,11 @@
 	<div id='decode_input_container'>
 		<div id='decode_city_context'>
 			<div id='decode_city_source_controls'>
-				<button id='decode_city_geolocation' class='decode_city_source_button' type='button' aria-label='Use geolocation city'>
-					<span class='image'><?php includeSVG('', 'Location'); ?></span>
-				</button>
 				<button id='decode_city_ip' class='decode_city_source_button' type='button' aria-label='Use IP city'>
 					<span class='image'><?php includeSVG('', 'Globe'); ?></span>
+				</button>
+				<button id='decode_city_geolocation' class='decode_city_source_button' type='button' aria-label='Use geolocation city'>
+					<span class='image'><?php includeSVG('', 'Location'); ?></span>
 				</button>
 				<button id='decode_city_history_toggle' class='decode_city_source_button' type='button' aria-label='Choose previous city' aria-expanded='false'>
 					<span class='image'><?php includeSVG('', 'Hamburger'); ?></span>

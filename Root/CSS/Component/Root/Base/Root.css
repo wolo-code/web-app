@@ -53,9 +53,14 @@
 	width: 39px;
 }
 
-#decode_city_history_toggle svg path:not(:first-child) {
-	transform: scale(1.08);
-	transform-origin: center;
+#decode_city_ip svg {
+	height: 24px;
+	width: 24px;
+}
+
+#decode_city_history_toggle svg{
+	height: 34px;
+	width: 34px;
 }
 
 .decode_city_source_button.active svg {

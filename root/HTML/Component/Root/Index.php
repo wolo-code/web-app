@@ -17,7 +17,7 @@
 					<span class='image'><?php includeSVG('', 'Location'); ?></span>
 				</button>
 				<button id='decode_city_history_toggle' class='decode_city_source_button' type='button' aria-label='Choose previous city' aria-expanded='false'>
-					<span class='image'><?php includeSVG('', 'Hamburger'); ?></span>
+					<span class='image'><?php includeSVG('', 'List'); ?></span>
 				</button>
 			</div>
 			<div id='decode_input_city'>&nbsp;</div>

@@ -28,7 +28,7 @@
 
 #decode_city_source_controls {
 	display: inline-flex;
-	gap: 14px;
+	gap: 36px;
 }
 
 .decode_city_source_button {
@@ -43,6 +43,9 @@
 	height: 39px;
 	justify-content: center;
 	padding: 0;
+	transform: scale(1);
+	transform-origin: center;
+	transition: transform 180ms ease, opacity 160ms ease;
 	width: 39px;
 }
 
@@ -50,6 +53,7 @@
 	display: block;
 	height: 39px;
 	opacity: .55;
+	transition: opacity 160ms ease;
 	width: 39px;
 }
 
@@ -63,13 +67,21 @@
 	width: 34px;
 }
 
-.decode_city_source_button.active svg {
+.decode_city_source_button:hover:not(:disabled),
+.decode_city_source_button.active,
+.decode_city_source_button.activating {
+	transform: scale(1.1);
+}
+
+.decode_city_source_button.active svg,
+.decode_city_source_button.activating svg {
 	opacity: 1;
 }
 
 .decode_city_source_button:disabled {
 	cursor: default;
 	opacity: .35;
+	transform: scale(1);
 }
 
 #map_input_suggestion_result {

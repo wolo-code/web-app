@@ -310,31 +310,37 @@ function getCityFromPositionViaGMap(position, callback_success, callback_failure
 }
 
 function isBadGeoPosition(pos) {
-	if (!pos || !pos.coords) return true;
+	if(!pos || !pos.coords)
+		return true;
 
-	const c = pos.coords;
+	var c = pos.coords;
 
 	return (
-		!Number.isFinite(c.latitude) ||
-		!Number.isFinite(c.longitude) ||
+		!isFiniteGeoCoordinate(c.latitude) ||
+		!isFiniteGeoCoordinate(c.longitude) ||
 		(c.latitude === 0 && c.longitude === 0) ||
 		c.accuracy === 0
 	);
 }
 
+function isFiniteGeoCoordinate(value) {
+	return typeof value == 'number' && isFinite(value);
+}
+
 function getCoarseLocation(success, failure) {
-	if (!navigator.geolocation) return failure?.("unsupported");
-	if (navigator.userActivation && !navigator.userActivation.isActive) {
-		return failure?.({
+	if(!navigator.geolocation)
+		return failCoarseLocation(failure, "unsupported");
+	if(navigator.userActivation && !navigator.userActivation.isActive) {
+		return failCoarseLocation(failure, {
 			code: "USER_GESTURE_REQUIRED",
 			message: "Geolocation must be requested from a user gesture"
 		});
 	}
 
 	navigator.geolocation.getCurrentPosition(
-		(pos) => {
-			if (isBadGeoPosition(pos)) {
-				return failure?.({
+		function(pos) {
+			if(isBadGeoPosition(pos)) {
+				return failCoarseLocation(failure, {
 					code: "INVALID_POSITION",
 					message: "Browser returned 0,0 with zero accuracy"
 				});
@@ -349,4 +355,9 @@ function getCoarseLocation(success, failure) {
 			maximumAge: 0
 		}
 	);
+}
+
+function failCoarseLocation(failure, reason) {
+	if(typeof failure == 'function')
+		return failure(reason);
 }

@@ -2,6 +2,22 @@
 // var refCityCenter;
 // var geoFire;
 
+function isFirebaseAuthNetworkError(error) {
+	var message = '';
+	if(error) {
+		if(error.message)
+			message = error.message;
+		else if(typeof error == 'string')
+			message = error;
+	}
+	if(error && error.code == 'auth/network-request-failed')
+		return true;
+	return message.indexOf('Network Error') != -1
+		|| message.indexOf('network-request-failed') != -1
+		|| message.indexOf('Failed to fetch') != -1
+		|| message.indexOf('Load failed') != -1;
+}
+
 function isFirebaseIndexedDbClosingError(error) {
 	var message = '';
 	if(error) {

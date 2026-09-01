@@ -37,6 +37,11 @@ function initApp() {
 			recoverFirebaseIndexedDbConnection(error);
 			return;
 		}
+		if(isFirebaseAuthNetworkError(error)) {
+			document.getElementById('account_default_image').classList.add('inactive');
+			document.getElementById('account_default_image').classList.remove('hide');
+			return;
+		}
 		Sentry.captureException(error);
 	});
 }

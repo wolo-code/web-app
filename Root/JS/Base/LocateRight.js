@@ -1,5 +1,3 @@
-// var locateRight_callback;
-
 function showLocateRightMessage(hide_dnd) {
 	if(hide_dnd == true)
 		locate_right_message_dnd.classList.add('hide');
@@ -14,7 +12,10 @@ function hideLocateRightMessage() {
 
 function locateRight_grant() {
 	setLocationAccess(true);
-	initLocate(false, locateRight_callback);
+	if(typeof locateRight_callback === 'function')
+		initLocate(false, locateRight_callback);
+	else
+		initLocate(false, locateExec);
 	hideLocateRightMessage();
 	locateRight_DND_check();
 }

@@ -6,24 +6,24 @@
 // var watch_location_id;
 // var watch_location_notice_timer;
 // var pendingFocusPos;
-// var locateRight_callback;
-
 function initLocate(override_dnd, callback) {
 	if(!locationAccessInitCheck()) {
 		locateRight_callback = callback;
 		showLocateRightMessage(true);
 	}
-	else
+	else if(typeof callback === 'function') {
 		callback(function() {
 			if(!locationAccessCheck()) {
 				var hide_dnd = typeof override_dnd == 'undefined' || override_dnd || !locationAccessDNDstatus();
 				if(override_dnd || !locationAccessDNDcheck()) {
+					locateRight_callback = callback;
 					showLocateRightMessage(hide_dnd);
 				}
 				else
 					popLoader();
 			}
 		});
+	}
 }
 
 function locateExec(failure) {

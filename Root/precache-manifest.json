@@ -1,9 +1,12 @@
 {
   "version": "wolo-offline-v1",
-  "generatedAt": "2026-09-04T08:58:32.882Z",
+  "generatedAt": "2026-09-04T09:10:10.619Z",
   "assets": [
     "/",
+    "/.well-known/assetlinks.json",
+    "/404.html",
     "/apple-touch-icon.png",
+    "/console.html",
     "/console.js",
     "/favicon.ico",
     "/favicon.svg",
@@ -16,11 +19,14 @@
     "/launcher-icon-2x.png",
     "/launcher-icon-3x.png",
     "/launcher-icon-4x.png",
+    "/manifest-console.json",
     "/manifest.json",
     "/offline-data/WordList.json",
     "/precache-manifest.json",
-    "/root-deadbeef.min.js",
+    "/root-2547152673.min.js",
+    "/root-575108084.js",
     "/root.js",
+    "/social.png",
     "/sw.js"
   ]
 }

@@ -63,6 +63,9 @@ function initExceptionMessageControls() {
 
 function clearCacheAndReload() {
 	var reload = function() {
+		if (typeof sessionStorage != 'undefined') {
+			sessionStorage.wolo_sw_reloading = '1';
+		}
 		var url = new URL(window.location.href);
 		url.searchParams.set('_reload', String(Date.now()));
 		window.location.replace(url.toString());

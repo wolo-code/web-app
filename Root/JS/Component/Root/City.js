@@ -90,6 +90,7 @@ function setDecodeCity(city, source, save_history) {
 
 	selected_decode_city = city;
 	selected_decode_city_source = source;
+	rememberCity(city);
 
 	if(city.gp_id)
 		current_city_gp_id = city.gp_id;
@@ -386,17 +387,44 @@ function getCityFromCityGp_idThenDecode(city_gp_id, wcode) {
 
 // only detail, not center
 function getCityFromId(id, callback) {
+	function finish(city) {
+		if (city) {
+			rememberCity(city);
+			callback(city);
+			return;
+		}
+		if (isOfflineMode()) {
+			getCityFromCache(id, function(cached) {
+				if (cached) {
+					callback(cached);
+				} else {
+					showNotification('City not available offline. Open this city once while online.');
+				}
+			});
+			return;
+		}
+		showNotification("Error: City not found!");
+	}
+
+	if (isOfflineMode()) {
+		getCityFromCache(id, finish);
+		return;
+	}
+
 	var ref = database.ref('CityDetail'+'/'+id);
 	pushLoader();
 	ref.once('value').then(function(snapshot) {
 		popLoader();
 		var city = snapshot.val();
-		if(city) {
+		if (city) {
 			city.id = id;
-			callback(city);			
+			finish(city);
 		} else {
-			showNotification("Error: City not found!")
+			finish(null);
 		}
+	}).catch(function() {
+		popLoader();
+		getCityFromCache(id, finish);
 	});
 }
 
@@ -420,6 +448,28 @@ function getCityFromNameQuery(query_list, index, callback) {
 	}
 
 	var query = query_list[index];
+	if (isOfflineMode()) {
+		findCachedCitiesByNameId(query.name).then(function(matches) {
+			var filtered = matches.filter(function(city) {
+				return matchCityByGroup({ [city.id]: city }, query.group, query.name).length > 0;
+			});
+			if (filtered.length === 1) {
+				callback(filtered[0]);
+			} else if (filtered.length > 1) {
+				var list = {};
+				filtered.forEach(function(city) {
+					list[city.id] = city;
+				});
+				chooseCity(list, filtered.map(function(city) { return city.id; }), callback);
+			} else {
+				getCityFromNameQuery(query_list, index + 1, callback);
+			}
+		}).catch(function() {
+			getCityFromNameQuery(query_list, index + 1, callback);
+		});
+		return;
+	}
+
 	var ref = database.ref('CityDetail');
 	pushLoader();
 	ref.orderByChild('name_id').equalTo(query.name).once('value', function(snapshot) {
@@ -439,6 +489,9 @@ function getCityFromNameQuery(query_list, index, callback) {
 			else	
 				chooseCity(list, matchList, callback);
 		}
+	}).catch(function() {
+		popLoader();
+		getCityFromNameQuery(query_list, index + 1, callback);
 	});
 }
 
@@ -467,10 +520,42 @@ function getCityCenterFromId_session(city, session_id, callback) {
 }
 
 function getCityCenterFromId(city, callback) {
-	refCityCenter.child(city.id).once('value', function(snapshot) {
-		var location = snapshot.val().l;
-		city.center = { lat: location[0], lng: location[1] };
+	function finish(center) {
+		if (center) {
+			city.center = center;
+			rememberCity(city);
+			callback(city);
+			return;
+		}
+		if (isOfflineMode()) {
+			showNotification('City center not available offline for ' + (city.name || 'this city'));
+			callback(city);
+			return;
+		}
 		callback(city);
+	}
+
+	if (city.center && city.center.lat != null && city.center.lng != null) {
+		callback(city);
+		return;
+	}
+
+	if (isOfflineMode()) {
+		getCachedCityCenter(city.id).then(function(center) {
+			finish(center);
+		});
+		return;
+	}
+
+	refCityCenter.child(city.id).once('value', function(snapshot) {
+		var value = snapshot.val();
+		if (!value || !value.l) {
+			getCachedCityCenter(city.id).then(finish);
+			return;
+		}
+		finish({ lat: value.l[0], lng: value.l[1] });
+	}).catch(function() {
+		getCachedCityCenter(city.id).then(finish);
 	});
 }
 

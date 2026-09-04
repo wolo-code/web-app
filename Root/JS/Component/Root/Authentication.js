@@ -1,4 +1,8 @@
 function onLogin() {
+	if (typeof isOfflineMode === 'function' && isOfflineMode()) {
+		showNetworkRequiredMessage('Sign-in');
+		return;
+	}
 	hideAccountDialog();
 	showAuthenticationDialog();
 	ui.start('#firebaseui-auth', uiConfig);	

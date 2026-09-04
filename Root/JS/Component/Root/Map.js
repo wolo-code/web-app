@@ -153,6 +153,7 @@ function initMap() {
 		syncAppModeBackground();
 
 	postMap();
+	trackMapViewport();
 
 }
 

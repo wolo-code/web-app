@@ -235,6 +235,35 @@ body > #pac-input {
 	width: 350px;
 }
 
+.offline_status_banner {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 10000;
+	padding: 8px 12px;
+	background: #5c3b00;
+	color: #fff;
+	font-size: 13px;
+	text-align: center;
+}
+
+.offline_queue_badge {
+	position: fixed;
+	top: 12px;
+	right: 12px;
+	z-index: 10001;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 6px;
+	border-radius: 10px;
+	background: #c0392b;
+	color: #fff;
+	font-size: 12px;
+	line-height: 20px;
+	text-align: center;
+}
+
 .center {
 	margin-left: auto;
 	margin-right: auto;

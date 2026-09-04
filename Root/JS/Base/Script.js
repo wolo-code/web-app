@@ -48,6 +48,7 @@ function initExceptionMessageControls() {
 	var close = document.getElementById('exception_message_close');
 	var toggle = document.getElementById('exception_log_toggle');
 	var continueButton = document.getElementById('exception_message_continue');
+	var reloadButton = document.getElementById('exception_message_reload');
 
 	if(!message || !close || !toggle || !continueButton || message.dataset.controlsReady)
 		return;
@@ -55,7 +56,37 @@ function initExceptionMessageControls() {
 	close.addEventListener('click', hideExceptionMessage);
 	toggle.addEventListener('click', toggleExceptionLog);
 	continueButton.addEventListener('click', hideExceptionMessage);
+	if(reloadButton)
+		reloadButton.addEventListener('click', clearCacheAndReload);
 	message.dataset.controlsReady = 'true';
+}
+
+function clearCacheAndReload() {
+	var reload = function() {
+		var url = new URL(window.location.href);
+		url.searchParams.set('_reload', String(Date.now()));
+		window.location.replace(url.toString());
+	};
+
+	var tasks = [];
+
+	if(typeof caches != 'undefined' && caches.keys) {
+		tasks.push(caches.keys().then(function(keys) {
+			return Promise.all(keys.map(function(key) {
+				return caches.delete(key);
+			}));
+		}).catch(function() {}));
+	}
+
+	if(typeof navigator != 'undefined' && navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+		tasks.push(navigator.serviceWorker.getRegistrations().then(function(regs) {
+			return Promise.all(regs.map(function(reg) {
+				return reg.unregister();
+			}));
+		}).catch(function() {}));
+	}
+
+	Promise.all(tasks).catch(function() {}).then(reload);
 }
 
 function normalizeException(errorMsg, url, lineNumber, columnNumber, error) {

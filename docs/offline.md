@@ -41,7 +41,7 @@ The generator scans `public/index.html` for hashed bundles such as `root-<hash>.
 | City metadata | Firebase `/CityDetail/{id}` | IndexedDB snapshot after first successful fetch |
 | City center | Firebase `/CityCenter/{id}` | IndexedDB snapshot after first successful fetch |
 
-Cities are cached automatically when loaded (decode history, saved addresses, encode/decode flows). GeoFire periphery search and IP/geolocation city lookup still require network.
+Cities are cached automatically when loaded (locate/encode, decode, decode-city history, and saved addresses). Locate and `gp_id` lookup seed the same IndexedDB snapshots used for offline name decode. GeoFire periphery search and first-time IP/geolocation city lookup still require network.
 
 ### Map tiles
 

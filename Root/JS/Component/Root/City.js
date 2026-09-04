@@ -25,8 +25,11 @@ function initDecodeCityContext() {
 	decode_city_history = getDecodeCityHistory();
 	syncDecodeCityHistoryControl();
 
-	if(decode_city_history.length > 0)
+	if(decode_city_history.length > 0) {
 		setDecodeCity(decode_city_history[0], 'history', false);
+		if(typeof seedCitiesFromHistory === 'function')
+			seedCitiesFromHistory(decode_city_history);
+	}
 	else
 		setDecodeCityLabel('');
 
@@ -443,6 +446,9 @@ function getCityFromName(group, name, callback) {
 
 function getCityFromNameQuery(query_list, index, callback) {
 	if(index >= query_list.length) {
+		if (isOfflineMode()) {
+			showNotification('City not available offline. Open this city once while online.');
+		}
 		decode_continue();
 		return;
 	}
@@ -536,6 +542,7 @@ function getCityCenterFromId(city, callback) {
 	}
 
 	if (city.center && city.center.lat != null && city.center.lng != null) {
+		rememberCity(city);
 		callback(city);
 		return;
 	}
@@ -598,6 +605,43 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 			sessionForwarder(encode_session_id, callback, ar_param);
 	}
 
+	function finishSuccess(city) {
+		if (city && city.id)
+			rememberCity(city);
+		forwardCityCallback(callback_success, [city]);
+	}
+
+	function finishFailure() {
+		forwardCityCallback(callback_failure);
+	}
+
+	function fromCacheThen(fallback) {
+		if (typeof findCachedCityByGpId !== 'function') {
+			fallback();
+			return;
+		}
+		findCachedCityByGpId(city_gp_id).then(function(city) {
+			if (!city) {
+				fallback();
+				return;
+			}
+			getCachedCityCenter(city.id).then(function(center) {
+				if (center)
+					city.center = center;
+				finishSuccess(city);
+			}).catch(function() {
+				finishSuccess(city);
+			});
+		}).catch(function() {
+			fallback();
+		});
+	}
+
+	if (isOfflineMode()) {
+		fromCacheThen(finishFailure);
+		return;
+	}
+
 	var ref = database.ref('CityDetail');
 	pushLoader();
 	ref.orderByChild('gp_id').equalTo(city_gp_id).once('value', function(snapshot) {
@@ -605,12 +649,15 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 		if (snapshot.exists()) {
 			var city = Object.values(snapshot.val())[0];
 			city.id = Object.keys(snapshot.val())[0];
-			forwardCityCallback(callback_success, [city]);
+			finishSuccess(city);
 		}
 		else {
-			forwardCityCallback(callback_failure);
+			fromCacheThen(finishFailure);
 		}
-	});	
+	}).catch(function() {
+		popLoader();
+		fromCacheThen(finishFailure);
+	});
 }
 
 function noCity(position) {

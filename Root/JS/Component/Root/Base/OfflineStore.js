@@ -41,37 +41,45 @@ function openOfflineDb() {
 	return offlineDbPromise;
 }
 
-function withStore(storeName, mode, callback) {
+function withStore(storeName, mode, onStore) {
 	return openOfflineDb().then(function(db) {
 		return new Promise(function(resolve, reject) {
 			var tx = db.transaction(storeName, mode);
 			var store = tx.objectStore(storeName);
-			var result;
+			var value;
 			try {
-				result = callback(store);
+				value = onStore(store);
 			} catch (error) {
 				reject(error);
 				return;
 			}
 			tx.oncomplete = function() {
-				resolve(result);
+				resolve(value);
 			};
 			tx.onerror = function() {
 				reject(tx.error || new Error('IndexedDB transaction failed'));
+			};
+			tx.onabort = function() {
+				reject(tx.error || new Error('IndexedDB transaction aborted'));
 			};
 		});
 	});
 }
 
 function offlineStoreGet(storeName, key) {
-	return withStore(storeName, 'readonly', function(store) {
+	return openOfflineDb().then(function(db) {
 		return new Promise(function(resolve, reject) {
-			var request = store.get(key);
+			var tx = db.transaction(storeName, 'readonly');
+			var request = tx.objectStore(storeName).get(key);
+			var value;
 			request.onsuccess = function() {
-				resolve(request.result);
+				value = request.result;
 			};
-			request.onerror = function() {
-				reject(request.error);
+			tx.oncomplete = function() {
+				resolve(value);
+			};
+			tx.onerror = function() {
+				reject(tx.error || request.error || new Error('IndexedDB get failed'));
 			};
 		});
 	});
@@ -84,14 +92,19 @@ function offlineStorePut(storeName, key, value) {
 }
 
 function offlineStoreGetAll(storeName) {
-	return withStore(storeName, 'readonly', function(store) {
+	return openOfflineDb().then(function(db) {
 		return new Promise(function(resolve, reject) {
-			var request = store.getAll();
+			var tx = db.transaction(storeName, 'readonly');
+			var request = tx.objectStore(storeName).getAll();
+			var value = [];
 			request.onsuccess = function() {
-				resolve(request.result || []);
+				value = request.result || [];
 			};
-			request.onerror = function() {
-				reject(request.error);
+			tx.oncomplete = function() {
+				resolve(value);
+			};
+			tx.onerror = function() {
+				reject(tx.error || request.error || new Error('IndexedDB getAll failed'));
 			};
 		});
 	});
@@ -111,12 +124,46 @@ function getWordListSnapshot() {
 	return offlineStoreGet('wordList', 'current');
 }
 
+function plainCityCenter(center) {
+	if (!center) {
+		return null;
+	}
+	var lat = typeof center.lat === 'function' ? center.lat() : center.lat;
+	var lng = typeof center.lng === 'function' ? center.lng() : center.lng;
+	if (lat == null || lng == null || !isFinite(Number(lat)) || !isFinite(Number(lng))) {
+		return null;
+	}
+	return { lat: Number(lat), lng: Number(lng) };
+}
+
+function sanitizeCityDetail(city) {
+	if (!city) {
+		return null;
+	}
+	var payload = {
+		name: city.name || null,
+		name_id: city.name_id || null,
+		accent: city.accent || null,
+		country: city.country || null,
+		administrative_level_1: city.administrative_level_1 || null,
+		administrative_level_2: city.administrative_level_2 || null,
+		locality: city.locality || null,
+		gp_id: city.gp_id || null
+	};
+	if (city.name_id == null && city.name) {
+		payload.name_id = String(city.name).toLowerCase();
+	}
+	return payload;
+}
+
 function cacheCityDetail(id, city) {
 	if (!id || !city) {
 		return Promise.resolve();
 	}
-	var payload = Object.assign({}, city);
-	delete payload.id;
+	var payload = sanitizeCityDetail(city);
+	if (!payload) {
+		return Promise.resolve();
+	}
 	return offlineStorePut('cityDetail', id, payload);
 }
 
@@ -131,38 +178,64 @@ function getCachedCityDetail(id) {
 }
 
 function cacheCityCenter(id, center) {
-	if (!id || !center) {
+	var plain = plainCityCenter(center);
+	if (!id || !plain) {
 		return Promise.resolve();
 	}
-	return offlineStorePut('cityCenter', id, center);
+	return offlineStorePut('cityCenter', id, plain);
 }
 
 function getCachedCityCenter(id) {
 	return offlineStoreGet('cityCenter', id);
 }
 
-function findCachedCitiesByNameId(name_id) {
-	return withStore('cityDetail', 'readonly', function(store) {
+function scanCityDetail(matchFn) {
+	return openOfflineDb().then(function(db) {
 		return new Promise(function(resolve, reject) {
+			var tx = db.transaction('cityDetail', 'readonly');
+			var request = tx.objectStore('cityDetail').openCursor();
 			var matches = [];
-			var request = store.openCursor();
 			request.onsuccess = function(event) {
 				var cursor = event.target.result;
 				if (!cursor) {
-					resolve(matches);
 					return;
 				}
 				var city = cursor.value;
-				if (city && city.name_id === name_id) {
+				if (city && matchFn(city, cursor.key)) {
 					city.id = cursor.key;
 					matches.push(city);
 				}
 				cursor.continue();
 			};
-			request.onerror = function() {
-				reject(request.error);
+			tx.oncomplete = function() {
+				resolve(matches);
+			};
+			tx.onerror = function() {
+				reject(tx.error || request.error || new Error('IndexedDB city scan failed'));
 			};
 		});
+	});
+}
+
+function findCachedCitiesByNameId(name_id) {
+	if (name_id == null || name_id === '') {
+		return Promise.resolve([]);
+	}
+	var needle = String(name_id).toLowerCase();
+	return scanCityDetail(function(city) {
+		var candidate = city.name_id != null ? city.name_id : city.name;
+		return candidate != null && String(candidate).toLowerCase() === needle;
+	});
+}
+
+function findCachedCityByGpId(gp_id) {
+	if (!gp_id) {
+		return Promise.resolve(null);
+	}
+	return scanCityDetail(function(city) {
+		return city.gp_id === gp_id;
+	}).then(function(matches) {
+		return matches.length ? matches[0] : null;
 	});
 }
 
@@ -235,8 +308,9 @@ function mergeCityWithCenter(city, center) {
 	if (!city) {
 		return null;
 	}
-	if (center) {
-		city.center = center;
+	var plain = plainCityCenter(center);
+	if (plain) {
+		city.center = plain;
 	}
 	return city;
 }
@@ -259,10 +333,26 @@ function rememberCity(city) {
 	if (!city || !city.id) {
 		return Promise.resolve();
 	}
-	var center = city.center ? { lat: city.center.lat, lng: city.center.lng } : null;
+	var center = plainCityCenter(city.center);
+	if (center) {
+		city.center = center;
+	}
 	return cacheCityDetail(city.id, city).then(function() {
 		if (center) {
 			return cacheCityCenter(city.id, center);
 		}
+	}).catch(function() {
+		return null;
 	});
+}
+
+function seedCitiesFromHistory(history) {
+	if (!history || !history.length) {
+		return Promise.resolve();
+	}
+	return history.reduce(function(chain, city) {
+		return chain.then(function() {
+			return rememberCity(city);
+		});
+	}, Promise.resolve());
 }

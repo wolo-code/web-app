@@ -113,6 +113,15 @@ function setupControls() {
 	document.getElementById('external_close').addEventListener('click', external_close);
 	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
 	addLongpressListener(document.getElementById('qr_download'), downloadQR, onQRDialogSave);
+	var logo = document.getElementById('logo');
+	if(logo && typeof clearCacheAndReload == 'function') {
+		logo.setAttribute('title', 'Press and hold to clear cache and reload');
+		addLongpressListener(logo, function() {}, function(e) {
+			if(e && e.preventDefault)
+				e.preventDefault();
+			clearCacheAndReload();
+		});
+	}
 }
 
 function toggleActionMenu() {

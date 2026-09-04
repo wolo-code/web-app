@@ -52,7 +52,7 @@
 	?>
 	</div>
 </div>
-<div id='logo' tabindex='1'>
+<div id='logo' tabindex='1' title='Press and hold to clear cache and reload'>
 	<div id='logo_surface' class='blur_background'>
 		<a id=logo_wolo href='//wolo.codes'>
 			<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>

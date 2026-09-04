@@ -50,6 +50,7 @@ Hence, for local debugging go to: https://&lt;ip&gt;
 Build:
 Commands:
 	clean | publish prod
+	npm run generate:precache
 	firebase.cmd deploy --only hosting -P prod
 	
 For website portion - publish it first separately

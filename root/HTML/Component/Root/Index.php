@@ -100,6 +100,7 @@
 	</button>
 </div>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
+<div id='offline_queue_badge' class='offline_queue_badge hide' aria-live='polite'></div>
 <?php require '../../HTML/Fragment/Accuracy.php' ?>
 <div id='notification_bottom' class="notification_bar hide"></div>
 <div id='footer-content-container' class='center'>

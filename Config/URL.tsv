@@ -7,6 +7,8 @@ Path	Name	Extension
 	apple-touch-icon	png
 	social	png
 	manifest	json
+	offline-data/WordList	json
+	precache-manifest	json
 	root	
 	root	js
 	sw	js

@@ -60,17 +60,34 @@ function onAccountDialogSave() {
 
 function saveAddress(title, segment, address, callback) {
 	if(firebase.auth().currentUser) {
-		firebase.database().ref('/UserData/'+uid).push({
+		var payload = {
+			uid: uid,
 			city_id: getCodeCity().id,
 			code: getCodeWCode(),
 			title: title,
 			segment: segment,
-			address: address,
-			time: firebase.database.ServerValue.TIMESTAMP
-		}, function() {
+			address: address
+		};
+		if (isOfflineMode()) {
+			enqueueOfflineSave(payload).then(function() {
+				if(typeof callback != 'undefined')
+					callback();
+			});
+			return;
+		}
+		pushOfflineSave(payload).then(function() {
 			if(typeof callback != 'undefined')
 				callback();
 			showNotification('Address saved');
+		}).catch(function(error) {
+			if (shouldQueueOfflineSave(error)) {
+				enqueueOfflineSave(payload).then(function() {
+					if(typeof callback != 'undefined')
+						callback();
+				});
+				return;
+			}
+			showNotification('Could not save address');
 		});
 	}
 	else

@@ -1,0 +1,8 @@
+{
+  "name": "wolo-web-app",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/offline/*.test.js",
+    "generate:precache": "node scripts/generate-precache-manifest.js"
+  }
+}

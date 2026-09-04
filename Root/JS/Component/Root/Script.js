@@ -7,6 +7,7 @@ function initLoad () {
 		firebaseInit();
 		initApp();
 		dbInit();
+		initOfflineStatus();
 		syncLocate_engage = versionCheck();
 		if(!urlDecode()) {
 			//if(syncLocate_engage)

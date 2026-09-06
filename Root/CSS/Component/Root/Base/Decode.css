@@ -102,6 +102,7 @@
 }
 
 .decode #action_menu svg {
+	background-color: transparent;
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 
@@ -169,7 +170,7 @@ body:not(.decode) .view_toggle_icon_code,
 }
 
 #decode_map_view_button svg {
-	background-color: rgb(255 255 255 / 50%);
+	background-color: transparent;
 	border-radius: 25px;
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 	box-sizing: border-box;

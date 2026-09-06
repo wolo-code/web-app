@@ -6,7 +6,7 @@ var pendingExceptionLogs = [];
 function syncInitMap() {
 	try {
 		if (document.readyState !== 'loading' && typeof google === 'object' && typeof google.maps === 'object' && typeof google.maps.Map === 'function' && typeof initMap == 'function' && pendingInitMap) {
-			map = new google.maps.Map(document.getElementById('map'), {
+			var mapOptions = {
 				center: DEFAULT_LATLNG,
 				zoom: DEFAULT_INIT_ZOOM,
 				mapTypeControl: false,
@@ -14,7 +14,10 @@ function syncInitMap() {
 				streetViewControl: false,
 				zoomControl: false,
 				backgroundColor: 'none'
-			});
+			};
+			if(typeof getGoogleMapStyles == 'function')
+				mapOptions.styles = getGoogleMapStyles();
+			map = new google.maps.Map(document.getElementById('map'), mapOptions);
 			initMap();
 
 			initDecodeCityContext();

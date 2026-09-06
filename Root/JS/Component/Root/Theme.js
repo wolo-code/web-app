@@ -25,7 +25,7 @@ function isDarkThemeResolved() {
 }
 
 function updateThemeControls(theme, resolvedTheme) {
-	var options = document.querySelectorAll('#account_theme_selector .theme-option');
+	var options = document.querySelectorAll('.theme-selector .theme-option');
 	var i;
 
 	document.documentElement.setAttribute('data-theme-preference', theme);
@@ -71,7 +71,7 @@ function applyTheme(theme, animate, persist) {
 
 function initTheme() {
 	var saved = null;
-	var options = document.querySelectorAll('#account_theme_selector .theme-option');
+	var options = document.querySelectorAll('.theme-selector .theme-option');
 	var i;
 
 	try {

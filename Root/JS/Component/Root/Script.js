@@ -4,6 +4,7 @@ var actionMenuTimeoutDuration = 5000;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
+		initTheme();
 		firebaseInit();
 		initApp();
 		dbInit();

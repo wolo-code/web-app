@@ -1,0 +1,218 @@
+.account_dialog_theme {
+	margin-top: 12px;
+	text-align: left;
+}
+
+#account_theme_selector {
+	display: flex;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+#account_theme_selector .theme-option {
+	flex: 1 1 0;
+	min-width: 0;
+	appearance: none;
+	background: #f4f4f4;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	color: #777;
+	cursor: pointer;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
+	font-size: 0.9em;
+	padding: 8px 6px;
+	transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+#account_theme_selector .theme-option:hover,
+#account_theme_selector .theme-option:focus-visible {
+	background: #ebebeb;
+	border-color: #d0d0d0;
+	color: #555;
+	outline: none;
+}
+
+#account_theme_selector .theme-option-active {
+	background: #69B7CF;
+	border-color: #69B7CF;
+	color: #fff;
+}
+
+html.dark-mode {
+	--app-background-wcode: #1a1a2e;
+	--app-background-map: #0e3d4a;
+	--app-background-satellite: #1b2f62;
+}
+
+html.dark-mode,
+html.dark-mode body {
+	color: #d0d0d0;
+}
+
+html.dark-mode .blur_background {
+	background-color: #1a1a2e80;
+}
+
+html.dark-mode .plain_background,
+html.dark-mode #logo.plain_background #logo_surface {
+	background: rgba(26, 26, 46, 0.75);
+}
+
+html.dark-mode .notification_bar {
+	background-color: #222244;
+	border-color: #33335a;
+	color: #69b7cf;
+}
+
+html.dark-mode .suggestion_result > div {
+	background-color: #222244;
+	border-color: #33335a;
+	color: #69b7cf;
+}
+
+html.dark-mode .decode_city_source_button {
+	background: rgb(34 34 68 / 70%);
+	border-color: rgb(105 183 207 / 35%);
+}
+
+html.dark-mode #decode_button,
+html.dark-mode #pac-input {
+	background-color: #222244;
+	color: #d0d0d0;
+}
+
+html.dark-mode .decode #decode_input {
+	border-bottom-color: #555;
+	color: #d0d0d0;
+}
+
+html.dark-mode #action_menu svg,
+html.dark-mode #location_button svg,
+html.dark-mode #map_type_button svg {
+	background-color: rgb(34 34 68 / 70%);
+}
+
+html.dark-mode #account > span.image {
+	background: rgb(34 34 68 / 70%);
+}
+
+html.dark-mode .overlay {
+	background-color: rgba(10, 10, 20, 0.85);
+	color: #aaa;
+}
+
+html.dark-mode .message_dialog,
+html.dark-mode #account_dialog,
+html.dark-mode #authentication_header,
+html.dark-mode #info_message {
+	background-color: #222244;
+	border-color: #33335a;
+	color: #b8b8b8;
+}
+
+html.dark-mode .message_dialog_label,
+html.dark-mode .overlay h3,
+html.dark-mode .dialog-sub-label {
+	color: #888;
+}
+
+html.dark-mode .message_dialog_body {
+	color: #b8b8b8;
+}
+
+html.dark-mode .message_dialog_control button {
+	background: #2a2a4a;
+	border-color: #33335a;
+	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px -1px;
+}
+
+html.dark-mode #account_dialog_save button,
+html.dark-mode #account_dialog_logout button {
+	background: transparent;
+	box-shadow: none;
+}
+
+html.dark-mode #save_title_main,
+html.dark-mode #save_title_segment,
+html.dark-mode #save_address {
+	background-color: #222244;
+	border-color: #33335a;
+	color: #aaa;
+}
+
+html.dark-mode .hr-separator {
+	border-bottom-color: #33335a;
+}
+
+html.dark-mode #account_dialog_save_list > div.active {
+	background: #2a2a4a;
+	border-color: #69B7CF;
+	color: #69B7CF;
+}
+
+html.dark-mode .row-address {
+	color: #888;
+}
+
+html.dark-mode #account_dialog_save_list_end {
+	color: #555;
+}
+
+html.dark-mode #account_theme_selector .theme-option {
+	background: #2a2a4a;
+	border-color: #33335a;
+	color: #aaa;
+}
+
+html.dark-mode #account_theme_selector .theme-option:hover,
+html.dark-mode #account_theme_selector .theme-option:focus-visible {
+	background: #33335a;
+	border-color: #44446a;
+	color: #ddd;
+}
+
+html.dark-mode #account_theme_selector .theme-option-active {
+	background: #69B7CF;
+	border-color: #69B7CF;
+	color: #fff;
+}
+
+html.dark-mode #firebaseui-auth > div {
+	background: #222244;
+}
+
+html.dark-mode button {
+	background: #2a2a4a;
+	color: #d0d0d0;
+}
+
+html.dark-mode .exception_log {
+	background: #1a1a2e;
+	border-color: #33335a;
+	color: #aaa;
+}
+
+html.dark-mode .exception_log_toggle {
+	background: #2a2a4a;
+	border-color: #33335a;
+}
+
+html.dark-mode #wcode_format > span {
+	background: #2a2a4a;
+}
+
+html.dark-mode .link-gray {
+	color: #666 !important;
+}
+
+html.dark-mode .link-gray:hover {
+	color: #69b7cf !important;
+}
+
+html.dark-mode,
+html.dark-mode body,
+html.dark-mode .message_dialog,
+html.dark-mode #account_dialog,
+html.dark-mode #info_message {
+	transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}

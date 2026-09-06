@@ -8,6 +8,29 @@
 	<meta name='author' content="<?php echo $config['author'] ?>" >
 	<meta name='viewport' content="width=device-width, initial-scale=1.0, viewport-fit=cover" >
 	<meta id='app_theme_color' name='theme-color' content='#efefef' >
+	<script>
+	(function() {
+		var theme;
+		try {
+			theme = localStorage.getItem('cutie-dark-mode');
+		}
+		catch(e) {}
+		if(!theme)
+			theme = 'system';
+		if(theme === 'true')
+			theme = 'dark';
+		else if(theme === 'false')
+			theme = 'light';
+		if(theme !== 'light' && theme !== 'dark' && theme !== 'system')
+			theme = 'system';
+		var dark = theme === 'dark' || (theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		if(dark)
+			document.documentElement.classList.add('dark-mode');
+		document.documentElement.setAttribute('data-theme-preference', theme);
+		document.documentElement.setAttribute('data-theme-resolved', dark ? 'dark' : 'light');
+		document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+	})();
+	</script>
 	<meta name='mobile-web-app-capable' content='yes' >
 	<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' >
 	<?php require '../HTML/Fragment/OG_Meta.php' ?>

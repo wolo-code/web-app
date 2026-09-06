@@ -8,7 +8,13 @@ var APP_MODE_BACKGROUND = {
 	map: '#60d0e5',
 	satellite: '#1b2f62'
 };
+var APP_MODE_BACKGROUND_DARK = {
+	wcode: '#1a1a2e',
+	map: '#0e3d4a',
+	satellite: '#1b2f62'
+};
 var APP_MODE_BACKGROUND_DEFAULT = '#efefef';
+var APP_MODE_BACKGROUND_DARK_DEFAULT = '#1a1a2e';
 
 // const INCORRECT_WCODE;
 // const MESSAGE_LOADING;
@@ -24,9 +30,11 @@ function getAppMode() {
 }
 
 function getAppModeBackground(mode) {
-	if(typeof APP_MODE_BACKGROUND != 'object' || !APP_MODE_BACKGROUND || !APP_MODE_BACKGROUND[mode])
-		return APP_MODE_BACKGROUND_DEFAULT || '#efefef';
-	return APP_MODE_BACKGROUND[mode];
+	var backgrounds = document.documentElement.classList.contains('dark-mode') ? APP_MODE_BACKGROUND_DARK : APP_MODE_BACKGROUND;
+	var fallback = document.documentElement.classList.contains('dark-mode') ? APP_MODE_BACKGROUND_DARK_DEFAULT : APP_MODE_BACKGROUND_DEFAULT;
+	if(typeof backgrounds != 'object' || !backgrounds || !backgrounds[mode])
+		return fallback || '#efefef';
+	return backgrounds[mode];
 }
 
 function syncAppModeBackground() {

@@ -3,39 +3,55 @@
 	text-align: left;
 }
 
-#account_theme_selector {
+.theme-selector {
 	display: flex;
 	gap: 6px;
 	margin-top: 6px;
 }
 
-#account_theme_selector .theme-option {
+.theme-selector .theme-option {
 	flex: 1 1 0;
 	min-width: 0;
 	appearance: none;
+	align-items: center;
 	background: #f4f4f4;
 	border: 1px solid #e0e0e0;
 	border-radius: 6px;
 	color: #777;
 	cursor: pointer;
+	display: flex;
+	flex-direction: column;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 	font-size: 0.9em;
+	gap: 4px;
+	justify-content: center;
 	padding: 8px 6px;
 	transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
-#account_theme_selector .theme-option:hover,
-#account_theme_selector .theme-option:focus-visible {
+.theme-selector .theme-option:hover,
+.theme-selector .theme-option:focus-visible {
 	background: #ebebeb;
 	border-color: #d0d0d0;
 	color: #555;
 	outline: none;
 }
 
-#account_theme_selector .theme-option-active {
+.theme-selector .theme-option-active {
 	background: #69B7CF;
 	border-color: #69B7CF;
 	color: #fff;
+}
+
+.theme-option-icon,
+.theme-option-icon svg {
+	display: block;
+	height: 18px;
+	width: 18px;
+}
+
+.theme-option-icon path {
+	fill: currentColor;
 }
 
 html.dark-mode {
@@ -90,6 +106,11 @@ html.dark-mode #action_menu svg,
 html.dark-mode #location_button svg,
 html.dark-mode #map_type_button svg {
 	background-color: rgb(34 34 68 / 70%);
+}
+
+html.dark-mode .decode #action_menu svg,
+html.dark-mode .decode #decode_map_view_button svg {
+	background-color: transparent;
 }
 
 html.dark-mode #account > span.image {
@@ -158,20 +179,20 @@ html.dark-mode #account_dialog_save_list_end {
 	color: #555;
 }
 
-html.dark-mode #account_theme_selector .theme-option {
+html.dark-mode .theme-selector .theme-option {
 	background: #2a2a4a;
 	border-color: #33335a;
 	color: #aaa;
 }
 
-html.dark-mode #account_theme_selector .theme-option:hover,
-html.dark-mode #account_theme_selector .theme-option:focus-visible {
+html.dark-mode .theme-selector .theme-option:hover,
+html.dark-mode .theme-selector .theme-option:focus-visible {
 	background: #33335a;
 	border-color: #44446a;
 	color: #ddd;
 }
 
-html.dark-mode #account_theme_selector .theme-option-active {
+html.dark-mode .theme-selector .theme-option-active {
 	background: #69B7CF;
 	border-color: #69B7CF;
 	color: #fff;

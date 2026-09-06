@@ -13,14 +13,7 @@
 					<div id='account_dialog_email'></div>
 				</div>
 				<div id='account_dialog_theme' class='account_dialog_theme'>
-					<h3 class='dialog-sub-label'>
-						Appearance
-					</h3>
-					<div id='account_theme_selector' role='radiogroup' aria-label='Theme'>
-						<button type='button' class='theme-option' data-theme='system' role='radio' aria-checked='false'>System</button>
-						<button type='button' class='theme-option' data-theme='light' role='radio' aria-checked='false'>Light</button>
-						<button type='button' class='theme-option' data-theme='dark' role='radio' aria-checked='false'>Dark</button>
-					</div>
+					<?php require __DIR__ . '/Theme_selector.php'; ?>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_logout' class='message_dialog_control'>

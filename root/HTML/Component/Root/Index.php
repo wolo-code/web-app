@@ -14,7 +14,7 @@
 					<span class='image'><?php includeSVG('', 'Globe'); ?></span>
 				</button>
 				<button id='decode_city_geolocation' class='decode_city_source_button' type='button' aria-label='Use geolocation city'>
-					<span class='image'><?php includeSVG('', 'Location'); ?></span>
+					<span class='image'><?php includeSVG('', 'Location-source'); ?></span>
 				</button>
 				<button id='decode_city_history_toggle' class='decode_city_source_button' type='button' aria-label='Choose previous city' aria-expanded='false'>
 					<span class='image'><?php includeSVG('', 'List'); ?></span>

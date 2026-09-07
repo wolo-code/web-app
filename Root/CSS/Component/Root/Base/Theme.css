@@ -91,6 +91,11 @@ html.dark-mode .decode_city_source_button {
 	border-color: rgb(105 183 207 / 35%);
 }
 
+html.dark-mode #decode_city_ip,
+html.dark-mode #decode_city_geolocation {
+	border-color: transparent;
+}
+
 html.dark-mode #decode_button,
 html.dark-mode #pac-input {
 	background-color: #222244;

@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-var CACHE_VERSION = 'wolo-offline-v1';
+var CACHE_VERSION = 'wolo-offline-v2';
 var STATIC_CACHE = CACHE_VERSION + ':static';
 var SHELL_CACHE = CACHE_VERSION + ':shell';
 var TILE_CACHE = CACHE_VERSION + ':tiles';
@@ -96,7 +96,7 @@ self.addEventListener('fetch', function(event) {
 	}
 
 	if (url.origin === self.location.origin) {
-		event.respondWith(cacheFirstStatic(request));
+		event.respondWith(networkFirstStatic(request));
 		return;
 	}
 });
@@ -196,20 +196,17 @@ function tryShellPaths(cache, index) {
 	});
 }
 
-function cacheFirstStatic(request) {
-	return caches.match(request).then(function(cached) {
-		if (cached) {
-			return cached;
+function networkFirstStatic(request) {
+	return fetch(request).then(function(response) {
+		if (response && response.ok) {
+			var copy = response.clone();
+			caches.open(STATIC_CACHE).then(function(cache) {
+				cache.put(request, copy);
+			});
 		}
-		return fetch(request).then(function(response) {
-			if (response && response.ok) {
-				var copy = response.clone();
-				caches.open(STATIC_CACHE).then(function(cache) {
-					cache.put(request, copy);
-				});
-			}
-			return response;
-		});
+		return response;
+	}).catch(function() {
+		return caches.match(request);
 	});
 }
 

@@ -110,6 +110,12 @@
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 
+.decode #map gmp-internal-camera-control > button,
+.decode #map gmp-internal-camera-control menu li button {
+	background-color: transparent !important;
+	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px !important;
+}
+
 .decode #logo_surface {
 	border-radius: 6px;
 }

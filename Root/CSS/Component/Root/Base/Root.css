@@ -245,3 +245,14 @@
 	padding: 8px;
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 }
+
+/* Google Maps camera control — match lower chrome pill buttons */
+#map gmp-internal-camera-control > button,
+#map gmp-internal-camera-control menu li button {
+	background-color: rgb(255 255 255 / 50%) !important;
+	background-image: none !important;
+	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px !important;
+	border-radius: 25px !important;
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+}

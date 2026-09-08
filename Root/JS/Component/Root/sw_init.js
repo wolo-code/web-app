@@ -8,6 +8,9 @@ if ('serviceWorker' in navigator) {
 				}
 			}
 
+			if (!registration) {
+				return;
+			}
 			promptWaiting(registration.waiting);
 			registration.addEventListener('updatefound', function() {
 				var installing = registration.installing;

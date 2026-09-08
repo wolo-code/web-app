@@ -18,10 +18,10 @@ flowchart TD
 
 ### Service worker (`Root/sw.js`)
 
-- Versioned caches (`wolo-offline-v1:*`).
+- Versioned caches (`wolo-offline-v2:*`).
 - Install step loads `Root/precache-manifest.json` and precaches the listed assets.
 - Navigation requests: network-first with cached shell fallback (`/` or `/index.html`).
-- Same-origin static assets: cache-first.
+- Same-origin static assets: network-first with cache fallback, so online refreshes pick up CSS/JS/SVG changes instead of serving a stale cache-first copy.
 - Google Maps tile hosts: cache-first with background refresh and a 500-entry cap.
 - Firebase/auth/API calls: network-only (except queued offline saves handled in app code).
 

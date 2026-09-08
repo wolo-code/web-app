@@ -86,14 +86,16 @@ html.dark-mode .suggestion_result > div {
 	color: #69b7cf;
 }
 
-html.dark-mode .decode_city_source_button {
+html.dark-mode body .decode_city_source_button {
 	background: rgb(34 34 68 / 70%);
-	border-color: rgb(105 183 207 / 35%);
+	color: #9a9a9a;
 }
 
-html.dark-mode #decode_city_ip,
-html.dark-mode #decode_city_geolocation {
-	border-color: transparent;
+html.dark-mode body .decode_city_source_button.active,
+html.dark-mode body .decode_city_source_button.activating,
+html.dark-mode body .decode_city_source_button.active svg,
+html.dark-mode body .decode_city_source_button.activating svg {
+	color: #69B7CF;
 }
 
 html.dark-mode #decode_button,
@@ -109,7 +111,8 @@ html.dark-mode .decode #decode_input {
 
 html.dark-mode #action_menu svg,
 html.dark-mode #location_button svg,
-html.dark-mode #map_type_button svg {
+html.dark-mode #map_type_button svg,
+html.dark-mode #decode_map_view_button svg {
 	background-color: rgb(34 34 68 / 70%);
 }
 
@@ -126,6 +129,7 @@ html.dark-mode .decode #action_menu svg,
 html.dark-mode .decode #decode_map_view_button svg {
 	background-color: transparent;
 }
+
 
 html.dark-mode #account > span.image {
 	background: rgb(34 34 68 / 70%);

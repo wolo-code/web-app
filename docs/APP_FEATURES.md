@@ -6,7 +6,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
-| Service worker shell | `Root/sw.js`, `Root/precache-manifest.json`, `sw_init.js` | Precaches baked assets, serves app shell offline, caches Google Maps tiles for recently viewed areas. |
+| Service worker shell | `Root/sw.js`, `Root/precache-manifest.json`, `sw_init.js` | Precaches baked assets, serves the app shell offline, and caches Google Maps tiles for recently viewed areas. Same-origin CSS/JS/SVG use network-first with cache fallback so a normal refresh does not keep a stale hard-refresh bypass. |
 | Offline word/city data | `OfflineStore.js`, `Database.js`, `City.js`, `/offline-data/WordList.json` | Word list and previously loaded cities are snapshotted in IndexedDB for encode/decode without Firebase. |
 | Offline save queue | `OfflineQueue.js`, `Account.js`, `#offline_queue_badge` | Address saves queue when offline or on network failure and flush after reconnect. |
 | Offline UX | `OfflineStatus.js`, `#offline_status_banner` | Banner and toasts explain when sign-in, geocoding, or uncached city lookup needs network. See `docs/offline.md`. |
@@ -15,7 +15,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
-| Decode View | `body.decode`, `#decode_interface_overlay`, `#decode_input` | Plain Wolo Code entry state. Users can type or paste a Wolo Code before switching into the map flow. |
+| Decode View | `body.decode`, `#decode_interface_overlay`, `#decode_input` | Plain Wolo Code entry state. Users can type or paste a Wolo Code before switching into the map flow. In dark mode, the bottom-left Action Menu, center Locate Button, and right Terrain Map View Button share the same circular disc. |
 | Map View | `body.map`, `#map`, `#pac-input` | Interactive Google Maps state for search, location selection, encoding, and viewing decoded places. |
 | Satellite View | `body.satellite`, Google Maps `SATELLITE` map type | Visual variant of Map View. |
 | Action Menu | `#action_menu`, `toggleActionMenu()` | Bottom-left expandable control for secondary actions. |
@@ -39,7 +39,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- | --- |
 | Search Place Input | `#pac-input`, Google Places-style controls | Search input is shown in Map View. |
 | Current Location | `#location_button`, locate permission dialog | Location control can request permission, locate the user, and optionally remember "do not ask again". |
-| Decode City Source | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle`, `#decode_city_history_message` | Wolo Code Input View exposes more widely spaced city-source controls above the city name for coarse geolocation on click, IP city, and previously used city history in a popup list. Hovered, active, or opening controls grow the full circular button with a smooth animation, then shrink when the state changes. Geolocation clears the current city label, shows `loading...`, and then fills the city from the reverse-geocoded locality; unsupported, invalid, or non-gesture geolocation attempts return through the normal city lookup failure path. |
+| Decode City Source | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle`, `#decode_city_history_message` | Wolo Code Input View exposes more widely spaced city-source controls above the city name for coarse geolocation on click, IP city, and previously used city history in a popup list. The IP globe sits padded inside the 39px circular control. All three source controls share the same 1px `currentColor` outer ring. The selected source paints those icons with the primary accent, while inactive sources stay muted. Hovered, active, or opening controls grow the full circular button with a smooth animation, then shrink when the state changes. Geolocation clears the current city label, shows `loading...`, and then fills the city from the reverse-geocoded locality; unsupported, invalid, or non-gesture geolocation attempts return through the normal city lookup failure path. |
 | Address Display | `#address_text`, `showAddress`, `copyAddress()` | Generated or resolved address can be shown, closed, and copied. |
 | External Navigation | `External.php`, `external_proceed_external()`, `external_proceed_internal()` | External app/link flow can either continue outward or stay inside the web app. |
 | Redirect Handling | `Redirect.php`, `redirectCancel()` | Redirect flow has cancel/loading states. |
@@ -84,8 +84,9 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `Wolo-code.svg` | Plain Wolo Code input action icon. |
 | `More.svg` | Action Menu launcher. |
 | `Info.svg` | Info action. |
-| `Location.svg` | Current-location action. |
-| `Globe.svg` | IP-derived city source action. |
+| `Location.svg` | Current-location action on the map. |
+| `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
+| `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |
 | `Hamburger.svg` | Previous-city popup action. |
 | `Proceed.svg` | Submit/proceed action for map and decode inputs. |
 

@@ -35,10 +35,10 @@
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
 	background: rgb(255 255 255 / 50%);
-	border: 1px solid rgb(105 183 207 / 35%);
+	border: 1px solid currentColor;
 	border-radius: 50%;
 	box-sizing: border-box;
-	color: #69B7CF;
+	color: #7f7f7f;
 	cursor: pointer;
 	display: inline-flex;
 	height: 39px;
@@ -46,7 +46,7 @@
 	padding: 0;
 	transform: scale(1);
 	transform-origin: center;
-	transition: transform 180ms ease, opacity 160ms ease;
+	transition: color 160ms ease, transform 180ms ease, opacity 160ms ease;
 	width: 39px;
 }
 
@@ -58,9 +58,9 @@
 	width: 39px;
 }
 
-#decode_city_ip,
-#decode_city_geolocation {
-	border-color: transparent;
+#decode_city_ip svg {
+	height: 24px;
+	width: 24px;
 }
 
 #decode_city_history_toggle svg{
@@ -72,6 +72,13 @@
 .decode_city_source_button.active,
 .decode_city_source_button.activating {
 	transform: scale(1.1);
+}
+
+html body .decode_city_source_button.active,
+html body .decode_city_source_button.activating,
+html body .decode_city_source_button.active svg,
+html body .decode_city_source_button.activating svg {
+	color: #69B7CF;
 }
 
 .decode_city_source_button.active svg,

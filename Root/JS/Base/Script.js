@@ -3,6 +3,12 @@ var clickHandler;
 var map;
 var pendingExceptionLogs = [];
 
+function getGooglePlacesLibrary() {
+	if(typeof google == 'object' && google.maps && google.maps.places)
+		return google.maps.places;
+	return null;
+}
+
 function syncInitMap() {
 	try {
 		if (document.readyState !== 'loading' && typeof google === 'object' && typeof google.maps === 'object' && typeof google.maps.Map === 'function' && typeof initMap == 'function' && pendingInitMap) {

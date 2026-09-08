@@ -6,6 +6,10 @@ Sentry.init({
 		'Failed to fetch',
 		'Load failed',
 		'auth/network-request-failed',
+		'Unexpected token \'<\'',
+		'Unexpected token <',
+		'Unexpected token =',
+		/Unexpected token ['<]/,
 		/this\.i\.at is not a function/,
 		/t\.entries\.at is not a function/
 	],

@@ -1,6 +1,7 @@
 var ClickEventHandler = function(map) {
+	var placesLib = typeof getGooglePlacesLibrary == 'function' ? getGooglePlacesLibrary() : null;
 	this.map = map;
-	this.placesService = new google.maps.places.PlacesService(map);
+	this.placesService = (placesLib && placesLib.PlacesService) ? new placesLib.PlacesService(map) : null;
 	this.map.addListener('click', this.handleClick.bind(this));
 };
 
@@ -19,6 +20,9 @@ ClickEventHandler.prototype.handleClick = function(event) {
 
 ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 	var me = this;
+	if(!this.placesService) {
+		return;
+	}
 	this.placesService.getDetails({placeId: placeId}, function(place, status) {
 		if (status === 'OK') {
 			poiPlace = place;

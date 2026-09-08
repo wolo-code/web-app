@@ -35,7 +35,7 @@
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
 	background: rgb(255 255 255 / 50%);
-	border: 1px solid currentColor;
+	border: none;
 	border-radius: 50%;
 	box-sizing: border-box;
 	color: #7f7f7f;

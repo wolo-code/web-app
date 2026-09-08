@@ -143,6 +143,26 @@ html.dark-mode #map gmp-internal-camera-control button img {
 	filter: brightness(0) saturate(100%) invert(72%) sepia(18%) saturate(749%) hue-rotate(152deg) brightness(93%) contrast(87%);
 }
 
+html.dark-mode .gm-style .gm-style-iw-c {
+	background-color: #222244;
+	color: #eee;
+}
+
+html.dark-mode .gm-style .gm-style-iw-tc::after,
+html.dark-mode .gm-style .gm-style-iw-t::after {
+	background: #222244;
+}
+
+html.dark-mode #infowindow_code,
+html.dark-mode #infowindow_code .infowindow_code,
+html.dark-mode #infowindow_code_right_code {
+	color: #f2f2f2;
+}
+
+html.dark-mode #infowindow_code .slash {
+	color: #8a8aaa;
+}
+
 html.dark-mode #account > span.image {
 	background: rgb(34 34 68 / 70%);
 }

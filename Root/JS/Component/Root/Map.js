@@ -104,6 +104,7 @@ function initMap() {
 	input.addEventListener("change", function() {
 		if(input.value == '')
 			document.getElementById('search_icon').classList.remove('hide');
+		syncProceedButtons();
 	});
 	
 	var markers = [];
@@ -185,9 +186,12 @@ function initMap() {
 	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
 
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
+	document.getElementById('pac-input').addEventListener('input', syncProceedButtons);
 	document.getElementById('pac-input').addEventListener('keyup', enterHandler);
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
+	document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
 	document.getElementById('decode_input').addEventListener('keyup', enterHandler);
+	syncProceedButtons();
 	
 	clickHandler = new ClickEventHandler(map);
 

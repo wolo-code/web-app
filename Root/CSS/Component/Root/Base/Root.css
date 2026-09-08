@@ -111,7 +111,7 @@ html body .decode_city_source_button.activating svg {
 	top: 36px;
 	height: 26px;
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
-	color: #69B7CF;
+	color: #7f7f7f;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
 	background-color: rgb(255, 255, 255);
@@ -120,6 +120,20 @@ html body .decode_city_source_button.activating svg {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 	background-color: #ffffff22;
+	transition: color 160ms ease;
+}
+
+#decode_button .proceed_button_shape {
+	opacity: .55;
+	transition: opacity 160ms ease;
+}
+
+#decode_button.active {
+	color: #69B7CF;
+}
+
+#decode_button.active .proceed_button_shape {
+	opacity: 1;
 }
 
 #action_menu {
@@ -262,4 +276,8 @@ html body .decode_city_source_button.activating svg {
 	border-radius: 25px !important;
 	-webkit-backdrop-filter: blur(4px);
 	backdrop-filter: blur(4px);
+}
+
+#map gmp-internal-camera-control button img {
+	filter: brightness(0) saturate(100%) invert(72%) sepia(18%) saturate(749%) hue-rotate(152deg) brightness(93%) contrast(87%);
 }

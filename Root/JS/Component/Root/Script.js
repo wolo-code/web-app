@@ -109,6 +109,7 @@ function setupControls() {
 	document.getElementById('qr_print').addEventListener('click', printQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
+	syncProceedButtons();
 	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
 	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
 	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
@@ -186,6 +187,7 @@ function resizeInput() {
 	this.style.width = shadow.offsetWidth+'px';
 	this.style.height = '26px';
 	this.style.height = Math.min(this.scrollHeight - 16, 112)+'px';
+	syncProceedButtons();
 }
 
 function showAndCopy(message) {

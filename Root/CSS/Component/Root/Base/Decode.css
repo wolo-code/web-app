@@ -78,7 +78,7 @@
 	z-index: 1;
 	display: inline-block;
 	height: 26px;
-	color: #69B7CF;
+	color: #7f7f7f;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
 	border: none;
@@ -87,6 +87,20 @@
 	padding: 25px;
 	margin-left: -18px;
 	vertical-align: bottom;
+	transition: color 160ms ease;
+}
+
+#decode_input_button .proceed_button_shape {
+	opacity: .55;
+	transition: opacity 160ms ease;
+}
+
+#decode_input_button.active {
+	color: #69B7CF;
+}
+
+#decode_input_button.active .proceed_button_shape {
+	opacity: 1;
 }
 
 #decode_input_button > svg {

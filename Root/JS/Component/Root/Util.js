@@ -67,3 +67,19 @@ function enterHandler(event) {
 		document.getElementById(event.target.getAttribute('data-handler')).click();
 	}
 }
+
+function hasProceedInput(value) {
+	return value.replace(/(\\|\/)/gm, '').trim().length > 0;
+}
+
+function syncProceedButtons() {
+	var pacInput = document.getElementById('pac-input');
+	var decodeInput = document.getElementById('decode_input');
+	var decodeButton = document.getElementById('decode_button');
+	var decodeInputButton = document.getElementById('decode_input_button');
+
+	if(decodeButton && pacInput)
+		decodeButton.classList.toggle('active', hasProceedInput(pacInput.value));
+	if(decodeInputButton && decodeInput)
+		decodeInputButton.classList.toggle('active', hasProceedInput(decodeInput.value));
+}

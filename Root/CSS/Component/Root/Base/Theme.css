@@ -98,10 +98,23 @@ html.dark-mode body .decode_city_source_button.activating svg {
 	color: #69B7CF;
 }
 
-html.dark-mode #decode_button,
 html.dark-mode #pac-input {
 	background-color: #222244;
 	color: #d0d0d0;
+}
+
+html.dark-mode #decode_button {
+	background-color: #222244;
+	color: #9a9a9a;
+}
+
+html.dark-mode #decode_button.active,
+html.dark-mode #decode_input_button.active {
+	color: #69B7CF;
+}
+
+html.dark-mode #decode_input_button {
+	color: #9a9a9a;
 }
 
 html.dark-mode .decode #decode_input {
@@ -116,13 +129,18 @@ html.dark-mode #decode_map_view_button svg {
 	background-color: rgb(34 34 68 / 70%);
 }
 
+html.dark-mode .decode #logo_surface,
+html.dark-mode .decode #logo.plain_background #logo_surface {
+	background-color: rgb(34 34 68 / 70%);
+}
+
 html.dark-mode #map gmp-internal-camera-control > button,
 html.dark-mode #map gmp-internal-camera-control menu li button {
 	background-color: rgb(34 34 68 / 70%) !important;
 }
 
 html.dark-mode #map gmp-internal-camera-control button img {
-	filter: brightness(2.2);
+	filter: brightness(0) saturate(100%) invert(72%) sepia(18%) saturate(749%) hue-rotate(152deg) brightness(93%) contrast(87%);
 }
 
 html.dark-mode #account > span.image {

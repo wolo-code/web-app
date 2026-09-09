@@ -1,5 +1,6 @@
 <div id='wait_loader'></div>
 <div id='map'></div>
+<div id='osm_attribution' class='hide blur_background'>Map data &copy; <a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> contributors</div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
 <span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
 <input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' >
@@ -23,7 +24,7 @@
 			<div id='decode_input_city'>&nbsp;</div>
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
-		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>
+		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code or DIGIPIN /" autocomplete='off'></textarea>
 		<div id='decode_input_button' class='control' tabindex='4'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 		</div>
@@ -75,6 +76,7 @@
 	<span class='image map_type_icon'>
 		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
 		<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
+		<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
 	</span>
 </div>
 <div id='action_menu' class='control' tabindex='7'>
@@ -92,6 +94,7 @@
 			<span class='image map_type_icon'>
 				<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
 				<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
+				<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
 			</span>
 		</button>
 	</div>

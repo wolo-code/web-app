@@ -90,6 +90,14 @@ function copyWcodeJumpLink() {
 	hideCopyCodeMessage();
 }
 
+function copyDigipin() {
+	if(!code_digipin) {
+		return;
+	}
+	showAndCopy(code_digipin);
+	showNotification(DIGIPIN_COPIED_MESSAGE);
+}
+
 function shareWCodeLink() {
 	if(share_jumto_map.checked)
 		copyWcodeJumpLink();

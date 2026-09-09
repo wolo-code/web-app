@@ -156,8 +156,9 @@
 	position: absolute;
 }
 
-body:not(.satellite) .map_type_icon_terrain,
-.satellite .map_type_icon_satellite,
+body.map .map_type_icon_terrain,
+body.satellite .map_type_icon_satellite,
+body.osm .map_type_icon_osm,
 body:not(.decode) .view_toggle_icon_code,
 .decode .view_toggle_icon_map {
 	display: block;

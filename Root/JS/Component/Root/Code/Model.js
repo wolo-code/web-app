@@ -19,6 +19,7 @@ function setCode(city, wcode, latLng) {
 
 function clearCode() {
 	code_postition = null;
+	code_digipin = null;
 }
 
 function getCodeComplete() {

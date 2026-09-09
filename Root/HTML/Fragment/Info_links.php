@@ -43,6 +43,16 @@
 </div>
 
 <div id='credits'>Wolo Code makes use of these opensource projects: <a class='link' href="https://wolo.codes/credits">wolo.codes/credits</a></div>
+<table id='map_data_credits'>
+	<tr>
+		<td>Map tiles:</td>
+		<td><a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> (terrain/satellite via Google Maps)</td>
+	</tr>
+	<tr>
+		<td>DIGIPIN:</td>
+		<td><a class='link' href='https://www.indiapost.gov.in/digipin' target='_blank' rel='noopener noreferrer'>India Post DIGIPIN</a> (<a class='link' href='https://www.indiapost.gov.in/documents/offerings/intiatives/DIGIPIN_Technical_document.pdf' target='_blank' rel='noopener noreferrer'>spec</a>, <a class='link' href='https://github.com/DEADSERPENT/digipin' target='_blank' rel='noopener noreferrer'>codec</a>)</td>
+	</tr>
+</table>
 <div id='software_info'>
 	<div id='version'>
 		Version: <span><?php echo $config['version'] ?></span>

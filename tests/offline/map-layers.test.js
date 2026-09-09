@@ -18,6 +18,13 @@ test('map layer module defines OSM tile endpoint and layer helpers', () => {
 	assert.match(mapLayers, /function setMapLayer/);
 });
 
+test('ensureMapViewForLocation leaves decode view for map layers', () => {
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	assert.match(mapLayers, /function ensureMapViewForLocation/);
+	assert.match(mapLayers, /classList\.contains\('decode'\)/);
+	assert.match(mapLayers, /classList\.remove\('decode'\)/);
+});
+
 test('map view toggle cycles roadmap, satellite, and osm', () => {
 	const mapJs = read('Root/JS/Component/Root/Map.js');
 	assert.match(mapJs, /setMapLayer\(MAP_LAYER_OSM\)/);
@@ -25,10 +32,36 @@ test('map view toggle cycles roadmap, satellite, and osm', () => {
 	assert.match(mapJs, /setMapLayer\(MAP_LAYER_SATELLITE\)/);
 });
 
-test('decode flow recognizes DIGIPIN input', () => {
+test('decode flow recognizes DIGIPIN and plus-code input', () => {
 	const mapJs = read('Root/JS/Component/Root/Map.js');
+	const utilJs = read('Root/JS/Component/Root/Util.js');
 	assert.match(mapJs, /execDecodeDigipin/);
 	assert.match(mapJs, /digipin\.looksLikeDigipin/);
+	assert.match(mapJs, /execDecodePlusCode/);
+	assert.match(mapJs, /showInvalidCodeDialog/);
+	assert.match(mapJs, /searchMapWithQuery/);
+	assert.match(utilJs, /function looksLikePlusCode/);
+});
+
+test('map infowindow omits DIGIPIN; address panel labels DIGIPIN and plus code', () => {
+	const infoWindow = read('Root/JS/Component/Root/InfoWindow.js');
+	const addressHtml = read('Root/HTML/Fragment/Address.php');
+	assert.doesNotMatch(infoWindow, /infowindow_digipin/);
+	assert.match(addressHtml, /address_text_digipin/);
+	assert.match(addressHtml, /address_text_plus/);
+	assert.match(addressHtml, />DIGIPIN</);
+	assert.match(addressHtml, /Plus code/);
+});
+
+test('unrecognized-code dialog and decode input tip are wired', () => {
+	const index = read('root/HTML/Component/Root/Index.php');
+	const fragment = read('Root/HTML/Fragment/Invalid_code.php');
+	assert.match(index, /Invalid_code\.php/);
+	assert.match(index, /decode_input_alt_tip/);
+	assert.match(fragment, /invalid_code_correct/);
+	assert.match(fragment, /invalid_code_search/);
+	assert.match(fragment, /includeSVG\('', 'Reverse'\)/);
+	assert.match(fragment, /includeSVG\('', 'Proceed'\)/);
 });
 
 test('info links include OSM and DIGIPIN attribution', () => {

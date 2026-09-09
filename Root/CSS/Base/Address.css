@@ -42,6 +42,34 @@
 	color: #888888;
 }
 
+#address_text_codes {
+	border-top: 1px solid #eee;
+	margin: 0 4px 6px;
+	padding-top: 6px;
+	text-align: left;
+}
+
+.address_text_code_row {
+	padding: 4px 0;
+}
+
+.address_text_code_label {
+	color: #69B7CF;
+	font-family: 'Abel', sans-serif;
+	font-size: 0.85em;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.address_text_code_value {
+	color: #555;
+	cursor: pointer;
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.95em;
+	letter-spacing: 0.03em;
+	padding: 2px 0 4px;
+}
+
 #address_text_close {
 	position: absolute;
 	top: 2px;

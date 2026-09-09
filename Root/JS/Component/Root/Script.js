@@ -91,6 +91,9 @@ function setupControls() {
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
 	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);
 	document.getElementById('locate_right_message_no').addEventListener('click', locateRight_deny);
+	document.getElementById('invalid_code_message_close').addEventListener('click', hideInvalidCodeDialog);
+	document.getElementById('invalid_code_correct').addEventListener('click', invalidCodeCorrect);
+	document.getElementById('invalid_code_search').addEventListener('click', invalidCodeSearchMap);
 	document.getElementById('no_city_submit_yes').addEventListener('click', noCity_add);
 	document.getElementById('no_city_submit_no').addEventListener('click', noCity_cancel);
 	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
@@ -101,6 +104,8 @@ function setupControls() {
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);
 	document.getElementById('address_text_main').addEventListener('click', copyAddress);
+	document.getElementById('address_text_digipin').addEventListener('click', copyDigipin);
+	document.getElementById('address_text_plus').addEventListener('click', copyPlusCode);
 	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);

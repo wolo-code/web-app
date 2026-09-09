@@ -24,12 +24,13 @@
 			<div id='decode_input_city'>&nbsp;</div>
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
-		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code or DIGIPIN /" autocomplete='off'></textarea>
+		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>
 		<div id='decode_input_button' class='control' tabindex='4'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 		</div>
 	</div>
 	<span id='decode_input_shadow'></span>
+	<div id='decode_input_alt_tip' class='hide'>You can also enter a DIGIPIN or a plus code</div>
 </div>
 <button id='decode_map_view_button' class='control' type='button' aria-label='Terrain map view' tabindex='6'>
 	<span class='image'><?php includeSVG('', 'Map-terrain'); ?></span>
@@ -44,6 +45,7 @@
 		require '../../HTML/Fragment/ChooseCity_by_name.php';
 		require '../../HTML/Fragment/ChooseCity_by_periphery.php';
 		require '../../HTML/Fragment/LocateRight.php';
+		require '../../HTML/Fragment/Invalid_code.php';
 		require '../../HTML/Fragment/Info.php';
 		require '../../HTML/Fragment/Exception.html';
 		require '../../HTML/Fragment/Incompatible_browser.html';

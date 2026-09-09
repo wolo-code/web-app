@@ -80,6 +80,9 @@ function isMapViewActive() {
 }
 
 function ensureMapViewForLocation() {
+	if(document.body.classList.contains('decode')) {
+		document.body.classList.remove('decode');
+	}
 	if(!isMapViewActive()) {
 		setMapLayer(MAP_LAYER_ROADMAP);
 	}

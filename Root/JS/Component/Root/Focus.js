@@ -1,4 +1,7 @@
 function focus__(city, pos, code) {
+	if(typeof ensureMapViewForLocation == 'function') {
+		ensureMapViewForLocation();
+	}
 	focus___(pos);
 	setCode(city, code, pos);
 }

@@ -164,13 +164,20 @@ html.dark-mode #infowindow_code .slash {
 	color: #8a8aaa;
 }
 
-html.dark-mode #infowindow_digipin,
-html.dark-mode #infowindow_digipin_code {
-	color: #d8e8d8;
+html.dark-mode #address_text_codes {
+	border-top-color: #33335a;
 }
 
-html.dark-mode #infowindow_digipin_label {
-	color: #8a9a8a;
+html.dark-mode .address_text_code_label {
+	color: #69B7CF;
+}
+
+html.dark-mode .address_text_code_value {
+	color: #c8d8d8;
+}
+
+html.dark-mode #decode_input_alt_tip {
+	color: #8a8aaa;
 }
 
 html.dark-mode #osm_attribution {

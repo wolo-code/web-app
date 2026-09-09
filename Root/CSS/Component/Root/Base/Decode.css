@@ -70,6 +70,24 @@
 	white-space: pre;
 }
 
+#decode_input_alt_tip {
+	bottom: 58px;
+	color: #8a8a8a;
+	font-family: Abel, sans-serif;
+	font-size: 0.88em;
+	left: 12px;
+	letter-spacing: 0.01em;
+	pointer-events: none;
+	position: absolute;
+	right: 12px;
+	text-align: center;
+	z-index: 1;
+}
+
+.decode #decode_input_alt_tip.hide {
+	display: none;
+}
+
 #decode_input {
 	display: none;
 }

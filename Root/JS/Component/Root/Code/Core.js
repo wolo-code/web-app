@@ -202,16 +202,21 @@ function decode(words) {
 			}
 
 	}
-	else
-		showNotification(INCORRECT_WCODE);
+	else {
+		if(typeof popLoader == 'function') {
+			popLoader();
+		}
+		showInvalidCodeDialog(words.join(' '));
+	}
 }
 
 function decode_continue(city, wcode) {
 	popLoader();
 	if(city != null)
 		decode_(city, wcode);
-	else
-		showNotification(INCORRECT_CITY);
+	else {
+		showInvalidCodeDialog((wcode && wcode.length) ? wcode.join(' ') : '');
+	}
 }
 
 function decodeWithIpCity(words) {

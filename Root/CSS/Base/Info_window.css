@@ -116,23 +116,3 @@ button.gm-ui-hover-effect {
 .city_tally_false #infowindow_code_left_code > span {
 	text-decoration: line-through;
 }
-
-#infowindow_digipin {
-	font-size: 0.95em;
-	margin-top: 2px;
-	padding-bottom: 6px;
-	text-align: left;
-}
-
-#infowindow_digipin_label {
-	color: #777;
-	font-size: 0.8em;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-}
-
-#infowindow_digipin_code {
-	cursor: pointer;
-	font-size: large;
-	letter-spacing: 0.06em;
-}

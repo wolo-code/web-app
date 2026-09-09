@@ -35,6 +35,31 @@
 	font-size: larger;
 }
 
+#invalid_code_query {
+	color: #555;
+	font-family: 'Roboto', sans-serif;
+	word-break: break-word;
+}
+
+#invalid_code_message .invalid_code_action {
+	min-width: 48px;
+	width: 48px;
+	height: 48px;
+	padding: 8px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #69B7CF;
+}
+
+#invalid_code_message .invalid_code_action svg {
+	display: block;
+}
+
+#invalid_code_search.invalid_code_action {
+	color: #ffffff;
+}
+
 .message_dialog_body > .secondary > span:first-child {
 	padding-left: 10px;
 }

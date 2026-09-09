@@ -199,6 +199,8 @@ function initMap() {
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
 	document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
 	document.getElementById('decode_input').addEventListener('keyup', enterHandler);
+	document.getElementById('decode_input').addEventListener('focus', showDecodeInputAltTip);
+	document.getElementById('decode_input').addEventListener('blur', hideDecodeInputAltTip);
 	syncProceedButtons();
 	
 	clickHandler = new ClickEventHandler(map);
@@ -226,8 +228,6 @@ function decode_input_from_map_external() {
 }
 
 function decode_input_from_form() {
-	if(!initWCode_jump_ask)
-		toggleMapType();
 	document.activeElement.blur();
 	beginDecode(document.getElementById('decode_input').value);
 }
@@ -247,6 +247,20 @@ function resolveLatLng(latLng) {
 	return {'lat':latLng.lat(), 'lng':latLng.lng()};
 }
 
+function showDecodeInputAltTip() {
+	var tip = document.getElementById('decode_input_alt_tip');
+	if(tip) {
+		tip.classList.remove('hide');
+	}
+}
+
+function hideDecodeInputAltTip() {
+	var tip = document.getElementById('decode_input_alt_tip');
+	if(tip) {
+		tip.classList.add('hide');
+	}
+}
+
 function execDecode(code) {
 	var trimmed = code.replace(/(\\|\/)/gm, '').trim();
 	if(trimmed.length === 0) {
@@ -256,6 +270,11 @@ function execDecode(code) {
 
 	if(typeof digipin != 'undefined' && digipin.looksLikeDigipin(trimmed)) {
 		execDecodeDigipin(trimmed);
+		return;
+	}
+
+	if(typeof looksLikePlusCode == 'function' && looksLikePlusCode(trimmed)) {
+		execDecodePlusCode(trimmed);
 		return;
 	}
 
@@ -273,7 +292,29 @@ function execDecode(code) {
 		decode(words);
 
 	if(!valid)
-		showNotification(INCORRECT_WCODE);
+		showInvalidCodeDialog(trimmed);
+}
+
+function execDecodePlusCode(code) {
+	if(typeof google != 'object' || !google.maps || !google.maps.Geocoder) {
+		showInvalidCodeDialog(code);
+		return;
+	}
+	var geocoder = new google.maps.Geocoder;
+	geocoder.geocode({'address': code}, function(results, status) {
+		if(status === 'OK' && results && results[0] && results[0].geometry) {
+			var loc = results[0].geometry.location;
+			var pos = {lat: loc.lat(), lng: loc.lng()};
+			ensureMapViewForLocation();
+			focus___(pos);
+			encode(pos);
+			clearAddress();
+			getAddress(pos);
+		}
+		else {
+			showInvalidCodeDialog(code);
+		}
+	});
 }
 
 function execDecodeDigipin(code) {
@@ -287,8 +328,93 @@ function execDecodeDigipin(code) {
 		getAddress(pos);
 	}
 	catch(error) {
-		showNotification(INCORRECT_DIGIPIN);
+		showInvalidCodeDialog(code);
 	}
+}
+
+var pendingInvalidQuery = '';
+function showInvalidCodeDialog(query) {
+	pendingInvalidQuery = query || '';
+	var wrap = document.getElementById('invalid_code_query_wrap');
+	var quoted = document.getElementById('invalid_code_query');
+	if(quoted) {
+		quoted.textContent = pendingInvalidQuery;
+	}
+	if(wrap) {
+		wrap.classList.toggle('hide', !pendingInvalidQuery);
+	}
+	showOverlay(document.getElementById('invalid_code_message'));
+}
+
+function hideInvalidCodeDialog() {
+	hideOverlay(document.getElementById('invalid_code_message'));
+}
+
+function invalidCodeCorrect() {
+	hideInvalidCodeDialog();
+	if(document.body.classList.contains('decode')) {
+		var decodeInput = document.getElementById('decode_input');
+		if(decodeInput) {
+			decodeInput.focus();
+			decodeInput.select();
+		}
+		return;
+	}
+	var pacInput = document.getElementById('pac-input');
+	if(pacInput) {
+		pacInput.focus();
+		pacInput.select();
+	}
+}
+
+function invalidCodeSearchMap() {
+	var query = pendingInvalidQuery;
+	hideInvalidCodeDialog();
+	searchMapWithQuery(query);
+}
+
+function searchMapWithQuery(query) {
+	if(!query) {
+		return;
+	}
+	ensureMapViewForLocation();
+	var input = document.getElementById('pac-input');
+	if(input) {
+		input.value = query;
+		var searchIcon = document.getElementById('search_icon');
+		if(searchIcon) {
+			searchIcon.classList.add('hide');
+		}
+	}
+	syncProceedButtons();
+	var placesLib = typeof getGooglePlacesLibrary == 'function' ? getGooglePlacesLibrary() : null;
+	if(!placesLib || !placesLib.PlacesService || !map) {
+		showNotification('Map search is unavailable');
+		return;
+	}
+	var service = new placesLib.PlacesService(map);
+	var applyResult = function(place) {
+		if(!place || !place.geometry || !place.geometry.location) {
+			return false;
+		}
+		var pos = resolveLatLng(place.geometry.location);
+		focus___(pos);
+		encode(pos);
+		clearAddress();
+		getAddress(pos);
+		return true;
+	};
+	service.findPlaceFromQuery({query: query, fields: ['name', 'geometry']}, function(results, status) {
+		if(status === 'OK' && results && results[0] && applyResult(results[0])) {
+			return;
+		}
+		service.textSearch({query: query}, function(textResults, textStatus) {
+			if(textStatus === 'OK' && textResults && textResults[0] && applyResult(textResults[0])) {
+				return;
+			}
+			showNotification('No map results for that search');
+		});
+	});
 }
 
 var lastMarker;

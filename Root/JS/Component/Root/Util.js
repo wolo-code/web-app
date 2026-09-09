@@ -59,6 +59,22 @@ function sessionForwarder(session_id, fwd_function, ar_param) {
 	}
 }
 
+function looksLikePlusCode(value) {
+	var text = (value || '').trim().toUpperCase();
+	if(!text) {
+		return false;
+	}
+	var compact = text.replace(/\s+/g, ' ');
+	var global = compact.replace(/ /g, '');
+	if(/^[23456789CFGHJMPQRVWX]{8}\+[23456789CFGHJMPQRVWX]{2,3}$/.test(global)) {
+		return true;
+	}
+	if(/^[23456789CFGHJMPQRVWX]{4,6}\+[23456789CFGHJMPQRVWX]{2,3}(\s+.+)?$/.test(compact)) {
+		return true;
+	}
+	return false;
+}
+
 function enterHandler(event) {
 	if (event.target.id === 'decode_input' && !event.ctrlKey && !event.metaKey)
 		return;
@@ -74,6 +90,9 @@ function hasProceedInput(value) {
 		return false;
 	}
 	if(typeof digipin != 'undefined' && digipin.looksLikeDigipin(trimmed)) {
+		return true;
+	}
+	if(typeof looksLikePlusCode == 'function' && looksLikePlusCode(trimmed)) {
 		return true;
 	}
 	return trimmed.length > 0;

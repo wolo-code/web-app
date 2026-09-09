@@ -33,12 +33,14 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Full-screen input surface | Wolo Code Input Surface | `#decode_interface_overlay` | Full viewport | Covers the map with the plain input-focused state. |
-| Code entry field | Wolo Code Input | `#decode_input` | Center of viewport | Accepts a Wolo Code such as `\ Wolo Code /`. |
+| Code entry field | Wolo Code Input | `#decode_input` | Center of viewport | Accepts a Wolo Code such as `\ Wolo Code /`, a DIGIPIN, or a plus code. |
+| Alternate-code tip | Decode Input Alternate Tip | `#decode_input_alt_tip` | Bottom of Wolo Code Input Surface while the field is focused | Notes that DIGIPIN and plus codes can also be entered. |
 | City hint row | Input City Hint | `#decode_city_context`, `#decode_input_city` | Slightly above centered Wolo Code Input, below city source controls | Shows the current or inferred city context for decoding after the city value is validated; startup uses a previous city when available and otherwise falls back to IP city without requesting browser geolocation. During geolocation city lookup, it shows `Loading...`. |
 | City source controls | Input City Source Controls | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle` | Above Input City Hint | Lets the user request coarse geolocation, switch to IP city, or open the previous-city popup using action-sized, widely spaced controls whose full circular button grows slightly on hover, active, or opening states and animates back when inactive. The selected source uses the primary icon accent; inactive sources stay muted. Unsupported, invalid, or non-gesture geolocation attempts use the standard city lookup failure state. |
 | Previous city popup | Input Previous City Popup | `#decode_city_history_message`, `#decode_city_history_message_list` | Center overlay when opened | Lists previously used cities cached from Wolo Code input, decoded/encoded cities, or geolocation-derived city selection. |
 | Input suggestions | Wolo Code Suggestions | `#decode_input_suggestion_result` | Above or near centered Wolo Code Input | Shows suggested Wolo Code tokens and resizes the input as needed. |
 | Submit control | Wolo Code Proceed Button | `#decode_input_button` | Immediately right of Wolo Code Input | Starts decode from the input page. |
+| Unrecognized input dialog | Unrecognized Code Dialog | `#invalid_code_message`, `showInvalidCodeDialog()` | Overlay | Offers correcting the typed value or searching the map for that text when decode does not recognize a Wolo Code, DIGIPIN, or plus code. |
 | Terrain map control | Terrain Map View Button | `#decode_map_view_button`, `toggleDecodeView()` | Bottom-right | Switches from Wolo Code Input View to Terrain Map View. |
 
 ## Terrain Map View
@@ -86,7 +88,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Accuracy circle | Location Accuracy Circle | `accuCircle` | Around current location on map | Visualizes the geolocation accuracy radius. |
 | Current location dot | Current Location Dot | `myLocDot` | On detected location | Shows the live device location point. |
 | Location marker | Location Wolo Marker | `marker` | On selected location | Marks the point used to encode the Wolo Code. |
-| Wolo label popup | Location Wolo Label View | `infoWindow`, `#infowindow_code` | Above Location Wolo Marker | Shows the city and Wolo Code for the selected location. |
+| Wolo label popup | Location Wolo Label View | `infoWindow`, `#infowindow_code` | Above Location Wolo Marker | Shows the city and Wolo Code for the selected location. DIGIPIN and plus code are shown on the Address Panel instead. |
 | Wolo label actions | Location Wolo Label Actions | `#infowindow_actions` | Bottom of Location Wolo Label View | Hosts address, external-map launch, and QR label actions. |
 | Address action | Wolo Label Address Action | `#show_address_button` | Left action in Location Wolo Label View | Opens or shares the selected address details. |
 | External map action | Wolo Label External Action | `#external_launch_button` | Center action in Location Wolo Label View | Opens the location in the platform map app. |
@@ -178,7 +180,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | View toggle action | Wolo Code Input Action | `#action_menu_decode`, `toggleDecodeView()` | Up/right from Action Menu when expanded | Switches between the map views and Wolo Code Input View. |
 | Map-type action | Map View Action | `#action_menu_map`, `toggleMapViewType()` | Right of Action Menu when expanded | Switches between Terrain Map View and Satellite Map View; from Wolo Code Input View it opens Satellite Map View. |
 | Notifications | Notification Bars | `#notification_top`, `#notification_bottom` | Top-center and lower-center | Shows short guidance, errors, and flow feedback. |
-| Address panel | Address Panel | `#address_text` and Address fragment | Overlay panel, view-dependent | Shows and copies the resolved address for a selected Wolo Code. |
+| Address panel | Address Panel | `#address_text` and Address fragment | Overlay panel, view-dependent | Shows and copies the resolved address for a selected Wolo Code, with labeled DIGIPIN and plus code when available. |
 | Modal layer | Overlay Layer | `#overlay` | Full viewport | Hosts info, redirects, city selection, QR, account, and browser-support dialogs. |
 | Info dialog | Info Modal View | `#info_message` | Center overlay | Explains Wolo Code format, usage steps, app links, and policy/contact details. |
 | QR label dialog | QR Label View | `#qr_container` | Center overlay | Builds, previews, downloads, and prints a Wolo Code label. |

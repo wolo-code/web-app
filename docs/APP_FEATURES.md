@@ -28,7 +28,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
 | Encode Location | `encode()`, map click listener, `focus___()` | Selecting a map position generates the corresponding Wolo Code. |
-| Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()` | A typed Wolo Code resolves to a place and can jump back to the map. |
+| Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()`, `showInvalidCodeDialog()` | A typed Wolo Code, DIGIPIN, or plus code resolves to a place and can jump back to the map. Unrecognized input opens a popup to correct the code or search the map for that text instead of a notification toast. |
+| Decode input hint | `#decode_input_alt_tip` | While the Wolo Code input is focused, a small bottom tip notes that DIGIPIN and plus codes can also be entered. |
 | City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, `#decode_city_context`, city chooser fragments | Codes can include city context, reuse a previous city, infer city from IP, or ask the user to choose a matching city. Initial load never requests browser geolocation; it defaults to the previous city when available, otherwise the IP city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
 | Suggestions | `suggestWrapper`, `#map_input_suggestion_result`, `#decode_input_suggestion_result` | Search and decode inputs share suggestion UI with different sizing behavior. |
 | Default Try Prompt | `#notification_top`, `tryDefaultCity()` | Top notification offers a starter city example. |
@@ -40,7 +41,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Search Place Input | `#pac-input`, Google Places-style controls | Search input is shown in Map View. |
 | Current Location | `#location_button`, locate permission dialog | Location control can request permission, locate the user, and optionally remember "do not ask again". |
 | Decode City Source | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle`, `#decode_city_history_message` | Wolo Code Input View exposes more widely spaced city-source controls above the city name for coarse geolocation on click, IP city, and previously used city history in a popup list. The IP globe sits padded inside the 39px circular control. The geolocation locate glyph keeps that same 39px circular disc and draws a smaller currentColor target (ring, ticks, and center dot) inside it. All three source controls share the same 39px circular disc. The selected source paints those icons with the primary accent, while inactive sources stay muted. Hovered, active, or opening controls grow the full circular button with a smooth animation, then shrink when the state changes. Geolocation clears the current city label, shows `loading...`, and then fills the city from the reverse-geocoded locality; unsupported, invalid, or non-gesture geolocation attempts return through the normal city lookup failure path. |
-| Address Display | `#address_text`, `showAddress`, `copyAddress()` | Generated or resolved address can be shown, closed, and copied. |
+| Address Display | `#address_text`, `showAddress`, `copyAddress()` | The separate address panel shows the resolved street address plus labeled DIGIPIN (when in India) and plus code rows. DIGIPIN is not shown on the map info window. |
 | External Navigation | `External.php`, `external_proceed_external()`, `external_proceed_internal()` | External app/link flow can either continue outward or stay inside the web app. |
 | Redirect Handling | `Redirect.php`, `redirectCancel()` | Redirect flow has cancel/loading states. |
 
@@ -71,6 +72,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Info Dialog | `Info.php`, `Info_intro.php`, `Info_full.php`, `Info_links.php` | Explains Wolo Code usage and links. |
 | No City Dialog | `NoCity.php`, `noCity_add()`, `noCity_cancel()` | Handles unsupported or missing city cases. |
 | Choose City Dialogs | `ChooseCity_by_name.php`, `ChooseCity_by_periphery.php` | Handles ambiguous city matches by name or location perimeter. |
+| Unrecognized Code Dialog | `Invalid_code.php`, `showInvalidCodeDialog()` | Offers correcting unrecognized decode input or searching the map for that text. Reverse-play corrects; play searches the map. |
 | Locate Permission Dialog | `LocateRight.php` | User-facing location permission request flow. |
 | Incompatible Browser Dialog | `Incompatible_browser.html` | Allows the app to warn and optionally continue when browser support is insufficient. |
 | Notifications | `#notification_top`, `#notification_bottom`, `showNotification()` | Lightweight messaging for examples, copy results, and status. |
@@ -88,7 +90,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
 | `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |
 | `Hamburger.svg` | Previous-city popup action. |
-| `Proceed.svg` | Submit/proceed action for map and decode inputs. |
+| `Proceed.svg` | Submit/proceed action for map and decode inputs, and search in the unrecognized-code dialog. |
+| `Reverse.svg` | Left-facing play triangle for correcting unrecognized decode input. |
 
 ## Implementation Notes
 

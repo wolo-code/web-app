@@ -132,7 +132,7 @@ html.dark-mode #decode_map_view_button svg {
 
 html.dark-mode .decode #logo_surface,
 html.dark-mode .decode #logo.plain_background #logo_surface {
-	background-color: rgb(34 34 68 / 70%);
+	background-color: rgb(34 34 68 / 10%);
 }
 
 html.dark-mode #map gmp-internal-camera-control > button,

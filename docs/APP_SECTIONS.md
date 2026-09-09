@@ -171,7 +171,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
-| Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. |
+| Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. `#logo_surface` draws an 8px padded frosted rectangle around the Wolo + CODE lockup. |
 | Account entry | Account Button | `#account` | Wolo Code Input View: top-left; map views desktop: top-right beside App Logo; mobile: top-right | Opens sign-in, account, and saved-address flows. |
 | Expandable action control | Action Menu | `#action_menu`, `#action_menu_toggle`, `toggleActionMenu()` | Bottom-left | Opens the bottom-left radial action controls. |
 | About/help action | Info Action | `#action_menu_info`, `showInfo()` | Above Action Menu when expanded | Opens app information and related links. |

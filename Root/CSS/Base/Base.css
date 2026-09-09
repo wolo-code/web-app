@@ -107,7 +107,7 @@ body.satellite #map {
 	position: absolute;
 	right: 10px;
 	top: 10px;
-	width: 160px;
+	width: auto;
 }
 
 #logo_surface {
@@ -115,7 +115,7 @@ body.satellite #map {
 	display: inline-flex;
 	flex-direction: column;
 	overflow: hidden;
-	padding: 2px;
+	padding: 8px;
 }
 
 #logo a {
@@ -128,7 +128,6 @@ body.satellite #map {
 }
 
 #logo_codes {
-	padding-bottom: 2px;
 	text-decoration: none;
 }
 

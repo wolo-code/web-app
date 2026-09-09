@@ -1,6 +1,6 @@
 #account {
 	position: absolute;
-	right: 188px;
+	right: 200px;
 	top: 18px;
 	padding: 8px;
 	margin: 0px;
@@ -20,10 +20,6 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-}
-
-#account svg {
-	border-radius: 20px;
 }
 
 #account svg path {
@@ -247,6 +243,6 @@
 	box-shadow: rgb(0 0 0 / 46%) 0px 0px 3px;
 	height: 42px;
 	display: inline-block;
-	border-radius: 20px;
+	border-radius: 50%;
 	background: rgb(255 255 255 / 50%);
 }

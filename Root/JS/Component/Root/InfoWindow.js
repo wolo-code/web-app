@@ -8,8 +8,30 @@ function infoWindow_setContent(string) {
 	infoWindow.setContent(string);
 }
 
+function getDigipinForPosition(latLng) {
+	if(!latLng || typeof digipin == 'undefined') {
+		return null;
+	}
+	try {
+		if(digipin.isValidCoordinate(latLng.lat, latLng.lng)) {
+			return digipin.encode(latLng.lat, latLng.lng);
+		}
+	}
+	catch(error) {}
+	return null;
+}
+
+function buildDigipinInfoHtml(digipinCode) {
+	if(!digipinCode) {
+		return '';
+	}
+	return "<div id='infowindow_digipin'><span id='infowindow_digipin_label'>DIGIPIN</span> <span class='infowindow_code control' id='infowindow_digipin_code'>" + digipinCode + "</span></div>";
+}
+
 function setInfoWindowText(city_accent, city_name, code_string, latLng) {
 	initInfoWindow();
+	var digipinCode = getDigipinForPosition(latLng);
+	code_digipin = digipinCode;
 	var infoWindow_share_longpress_handle = google.maps.event.addListener(infoWindow, 'domready', function() {
 		google.maps.event.removeListener(infoWindow_share_longpress_handle);
 		if(document.getElementById('share_qr_button') != null) {
@@ -17,9 +39,13 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng) {
 			addLongpressListener(document.getElementById('show_address_button'), toggleAddress, handleShareWCode);
 			addLongpressListener(document.getElementById('external_launch_button'), gotoCoordinate, copyWcodeJumpLink);
 			addLongpressListener(document.getElementById('share_qr_button'), showQR, downloadQR_minimal);
+			var digipinNode = document.getElementById('infowindow_digipin_code');
+			if(digipinNode) {
+				addLongpressListener(digipinNode, copyDigipin, copyDigipin);
+			}
 		}
 	});
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'><span class='control' onclick='showChooseCity_by_periphery_Message();'>" + city_accent + "</span></span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code_string + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' src=" + svg_address + " ><div id='external_launch_button' class='control'><img src=" + svg_launch + " ></div><div id='share_qr_button' class='control'><div class='shield'></div><img src=" + svg_label + " ></div></div>");
+	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'><span class='control' onclick='showChooseCity_by_periphery_Message();'>" + city_accent + "</span></span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code_string + "</span> <span class='slash'>/</span></div></div>" + buildDigipinInfoHtml(digipinCode) + "<div id='infowindow_actions' class='center'><img id='show_address_button' class='control' src=" + svg_address + " ><div id='external_launch_button' class='control'><img src=" + svg_launch + " ></div><div id='share_qr_button' class='control'><div class='shield'></div><img src=" + svg_label + " ></div></div>");
 	showInfoWindow();
 }
 

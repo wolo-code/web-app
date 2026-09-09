@@ -69,7 +69,14 @@ function enterHandler(event) {
 }
 
 function hasProceedInput(value) {
-	return value.replace(/(\\|\/)/gm, '').trim().length > 0;
+	var trimmed = value.replace(/(\\|\/)/gm, '').trim();
+	if(trimmed.length === 0) {
+		return false;
+	}
+	if(typeof digipin != 'undefined' && digipin.looksLikeDigipin(trimmed)) {
+		return true;
+	}
+	return trimmed.length > 0;
 }
 
 function syncProceedButtons() {

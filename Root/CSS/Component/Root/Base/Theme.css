@@ -58,6 +58,7 @@ html.dark-mode {
 	--app-background-wcode: #1a1a2e;
 	--app-background-map: #0e3d4a;
 	--app-background-satellite: #1b2f62;
+	--app-background-osm: #1a2a1a;
 }
 
 html.dark-mode,
@@ -161,6 +162,20 @@ html.dark-mode #infowindow_code_right_code {
 
 html.dark-mode #infowindow_code .slash {
 	color: #8a8aaa;
+}
+
+html.dark-mode #infowindow_digipin,
+html.dark-mode #infowindow_digipin_code {
+	color: #d8e8d8;
+}
+
+html.dark-mode #infowindow_digipin_label {
+	color: #8a9a8a;
+}
+
+html.dark-mode #osm_attribution {
+	background-color: rgb(34 34 68 / 70%);
+	color: #c8d8c8;
 }
 
 html.dark-mode #account > span.image {

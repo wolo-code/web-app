@@ -32,6 +32,7 @@ var dencode_session_id;
 var code_city;
 var code_wcode;
 var code_postition;
+var code_digipin;
 
 // Address
 var latLng_p = '';
@@ -49,7 +50,9 @@ var DEFAULT_WCODE = ['bengaluru', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
 var pendingCitySubmit = false;
 
-var INCORRECT_WCODE = 'INCORRECT INPUT! Should be at least 3 Wolo Code words, optionally preceded by a city. E.g: "Bengaluru cat apple tomato"';
+var INCORRECT_WCODE = 'INCORRECT INPUT! Enter a Wolo Code (3+ words), a 10-character DIGIPIN, or a city + Wolo Code. E.g: "Bengaluru cat apple tomato" or "39J49LL8T4"';
+var INCORRECT_DIGIPIN = 'INCORRECT DIGIPIN! Enter a valid 10-character India Post DIGIPIN code.';
+var DIGIPIN_COPIED_MESSAGE = 'DIGIPIN copied to clipboard';
 var INCORRECT_CITY = "City not found - check the Wolo Code";
 var MESSAGE_LOADING = 'Loading ..';
 var LOCATION_PERMISSION_DENIED = "Location permission was denied. Click to point or retry with the locate button";

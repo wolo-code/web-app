@@ -103,6 +103,11 @@
 	padding: 20px 0;
 }
 
+#map_data_credits {
+	font-size: smaller;
+	margin-top: 8px;
+}
+
 #software_info {
 	padding: 6px 0 20px;
 }

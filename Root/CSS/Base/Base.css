@@ -162,6 +162,10 @@ body > #pac-input {
 	opacity: 0.5;
 }
 
+#pac-input:valid {
+	text-transform: uppercase;
+}
+
 #pac-input:focus {
 	border-color: #4d90fe;
 }

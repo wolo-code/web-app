@@ -44,6 +44,19 @@ test('decode flow recognizes DIGIPIN and plus-code input', () => {
 	assert.match(mapJs, /showInvalidCodeDialog/);
 	assert.match(mapJs, /searchMapWithQuery/);
 	assert.match(utilJs, /function looksLikePlusCode/);
+	assert.match(utilJs, /syncDecodeInputCaseSource/);
+});
+
+test('decode and map inputs uppercase DIGIPIN and plus-code values with CSS', () => {
+	const index = read('Root/HTML/Component/Root/Index.php');
+	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
+	const baseCss = read('Root/CSS/Base/Base.css');
+	assert.match(index, /id='decode_input_case'/);
+	assert.match(index, /id='pac-input'[\s\S]*pattern=/);
+	assert.match(decodeCss, /#decode_input_case:valid/);
+	assert.match(decodeCss, /text-transform:\s*uppercase/);
+	assert.match(baseCss, /#pac-input:valid/);
+	assert.match(baseCss, /text-transform:\s*uppercase/);
 });
 
 test('map infowindow omits DIGIPIN; address panel labels DIGIPIN and plus code', () => {

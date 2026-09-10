@@ -25,13 +25,25 @@
 }
 
 #decode_input_container {
-	position: absolute;
+	align-items: center;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 	left: 0;
+	max-height: 220px;
+	max-width: 468px;
+	position: absolute;
 	right: 0;
 	top: 0;
-	bottom: 0;
-	max-width: 468px;
-	max-height: 166px;
+}
+
+#decode_input_row {
+	align-items: flex-end;
+	display: flex;
+	justify-content: center;
+	max-width: 100%;
+	width: 100%;
 }
 
 .decode #decode_input, #decode_input_shadow {
@@ -47,6 +59,24 @@
 	text-transform: lowercase;
 }
 
+.decode:has(#decode_input_case:valid) #decode_input,
+.decode:has(#decode_input_case:valid) #decode_input_shadow {
+	text-transform: uppercase;
+}
+
+#decode_input_case {
+	height: 1px;
+	left: 0;
+	margin: 0;
+	opacity: 0;
+	overflow: hidden;
+	padding: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	width: 1px;
+}
+
 .decode #decode_input {
 	padding: 8px;
 	display: inline-block;
@@ -58,7 +88,7 @@
 	overflow: hidden;
 	resize: none;
 	vertical-align: bottom;
-	margin-bottom: 10px;
+	margin-bottom: 0;
 }
 
 #decode_input_shadow {
@@ -71,17 +101,15 @@
 }
 
 #decode_input_alt_tip {
-	bottom: 58px;
 	color: #8a8a8a;
 	font-family: Abel, sans-serif;
 	font-size: 0.88em;
-	left: 12px;
 	letter-spacing: 0.01em;
+	margin-top: 8px;
+	max-width: 92%;
 	pointer-events: none;
-	position: absolute;
-	right: 12px;
 	text-align: center;
-	z-index: 1;
+	width: 100%;
 }
 
 .decode #decode_input_alt_tip.hide {

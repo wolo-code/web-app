@@ -3,7 +3,7 @@
 <div id='osm_attribution' class='hide blur_background'>Map data &copy; <a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> contributors</div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
 <span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
-<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' >
+<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?' >
 <div id='decode_button' class='control' tabindex='4'>
 	<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 </div>
@@ -24,13 +24,16 @@
 			<div id='decode_input_city'>&nbsp;</div>
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
-		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>
-		<div id='decode_input_button' class='control' tabindex='4'>
-			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+		<div id='decode_input_row'>
+			<textarea id='decode_input' data-suggest='decode_input_suggestion_result' data-handler='decode_input_button' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>
+			<div id='decode_input_button' class='control' tabindex='4'>
+				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+			</div>
 		</div>
+		<div id='decode_input_alt_tip' class='hide'>You can also enter a DIGIPIN or a plus code</div>
+		<input id='decode_input_case' type='text' tabindex='-1' aria-hidden='true' autocomplete='off' required pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?'>
 	</div>
 	<span id='decode_input_shadow'></span>
-	<div id='decode_input_alt_tip' class='hide'>You can also enter a DIGIPIN or a plus code</div>
 </div>
 <button id='decode_map_view_button' class='control' type='button' aria-label='Terrain map view' tabindex='6'>
 	<span class='image'><?php includeSVG('', 'Map-terrain'); ?></span>

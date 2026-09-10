@@ -33,8 +33,8 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Full-screen input surface | Wolo Code Input Surface | `#decode_interface_overlay` | Full viewport | Covers the map with the plain input-focused state. |
-| Code entry field | Wolo Code Input | `#decode_input` | Center of viewport | Accepts a Wolo Code such as `\ Wolo Code /`, a DIGIPIN, or a plus code. |
-| Alternate-code tip | Decode Input Alternate Tip | `#decode_input_alt_tip` | Bottom of Wolo Code Input Surface while the field is focused | Notes that DIGIPIN and plus codes can also be entered. |
+| Code entry field | Wolo Code Input | `#decode_input`, `#decode_input_case` | Center of viewport | Accepts a Wolo Code such as `\ Wolo Code /`, a DIGIPIN, or a plus code. CSS shows DIGIPIN and plus-code values in uppercase while `#decode_input_case` is `:valid`; other input stays lowercase. |
+| Alternate-code tip | Decode Input Alternate Tip | `#decode_input_alt_tip` | Directly below the Wolo Code Input while the field is focused | Notes that DIGIPIN and plus codes can also be entered. |
 | City hint row | Input City Hint | `#decode_city_context`, `#decode_input_city` | Slightly above centered Wolo Code Input, below city source controls | Shows the current or inferred city context for decoding after the city value is validated; startup uses a previous city when available and otherwise falls back to IP city without requesting browser geolocation. During geolocation city lookup, it shows `Loading...`. |
 | City source controls | Input City Source Controls | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle` | Above Input City Hint | Lets the user request coarse geolocation, switch to IP city, or open the previous-city popup using action-sized, widely spaced controls whose full circular button grows slightly on hover, active, or opening states and animates back when inactive. The selected source uses the primary icon accent; inactive sources stay muted. Unsupported, invalid, or non-gesture geolocation attempts use the standard city lookup failure state. |
 | Previous city popup | Input Previous City Popup | `#decode_city_history_message`, `#decode_city_history_message_list` | Center overlay when opened | Lists previously used cities cached from Wolo Code input, decoded/encoded cities, or geolocation-derived city selection. |
@@ -48,7 +48,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Map canvas | Terrain Map Canvas | `#map`, Google Maps `ROADMAP` | Full viewport | Standard map surface for selection, pan, zoom, and place context. |
-| Search field | Place Search Input | `#pac-input` | Top-left | Accepts place names and Wolo Codes while in the map flow. |
+| Search field | Place Search Input | `#pac-input` | Top-left | Accepts place names and Wolo Codes while in the map flow. CSS shows DIGIPIN and plus-code values in uppercase while the field is `:valid`; other input stays lowercase. |
 | Search affordance | Search Icon | `#search_icon` | Inside left edge of Place Search Input | Visual cue for the map search field before input focus. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Shows suggestions for the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |

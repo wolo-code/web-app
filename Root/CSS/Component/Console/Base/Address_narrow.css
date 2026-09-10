@@ -1,5 +1,5 @@
 @media (max-width: 512px) {
-	#address_text {
+	#map_bottom_stack {
 		bottom: 140px !important;
 	}
 }

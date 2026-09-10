@@ -14,16 +14,46 @@ function getDigipinForPosition(latLng) {
 	}
 	try {
 		if(digipin.isValidCoordinate(latLng.lat, latLng.lng)) {
-			return digipin.encode(latLng.lat, latLng.lng);
+			return String(digipin.encode(latLng.lat, latLng.lng) || '').toUpperCase();
 		}
 	}
 	catch(error) {}
 	return null;
 }
 
+function getPlusCodeForPosition(latLng) {
+	if(!latLng || typeof pluscode == 'undefined' || typeof pluscode.encode != 'function') {
+		return null;
+	}
+	try {
+		return pluscode.encode(latLng.lat, latLng.lng);
+	}
+	catch(error) {}
+	return null;
+}
+
+function extractPlusCodeFromGeocode(results) {
+	if(!results || !results.length) {
+		return null;
+	}
+	var i;
+	var plus;
+	for(i = 0; i < results.length; i++) {
+		plus = results[i] && results[i].plus_code;
+		if(plus) {
+			return plus.compound_code || plus.global_code || null;
+		}
+	}
+	return null;
+}
+
 function setInfoWindowText(city_accent, city_name, code_string, latLng) {
 	initInfoWindow();
+	if(latLng) {
+		latLng_p = latLng;
+	}
 	code_digipin = getDigipinForPosition(latLng);
+	code_plus_code = getPlusCodeForPosition(latLng);
 	var infoWindow_share_longpress_handle = google.maps.event.addListener(infoWindow, 'domready', function() {
 		google.maps.event.removeListener(infoWindow_share_longpress_handle);
 		if(document.getElementById('share_qr_button') != null) {

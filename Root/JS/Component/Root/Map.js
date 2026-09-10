@@ -194,14 +194,20 @@ function initMap() {
 	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
 
 	document.getElementById('pac-input').addEventListener('input', suggestWrapper);
-	document.getElementById('pac-input').addEventListener('input', syncProceedButtons);
+	if(typeof syncProceedButtons == 'function') {
+		document.getElementById('pac-input').addEventListener('input', syncProceedButtons);
+	}
 	document.getElementById('pac-input').addEventListener('keyup', enterHandler);
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
-	document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
+	if(typeof syncProceedButtons == 'function') {
+		document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
+	}
 	document.getElementById('decode_input').addEventListener('keyup', enterHandler);
 	document.getElementById('decode_input').addEventListener('focus', showDecodeInputAltTip);
 	document.getElementById('decode_input').addEventListener('blur', hideDecodeInputAltTip);
-	syncProceedButtons();
+	if(typeof syncProceedButtons == 'function') {
+		syncProceedButtons();
+	}
 	
 	clickHandler = new ClickEventHandler(map);
 
@@ -305,11 +311,7 @@ function execDecodePlusCode(code) {
 		if(status === 'OK' && results && results[0] && results[0].geometry) {
 			var loc = results[0].geometry.location;
 			var pos = {lat: loc.lat(), lng: loc.lng()};
-			ensureMapViewForLocation();
-			focus___(pos);
-			encode(pos);
-			clearAddress();
-			getAddress(pos);
+			steerToDecodedCoordinate(pos);
 		}
 		else {
 			showInvalidCodeDialog(code);
@@ -317,15 +319,22 @@ function execDecodePlusCode(code) {
 	});
 }
 
+function steerToDecodedCoordinate(pos) {
+	keepAddressPanelOpen = true;
+	ensureMapViewForLocation();
+	focus___(pos);
+	encode(pos);
+	clearAddress();
+	latLng_p = pos;
+	getAddress(pos);
+	showAddress();
+}
+
 function execDecodeDigipin(code) {
 	try {
 		var result = digipin.decode(digipin.normalizeInput(code));
 		var pos = {lat: result.lat, lng: result.lon};
-		ensureMapViewForLocation();
-		focus___(pos);
-		encode(pos);
-		clearAddress();
-		getAddress(pos);
+		steerToDecodedCoordinate(pos);
 	}
 	catch(error) {
 		showInvalidCodeDialog(code);
@@ -428,11 +437,48 @@ function load(marker) {
 	encode(resolveLatLng(marker.position));
 }
 
+function getBottomStackHeight() {
+	var stack = document.getElementById('map_bottom_stack');
+	return stack ? stack.offsetHeight : 0;
+}
+
 function getPanByOffset() {
-	if(window.innerHeight < 1000)
-		return -118;
-	else
-		return 0;
+	var base = window.innerHeight < 1000 ? -118 : 0;
+	return base - getBottomStackHeight();
+}
+
+function applyMapChromePan() {
+	if(typeof map == 'undefined' || !map) {
+		return;
+	}
+	map.panBy(0, getPanByOffset());
+	lastBottomStackPanY = getBottomStackHeight();
+}
+
+function syncBottomStackMapPan() {
+	if(typeof map == 'undefined' || !map) {
+		return;
+	}
+	var next = getBottomStackHeight();
+	var delta = next - lastBottomStackPanY;
+	if(delta) {
+		map.panBy(0, -delta);
+		lastBottomStackPanY = next;
+	}
+}
+
+function initBottomStackMapPan() {
+	var stack = document.getElementById('map_bottom_stack');
+	if(typeof lastBottomStackPanY == 'undefined') {
+		lastBottomStackPanY = 0;
+	}
+	if(stack && typeof ResizeObserver != 'undefined' && !stack._bottomStackObserver) {
+		stack._bottomStackObserver = new ResizeObserver(function() {
+			syncBottomStackMapPan();
+		});
+		stack._bottomStackObserver.observe(stack);
+	}
+	window.addEventListener('resize', syncBottomStackMapPan);
 }
 
 function getIntentURL(latLng, code_string) {

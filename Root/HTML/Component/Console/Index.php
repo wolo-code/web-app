@@ -41,12 +41,6 @@
 				<div id='data_lng'>Long</div>
 			</div>
 		</div>
-		<div id='address_text'>
-			<div id='address_text_label'>Address</div>
-			<div id='address_text_main'>
-				<span id='address_text_content'></span>
-			</div>
-		</div>
 		<input id='pac-input' type='text' placeholder='Search' tabindex='3' >
 		<form id='city_submit_panel'>
 			<input id='city_gpid' type='hidden' >
@@ -60,7 +54,15 @@
 			<input id='city_country' class='city_form_field' type='text' placeholder='Country' required tabindex='8' autocomplete='new-password' >
 			<input id='submit_city_button' class='control' type='submit' value='Submit' tabindex='9'>
 		</form>
-		<div id='notification_bottom' class="notification_bar hide"></div>
+		<div id='map_bottom_stack'>
+			<div id='notification_bottom' class="notification_bar hide"></div>
+			<div id='address_text'>
+				<div id='address_text_label'>Address</div>
+				<div id='address_text_main'>
+					<span id='address_text_content'></span>
+				</div>
+			</div>
+		</div>
 		<div id='footer-content-container' class='center'>
 			<div id='footer-content' class='blur_background'>
 				<a class='link-gray' href='/license'>&copy; <?php echo date('Y'); ?></a>

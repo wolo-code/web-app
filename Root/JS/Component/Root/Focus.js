@@ -103,7 +103,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
 							var idleListenerPanBy = map.addListener('idle', function() {
 									idleListenerPanBy.remove();
-									map.panBy(0, getPanByOffset());
+									applyMapChromePan();
 								});
 						}
 					}

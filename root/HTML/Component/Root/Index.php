@@ -106,15 +106,17 @@
 </div>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <div id='offline_queue_badge' class='offline_queue_badge hide' aria-live='polite'></div>
-<?php require '../../HTML/Fragment/Accuracy.php' ?>
-<div id='notification_bottom' class="notification_bar hide"></div>
+<div id='map_bottom_stack'>
+	<div id='notification_bottom' class="notification_bar hide"></div>
+	<?php require '../../HTML/Fragment/Accuracy.php' ?>
+	<?php require '../../HTML/Fragment/Address.php'; ?>
+</div>
 <div id='footer-content-container' class='center'>
 	<div id='footer-content' class='blur_background'>
 		<a class='link-gray' href='/license'>&copy; <?php echo date('Y'); ?> </a>
 		<span id='footer_author' class='link'>Wolo</span>
 	</div>
 </div>
-<?php require '../../HTML/Fragment/Address.php'; ?>
 <?php require '../../HTML/Fragment/Firebase_includes.php'; ?>
 <script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>
 <script src='https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.js'></script>

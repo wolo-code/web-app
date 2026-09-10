@@ -80,7 +80,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Permission approve action | Location Access Yes Button | `#locate_right_message_yes` | Bottom of Location Access Prompt | Continues into automatic location detection. |
 | Permission deny action | Location Access No Button | `#locate_right_message_no` | Bottom of Location Access Prompt | Closes the prompt and leaves manual map selection available. |
 | Permission reminder option | Location Access Do-Not-Ask Option | `#locate_right_message_dnd`, `#locate_right_message_dnd_input` | Bottom of Location Access Prompt when shown | Lets the user avoid repeated app-level location prompts. |
-| Accuracy strip | Location Accuracy Indicator | `#accuracy_container` | Bottom-center above Locate Button | Shows active location accuracy feedback while geolocation is running. |
+| Accuracy strip | Location Accuracy Indicator | `#accuracy_container` | Inside `#map_bottom_stack`, above the Address Panel when both are open | Shows active location accuracy feedback while geolocation is running. |
 | Accuracy value | Location Accuracy Meter | `#accuracy_meter`, `#accuracy_meter_unit` | Inside Location Accuracy Indicator | Shows current accuracy as `nnn m` or `99+ m`. |
 | Accuracy status dot | Location Accuracy Dot | `#accuracy_indicator` | Left side of Location Accuracy Indicator | Blinks and changes color based on current accuracy. |
 | Locate proceed control | Location Proceed Button | `#proceed_button` | Right side of Location Accuracy Indicator | Lets the user proceed with the current location fix. |
@@ -179,13 +179,14 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | About/help action | Info Action | `#action_menu_info`, `showInfo()` | Above Action Menu when expanded | Opens app information and related links. |
 | View toggle action | Wolo Code Input Action | `#action_menu_decode`, `toggleDecodeView()` | Up/right from Action Menu when expanded | Switches between the map views and Wolo Code Input View. |
 | Map-type action | Map View Action | `#action_menu_map`, `toggleMapViewType()` | Right of Action Menu when expanded | Switches between Terrain Map View and Satellite Map View; from Wolo Code Input View it opens Satellite Map View. |
-| Notifications | Notification Bars | `#notification_top`, `#notification_bottom` | Top-center and lower-center | Shows short guidance, errors, and flow feedback. |
-| Address panel | Address Panel | `#address_text` and Address fragment | Overlay panel, view-dependent | Shows and copies the resolved address for a selected Wolo Code, with labeled DIGIPIN and plus code when available. |
+| Notifications | Notification Bars | `#notification_top`, `#notification_bottom` | Top-center and in `#map_bottom_stack` above the Address Panel | Shows short guidance, errors, and flow feedback. The bottom bar stacks with the Address Panel and Location Accuracy Indicator; the top bar stays below search. |
+| Address panel | Address Panel | `#address_text` and Address fragment | Bottom of `#map_bottom_stack`, above Locate/footer | Shows and copies the resolved address for a selected Wolo Code. DIGIPIN (India) and plus code rows keep labels on the left and values on the right; plus code is encoded locally if geocoding omits it. Theme follows light/dark mode. Drag-selected text copies only the selection. Steering with a DIGIPIN or plus code keeps the panel open. Locate hides the panel. |
 | Modal layer | Overlay Layer | `#overlay` | Full viewport | Hosts info, redirects, city selection, QR, account, and browser-support dialogs. |
 | Info dialog | Info Modal View | `#info_message` | Center overlay | Explains Wolo Code format, usage steps, app links, and policy/contact details. |
 | QR label dialog | QR Label View | `#qr_container` | Center overlay | Builds, previews, downloads, and prints a Wolo Code label. |
 | Account dialog | Account Address Book View | `#account_dialog_container`, `#account_dialog` | Center overlay | Shows profile, logout, current address save fields, and saved addresses. |
 | Footer credit | Footer Credit | `#footer-content-container`, `#footer-content` | Bottom-center | Shows license year and author credit. |
+| Bottom info-card dock | Map Bottom Stack | `#map_bottom_stack` | Bottom-center, `80px` above Locate/footer (`128px`/`140px` on Console) | Flex column that stacks the bottom notification, Location Accuracy Indicator, and Address Panel with an 8px gap so variable-height cards do not overlap. Overlay dialogs, `#decode_input_alt_tip`, and `#notification_top` are not in this dock. |
 
 ## Responsive Placement Notes
 
@@ -197,6 +198,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Map Proceed Button | Right of Place Search Input | Top-right beside mobile Place Search Input | `#decode_button`, `Base_narrow.css` |
 | Search Icon | Inside Place Search Input | Moves with mobile Place Search Input | `#search_icon`, `Base_narrow.css` |
 | Notification Top Bar | Top-center below desktop search/logo area | Lower top-center, below mobile search row | `#notification_top`, `Base_narrow.css` |
+| Map Bottom Stack | Bottom-center above Locate Button | Same band; Console uses a higher dock offset | `#map_bottom_stack`, `Base.css` |
 | Footer Credit | Bottom-center | Bottom-center with smaller text | `#footer-content-container`, `Base_narrow.css` |
 | Action Menu | Bottom-left | Bottom-left | `#action_menu` |
 | Locate Button | Bottom-center | Bottom-center | `#location_button` |

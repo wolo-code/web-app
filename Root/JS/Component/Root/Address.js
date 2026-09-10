@@ -6,14 +6,11 @@ function getAddress(latLng, session_id, callback) {
 	var geocoder = new google.maps.Geocoder;
 	geocoder.geocode({'location': latLng}, function(address_components, status) {
 		latLng_p = latLng;
-		code_plus_code = null;
+		code_plus_code = extractPlusCodeFromGeocode(address_components) || getPlusCodeForPosition(latLng);
 		if (status === 'OK') {
 			if (address_components[0]) {
 				getCity_by_address_list(address_components);
 				address = address_components[0].formatted_address;
-				if(address_components[0].plus_code) {
-					code_plus_code = address_components[0].plus_code.compound_code || address_components[0].plus_code.global_code || null;
-				}
 				gpId = getCityGpId(address_components);
 				if(typeof code_city != 'undefined' && code_city.gp_id != null && gpId != code_city.gp_id) {
 					setCurrentCity_status(false);
@@ -39,6 +36,9 @@ function getAddress(latLng, session_id, callback) {
 			execSubmitCity();
 			pendingCitySubmit = false;
 		}
+		if(keepAddressPanelOpen) {
+			showAddress();
+		}
 	});
 }
 
@@ -52,12 +52,13 @@ function toggleAddress() {
 function showAddress() {
 	document.getElementById('address_text_title').innerText = '';
 	document.getElementById('address_text_segment').innerText = '';
-	address_text_content.innerText = address;
+	address_text_content.innerText = address || '';
 	refreshAddressCodes();
 	address_text.classList.remove('hide');
 }
 
 function hideAddress() {
+	keepAddressPanelOpen = false;
 	address_text_content.innerText = '';
 	clearAddressCodeRows();
 	address_text.classList.add('hide');
@@ -82,7 +83,10 @@ function refreshAddressCodes() {
 	if(typeof code_digipin != 'undefined') {
 		code_digipin = digipinCode;
 	}
-	var plusCode = code_plus_code;
+	var plusCode = code_plus_code || (typeof getPlusCodeForPosition == 'function' ? getPlusCodeForPosition(latLng_p) : null);
+	if(typeof code_plus_code != 'undefined') {
+		code_plus_code = plusCode;
+	}
 	var codes = document.getElementById('address_text_codes');
 	var digipinRow = document.getElementById('address_text_digipin_row');
 	var plusRow = document.getElementById('address_text_plus_row');
@@ -92,7 +96,7 @@ function refreshAddressCodes() {
 		return;
 	}
 	if(digipinCode) {
-		digipinNode.innerText = digipinCode;
+		digipinNode.innerText = String(digipinCode).toUpperCase();
 		digipinRow.classList.remove('hide');
 	}
 	else {
@@ -138,7 +142,44 @@ function clearAddressCodeRows() {
 	}
 }
 
-function copyAddress() {
+function getAddressPanelSelection() {
+	var panel = document.getElementById('address_text');
+	var sel = window.getSelection();
+	var node;
+	var range;
+	var text;
+	if(!panel || !sel || sel.isCollapsed || !sel.rangeCount) {
+		return '';
+	}
+	node = sel.anchorNode;
+	if(node && node.nodeType !== 1) {
+		node = node.parentNode;
+	}
+	if(!node || !panel.contains(node)) {
+		return '';
+	}
+	range = sel.getRangeAt(0);
+	text = range ? range.toString() : sel.toString();
+	return text;
+}
+
+function copyAddressPanelSelection() {
+	var text = getAddressPanelSelection();
+	if(!text || !text.trim()) {
+		return false;
+	}
+	copyPlainText(text);
+	showNotification(SELECTED_TEXT_COPIED_MESSAGE);
+	return true;
+}
+
+function copyAddress(event) {
+	if(copyAddressPanelSelection()) {
+		if(event && event.stopPropagation) {
+			event.stopPropagation();
+		}
+		return;
+	}
 	if(address_text.classList.contains('hide')) {
 		showAddress();
 	}
@@ -146,7 +187,13 @@ function copyAddress() {
 	showNotification(ADDRESS_COPIED_MESSAGE);
 }
 
-function copyPlusCode() {
+function copyPlusCode(event) {
+	if(event && event.stopPropagation) {
+		event.stopPropagation();
+	}
+	if(copyAddressPanelSelection()) {
+		return;
+	}
 	if(!code_plus_code) {
 		return;
 	}

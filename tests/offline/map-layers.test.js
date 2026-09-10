@@ -38,6 +38,9 @@ test('decode flow recognizes DIGIPIN and plus-code input', () => {
 	assert.match(mapJs, /execDecodeDigipin/);
 	assert.match(mapJs, /digipin\.looksLikeDigipin/);
 	assert.match(mapJs, /execDecodePlusCode/);
+	assert.match(mapJs, /steerToDecodedCoordinate/);
+	assert.match(mapJs, /keepAddressPanelOpen/);
+	assert.match(mapJs, /showAddress/);
 	assert.match(mapJs, /showInvalidCodeDialog/);
 	assert.match(mapJs, /searchMapWithQuery/);
 	assert.match(utilJs, /function looksLikePlusCode/);

@@ -65,7 +65,52 @@ function signedIn() {
 	loadSaveList();
 }
 
+function getBottomStackHeight() {
+	var stack = document.getElementById('map_bottom_stack');
+	return stack ? stack.offsetHeight : 0;
+}
+
+function getPanByOffset() {
+	var base = window.innerHeight < 1000 ? -118 : 0;
+	return base - getBottomStackHeight();
+}
+
+function applyMapChromePan() {
+	if(typeof map == 'undefined' || !map) {
+		return;
+	}
+	map.panBy(0, getPanByOffset());
+	lastBottomStackPanY = getBottomStackHeight();
+}
+
+function syncBottomStackMapPan() {
+	if(typeof map == 'undefined' || !map) {
+		return;
+	}
+	var next = getBottomStackHeight();
+	var delta = next - lastBottomStackPanY;
+	if(delta) {
+		map.panBy(0, -delta);
+		lastBottomStackPanY = next;
+	}
+}
+
+function initBottomStackMapPan() {
+	var stack = document.getElementById('map_bottom_stack');
+	if(typeof lastBottomStackPanY == 'undefined') {
+		lastBottomStackPanY = 0;
+	}
+	if(stack && typeof ResizeObserver != 'undefined' && !stack._bottomStackObserver) {
+		stack._bottomStackObserver = new ResizeObserver(function() {
+			syncBottomStackMapPan();
+		});
+		stack._bottomStackObserver.observe(stack);
+	}
+	window.addEventListener('resize', syncBottomStackMapPan);
+}
+
 function setupControls() {
+	initBottomStackMapPan();
 	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
 	document.getElementById('account').addEventListener('click', showAccountDialog);
 	document.getElementById('authentication_header_close').addEventListener('click', hideAuthenticationDialog);
@@ -104,8 +149,12 @@ function setupControls() {
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('address_text_close').addEventListener('click', hideAddress);
 	document.getElementById('address_text_main').addEventListener('click', copyAddress);
-	document.getElementById('address_text_digipin').addEventListener('click', copyDigipin);
-	document.getElementById('address_text_plus').addEventListener('click', copyPlusCode);
+	document.getElementById('address_text_digipin').addEventListener('click', function(event) {
+		copyDigipin(event);
+	});
+	document.getElementById('address_text_plus').addEventListener('click', function(event) {
+		copyPlusCode(event);
+	});
 	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
@@ -114,7 +163,9 @@ function setupControls() {
 	document.getElementById('qr_print').addEventListener('click', printQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
-	syncProceedButtons();
+	if(typeof syncProceedButtons == 'function') {
+		syncProceedButtons();
+	}
 	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
 	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
 	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
@@ -192,12 +243,39 @@ function resizeInput() {
 	this.style.width = shadow.offsetWidth+'px';
 	this.style.height = '26px';
 	this.style.height = Math.min(this.scrollHeight - 16, 112)+'px';
-	syncProceedButtons();
+	if(typeof syncProceedButtons == 'function') {
+		syncProceedButtons();
+	}
 }
 
 function showAndCopy(message) {
 	showNotification(message);
 	copyNodeText(notification_bottom);
+}
+
+function copyPlainText(text) {
+	if(navigator.clipboard && window.isSecureContext && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).catch(function() {
+			copyPlainTextFallback(text);
+		});
+		return;
+	}
+	copyPlainTextFallback(text);
+}
+
+function copyPlainTextFallback(text) {
+	var textarea = document.createElement('textarea');
+	textarea.value = text;
+	textarea.setAttribute('readonly', '');
+	textarea.style.position = 'fixed';
+	textarea.style.left = '-9999px';
+	document.body.appendChild(textarea);
+	textarea.select();
+	try {
+		document.execCommand('copy');
+	}
+	catch(error) {}
+	document.body.removeChild(textarea);
 }
 
 function copyNodeText(node) {

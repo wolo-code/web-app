@@ -1,16 +1,35 @@
-#address_text {
-	position: absolute;
-	text-align: center;
+#map_bottom_stack {
+	align-items: center;
 	bottom: 80px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	z-index: 100;
+}
+
+#map_bottom_stack > * {
+	bottom: auto;
+	left: auto;
+	pointer-events: auto;
+	position: relative;
+	right: auto;
+}
+
+#address_text {
+	position: relative;
+	text-align: center;
 	background-color: #FFFFFF;
+	color: #444444;
 	padding: 4px 8px;
 	border: 1px solid #ddd;
 	border-radius: 18px;
-	left: 0;
-	right: 0;
-	margin-left: auto;
-	margin-right: auto;
+	width: 100%;
 	max-width: 350px;
+	user-select: text;
 }
 
 #address_text_main {
@@ -50,24 +69,35 @@
 }
 
 .address_text_code_row {
+	align-items: baseline;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
 	padding: 4px 0;
 }
 
 .address_text_code_label {
 	color: #69B7CF;
+	flex: 0 0 auto;
 	font-family: 'Abel', sans-serif;
 	font-size: 0.85em;
 	letter-spacing: 0.04em;
+	text-align: left;
 	text-transform: uppercase;
 }
 
 .address_text_code_value {
-	color: #555;
+	color: #333333;
 	cursor: pointer;
+	flex: 1 1 auto;
 	font-family: 'Roboto', sans-serif;
 	font-size: 0.95em;
 	letter-spacing: 0.03em;
+	min-width: 0;
 	padding: 2px 0 4px;
+	text-align: right;
+	user-select: text;
+	word-break: break-word;
 }
 
 #address_text_close {

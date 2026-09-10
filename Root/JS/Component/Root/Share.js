@@ -90,11 +90,17 @@ function copyWcodeJumpLink() {
 	hideCopyCodeMessage();
 }
 
-function copyDigipin() {
+function copyDigipin(event) {
+	if(event && event.stopPropagation) {
+		event.stopPropagation();
+	}
+	if(typeof copyAddressPanelSelection == 'function' && copyAddressPanelSelection()) {
+		return;
+	}
 	if(!code_digipin) {
 		return;
 	}
-	showAndCopy(code_digipin);
+	showAndCopy(String(code_digipin).toUpperCase());
 	showNotification(DIGIPIN_COPIED_MESSAGE);
 }
 

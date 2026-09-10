@@ -28,6 +28,9 @@ function initLocate(override_dnd, callback) {
 
 function locateExec(failure) {
 	if(!locating) {
+		if(typeof hideAddress == 'function') {
+			hideAddress();
+		}
 		var WATCH_LOCATION_MAX_TIMEOUT = 60000;
 		var WATCH_LOCATION_TIMEOUT = 45000;
 		var WATCH_LOCATION_NOTICE_TIMEOUT = 5000;
@@ -166,7 +169,7 @@ function proceedPosition() {
 			map.panTo(pos);
 			var idleListenerPanBy = map.addListener('idle', function() {
 					idleListenerPanBy.remove();
-					map.panBy(0, getPanByOffset());
+					applyMapChromePan();
 				});
 		}
 		processPosition(pos);
@@ -199,6 +202,9 @@ function processPosition(pos) {
 function processPositionButtonDown() {
 	armPositionButtonReleaseHandlers();
 	firstFocus = true;
+	if(typeof hideAddress == 'function') {
+		hideAddress();
+	}
 	clearMap();
 	if(document.body.classList.contains('decode'))
 		toggleMapType();

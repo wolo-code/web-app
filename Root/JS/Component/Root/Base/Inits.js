@@ -14,6 +14,7 @@ var cityNameList;
 var WCODE_CODE_COPIED_MESSAGE = "Wolo Code copied to clipboard";
 var WCODE_LINK_COPIED_MESSAGE = "Wolo Code link copied to clipboard";
 var ADDRESS_COPIED_MESSAGE = "Address copied to clipboard";
+var SELECTED_TEXT_COPIED_MESSAGE = "Selected text copied";
 
 // Code\Core
 var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
@@ -39,6 +40,7 @@ var code_plus_code;
 var latLng_p = '';
 var address = '';
 var gpId = '';
+var keepAddressPanelOpen = false;
 
 // Base
 var CURRENT_VERSION = 1;
@@ -89,6 +91,7 @@ var mode_preview_activated = false;
 // Notification
 var NOTIFICATION_DURATION_DEFAULT = 2500;
 var NOTIFICATION_DURATION_LONG = 10000;
+var lastBottomStackPanY = 0;
 
 // Account Dialog
 var saveList;

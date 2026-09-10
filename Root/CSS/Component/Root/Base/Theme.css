@@ -164,6 +164,20 @@ html.dark-mode #infowindow_code .slash {
 	color: #8a8aaa;
 }
 
+html.dark-mode #address_text {
+	background-color: #222244;
+	border-color: #33335a;
+	color: #d0d0d0;
+}
+
+html.dark-mode #address_text_content {
+	color: #c8c8d8;
+}
+
+html.dark-mode #address_text_close path:first-child {
+	fill: #8a8aaa;
+}
+
 html.dark-mode #address_text_codes {
 	border-top-color: #33335a;
 }
@@ -173,7 +187,7 @@ html.dark-mode .address_text_code_label {
 }
 
 html.dark-mode .address_text_code_value {
-	color: #c8d8d8;
+	color: #f2f2f2;
 }
 
 html.dark-mode #decode_input_alt_tip {

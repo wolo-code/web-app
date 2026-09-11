@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
+const vm = require('node:vm');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
@@ -33,6 +34,80 @@ test('map view toggle cycles enabled map layers', () => {
 	assert.match(mapJs, /setMapLayer\(MAP_LAYER_SATELLITE\)/);
 	assert.match(mapLayers, /function getNextMapLayer/);
 	assert.match(mapLayers, /MAP_LAYER_OSM/);
+});
+
+test('map source constants are declared before pref helpers and layer setters', () => {
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	const constantsPos = mapLayers.indexOf('var MAP_SOURCE_IDS');
+	const copyPrefsPos = mapLayers.indexOf('function copyMapSourcePrefs');
+	const setLayerPos = mapLayers.indexOf('function setMapLayer');
+	assert.ok(constantsPos > -1);
+	assert.ok(copyPrefsPos > -1);
+	assert.ok(setLayerPos > -1);
+	assert.ok(constantsPos < copyPrefsPos);
+	assert.ok(constantsPos < setLayerPos);
+});
+
+test('initLoad is triggered after component scripts define map sources', () => {
+	const rootScript = read('Root/JS/Script.js');
+	const componentScript = read('Root/JS/Component/Root/Script.js');
+	assert.doesNotMatch(rootScript, /typeof initLoad[^;]*initLoad\(\)/);
+	assert.match(componentScript, /typeof initLoad[^;]*initLoad\(\)/);
+});
+
+function loadMapSourcePrefsApi(overrides) {
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	const start = mapLayers.indexOf('function getMapSourceIds()');
+	const end = mapLayers.indexOf('function readStoredMapSourcePrefs()');
+	const sandbox = {
+		MAP_SOURCE_GOOGLE: 'google',
+		MAP_SOURCE_OSM: 'osm',
+		MAP_SOURCE_APPLE: 'apple',
+		MAP_SOURCE_ESRI: 'esri',
+		MAP_SOURCE_MICROSOFT: 'microsoft',
+		MAP_SOURCE_IDS: [ 'google', 'osm', 'apple', 'esri', 'microsoft' ],
+		MAP_SOURCE_STATE_DEFAULT: 'default',
+		MAP_SOURCE_STATE_ON: 'on',
+		MAP_SOURCE_STATE_OFF: 'off',
+		MAP_SOURCE_PREF_DEFAULTS: {
+			google: 'default',
+			osm: 'on',
+			apple: 'off',
+			esri: 'on',
+			microsoft: 'on'
+		},
+		hasAppleMapsToken: function() {
+			return false;
+		}
+	};
+	Object.assign(sandbox, overrides);
+	vm.createContext(sandbox);
+	vm.runInContext(mapLayers.slice(start, end), sandbox);
+	return sandbox;
+}
+
+test('copyMapSourcePrefs and normalizeMapSourcePrefs handle missing MAP_SOURCE_IDS', () => {
+	const api = loadMapSourcePrefsApi({ MAP_SOURCE_IDS: undefined });
+	const copied = api.copyMapSourcePrefs({ google: 'off', osm: 'default' });
+	assert.equal(copied.google, 'off');
+	assert.equal(copied.osm, 'default');
+	assert.equal(copied.esri, 'on');
+	const normalized = api.normalizeMapSourcePrefs({ google: 'off', osm: 'off', apple: 'off', esri: 'off', microsoft: 'off' });
+	assert.equal(normalized.google, 'default');
+	assert.equal(normalized.osm, 'on');
+});
+
+test('normalizeMapSourcePrefs keeps a single default source', () => {
+	const api = loadMapSourcePrefsApi();
+	const normalized = api.normalizeMapSourcePrefs({
+		google: 'default',
+		osm: 'default',
+		apple: 'off',
+		esri: 'on',
+		microsoft: 'on'
+	});
+	assert.equal(normalized.google, 'default');
+	assert.equal(normalized.osm, 'on');
 });
 
 test('profile menu can affix google, osm, apple, esri, and microsoft map sources', () => {
@@ -84,7 +159,7 @@ test('decode flow recognizes DIGIPIN and plus-code input', () => {
 });
 
 test('decode and map inputs uppercase DIGIPIN and plus-code values with CSS', () => {
-	const index = read('Root/HTML/Component/Root/Index.php');
+	const index = read('root/HTML/Component/Root/Index.php');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const baseCss = read('Root/CSS/Base/Base.css');
 	assert.match(index, /id='decode_input_case'/);
@@ -194,7 +269,7 @@ test('non-Google map views hide Google branding and keep Apple Maps transparent'
 });
 
 test('chrome controls include native tooltips', () => {
-	const index = read('Root/HTML/Component/Root/Index.php');
+	const index = read('root/HTML/Component/Root/Index.php');
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
 	assert.match(index, /id='action_menu_toggle'[\s\S]*title='Actions'/);

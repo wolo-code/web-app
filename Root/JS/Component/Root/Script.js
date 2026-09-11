@@ -184,6 +184,9 @@ function setupControls() {
 	}
 }
 
+if(typeof initLoad !== 'undefined')
+	initLoad();
+
 function toggleActionMenu() {
 	var action_menu = document.getElementById('action_menu');
 	var is_open = action_menu.classList.toggle('open');

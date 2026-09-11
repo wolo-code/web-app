@@ -5,6 +5,37 @@ var MAP_LAYER_APPLE = 'apple';
 var MAP_LAYER_ESRI = 'esri';
 var MAP_LAYER_MICROSOFT = 'microsoft';
 var MAP_VIEW_CLASSES = ['map', 'satellite', 'osm', 'apple', 'esri', 'microsoft'];
+var MAP_SOURCE_STORAGE_KEY = 'wolo-map-source';
+var MAP_SOURCE_GOOGLE = 'google';
+var MAP_SOURCE_OSM = 'osm';
+var MAP_SOURCE_APPLE = 'apple';
+var MAP_SOURCE_ESRI = 'esri';
+var MAP_SOURCE_MICROSOFT = 'microsoft';
+var MAP_SOURCE_IDS = [MAP_SOURCE_GOOGLE, MAP_SOURCE_OSM, MAP_SOURCE_APPLE, MAP_SOURCE_ESRI, MAP_SOURCE_MICROSOFT];
+var MAP_SOURCE_LABELS = {
+	google: 'Google Maps',
+	osm: 'OpenStreetMap',
+	apple: 'Apple Maps',
+	esri: 'Esri',
+	microsoft: 'Microsoft Maps'
+};
+var MAP_SOURCE_STATE_DEFAULT = 'default';
+var MAP_SOURCE_STATE_ON = 'on';
+var MAP_SOURCE_STATE_OFF = 'off';
+var MAP_SOURCE_PREF_DEFAULTS = {
+	google: MAP_SOURCE_STATE_DEFAULT,
+	osm: MAP_SOURCE_STATE_ON,
+	apple: MAP_SOURCE_STATE_OFF,
+	esri: MAP_SOURCE_STATE_ON,
+	microsoft: MAP_SOURCE_STATE_ON
+};
+var mapSourcePrefs = {
+	google: MAP_SOURCE_STATE_DEFAULT,
+	osm: MAP_SOURCE_STATE_ON,
+	apple: MAP_SOURCE_STATE_OFF,
+	esri: MAP_SOURCE_STATE_ON,
+	microsoft: MAP_SOURCE_STATE_ON
+};
 var OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 var MAPKIT_SCRIPT_URL = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
 var TRANSPARENT_TILE_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -498,37 +529,12 @@ function ensureMapViewForLocation() {
 	}
 }
 
-var MAP_SOURCE_STORAGE_KEY = 'wolo-map-source';
-var MAP_SOURCE_GOOGLE = 'google';
-var MAP_SOURCE_OSM = 'osm';
-var MAP_SOURCE_APPLE = 'apple';
-var MAP_SOURCE_ESRI = 'esri';
-var MAP_SOURCE_MICROSOFT = 'microsoft';
-var MAP_SOURCE_IDS = [MAP_SOURCE_GOOGLE, MAP_SOURCE_OSM, MAP_SOURCE_APPLE, MAP_SOURCE_ESRI, MAP_SOURCE_MICROSOFT];
-var MAP_SOURCE_LABELS = {
-	google: 'Google Maps',
-	osm: 'OpenStreetMap',
-	apple: 'Apple Maps',
-	esri: 'Esri',
-	microsoft: 'Microsoft Maps'
-};
-var MAP_SOURCE_STATE_DEFAULT = 'default';
-var MAP_SOURCE_STATE_ON = 'on';
-var MAP_SOURCE_STATE_OFF = 'off';
-var MAP_SOURCE_PREF_DEFAULTS = {
-	google: MAP_SOURCE_STATE_DEFAULT,
-	osm: MAP_SOURCE_STATE_ON,
-	apple: MAP_SOURCE_STATE_OFF,
-	esri: MAP_SOURCE_STATE_ON,
-	microsoft: MAP_SOURCE_STATE_ON
-};
-var mapSourcePrefs = {
-	google: MAP_SOURCE_STATE_DEFAULT,
-	osm: MAP_SOURCE_STATE_ON,
-	apple: MAP_SOURCE_STATE_OFF,
-	esri: MAP_SOURCE_STATE_ON,
-	microsoft: MAP_SOURCE_STATE_ON
-};
+function getMapSourceIds() {
+	if(Array.isArray(MAP_SOURCE_IDS) && MAP_SOURCE_IDS.length) {
+		return MAP_SOURCE_IDS;
+	}
+	return [MAP_SOURCE_GOOGLE, MAP_SOURCE_OSM, MAP_SOURCE_APPLE, MAP_SOURCE_ESRI, MAP_SOURCE_MICROSOFT];
+}
 
 function normalizeMapSourceState(state) {
 	if(state === MAP_SOURCE_STATE_DEFAULT || state === MAP_SOURCE_STATE_ON || state === MAP_SOURCE_STATE_OFF) {
@@ -539,10 +545,11 @@ function normalizeMapSourceState(state) {
 
 function copyMapSourcePrefs(prefs) {
 	var next = {};
+	var ids = getMapSourceIds();
 	var i;
 	var id;
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		next[id] = prefs && prefs[id] ? prefs[id] : MAP_SOURCE_PREF_DEFAULTS[id];
 	}
 	return next;
@@ -550,10 +557,11 @@ function copyMapSourcePrefs(prefs) {
 
 function getEnabledMapSources(prefs) {
 	var enabled = [];
+	var ids = getMapSourceIds();
 	var i;
 	var id;
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		if(prefs[id] !== MAP_SOURCE_STATE_OFF) {
 			enabled.push(id);
 		}
@@ -569,8 +577,9 @@ function normalizeMapSourcePrefs(prefs) {
 	var defaultCount = 0;
 	var seenDefault = false;
 
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	var ids = getMapSourceIds();
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		if(!normalizeMapSourceState(next[id])) {
 			next[id] = MAP_SOURCE_PREF_DEFAULTS[id];
 		}
@@ -601,8 +610,8 @@ function normalizeMapSourcePrefs(prefs) {
 		next[enabled[0]] = MAP_SOURCE_STATE_DEFAULT;
 	}
 	else if(defaultCount > 1) {
-		for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-			id = MAP_SOURCE_IDS[i];
+		for(i = 0; i < ids.length; i++) {
+			id = ids[i];
 			if(next[id] === MAP_SOURCE_STATE_DEFAULT) {
 				if(seenDefault) {
 					next[id] = MAP_SOURCE_STATE_ON;
@@ -673,11 +682,12 @@ function sourceDefaultLayer(source) {
 }
 
 function getDefaultMapLayer() {
+	var ids = getMapSourceIds();
 	var i;
 	var id;
 	var layer;
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		if(mapSourcePrefs[id] === MAP_SOURCE_STATE_DEFAULT) {
 			layer = sourceDefaultLayer(id);
 			if(isMapLayerEnabled(layer)) {
@@ -704,10 +714,11 @@ function getDefaultMapLayer() {
 }
 
 function getDefaultMapSourceLabel() {
+	var ids = getMapSourceIds();
 	var i;
 	var id;
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		if(mapSourcePrefs[id] === MAP_SOURCE_STATE_DEFAULT) {
 			return MAP_SOURCE_LABELS[id];
 		}
@@ -820,8 +831,9 @@ function syncMapSourceControls() {
 	var label;
 	var id;
 
-	for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-		id = MAP_SOURCE_IDS[i];
+	var ids = getMapSourceIds();
+	for(i = 0; i < ids.length; i++) {
+		id = ids[i];
 		document.body.classList.toggle('map-source-default-' + id, mapSourcePrefs[id] === MAP_SOURCE_STATE_DEFAULT);
 		document.body.classList.toggle('map-source-' + id + '-off', !isMapSourceEnabled(id));
 	}
@@ -865,7 +877,7 @@ function setMapSourceState(source, state, persist) {
 	var i;
 	var id;
 
-	if(MAP_SOURCE_IDS.indexOf(source) < 0) {
+	if(getMapSourceIds().indexOf(source) < 0) {
 		return;
 	}
 	state = normalizeMapSourceState(state);
@@ -902,8 +914,9 @@ function setMapSourceState(source, state, persist) {
 		}
 	}
 	else if(state === MAP_SOURCE_STATE_DEFAULT) {
-		for(i = 0; i < MAP_SOURCE_IDS.length; i++) {
-			id = MAP_SOURCE_IDS[i];
+		var ids = getMapSourceIds();
+		for(i = 0; i < ids.length; i++) {
+			id = ids[i];
 			if(id === source) {
 				next[id] = MAP_SOURCE_STATE_DEFAULT;
 			}

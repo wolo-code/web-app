@@ -3,6 +3,7 @@ function isInfoIntroActive() {
 	var message = document.getElementById('info_message');
 	var intro = document.getElementById('info_intro');
 	return !!(overlay && message && intro
+		&& overlay.classList && message.classList && intro.classList
 		&& !overlay.classList.contains('hide')
 		&& !message.classList.contains('hide')
 		&& !intro.classList.contains('hide'));
@@ -13,10 +14,10 @@ function getVisibleOverlayDialog() {
 	var visible_div;
 	if(isInfoIntroActive())
 		return document.getElementById('info_message');
-	if(!overlay || overlay.classList.contains('hide') || !overlay.children[0])
+	if(!overlay || !overlay.classList || overlay.classList.contains('hide') || !overlay.children || !overlay.children[0])
 		return null;
 	for(var child = overlay.children[0].firstChild; child !== null; child = child.nextSibling)
-		if(child.nodeType == 1 && !child.classList.contains('hide'))
+		if(child.nodeType == 1 && child.classList && !child.classList.contains('hide'))
 			visible_div = child;
 	return visible_div || null;
 }
@@ -66,7 +67,7 @@ function onOverlayBackdropClick(event) {
 
 function unbindOverlayBackdropClick() {
 	var overlay = document.getElementById('overlay');
-	if(!overlay || !overlay.dataset.backdropClickBound)
+	if(!overlay || !overlay.dataset || !overlay.dataset.backdropClickBound)
 		return;
 	overlay.removeEventListener('click', onOverlayBackdropClick);
 	delete overlay.dataset.backdropClickBound;
@@ -74,7 +75,7 @@ function unbindOverlayBackdropClick() {
 
 function bindOverlayBackdropClick() {
 	var overlay = document.getElementById('overlay');
-	if(!overlay || overlay.dataset.backdropClickBound || isInfoIntroActive())
+	if(!overlay || !overlay.dataset || overlay.dataset.backdropClickBound || isInfoIntroActive())
 		return;
 	overlay.dataset.backdropClickBound = 'true';
 	overlay.addEventListener('click', onOverlayBackdropClick);
@@ -86,12 +87,13 @@ else
 	bindOverlayBackdropClick();
 
 function hideOverlay(e) {
+	var overlay = document.getElementById('overlay');
 	var visible_div;
 	if(isInfoIntroActive() && (!e || e.id === 'info_message'))
 		return;
 	visible_div = getVisibleOverlayDialog();
-	if(visible_div == e) {
-		document.getElementById('overlay').classList.add('hide');
+	if(visible_div == e && overlay && overlay.classList && visible_div.classList) {
+		overlay.classList.add('hide');
 		visible_div.classList.add('hide');
 	}
 	if(isInfoIntroActive())
@@ -105,15 +107,18 @@ function hideOverlay(e) {
 }
 
 function showOverlay(e) {
-	if(!e)
+	if(!e || !e.classList)
 		return;
 	if(isInfoIntroActive() && e.id !== 'info_message')
 		return;
-	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
-		if(child.nodeType == 1 && !child.classList.contains('hide') && child != e)
+	var overlay = document.getElementById('overlay');
+	if(!overlay || !overlay.classList || !overlay.children || !overlay.children[0])
+		return;
+	for(var child = overlay.children[0].firstChild; child !== null; child = child.nextSibling)
+		if(child.nodeType == 1 && child.classList && !child.classList.contains('hide') && child != e)
 			child.classList.add('hide');
-	if(document.getElementById('overlay').classList.contains('hide'))
-		document.getElementById('overlay').classList.remove('hide');
+	if(overlay.classList.contains('hide'))
+		overlay.classList.remove('hide');
 	if(e.classList.contains('hide'))
 		e.classList.remove('hide');
 	if(isInfoIntroActive())

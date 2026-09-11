@@ -44,8 +44,15 @@ function getAddress(latLng, session_id, callback) {
 	});
 }
 
+function getAddressPanel() {
+	return document.getElementById('address_text');
+}
+
 function toggleAddress() {
-	if(address_text.classList.value == 'hide')
+	var panel = getAddressPanel();
+	if(!panel || !panel.classList)
+		return;
+	if(panel.classList.contains('hide'))
 		showAddress();
 	else
 		hideAddress();
@@ -70,40 +77,52 @@ function setAddressPanelHeading(title, segment) {
 }
 
 function showAddress() {
+	var panel = getAddressPanel();
 	if(!current_title && !current_segment)
 		setAddressPanelHeading('', '');
 	else
 		setAddressPanelHeading(current_title, current_segment);
-	address_text_content.innerText = address || '';
+	if(address_text_content)
+		address_text_content.innerText = address || '';
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
-	address_text.classList.remove('hide');
+	if(panel && panel.classList)
+		panel.classList.remove('hide');
 }
 
 function hideAddress() {
+	var content = document.getElementById('address_text_content');
+	var panel = getAddressPanel();
 	keepAddressPanelOpen = false;
 	setAddressPanelHeading('', '');
-	address_text_content.innerText = '';
+	if(content)
+		content.innerText = '';
 	clearAddressCodeRows();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
-	address_text.classList.add('hide');
+	if(panel && panel.classList)
+		panel.classList.add('hide');
 }
 
 function clearAddress() {
+	var content = document.getElementById('address_text_content');
 	address = null;
 	gpId = null;
 	code_plus_code = null;
-	address_text_content.innerText = '';
+	if(content)
+		content.innerText = '';
 	clearAddressCodeRows();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
 }
 
 function refreshAddress() {
-	address_text_content.innerText = address;
-	external_address.innerText = address;
+	var content = document.getElementById('address_text_content');
+	if(content)
+		content.innerText = address;
+	if(typeof external_address != 'undefined' && external_address)
+		external_address.innerText = address;
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -123,7 +142,7 @@ function refreshAddressCodes() {
 	var plusRow = document.getElementById('address_text_plus_row');
 	var digipinNode = document.getElementById('address_text_digipin');
 	var plusNode = document.getElementById('address_text_plus');
-	if(!codes || !digipinRow || !plusRow) {
+	if(!codes || !digipinRow || !plusRow || !digipinNode || !plusNode) {
 		return;
 	}
 	if(digipinCode) {
@@ -205,16 +224,19 @@ function copyAddressPanelSelection() {
 }
 
 function copyAddress(event) {
+	var panel = getAddressPanel();
+	var content = document.getElementById('address_text_content');
 	if(copyAddressPanelSelection()) {
 		if(event && event.stopPropagation) {
 			event.stopPropagation();
 		}
 		return;
 	}
-	if(address_text.classList.contains('hide')) {
+	if(panel && panel.classList && panel.classList.contains('hide')) {
 		showAddress();
 	}
-	copyNodeText(address_text_content);
+	if(content)
+		copyNodeText(content);
 	showNotification(ADDRESS_COPIED_MESSAGE);
 }
 

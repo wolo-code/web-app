@@ -13,7 +13,7 @@ function setCode(city, wcode, latLng) {
 	}
 	code_wcode = wcode;
 	code_postition = latLng;
-	document.getElementById('accuracy_container').classList.add('hide');
+	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng);
 }
 

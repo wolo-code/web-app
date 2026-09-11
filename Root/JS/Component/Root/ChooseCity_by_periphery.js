@@ -38,8 +38,10 @@ function clearChooseCity_by_periphery_List() {
 function chooseCity_by_periphery(list, callback) {
 	chooseCity_by_periphery_List = list;
 	chooseCity_by_periphery_Callback = callback;
-	if(!document.getElementById('choose_city_by_periphery_message').classList.contains('hide')
-	 && document.getElementById('choose_city_by_periphery_message_list').innerHTML.length == 0)
+	var peripheryMessage = document.getElementById('choose_city_by_periphery_message');
+	var peripheryList = document.getElementById('choose_city_by_periphery_message_list');
+	if(peripheryMessage && peripheryMessage.classList && !peripheryMessage.classList.contains('hide')
+	 && peripheryList && peripheryList.innerHTML.length == 0)
 		showChooseCity_by_periphery_List()
 }
 

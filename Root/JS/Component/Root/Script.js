@@ -110,6 +110,13 @@ function initBottomStackMapPan() {
 	window.addEventListener('resize', syncBottomStackMapPan);
 }
 
+function bindClick(id, handler) {
+	var node = document.getElementById(id);
+	if(node)
+		node.addEventListener('click', handler);
+	return node;
+}
+
 function setupControls() {
 	initBottomStackMapPan();
 	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
@@ -137,9 +144,9 @@ function setupControls() {
 	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
 	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);
 	document.getElementById('locate_right_message_no').addEventListener('click', locateRight_deny);
-	document.getElementById('invalid_code_message_close').addEventListener('click', hideInvalidCodeDialog);
-	document.getElementById('invalid_code_correct').addEventListener('click', invalidCodeCorrect);
-	document.getElementById('invalid_code_search').addEventListener('click', invalidCodeSearchMap);
+	bindClick('invalid_code_message_close', hideInvalidCodeDialog);
+	bindClick('invalid_code_correct', invalidCodeCorrect);
+	bindClick('invalid_code_search', invalidCodeSearchMap);
 	document.getElementById('no_city_submit_yes').addEventListener('click', noCity_add);
 	document.getElementById('no_city_submit_no').addEventListener('click', noCity_cancel);
 	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
@@ -148,12 +155,12 @@ function setupControls() {
 	document.getElementById('proceed_button').addEventListener('click', proceedPosition);
 	document.getElementById('incompatible_browser_message_close').addEventListener('click', hideIncompatibleBrowserMessage);
 	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
-	document.getElementById('address_text_close').addEventListener('click', hideAddress);
-	document.getElementById('address_text_main').addEventListener('click', copyAddress);
-	document.getElementById('address_text_digipin').addEventListener('click', function(event) {
+	bindClick('address_text_close', hideAddress);
+	bindClick('address_text_main', copyAddress);
+	bindClick('address_text_digipin', function(event) {
 		copyDigipin(event);
 	});
-	document.getElementById('address_text_plus').addEventListener('click', function(event) {
+	bindClick('address_text_plus', function(event) {
 		copyPlusCode(event);
 	});
 	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
@@ -186,11 +193,22 @@ function setupControls() {
 
 function toggleActionMenu() {
 	var action_menu = document.getElementById('action_menu');
-	var is_open = action_menu.classList.toggle('open');
-	document.getElementById('action_menu_toggle').setAttribute('aria-expanded', is_open);
-	document.getElementById('action_menu_info').tabIndex = is_open ? 0 : -1;
-	document.getElementById('action_menu_map').tabIndex = is_open ? 0 : -1;
-	document.getElementById('action_menu_decode').tabIndex = is_open ? 0 : -1;
+	var toggle = document.getElementById('action_menu_toggle');
+	var info = document.getElementById('action_menu_info');
+	var mapItem = document.getElementById('action_menu_map');
+	var decode = document.getElementById('action_menu_decode');
+	var is_open;
+	if(!action_menu || !action_menu.classList)
+		return;
+	is_open = action_menu.classList.toggle('open');
+	if(toggle)
+		toggle.setAttribute('aria-expanded', is_open);
+	if(info)
+		info.tabIndex = is_open ? 0 : -1;
+	if(mapItem)
+		mapItem.tabIndex = is_open ? 0 : -1;
+	if(decode)
+		decode.tabIndex = is_open ? 0 : -1;
 	if(is_open)
 		refreshActionMenuTimeout();
 	else
@@ -198,16 +216,27 @@ function toggleActionMenu() {
 }
 
 function closeActionMenu() {
-	document.getElementById('action_menu').classList.remove('open');
-	document.getElementById('action_menu_toggle').setAttribute('aria-expanded', false);
-	document.getElementById('action_menu_info').tabIndex = -1;
-	document.getElementById('action_menu_map').tabIndex = -1;
-	document.getElementById('action_menu_decode').tabIndex = -1;
+	var action_menu = document.getElementById('action_menu');
+	var toggle = document.getElementById('action_menu_toggle');
+	var info = document.getElementById('action_menu_info');
+	var mapItem = document.getElementById('action_menu_map');
+	var decode = document.getElementById('action_menu_decode');
+	if(action_menu && action_menu.classList)
+		action_menu.classList.remove('open');
+	if(toggle)
+		toggle.setAttribute('aria-expanded', false);
+	if(info)
+		info.tabIndex = -1;
+	if(mapItem)
+		mapItem.tabIndex = -1;
+	if(decode)
+		decode.tabIndex = -1;
 	clearActionMenuTimeout();
 }
 
 function refreshActionMenuTimeout() {
-	if(!document.getElementById('action_menu').classList.contains('open'))
+	var action_menu = document.getElementById('action_menu');
+	if(!action_menu || !action_menu.classList || !action_menu.classList.contains('open'))
 		return;
 	clearActionMenuTimeout();
 	actionMenuTimeout = setTimeout(closeActionMenu, actionMenuTimeoutDuration);

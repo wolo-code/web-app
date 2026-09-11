@@ -44,8 +44,8 @@ function locateExec(failure) {
 				accuCircle.setMap(null);
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
-			document.getElementById('proceed_container').classList.remove('hide');
-			document.getElementById('accuracy_container').classList.remove('hide');
+			removeClassIfPresent(document.getElementById('proceed_container'), 'hide');
+			removeClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 			document.getElementById('proceed_progress').style.transition = 'none';
 			document.getElementById('proceed_progress').style.width = "0%";
 			document.getElementById('proceed_progress').offsetWidth;
@@ -97,9 +97,9 @@ function locateExec(failure) {
 						document.getElementById('accuracy_meter').innerText = Math.round(position.coords.accuracy);
 						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: '+percantageToColor(100-position.coords.accuracy));
 					}
-					document.getElementById('proceed_container').classList.remove('hide');
-					document.getElementById('accuracy_container').classList.remove('highlight');
-					document.getElementById('accuracy_container').classList.remove('hide');
+					removeClassIfPresent(document.getElementById('proceed_container'), 'hide');
+					removeClassIfPresent(document.getElementById('accuracy_container'), 'highlight');
+					removeClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 					if(!firstFocus || !myLocDot || !myLocDot.getMap())
 						focus_(pos, accuCircle.getBounds());
 					else
@@ -183,8 +183,8 @@ function processPosition(pos) {
 	if(typeof navigator.geolocation !== 'undefined')
 		navigator.geolocation.clearWatch(watch_location_id);
 	clearTimeout(watch_location_timer);
-	document.getElementById('proceed_container').classList.add('hide');
-	document.getElementById('accuracy_container').classList.add('highlight');
+	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
+	addClassIfPresent(document.getElementById('accuracy_container'), 'highlight');
 	infoWindow_setContent(MESSAGE_LOADING);
 	showMarker(pos);
 	infoWindow.open(map, marker);
@@ -257,13 +257,13 @@ function handleLocationError(browserHasGeolocation) {
 	showNotification(browserHasGeolocation ?
 												'Error: The Geolocation service failed' :
 												'Error: Your browser doesn\'t support geolocation');
-	notification_top.classList.remove('hide');
+	removeClassIfPresent(document.getElementById('notification_top'), 'hide');
 	syncCheckIncompatibleBrowserMessage();
 }
 
 function clearLocating(hideAccuracyContainer) {
 	if(hideAccuracyContainer)
-		document.getElementById('accuracy_container').classList.add('hide');
+		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	locating = false;
 	popLoader();
 	removeClassIfPresent(typeof location_icon_dot == 'undefined' ? null : location_icon_dot, 'blinking');

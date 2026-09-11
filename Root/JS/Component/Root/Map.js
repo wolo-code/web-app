@@ -124,15 +124,17 @@ function initMap() {
 		});
 	}
 	
-	input.addEventListener("focus", function() {
-		document.getElementById('search_icon').classList.add('hide');
-	});
+	if(input) {
+		input.addEventListener("focus", function() {
+			addClassIfPresent(document.getElementById('search_icon'), 'hide');
+		});
 
-	input.addEventListener("change", function() {
-		if(input.value == '')
-			document.getElementById('search_icon').classList.remove('hide');
-		syncProceedButtons();
-	});
+		input.addEventListener("change", function() {
+			if(input.value == '')
+				removeClassIfPresent(document.getElementById('search_icon'), 'hide');
+			syncProceedButtons();
+		});
+	}
 	
 	var markers = [];
 	if(searchBox) {
@@ -280,7 +282,7 @@ function decode_input_from_form_external() {
 
 function beginDecode(code) {
 	cleanUp();
-	document.getElementById('accuracy_container').classList.add('hide');
+	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	execDecode(code);
 }
 
@@ -544,7 +546,7 @@ function cleanUp(full = false) {
 	navigator.geolocation.clearWatch(watch_location_id);
 	pendingPosition = null;
 	pendingCity = null;
-	notification_top.classList.add('hide');
+	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	if(infoWindow) {
 		infoWindow.close();
 		infoWindow.setContent('');
@@ -552,7 +554,7 @@ function cleanUp(full = false) {
 	clearAddress();
 	hideAddress();
 	clearURL();
-	document.getElementById('proceed_container').classList.add('hide');
+	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
 	firstFocus = true;
 	selfBoundsChangedCount = 1;
 	current_title = null;

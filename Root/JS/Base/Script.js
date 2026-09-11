@@ -9,6 +9,15 @@ function getGooglePlacesLibrary() {
 	return null;
 }
 
+function getSearchBoxPlaceList(searchBox) {
+	if(!searchBox || typeof searchBox.getPlaces != 'function')
+		return [];
+	var places = searchBox.getPlaces();
+	if(!places || !places.length)
+		return [];
+	return places;
+}
+
 function syncInitMap() {
 	try {
 		if (document.readyState !== 'loading' && typeof google === 'object' && typeof google.maps === 'object' && typeof google.maps.Map === 'function' && typeof initMap == 'function' && pendingInitMap) {

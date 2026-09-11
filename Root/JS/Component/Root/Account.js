@@ -219,10 +219,18 @@ function processSaveEntry(e) {
 
 function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
-		document.getElementById('address_text_title').innerText = saveList[row.data_key].title;
-		document.getElementById('address_text_segment').innerText = saveList[row.data_key].segment;
-		document.getElementById('address_text_content').innerText = saveList[row.data_key].address;
-		address_text.classList.remove('hide');
+		var title = document.getElementById('address_text_title');
+		var segment = document.getElementById('address_text_segment');
+		var content = document.getElementById('address_text_content');
+		var panel = typeof getAddressPanel == 'function' ? getAddressPanel() : document.getElementById('address_text');
+		if(title)
+			title.innerText = saveList[row.data_key].title;
+		if(segment)
+			segment.innerText = saveList[row.data_key].segment;
+		if(content)
+			content.innerText = saveList[row.data_key].address;
+		if(panel && panel.classList)
+			panel.classList.remove('hide');
 		current_title = saveList[row.data_key].title;
 		current_segment = saveList[row.data_key].segment;
 		current_address = saveList[row.data_key].address;

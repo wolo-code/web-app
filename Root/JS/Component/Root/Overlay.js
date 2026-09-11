@@ -1,21 +1,38 @@
+function getOverlayRoot() {
+	return document.getElementById('overlay');
+}
+
 function hideOverlay(e) {
+	var overlay = getOverlayRoot();
+	var host;
 	var visible_div;
-	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
-		if(child.nodeType == 1 && !child.classList.contains('hide'))
+	var child;
+	if(!overlay || !overlay.classList || !overlay.children || !overlay.children[0])
+		return;
+	host = overlay.children[0];
+	for(child = host.firstChild; child !== null; child = child.nextSibling)
+		if(child.nodeType == 1 && child.classList && !child.classList.contains('hide'))
 			visible_div = child;
-	if(!document.getElementById('overlay').classList.contains('hide'))
-		if(visible_div == e) {
-			document.getElementById('overlay').classList.add('hide');
-			visible_div.classList.add('hide');
-		}
+	if(!overlay.classList.contains('hide') && visible_div && visible_div === e) {
+		overlay.classList.add('hide');
+		visible_div.classList.add('hide');
+	}
 }
 
 function showOverlay(e) {
-	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
-		if(child.nodeType == 1 && !child.classList.contains('hide') && child != e)
-			child.classList.add('hide');
-	if(document.getElementById('overlay').classList.contains('hide'))
-		document.getElementById('overlay').classList.remove('hide');
+	var overlay = getOverlayRoot();
+	var host;
+	var child;
+	if(!overlay || !overlay.classList || !e || !e.classList)
+		return;
+	if(overlay.children && overlay.children[0]) {
+		host = overlay.children[0];
+		for(child = host.firstChild; child !== null; child = child.nextSibling)
+			if(child.nodeType == 1 && child.classList && !child.classList.contains('hide') && child !== e)
+				child.classList.add('hide');
+	}
+	if(overlay.classList.contains('hide'))
+		overlay.classList.remove('hide');
 	if(e.classList.contains('hide'))
 		e.classList.remove('hide');
 }

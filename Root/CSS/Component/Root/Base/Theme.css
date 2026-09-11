@@ -25,8 +25,28 @@
 	font-size: 0.9em;
 	gap: 4px;
 	justify-content: center;
-	padding: 8px 6px;
+	padding: 8px 6px 22px;
+	position: relative;
 	transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.theme-selector .theme-option-label {
+	bottom: 4px;
+	font-size: 0.75em;
+	left: 50%;
+	line-height: 1.2;
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+	top: auto;
+	transform: translateX(-50%);
+	transition: opacity 0.15s;
+	white-space: nowrap;
+}
+
+.theme-selector .theme-option:hover .theme-option-label,
+.theme-selector .theme-option:focus-visible .theme-option-label {
+	opacity: 1;
 }
 
 .theme-selector .theme-option:hover,
@@ -41,6 +61,120 @@
 	background: #69B7CF;
 	border-color: #69B7CF;
 	color: #fff;
+}
+
+.map-source-selector {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.map-source-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	justify-content: space-between;
+}
+
+.map-source-label {
+	color: #777;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
+	font-size: 0.9em;
+}
+
+.map-source-controls {
+	align-items: center;
+	display: flex;
+	flex-shrink: 0;
+	gap: 6px;
+}
+
+.map-source-toggle {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+	flex-shrink: 0;
+	height: 22px;
+	padding: 0;
+	width: 38px;
+}
+
+.map-source-toggle:focus-visible {
+	outline: 2px solid #69B7CF;
+	outline-offset: 2px;
+}
+
+.map-source-toggle-track {
+	background: #d8d8d8;
+	border-radius: 11px;
+	display: block;
+	height: 22px;
+	position: relative;
+	transition: background-color 0.2s;
+	width: 38px;
+}
+
+.map-source-toggle-track::after {
+	background: #fff;
+	border-radius: 50%;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+	content: '';
+	height: 16px;
+	left: 3px;
+	position: absolute;
+	top: 3px;
+	transition: transform 0.2s;
+	width: 16px;
+}
+
+.map-source-toggle-on .map-source-toggle-track {
+	background: #69B7CF;
+}
+
+.map-source-toggle-on .map-source-toggle-track::after {
+	transform: translateX(16px);
+}
+
+.map-source-default {
+	align-items: center;
+	appearance: none;
+	background: transparent;
+	border: 0;
+	color: #bbb;
+	cursor: pointer;
+	display: flex;
+	height: 28px;
+	justify-content: center;
+	padding: 0;
+	width: 28px;
+}
+
+.map-source-default:focus-visible {
+	outline: 2px solid #69B7CF;
+	outline-offset: 2px;
+}
+
+.map-source-default:disabled {
+	color: #ddd;
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+
+.map-source-default-active:not(:disabled) {
+	color: #69B7CF;
+}
+
+.map-source-default-icon,
+.map-source-default-icon svg {
+	display: block;
+	height: 20px;
+	width: 20px;
+}
+
+.map-source-default-icon path {
+	fill: currentColor;
 }
 
 .theme-option-icon,
@@ -59,6 +193,9 @@ html.dark-mode {
 	--app-background-map: #0e3d4a;
 	--app-background-satellite: #1b2f62;
 	--app-background-osm: #1a2a1a;
+	--app-background-apple: #2a2620;
+	--app-background-esri: #222a1a;
+	--app-background-microsoft: #1a2430;
 }
 
 html.dark-mode,
@@ -190,11 +327,7 @@ html.dark-mode .address_text_code_value {
 	color: #f2f2f2;
 }
 
-html.dark-mode #decode_input_alt_tip {
-	color: #8a8aaa;
-}
-
-html.dark-mode #osm_attribution {
+html.dark-mode .map_attribution {
 	background-color: rgb(34 34 68 / 70%);
 	color: #c8d8c8;
 }
@@ -231,6 +364,21 @@ html.dark-mode .message_dialog_control button {
 	background: #2a2a4a;
 	border-color: #33335a;
 	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 4px -1px;
+}
+
+html.dark-mode #invalid_code_message #invalid_code_query {
+	color: #c5e6ef;
+}
+
+html.dark-mode #invalid_code_message .invalid_code_actions button {
+	background: #69B7CF;
+	border-color: #69B7CF;
+	color: #ffffff;
+}
+
+html.dark-mode #invalid_code_message .invalid_code_actions button .image,
+html.dark-mode #invalid_code_message .invalid_code_actions button svg {
+	color: #ffffff;
 }
 
 html.dark-mode #account_dialog_save button,
@@ -282,6 +430,35 @@ html.dark-mode .theme-selector .theme-option-active {
 	background: #69B7CF;
 	border-color: #69B7CF;
 	color: #fff;
+}
+
+html.dark-mode .map-source-label {
+	color: #aaa;
+}
+
+html.dark-mode .map-source-toggle,
+html.dark-mode .map-source-default {
+	background: transparent;
+}
+
+html.dark-mode .map-source-toggle-track {
+	background: #44446a;
+}
+
+html.dark-mode .map-source-toggle-on .map-source-toggle-track {
+	background: #69B7CF;
+}
+
+html.dark-mode .map-source-default {
+	color: #777;
+}
+
+html.dark-mode .map-source-default:disabled {
+	color: #555;
+}
+
+html.dark-mode .map-source-default-active:not(:disabled) {
+	color: #69B7CF;
 }
 
 html.dark-mode #firebaseui-auth > div {

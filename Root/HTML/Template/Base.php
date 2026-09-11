@@ -46,6 +46,7 @@
 	require '../HTML/Fragment/Head.php';
 ?>
 	<script><?php require '../JS/Fragment/Firebase_inits.php' ?></script>
+	<script>var WOLO_APPLE_MAPS_TOKEN = <?php echo json_encode(isset($config['apple_maps_token']) ? $config['apple_maps_token'] : ''); ?>;</script>
 <?php
 	if($bPublish) { ?>
 		<script <?php require '../JS/Fragment/Sentry_version.php' ?>></script>

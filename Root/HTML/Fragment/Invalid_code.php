@@ -7,19 +7,18 @@
 	</div>
 	<div class='message_dialog_body'>
 		<p>
-			This does not look like a Wolo Code, DIGIPIN, or plus code.
+			Invalid Wolo Code, DIGIPIN, or Plus Code
 		</p>
 		<p id='invalid_code_query_wrap' class='hide'>
 			<span id='invalid_code_query'></span>
 		</p>
-		<p>
-			Correct the code, or search the map for this text.
-		</p>
-		<div class="center message_dialog_control">
-			<button id='invalid_code_correct' class="border dialog_message_secondary invalid_code_action" type='button' aria-label='Correct'>
+		<div class="invalid_code_actions">
+			<button id='invalid_code_correct' class="border invalid_code_action" type='button'>
 				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
+				Edit code
 			</button>
-			<button id='invalid_code_search' class="border dialog_message_primary button_highlight invalid_code_action" type='button' aria-label='Search map'>
+			<button id='invalid_code_search' class="border invalid_code_action" type='button'>
+				Search map
 				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			</button>
 		</div>

@@ -14,6 +14,14 @@
 	#map_input_suggestion_result {
 		top: 74px !important;
 	}
+
+	.map_attribution {
+		bottom: 30px;
+		font-size: 0.65em;
+		left: 66px;
+		max-width: calc(50vw - 120px);
+		padding: 4px 8px;
+	}
 	
 }
 

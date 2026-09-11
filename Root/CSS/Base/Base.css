@@ -56,9 +56,68 @@ button.border {
 	outline: none;
 }
 
+#map_stage {
+	height: 100%;
+	position: relative;
+	width: 100%;
+	z-index: 0;
+}
+
+#apple_map {
+	height: 100%;
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	will-change: transform;
+	z-index: 0;
+}
+
+body.apple #map_stage::after {
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	bottom: 16px;
+	content: '';
+	height: 40px;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	width: 168px;
+	z-index: 0;
+}
+
 #map {
 	height: 100%;
 	background: var(--app-background-current);
+	position: relative;
+	z-index: 1;
+}
+
+#logo,
+#account {
+	z-index: 2;
+}
+
+body.apple #map,
+body.apple #map .gm-style,
+body.apple #map .gm-style > div {
+	background: transparent !important;
+	background-image: none !important;
+}
+
+body.apple #map .gm-style canvas {
+	visibility: hidden;
+}
+
+body.osm #map .gm-style-cc,
+body.apple #map .gm-style-cc,
+body.esri #map .gm-style-cc,
+body.microsoft #map .gm-style-cc,
+body.osm #map a[href^="https://maps.google.com/maps"],
+body.apple #map a[href^="https://maps.google.com/maps"],
+body.esri #map a[href^="https://maps.google.com/maps"],
+body.microsoft #map a[href^="https://maps.google.com/maps"] {
+	display: none !important;
 }
 
 body.map #map,
@@ -255,8 +314,15 @@ body > #pac-input {
 }
 
 #map_bottom_stack #notification_bottom {
-	width: 350px;
 	max-width: 100%;
+	opacity: 1;
+	transition: opacity 400ms ease;
+	width: 350px;
+}
+
+#map_bottom_stack #notification_bottom.fade-out {
+	opacity: 0;
+	pointer-events: none;
 }
 
 .offline_status_banner {

@@ -25,25 +25,13 @@
 }
 
 #decode_input_container {
-	align-items: center;
-	bottom: 0;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	left: 0;
-	max-height: 220px;
-	max-width: 468px;
 	position: absolute;
+	left: 0;
 	right: 0;
 	top: 0;
-}
-
-#decode_input_row {
-	align-items: flex-end;
-	display: flex;
-	justify-content: center;
-	max-width: 100%;
-	width: 100%;
+	bottom: 0;
+	max-width: 468px;
+	max-height: 166px;
 }
 
 .decode #decode_input, #decode_input_shadow {
@@ -88,7 +76,7 @@
 	overflow: hidden;
 	resize: none;
 	vertical-align: bottom;
-	margin-bottom: 0;
+	margin-bottom: 10px;
 }
 
 #decode_input_shadow {
@@ -98,22 +86,6 @@
 	max-width: 92%;
 	overflow: hidden;
 	white-space: pre;
-}
-
-#decode_input_alt_tip {
-	color: #8a8a8a;
-	font-family: Abel, sans-serif;
-	font-size: 0.88em;
-	letter-spacing: 0.01em;
-	margin-top: 8px;
-	max-width: 92%;
-	pointer-events: none;
-	text-align: center;
-	width: 100%;
-}
-
-.decode #decode_input_alt_tip.hide {
-	display: none;
 }
 
 #decode_input {
@@ -205,9 +177,31 @@
 body.map .map_type_icon_terrain,
 body.satellite .map_type_icon_satellite,
 body.osm .map_type_icon_osm,
+body.apple .map_type_icon_apple,
+body.esri .map_type_icon_esri,
+body.microsoft .map_type_icon_microsoft,
 body:not(.decode) .view_toggle_icon_code,
-.decode .view_toggle_icon_map {
+.decode .view_toggle_icon_map,
+.decode #decode_map_view_button .map_type_icon_terrain {
 	display: block;
+}
+
+.decode.map-source-default-osm #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-apple #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-esri #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_terrain {
+	display: none;
+}
+
+.decode.map-source-default-osm #decode_map_view_button .map_type_icon_osm,
+.decode.map-source-default-apple #decode_map_view_button .map_type_icon_apple,
+.decode.map-source-default-esri #decode_map_view_button .map_type_icon_esri,
+.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_microsoft {
+	display: block;
+}
+
+body.map-source-single #action_menu_map {
+	display: none;
 }
 
 .decode #action_menu_map .map_type_icon_terrain {

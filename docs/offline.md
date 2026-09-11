@@ -22,7 +22,7 @@ flowchart TD
 - Install step loads `Root/precache-manifest.json` and precaches the listed assets.
 - Navigation requests: network-first with cached shell fallback (`/` or `/index.html`).
 - Same-origin static assets: network-first with cache fallback, so online refreshes pick up CSS/JS/SVG changes instead of serving a stale cache-first copy.
-- Google Maps tile hosts: cache-first with background refresh and a 500-entry cap.
+- Map tile hosts (Google, OSM, Esri/Apple Maps view, Bing/Microsoft): cache-first with background refresh and a 500-entry cap.
 - Firebase/auth/API calls: network-only (except queued offline saves handled in app code).
 
 Regenerate the manifest after publish/bake:
@@ -46,7 +46,7 @@ Cities are cached automatically when loaded (locate/encode, decode, decode-city 
 ### Map tiles
 
 - `OfflineStatus.js` stores the latest map center, zoom, and bounds in IndexedDB.
-- The service worker caches tile responses from Google Maps tile hosts while online.
+- The service worker caches tile responses from Google, OSM, Esri, and Bing tile hosts while online.
 - Offline map view shows cached tiles for areas already visited; missing tiles show the offline banner instead of blocking encode/decode.
 
 ### Offline save queue

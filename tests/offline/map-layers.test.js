@@ -159,7 +159,7 @@ test('decode flow recognizes DIGIPIN and plus-code input', () => {
 });
 
 test('decode and map inputs uppercase DIGIPIN and plus-code values with CSS', () => {
-	const index = read('Root/HTML/Component/Root/Index.php');
+	const index = read('root/HTML/Component/Root/Index.php');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const baseCss = read('Root/CSS/Base/Base.css');
 	assert.match(index, /id='decode_input_case'/);
@@ -269,7 +269,7 @@ test('non-Google map views hide Google branding and keep Apple Maps transparent'
 });
 
 test('chrome controls include native tooltips', () => {
-	const index = read('Root/HTML/Component/Root/Index.php');
+	const index = read('root/HTML/Component/Root/Index.php');
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
 	assert.match(index, /id='action_menu_toggle'[\s\S]*title='Actions'/);

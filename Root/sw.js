@@ -6,13 +6,13 @@ var STATIC_CACHE = CACHE_VERSION + ':static';
 var SHELL_CACHE = CACHE_VERSION + ':shell';
 var TILE_CACHE = CACHE_VERSION + ':tiles';
 var MAX_TILE_ENTRIES = 500;
-var TILE_HOSTS = [
+var TILE_HOST_SUFFIXES = [
 	'maps.googleapis.com',
 	'maps.gstatic.com',
-	'khms0.googleapis.com',
-	'khms1.googleapis.com',
-	'khms2.googleapis.com',
-	'khms3.googleapis.com'
+	'tile.openstreetmap.org',
+	'tiles.virtualearth.net',
+	'dynamic.tiles.virtualearth.net',
+	'server.arcgisonline.com'
 ];
 
 var NETWORK_ONLY_HOSTS = [
@@ -269,14 +269,30 @@ function pruneTileCache(keepUrls) {
 	});
 }
 
+function isTileHost(hostname) {
+	var i;
+	if (hostname.indexOf('khms') === 0 && hostname.indexOf('.googleapis.com') !== -1) {
+		return true;
+	}
+	for (i = 0; i < TILE_HOST_SUFFIXES.length; i++) {
+		if (hostname === TILE_HOST_SUFFIXES[i] || hostname.indexOf('.' + TILE_HOST_SUFFIXES[i]) !== -1) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function isMapTileRequest(url) {
-	if (TILE_HOSTS.indexOf(url.hostname) === -1) {
+	if (!isTileHost(url.hostname)) {
 		return false;
 	}
 	return url.pathname.indexOf('/vt') !== -1
 		|| url.pathname.indexOf('/kh') !== -1
 		|| url.pathname.indexOf('/mapfiles') !== -1
 		|| url.pathname.indexOf('/maps/vt') !== -1
+		|| url.pathname.indexOf('/tiles/') !== -1
+		|| url.pathname.indexOf('/MapServer/tile/') !== -1
+		|| url.pathname.indexOf('/comp/ch') !== -1
 		|| /\.(png|jpg|jpeg|webp)$/.test(url.pathname);
 }
 

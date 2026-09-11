@@ -137,7 +137,7 @@ html body .decode_city_source_button.activating svg {
 }
 
 #action_menu {
-	z-index: 1;
+	z-index: 2;
 	position: absolute;
 	bottom: 26px;
 	left: 11px;
@@ -270,20 +270,32 @@ html body .decode_city_source_button.activating svg {
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 }
 
-#osm_attribution {
-	bottom: 12px;
+.map_attribution {
+	bottom: 32px;
 	color: #444;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.72em;
-	left: 12px;
+	left: 70px;
 	line-height: 1.3;
-	max-width: calc(100vw - 120px);
+	max-width: min(280px, calc(50vw - 90px));
 	padding: 6px 10px;
 	position: absolute;
+	right: auto;
+	text-align: left;
 	z-index: 1;
 }
 
-#osm_attribution a {
+@media (max-width: 662px) {
+	.map_attribution {
+		bottom: 30px;
+		font-size: 0.65em;
+		left: 66px;
+		max-width: calc(50vw - 120px);
+		padding: 4px 8px;
+	}
+}
+
+.map_attribution a {
 	color: inherit;
 }
 

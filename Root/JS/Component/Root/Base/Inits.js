@@ -53,6 +53,7 @@ var DEFAULT_WCODE = ['bengaluru', 'diesel', 'hall', 'planet'];
 var pendingCity = false;
 var pendingCitySubmit = false;
 
+var DECODE_INPUT_ALT_TIP_MESSAGE = 'You can also enter a DIGIPIN or a plus code';
 var INCORRECT_WCODE = 'INCORRECT INPUT! Enter a Wolo Code (3+ words), a 10-character DIGIPIN, or a city + Wolo Code. E.g: "Bengaluru cat apple tomato" or "39J49LL8T4"';
 var INCORRECT_DIGIPIN = 'INCORRECT DIGIPIN! Enter a valid 10-character India Post DIGIPIN code.';
 var DIGIPIN_COPIED_MESSAGE = 'DIGIPIN copied to clipboard';

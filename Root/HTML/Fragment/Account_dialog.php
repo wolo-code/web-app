@@ -14,6 +14,7 @@
 				</div>
 				<div id='account_dialog_theme' class='account_dialog_theme'>
 					<?php require __DIR__ . '/Theme_selector.php'; ?>
+					<?php require __DIR__ . '/Map_source_selector.php'; ?>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_logout' class='message_dialog_control'>

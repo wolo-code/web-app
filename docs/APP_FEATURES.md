@@ -6,7 +6,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
-| Service worker shell | `Root/sw.js`, `Root/precache-manifest.json`, `sw_init.js` | Precaches baked assets, serves the app shell offline, and caches Google Maps tiles for recently viewed areas. Same-origin CSS/JS/SVG use network-first with cache fallback so a normal refresh does not keep a stale hard-refresh bypass. |
+| Service worker shell | `Root/sw.js`, `Root/precache-manifest.json`, `sw_init.js` | Precaches baked assets, serves the app shell offline, and caches Google Maps, OSM, Apple Maps, Esri, and Microsoft Maps tiles for recently viewed areas. Same-origin CSS/JS/SVG use network-first with cache fallback so a normal refresh does not keep a stale hard-refresh bypass. |
 | Offline word/city data | `OfflineStore.js`, `Database.js`, `City.js`, `/offline-data/WordList.json` | Word list and previously loaded cities are snapshotted in IndexedDB for encode/decode without Firebase. |
 | Offline save queue | `OfflineQueue.js`, `Account.js`, `#offline_queue_badge` | Address saves queue when offline or on network failure and flush after reconnect. |
 | Offline UX | `OfflineStatus.js`, `#offline_status_banner` | Banner and toasts explain when sign-in, geocoding, or uncached city lookup needs network. See `docs/offline.md`. |
@@ -18,9 +18,14 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Decode View | `body.decode`, `#decode_interface_overlay`, `#decode_input` | Plain Wolo Code entry state. Users can type or paste a Wolo Code before switching into the map flow. In dark mode, the bottom-left Action Menu, center Locate Button, and right Terrain Map View Button share the same circular disc. |
 | Map View | `body.map`, `#map`, `#pac-input` | Interactive Google Maps state for search, location selection, encoding, and viewing decoded places. |
 | Satellite View | `body.satellite`, Google Maps `SATELLITE` map type | Visual variant of Map View. |
+| OSM View | `body.osm`, OSM tiles on `#map` | OpenStreetMap tiles when that source is enabled. |
+| Apple Maps View | `body.apple`, MapKit JS `#apple_map` under transparent Google `#map` | Apple Maps source. Requires `apple_maps_token` (MapKit JS JWT). MapKit JS draws Apple tiles through a transparent Google overlay; Google Maps stays for clicks, markers, search, geocoding, and city add. During pan, Apple tiles follow with a CSS transform and only recommit MapKit’s camera on idle, zoom, or a large pan so dragging stays in sync. Google’s logo and map-data credit are hidden on OSM, Apple, Esri, and Microsoft views. OSM/Esri/Microsoft/Apple source attribution sits bottom-left after a small gap from the Action Menu and stays visible while that menu is open. Off until that token is set. |
+| Esri View | `body.esri`, Esri World Street Map tiles on `#map` | Esri street tiles when that source is enabled. |
+| Microsoft Maps View | `body.microsoft`, Bing tiles on `#map` | Microsoft/Bing road tiles when that source is enabled. |
+| Map Source Prefs | `Map_source_selector.php`, `initMapSource()`, `wolo-map-source` | Account and login profile menus show Google Maps, OSM, Apple Maps, Esri, and Microsoft Maps each with an enable/disable toggle beside the label and a set-default star that is active only while that source is enabled. At least one source stays enabled. The default source is used when opening map from Wolo Code Input View. |
 | Action Menu | `#action_menu`, `toggleActionMenu()` | Bottom-left expandable control for secondary actions. |
-| Map Type Toggle | `#action_menu_map`, `#map_type_button`, `toggleMapViewType()` | Toggles in place between Terrain/Roadmap and Satellite map icons using `Map-terrain.svg` and `Map-satellite.svg`; from Decode View, the Action Menu map-type action opens Satellite View directly. |
-| Wolo Code Input Toggle | `#action_menu_decode`, `toggleDecodeView()` | Replaces the previous mail action in the Action Menu. Toggles in place between the map icon and `Wolo-code.svg`; from Decode View, it opens the terrain/roadmap Map View. |
+| Map Type Toggle | `#action_menu_map`, `#map_type_button`, `toggleMapViewType()`, `getNextMapLayer()` | Cycles enabled layers (Google terrain/satellite, OSM, Apple Maps, Esri, and Microsoft Maps). From Decode View, the Action Menu map-type action opens Satellite View when Google Maps is enabled. Hidden when only one layer remains. Chrome controls expose native `title` tooltips; map-type labels follow the next enabled source. |
+| Wolo Code Input Toggle | `#action_menu_decode`, `toggleDecodeView()` | Replaces the previous mail action in the Action Menu. Toggles in place between the map icon and `Wolo-code.svg`; from Decode View, it opens the affixed default map source. |
 | Info Entry | `#action_menu_info`, `showInfoFromActionMenu()` | Opens the app information flow from the Action Menu. |
 
 ## Wolo Code Workflows
@@ -28,8 +33,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
 | Encode Location | `encode()`, map click listener, `focus___()` | Selecting a map position generates the corresponding Wolo Code. |
-| Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()`, `showInvalidCodeDialog()` | A typed Wolo Code, DIGIPIN, or plus code resolves to a place and can jump back to the map. DIGIPIN and plus-code jumps keep the Address Panel open. Unrecognized input opens a popup to correct the code or search the map for that text instead of a notification toast. |
-| Decode input hint | `#decode_input_alt_tip` | While the Wolo Code input is focused, a small bottom tip notes that DIGIPIN and plus codes can also be entered. |
+| Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()`, `showInvalidCodeDialog()` | A typed Wolo Code, DIGIPIN, or plus code resolves to a place and can jump back to the map. DIGIPIN and plus-code jumps keep the Address Panel open. Unrecognized input opens a popup with edge-aligned Edit code and Search map actions instead of a notification toast. Wolo Code Input and Place Search Input use CSS `text-transform` to show DIGIPIN and plus-code values in uppercase (`:valid` against those patterns) and return to lowercase when the value no longer matches. |
+| Decode input hint | `#notification_bottom`, `showDecodeInputAltTip()` | While the Wolo Code input is focused, a bottom notification notes that DIGIPIN and plus codes can also be entered, then fades out. |
 | City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, `#decode_city_context`, city chooser fragments | Codes can include city context, reuse a previous city, infer city from IP, or ask the user to choose a matching city. Initial load never requests browser geolocation; it defaults to the previous city when available, otherwise the IP city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
 | Suggestions | `suggestWrapper`, `#map_input_suggestion_result`, `#decode_input_suggestion_result` | Search and decode inputs share suggestion UI with different sizing behavior. |
 | Default Try Prompt | `#notification_top`, `tryDefaultCity()` | Top notification offers a starter city example. |
@@ -61,7 +66,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
 | Firebase Auth | `firebase.auth()`, `signedIn()` | Handles redirect result, current user state, display name, email, and profile image. |
-| Account Dialog | `Account_Dialog.php`, `showAccountDialog()`, `hideAccountDialog()` | Lets signed-in users inspect account details and access saved address controls. |
+| Account Dialog | `Account_Dialog.php`, `showAccountDialog()`, `hideAccountDialog()` | Lets signed-in users inspect account details, set appearance and map source prefs, and access saved address controls. Appearance theme buttons show System/Light/Dark labels on hover and focus. |
 | Logout | `account_dialog_logout`, `onLogout()` | Account dialog includes logout behavior. |
 | Saved Addresses | `loadSaveList()`, `saveAddress()` | Inferred from handlers: users can load and save address records when signed in. |
 
@@ -72,10 +77,10 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Info Dialog | `Info.php`, `Info_intro.php`, `Info_full.php`, `Info_links.php` | Explains Wolo Code usage and links. |
 | No City Dialog | `NoCity.php`, `noCity_add()`, `noCity_cancel()` | Handles unsupported or missing city cases. |
 | Choose City Dialogs | `ChooseCity_by_name.php`, `ChooseCity_by_periphery.php` | Handles ambiguous city matches by name or location perimeter. |
-| Unrecognized Code Dialog | `Invalid_code.php`, `showInvalidCodeDialog()` | Offers correcting unrecognized decode input or searching the map for that text. Reverse-play corrects; play searches the map. |
+| Unrecognized Code Dialog | `Invalid_code.php`, `showInvalidCodeDialog()` | Explains that the input is not a Wolo Code, DIGIPIN, or plus code. The typed value is centered in a theme-aware teal. Matching primary-accent Edit code and Search map buttons sit on the left and right edges with a minimum gap and reverse-play / play icons. |
 | Locate Permission Dialog | `LocateRight.php` | User-facing location permission request flow. |
 | Incompatible Browser Dialog | `Incompatible_browser.html` | Allows the app to warn and optionally continue when browser support is insufficient. |
-| Notifications | `#notification_top`, `#notification_bottom`, `showNotification()` | Lightweight messaging for examples, copy results, and status. Bottom notifications share `#map_bottom_stack` with the Address Panel and Location Accuracy Indicator so they stack above those cards instead of overlapping them. Overlay dialogs, the decode input tip, and `#notification_top` stay outside that dock. |
+| Notifications | `#notification_top`, `#notification_bottom`, `showNotification()` | Lightweight messaging for examples, copy results, decode input hints, and status. Bottom notifications share `#map_bottom_stack` with the Address Panel and Location Accuracy Indicator so they stack above those cards instead of overlapping them, and they fade out when dismissed. Overlay dialogs and `#notification_top` stay outside that dock. |
 
 ## Icon Resources
 
@@ -83,6 +88,10 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- |
 | `Map-terrain.svg` | Roadmap/Terrain map-type action icon. |
 | `Map-satellite.svg` | Satellite map-type action icon. |
+| `Map-osm.svg` | OpenStreetMap map-type action icon. |
+| `Map-apple.svg` | Apple Maps map-type action icon. |
+| `Map-esri.svg` | Esri map-type action icon. |
+| `Map-microsoft.svg` | Microsoft Maps map-type action icon. |
 | `Wolo-code.svg` | Plain Wolo Code input action icon. |
 | `More.svg` | Action Menu launcher. |
 | `Info.svg` | Info action. |
@@ -90,13 +99,15 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
 | `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |
 | `Hamburger.svg` | Previous-city popup action. |
-| `Proceed.svg` | Submit/proceed action for map and decode inputs, and search in the unrecognized-code dialog. |
-| `Reverse.svg` | Left-facing play triangle for correcting unrecognized decode input. |
+| `Proceed.svg` | Submit/proceed action for map and decode inputs, and Search map in the unrecognized-code dialog. |
+| `Reverse.svg` | Left-facing play triangle for Edit code in the unrecognized-code dialog. |
 
 ## Implementation Notes
 
 - `toggleMapType()` remains as the legacy three-state cycle used by older flows: Decode View, Map View, and Satellite View.
-- `toggleMapViewType()` is the newer map-only toggle used by the visible map type controls.
-- `activateSatelliteMapType()` is used when the Decode View Action Menu satellite icon needs to enter Satellite View directly.
+- `toggleMapViewType()` is the newer map-only toggle used by the visible map type controls; it skips disabled map sources.
+- `activateMapType()` opens the affixed default map source (Google terrain, OSM, Apple Maps, Esri, or Microsoft Maps).
+- Apple Maps uses MapKit JS (`#apple_map`) for tiles only. Google Maps stays on top as a transparent interaction layer for clicks, markers, Places search, geocoding, and city add. Pan follows with `scheduleAppleMapFollow()`; MapKit region updates use `setRegionAnimated(..., false)`.
+- `activateSatelliteMapType()` is used when the Decode View Action Menu satellite icon needs to enter Satellite View directly, and falls back to the default source when Google Maps is disabled.
 - `toggleDecodeView()` is the newer view toggle used by the Action Menu Wolo Code input control.
 - Toggle icons are rendered as paired inline SVG resources, stacked in one fixed-size slot, and switched by `body.decode` and `body.satellite` state classes.

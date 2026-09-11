@@ -8,6 +8,7 @@
 		<h2>Login / SignUp</h2>
 		<div id='authentication_theme' class='account_dialog_theme'>
 			<?php require __DIR__ . '/Theme_selector.php'; ?>
+			<?php require __DIR__ . '/Map_source_selector.php'; ?>
 		</div>
 	</div>
 	<div id='firebaseui-auth'></div>

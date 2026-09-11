@@ -47,6 +47,24 @@
 	text-transform: lowercase;
 }
 
+.decode:has(#decode_input_case:valid) #decode_input,
+.decode:has(#decode_input_case:valid) #decode_input_shadow {
+	text-transform: uppercase;
+}
+
+#decode_input_case {
+	height: 1px;
+	left: 0;
+	margin: 0;
+	opacity: 0;
+	overflow: hidden;
+	padding: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	width: 1px;
+}
+
 .decode #decode_input {
 	padding: 8px;
 	display: inline-block;
@@ -68,24 +86,6 @@
 	max-width: 92%;
 	overflow: hidden;
 	white-space: pre;
-}
-
-#decode_input_alt_tip {
-	bottom: 58px;
-	color: #8a8a8a;
-	font-family: Abel, sans-serif;
-	font-size: 0.88em;
-	left: 12px;
-	letter-spacing: 0.01em;
-	pointer-events: none;
-	position: absolute;
-	right: 12px;
-	text-align: center;
-	z-index: 1;
-}
-
-.decode #decode_input_alt_tip.hide {
-	display: none;
 }
 
 #decode_input {
@@ -177,9 +177,31 @@
 body.map .map_type_icon_terrain,
 body.satellite .map_type_icon_satellite,
 body.osm .map_type_icon_osm,
+body.apple .map_type_icon_apple,
+body.esri .map_type_icon_esri,
+body.microsoft .map_type_icon_microsoft,
 body:not(.decode) .view_toggle_icon_code,
-.decode .view_toggle_icon_map {
+.decode .view_toggle_icon_map,
+.decode #decode_map_view_button .map_type_icon_terrain {
 	display: block;
+}
+
+.decode.map-source-default-osm #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-apple #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-esri #decode_map_view_button .map_type_icon_terrain,
+.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_terrain {
+	display: none;
+}
+
+.decode.map-source-default-osm #decode_map_view_button .map_type_icon_osm,
+.decode.map-source-default-apple #decode_map_view_button .map_type_icon_apple,
+.decode.map-source-default-esri #decode_map_view_button .map_type_icon_esri,
+.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_microsoft {
+	display: block;
+}
+
+body.map-source-single #action_menu_map {
+	display: none;
 }
 
 .decode #action_menu_map .map_type_icon_terrain {

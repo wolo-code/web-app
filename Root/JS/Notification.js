@@ -1,22 +1,33 @@
+var NOTIFICATION_FADE_MS = 400;
+
 function showNotification(message, duration) {
-	// var NOTIFICATION_DURATION_DEFAULT = 2500;
-	// var NOTIFICATION_DURATION_LONG = 10000;
-	
 	if(typeof duration == 'undefined')
 		duration = NOTIFICATION_DURATION_DEFAULT;
-		
-	notification_bottom.innerHTML = message;
-	notification_bottom.classList.remove('hide');
+
 	clearNotificationTimer();
+	notification_bottom.innerHTML = message;
+	notification_bottom.classList.remove('hide', 'fade-out');
 	notification_timer = setTimeout(function() {
-		notification_bottom.innerText = '';
-		notification_bottom.classList.add('hide');
+		fadeOutNotification();
 	}, duration);
-	
 }
 
 function hideNotication() {
-	notification_bottom.classList.add('hide');
+	fadeOutNotification();
+}
+
+function fadeOutNotification() {
+	if(!notification_bottom || notification_bottom.classList.contains('hide')) {
+		return;
+	}
+	clearNotificationTimer();
+	notification_bottom.classList.add('fade-out');
+	notification_timer = setTimeout(function() {
+		notification_bottom.innerText = '';
+		notification_bottom.classList.add('hide');
+		notification_bottom.classList.remove('fade-out');
+		notification_timer = null;
+	}, NOTIFICATION_FADE_MS);
 }
 
 function clearNotificationTimer() {

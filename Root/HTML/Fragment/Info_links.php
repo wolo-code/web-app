@@ -46,11 +46,15 @@
 <table id='map_data_credits'>
 	<tr>
 		<td>Map tiles:</td>
-		<td><a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> (terrain/satellite via Google Maps)</td>
+		<td><a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a>, <a class='link' href='https://www.esri.com/' target='_blank' rel='noopener noreferrer'>Esri</a>, <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a>, <a class='link' href='https://www.apple.com/maps/' target='_blank' rel='noopener noreferrer'>Apple Maps</a> (when configured), terrain/satellite via Google Maps</td>
 	</tr>
 	<tr>
 		<td>DIGIPIN:</td>
 		<td><a class='link' href='https://www.indiapost.gov.in/digipin' target='_blank' rel='noopener noreferrer'>India Post DIGIPIN</a> (<a class='link' href='https://www.indiapost.gov.in/documents/offerings/intiatives/DIGIPIN_Technical_document.pdf' target='_blank' rel='noopener noreferrer'>spec</a>, <a class='link' href='https://github.com/DEADSERPENT/digipin' target='_blank' rel='noopener noreferrer'>codec</a>)</td>
+	</tr>
+	<tr>
+		<td>Plus codes:</td>
+		<td><a class='link' href='https://plus.codes' target='_blank' rel='noopener noreferrer'>plus.codes</a> (<a class='link' href='https://github.com/google/open-location-code' target='_blank' rel='noopener noreferrer'>Open Location Code</a>)</td>
 	</tr>
 </table>
 <div id='software_info'>

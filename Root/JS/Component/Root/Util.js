@@ -98,6 +98,15 @@ function hasProceedInput(value) {
 	return trimmed.length > 0;
 }
 
+function syncDecodeInputCaseSource() {
+	var decodeInput = document.getElementById('decode_input');
+	var caseInput = document.getElementById('decode_input_case');
+	if(!decodeInput || !caseInput) {
+		return;
+	}
+	caseInput.value = decodeInput.value.replace(/(\\|\/)/gm, '').trim();
+}
+
 function syncProceedButtons() {
 	var pacInput = document.getElementById('pac-input');
 	var decodeInput = document.getElementById('decode_input');
@@ -108,4 +117,5 @@ function syncProceedButtons() {
 		decodeButton.classList.toggle('active', hasProceedInput(pacInput.value));
 	if(decodeInputButton && decodeInput)
 		decodeInputButton.classList.toggle('active', hasProceedInput(decodeInput.value));
+	syncDecodeInputCaseSource();
 }

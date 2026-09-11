@@ -7,13 +7,19 @@ var APP_MODE_BACKGROUND = {
 	wcode: '#efefef',
 	map: '#60d0e5',
 	satellite: '#1b2f62',
-	osm: '#d8e8d8'
+	osm: '#d8e8d8',
+	apple: '#e8e4dc',
+	esri: '#e4ecd8',
+	microsoft: '#d8e0e8'
 };
 var APP_MODE_BACKGROUND_DARK = {
 	wcode: '#1a1a2e',
 	map: '#0e3d4a',
 	satellite: '#1b2f62',
-	osm: '#1a2a1a'
+	osm: '#1a2a1a',
+	apple: '#2a2620',
+	esri: '#222a1a',
+	microsoft: '#1a2430'
 };
 var APP_MODE_BACKGROUND_DEFAULT = '#efefef';
 var APP_MODE_BACKGROUND_DARK_DEFAULT = '#1a1a2e';
@@ -55,6 +61,12 @@ function getAppMode() {
 		return 'satellite';
 	else if(document.body.classList.contains('osm'))
 		return 'osm';
+	else if(document.body.classList.contains('apple'))
+		return 'apple';
+	else if(document.body.classList.contains('esri'))
+		return 'esri';
+	else if(document.body.classList.contains('microsoft'))
+		return 'microsoft';
 	else if(document.body.classList.contains('map'))
 		return 'map';
 	else
@@ -84,9 +96,16 @@ function syncAppModeBackground() {
 	document.body.style.backgroundColor = background;
 	if(typeof map == 'object' && map) {
 		var mapOptions = {backgroundColor: background};
-		if(typeof getGoogleMapStyles == 'function')
+		if(mode === 'apple') {
+			mapOptions.backgroundColor = 'transparent';
+			mapOptions.styles = [];
+		}
+		else if(typeof getGoogleMapStyles == 'function')
 			mapOptions.styles = getGoogleMapStyles();
 		map.setOptions(mapOptions);
+	}
+	if(typeof syncAppleMapAppearance === 'function') {
+		syncAppleMapAppearance();
 	}
 }
 
@@ -184,6 +203,16 @@ function initMap() {
 		encode(pos);
 		focus___(pos);
 	});
+	map.addListener('bounds_changed', function() {
+		if(typeof scheduleAppleMapFollow === 'function') {
+			scheduleAppleMapFollow();
+		}
+	});
+	map.addListener('idle', function() {
+		if(typeof syncAppleMapFromGoogle === 'function') {
+			syncAppleMapFromGoogle();
+		}
+	});
 
 	addLongpressListener(document.getElementById('decode_button'), decode_input_from_map, decode_input_from_map_external);
 	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form);
@@ -217,6 +246,12 @@ function initMap() {
 		setMapLayer(MAP_LAYER_SATELLITE);
 	else if(init_map_mode == 'osm')
 		setMapLayer(MAP_LAYER_OSM);
+	else if(init_map_mode == 'apple')
+		setMapLayer(MAP_LAYER_APPLE);
+	else if(init_map_mode == 'esri')
+		setMapLayer(MAP_LAYER_ESRI);
+	else if(init_map_mode == 'microsoft')
+		setMapLayer(MAP_LAYER_MICROSOFT);
 	else
 		syncAppModeBackground();
 
@@ -256,16 +291,17 @@ function resolveLatLng(latLng) {
 }
 
 function showDecodeInputAltTip() {
-	var tip = document.getElementById('decode_input_alt_tip');
-	if(tip) {
-		tip.classList.remove('hide');
+	if(typeof showNotification == 'function') {
+		showNotification(DECODE_INPUT_ALT_TIP_MESSAGE);
 	}
 }
 
 function hideDecodeInputAltTip() {
-	var tip = document.getElementById('decode_input_alt_tip');
-	if(tip) {
-		tip.classList.add('hide');
+	if(typeof hideNotication != 'function' || !notification_bottom) {
+		return;
+	}
+	if(notification_bottom.innerHTML === DECODE_INPUT_ALT_TIP_MESSAGE) {
+		hideNotication();
 	}
 }
 
@@ -530,20 +566,25 @@ function activateMapType() {
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
 	}
-	setMapLayer(MAP_LAYER_ROADMAP);
+	setMapLayer(getDefaultMapLayer());
 }
 
 function activateSatelliteMapType() {
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
 	}
-	setMapLayer(MAP_LAYER_SATELLITE);
+	if(isMapLayerEnabled(MAP_LAYER_SATELLITE)) {
+		setMapLayer(MAP_LAYER_SATELLITE);
+	}
+	else {
+		setMapLayer(getDefaultMapLayer());
+	}
 }
 
 function toggleMapType() {
 	var layer = getCurrentMapLayer();
 	if(document.body.classList.contains('decode')) {
-		setMapLayer(MAP_LAYER_ROADMAP);
+		setMapLayer(getDefaultMapLayer());
 	}
 	else if(layer === MAP_LAYER_SATELLITE) {
 		document.body.classList.remove('satellite');
@@ -551,12 +592,12 @@ function toggleMapType() {
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
-	}
-	else if(layer === MAP_LAYER_OSM) {
-		setMapLayer(MAP_LAYER_SATELLITE);
+		if(typeof syncMapChromeTooltips === 'function') {
+			syncMapChromeTooltips();
+		}
 	}
 	else {
-		setMapLayer(MAP_LAYER_SATELLITE);
+		setMapLayer(getNextMapLayer(layer));
 	}
 }
 
@@ -566,13 +607,7 @@ function toggleMapViewType() {
 		return;
 	}
 
-	var layer = getCurrentMapLayer();
-	if(layer === MAP_LAYER_SATELLITE)
-		setMapLayer(MAP_LAYER_OSM);
-	else if(layer === MAP_LAYER_OSM)
-		setMapLayer(MAP_LAYER_ROADMAP);
-	else
-		setMapLayer(MAP_LAYER_SATELLITE);
+	setMapLayer(getNextMapLayer(getCurrentMapLayer()));
 }
 
 function toggleDecodeView() {
@@ -580,10 +615,13 @@ function toggleDecodeView() {
 		activateMapType();
 	}
 	else {
-		document.body.classList.remove('map', 'satellite', 'osm');
+		clearMapViewClasses();
 		document.body.classList.add('decode');
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
+		if(typeof syncMapChromeTooltips === 'function') {
+			syncMapChromeTooltips();
+		}
 	}
 }

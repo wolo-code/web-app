@@ -2,8 +2,10 @@
 var actionMenuTimeout = null;
 var actionMenuTimeoutDuration = 5000;
 
-function initLoad () {
-	if(!initLoadDone && document.readyState === 'interactive') {
+// Late-bound: a function declaration would be hoisted in concatenated /root.js
+// and Root/JS/Script.js would call it before MAP_SOURCE_IDS is assigned.
+var initLoad = function() {
+	if(!initLoadDone && document.readyState !== 'loading') {
 		initTheme();
 		initMapSource();
 		firebaseInit();
@@ -287,3 +289,6 @@ function copyNodeText(node) {
 	document.execCommand('copy');
 	window.getSelection().removeAllRanges();
 }
+
+if(typeof initLoad !== 'undefined')
+	initLoad();

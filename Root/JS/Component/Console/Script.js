@@ -3,8 +3,10 @@
 var target_id;
 // var pendingEntry_lat_lng;
 
-function initLoad () {
-	if(!initLoadDone && document.readyState === 'interactive') {
+// Late-bound so concatenated /console.js does not hoist a callable initLoad
+// before later files initialize their vars.
+var initLoad = function() {
+	if(!initLoadDone && document.readyState !== 'loading') {
 		firebaseInit();
 		initApp();
 		setupControls();
@@ -107,3 +109,6 @@ function setupControls() {
 	});
 
 }
+
+if(typeof initLoad !== 'undefined')
+	initLoad();

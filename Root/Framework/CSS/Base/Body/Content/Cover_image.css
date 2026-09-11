@@ -1,0 +1,17 @@
+.cover-image img {
+	width: 100%;
+	border-radius: 8px
+}
+
+.cover-image {
+	height: 0;
+	margin: 0px 2px 1px 2px;
+	border-radius: 8px;
+	background: #DDDDDD;
+	box-shadow: 0 1px 10px #C7C7C7
+}
+
+html.dark-mode .cover-image {
+	background: #222244;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45)
+}

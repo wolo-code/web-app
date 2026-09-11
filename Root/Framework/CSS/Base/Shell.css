@@ -1,0 +1,98 @@
+/*
+ * Column flex/grid shell so the 200%-wide menu/canvas rail cannot inflate
+ * min-content width and squeeze the page. Matches the Cutie layout used on
+ * ujnotes; classic float header chrome stays unchanged.
+ *
+ * Sticky footer is flex, not padding/negative-margin lengths: short pages
+ * (including the menu) grow the canvas column so the footer sits at the
+ * bottom of the page without a leftover scrollbar.
+ */
+html, body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+#main-wrapper {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+}
+
+#content-wrapper {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0 auto;
+}
+
+.pml-open.pml-settled #content-wrapper,
+.pml-open.pml-settled #wrapper,
+.pml-open.pml-settled #main,
+.pml-open.pml-settled #main > .container,
+.pml-open.pml-settled #content-wrapper-inside,
+.pml-open.pml-settled #canvas-wrapper {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+#footer-wrapper {
+	flex: 0 0 auto;
+}
+
+#header-wrapper {
+	flex: 0 0 auto;
+	width: 100%;
+}
+
+#wrapper {
+	flex: 1 0 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+#main,
+#main > .container,
+#content-wrapper-inside {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0 auto;
+}
+
+#canvas-wrapper {
+	flex: 1 0 auto;
+	display: grid;
+	grid-template-rows: auto auto 1fr;
+	width: 100%;
+	min-width: 0;
+}
+
+#canvas-wrapper-inner-container {
+	display: flex;
+	align-items: stretch;
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+}
+
+#canvas-main {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 50%;
+	min-height: 100%;
+	min-width: 0;
+}
+
+#content {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0 auto;
+	min-width: 0;
+}
+
+#nav-menu {
+	min-width: 0;
+	min-height: 100%;
+}

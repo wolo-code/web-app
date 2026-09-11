@@ -1,0 +1,28 @@
+#search-button :hover svg > path:first-child {
+	fill: #56b4d1
+}
+
+#search_box {
+	display: flex;
+	justify-content: center;
+	padding-top: 8px;
+	width: 100%;
+}
+
+#search_box.hide_display {
+	display: none;
+}
+
+#search_box .gsc-control-cse {
+	padding: 0;
+	width: 100%;
+	max-width: 520px;
+	margin-left: auto;
+	margin-right: auto;
+	background: transparent;
+	border: 0;
+}
+
+#search_box .gsc-control-wrapper-cse {
+	width: 100%;
+}

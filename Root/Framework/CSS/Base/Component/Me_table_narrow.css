@@ -1,0 +1,18 @@
+@media (max-width: 540px) {
+
+	#me-table div {
+	}
+
+	#me-table .R1 {
+		text-align: left !important;
+		padding-left: 6px
+	}
+
+	#me-table .R2 {
+		padding-left: 45px !important;
+		clear: both;
+		margin-top: 4px;
+		margin-bottom: 4px
+	}
+
+}

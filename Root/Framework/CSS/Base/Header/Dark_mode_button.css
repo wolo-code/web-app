@@ -1,0 +1,125 @@
+#header_button {
+	display: inline-block;
+	position: relative;
+}
+
+#theme-selector {
+	display: inline-block;
+	position: static;
+	vertical-align: top;
+}
+
+#darkmode-button {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	box-sizing: content-box;
+	display: inline-flex;
+	height: 30px;
+	margin: 12px 5px;
+	padding: 0;
+	width: 30px;
+}
+
+.theme-current-icon {
+	display: none;
+	height: 30px;
+	width: 30px;
+}
+
+html[data-theme-resolved='light'] .theme-current-icon[data-theme-icon='light'],
+html[data-theme-resolved='dark'] .theme-current-icon[data-theme-icon='dark'] {
+	display: inline-block;
+}
+
+#darkmode-button:hover svg {
+	cursor: pointer;
+}
+
+#darkmode-button:hover svg path {
+	fill: #56b4d1;
+	transition: all ease-out 0.3s;
+}
+
+#darkmode-button path {
+	transition: all ease-out 0.3s;
+}
+
+#darkmode-button:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid #56b4d1;
+	outline-offset: 2px;
+}
+
+#theme-menu {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+	box-sizing: border-box;
+	min-width: 128px;
+	padding: 5px;
+	position: absolute;
+	right: 5px;
+	top: 48px;
+	z-index: 100;
+}
+
+#theme-menu[hidden] {
+	display: none;
+}
+
+.theme-option {
+	align-items: center;
+	appearance: none;
+	background: transparent;
+	border: 0;
+	border-radius: 4px;
+	box-sizing: border-box;
+	column-gap: 10px;
+	color: #666;
+	cursor: pointer;
+	display: grid;
+	font: inherit;
+	font-size: 0.875em;
+	grid-template-columns: 18px minmax(0, 1fr);
+	padding: 7px 16px 7px 11px;
+	text-align: left;
+	width: 100%;
+}
+
+.theme-option:hover,
+.theme-option:focus-visible {
+	background: #f2f2f2;
+	color: #333;
+	outline: none;
+}
+
+.theme-option-icon,
+.theme-option-icon svg {
+	height: 18px;
+	width: 18px;
+}
+
+.theme-option-icon {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.theme-option > span:last-child {
+	grid-column: 2;
+	grid-row: 1;
+	text-align: left;
+}
+
+.theme-option-icon path {
+	fill: #999;
+}
+
+.theme-option-active {
+	color: #56b4d1;
+}
+
+.theme-option-active .theme-option-icon path {
+	fill: #56b4d1;
+}

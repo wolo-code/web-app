@@ -1,0 +1,15 @@
+@media (max-width: 540px) {
+
+	.indent-c {
+		padding-left: 8px;
+	}
+
+	.indent-e {
+		padding-left: 30px;
+	}
+
+	.indent-f {
+		padding-left: 8px;
+	}
+
+}

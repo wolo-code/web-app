@@ -1,0 +1,17 @@
+.pml-open #canvas-main {
+	transform: translateX(934px);
+}
+
+.pml-open.pml-settled #canvas-main {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 50%;
+	min-height: 0;
+	height: auto;
+}
+
+.pml-open #nav-menu {
+	transform: translateX(0);
+	min-height: 100%;
+}

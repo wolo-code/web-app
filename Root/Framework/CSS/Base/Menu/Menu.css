@@ -1,0 +1,25 @@
+#nav-menu {
+	bottom: 0;
+	z-index: 1;
+	overflow: hidden;
+	width: 50%;
+	transform: translateX(-100%);
+	display: flex;
+	flex: 0 0 50%;
+	transition: transform 0.7s;
+	will-change: transform;
+}
+
+.sidebar-sub {
+	text-align: left;
+}
+
+#nav-menu .sidebar-nav-group {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+#nav-menu .sidebar-nav-group + .sidebar-nav-group {
+	margin-top: 24px;
+}

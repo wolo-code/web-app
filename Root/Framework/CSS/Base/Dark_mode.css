@@ -1,0 +1,239 @@
+html.dark-mode body {
+	background-color: #1a1a2e;
+	color: #d0d0d0;
+}
+
+html.dark-mode #main-wrapper {
+	background: #1a1a2e;
+}
+
+/* Header */
+html.dark-mode #header-slogan-text {
+	color: #777 !important;
+}
+
+html.dark-mode #header-wrapper-divider {
+	border-bottom-color: #333;
+}
+
+html.dark-mode .shadow-scroll-top {
+	background-image: none;
+}
+
+/* SVG icons in header */
+html.dark-mode #header_buttons_right path[fill]:not([fill='none']),
+html.dark-mode .toggle-push-left svg path[fill]:not([fill='none']) {
+	fill: #666;
+}
+
+html.dark-mode #header_buttons_right .header-button-active path[fill]:not([fill='none']) {
+	fill: #69b7cf;
+}
+
+/* Body text & headings */
+html.dark-mode h2 {
+	color: #888 !important;
+}
+
+html.dark-mode h4 {
+	color: #999 !important;
+}
+
+html.dark-mode .bold {
+	color: #aaa;
+}
+
+html.dark-mode ul.list-bullet > li > div,
+html.dark-mode ol.list-bullet > li > div {
+	color: #b8b8b8;
+}
+
+/* Links */
+html.dark-mode .content-link-gray, html.dark-mode .link-gray {
+	color: #666 !important;
+}
+
+html.dark-mode .content-link-gray:hover, html.dark-mode .link-gray:hover {
+	color: #69b7cf !important;
+}
+
+/* Backgrounds & shading */
+html.dark-mode .even_shade,
+html.dark-mode .alt_div_shade > div:nth-child(even) {
+	background: linear-gradient(to right, #222244 20%, #1a1a2e);
+}
+
+html.dark-mode .h_faded_bar h2 {
+	background: linear-gradient(to right, #222244 20%, #1a1a2e);
+}
+
+/* Code blocks */
+html.dark-mode code {
+	color: #d0d0d0;
+}
+
+html.dark-mode code.inline {
+	background-color: #222244;
+}
+
+html.dark-mode code.block {
+	background: linear-gradient(to right, #222244 20%, #1a1a2e);
+}
+
+/* Items / cards */
+html.dark-mode .item_block_text {
+	background-color: #222244;
+	border-color: #2a2a4a;
+	border-top-color: #1a1a2e;
+}
+
+html.dark-mode .item_block {
+	background: #222244;
+	border-color: #2a2a4a;
+}
+
+html.dark-mode .item_block-disabled {
+	background-color: #1a1a2e !important;
+	border-color: #222244;
+}
+
+/* Path & separator */
+html.dark-mode .path-separator {
+	color: #444 !important;
+}
+
+html.dark-mode .article-title-nav path {
+	fill: #69b7cf;
+}
+
+html.dark-mode .article-title-nav-disabled path {
+	fill: #38384a;
+}
+
+/* Content separator */
+html.dark-mode #content-body-separator {
+	border-top-color: #333;
+}
+
+/* Footer */
+html.dark-mode #footer-wrapper-divider {
+	border-bottom-color: #333;
+}
+
+html.dark-mode .footer-content {
+	color: #555;
+}
+
+html.dark-mode #updated, html.dark-mode #date {
+	color: #555 !important;
+}
+
+/* Social icons */
+html.dark-mode .social .image path,
+html.dark-mode .social .image svg path {
+	fill: #555;
+}
+
+html.dark-mode #site-twitter:hover path,
+html.dark-mode #site-linkedin:hover path,
+html.dark-mode #site-x:hover path,
+html.dark-mode #site-facebook:hover path,
+html.dark-mode #site-youtube:hover svg > path {
+	fill: #69b7cf;
+}
+
+/* Content low */
+html.dark-mode .content-low {
+	color: #555;
+}
+
+/* Gray utility */
+html.dark-mode .gray {
+	color: #555 !important;
+}
+
+/* Logo SVG - dim slightly */
+html.dark-mode #header-logo-image svg path {
+	fill: #888;
+}
+
+/* Menu icon */
+html.dark-mode .toggle-push-left.active svg path {
+	fill: #69b7cf;
+}
+
+/* Sidebar nav items */
+html.dark-mode .sidebar-nav-high {
+	background-color: #222244;
+}
+
+/* Smooth transition for theme switch */
+html.dark-mode,
+html.dark-mode body,
+html.dark-mode #main-wrapper,
+html.dark-mode .item_block,
+html.dark-mode .item_block_text,
+html.dark-mode code.inline,
+html.dark-mode code.block {
+	transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Theme menu */
+html.dark-mode #theme-menu {
+	background: #222244;
+	border-color: #33335a;
+}
+
+html.dark-mode .theme-option {
+	color: #aaa;
+}
+
+html.dark-mode .theme-option:hover,
+html.dark-mode .theme-option:focus-visible {
+	background: #2a2a4a;
+	color: #ddd;
+}
+
+html.dark-mode .theme-option-active {
+	color: #69b7cf;
+}
+
+html.dark-mode #header_buttons_right .theme-option-icon path {
+	fill: #888;
+}
+
+html.dark-mode #header_buttons_right .theme-option-active .theme-option-icon path {
+	fill: #69b7cf;
+}
+
+/* Scrollbar */
+html.dark-mode ::-webkit-scrollbar {
+	background: #1a1a2e;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+	background: #333;
+	border-radius: 4px;
+}
+
+/* Google translate element */
+html.dark-mode #google_translate_element {
+	background: transparent;
+}
+
+/* Google custom search */
+html.dark-mode #search_box,
+html.dark-mode #search_box .gsc-control-cse {
+	background: #1a1a2e;
+	border-color: #333;
+}
+
+html.dark-mode #search_box .gsc-input-box {
+	background: #224;
+	border-color: #33335a;
+}
+
+html.dark-mode #search_box input.gsc-input {
+	background-color: #224 !important;
+	color: #d0d0d0 !important;
+}

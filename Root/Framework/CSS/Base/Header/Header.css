@@ -1,0 +1,98 @@
+/* Contain header floats without clipping #theme-menu (position:absolute).
+   overflow:hidden also contained floats but clipped the theme dropdown. */
+#header-wrapper {
+	display: flow-root;
+}
+#header-wrapper::after {
+	content: '';
+	display: table;
+	clear: both;
+}
+#header-logo {
+	width: 50%;
+	float: right;
+	margin-top: 32px
+}
+
+#header-logo a {
+	text-decoration: none;
+	border: none
+}
+
+#header-slogan {
+	width: 50%;
+	float: left;
+	margin-top: 49px;
+	text-align: right;
+	font-size: 1.125em;
+	color: #555;
+	text-shadow: 0 1px 1px rgba(0,0,0,0.1)
+}
+
+#header-slogan-text {
+	padding-right: 6px;
+	color: #A9A9A9!important
+}
+
+#header-slogan-href {
+	text-decoration: none
+}
+
+#notification {
+	display: inline-block;
+	font-size: 0.75em;
+	color: #aaa!important;
+	background: yellow;
+	padding: 10px;
+	border-radius: 22px;
+	visibility: hidden
+}
+
+#header_buttons_right {
+	margin: 0;
+	float: right;
+	text-align: right
+}
+
+#header-logo-image {
+	height: 50px;
+	width: 144px;
+	background-size: contain
+}
+
+#header-bar {
+	margin-top: -10px;
+	text-align: center
+}
+
+.header-logo {
+	display: inline-block
+}
+
+#header-left-list {
+	text-align: center;
+	margin: auto;
+	padding: 0 0 0 6px;
+	overflow: hidden;
+	display: inline-block;
+	float: left
+}
+
+#header-left-list > div {
+	display: inline-block
+}
+
+#header-right-list {
+	text-align: center;
+	margin: auto;
+	padding: 0 6px 0 0;
+	overflow: visible;
+	display: inline-block;
+	float: right
+}
+
+#header-title {
+	overflow: hidden;
+	padding-top: 2px;
+	margin-bottom: -4px
+}

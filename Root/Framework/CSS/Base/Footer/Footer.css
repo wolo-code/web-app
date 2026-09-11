@@ -1,0 +1,29 @@
+#footer-wrapper-divider {
+	border-bottom: 1px solid #ddd;
+	margin-left: 25%;
+	margin-right: 25%
+}
+
+#footer-wrapper {
+	text-align: center;
+	font-size: 0.875em;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative
+}
+
+#footer-wrapper-inside {
+	padding: 4px 0 18px;
+}
+
+.footer-content {
+	color: #bbbbbb
+}
+
+#footer-support {
+	padding-top: 16px
+}
+
+#footer-rights {
+	margin-bottom: 14px
+}

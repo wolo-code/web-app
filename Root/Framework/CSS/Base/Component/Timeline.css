@@ -1,0 +1,11 @@
+#content-timeline {
+	padding-top: 8px
+}
+
+#content-timeline .date,
+#message .content-list .date {
+	font-family: consolas, ui-monospace, monospace;
+	display: inline-block;
+	min-width: 11ch;
+	text-align: right
+}

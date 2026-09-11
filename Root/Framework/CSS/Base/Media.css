@@ -1,0 +1,68 @@
+@media (max-width: 354px) {
+	#nav-list.page-list > .item_block_container {
+		float: none;
+	}
+}
+
+@media (max-width: 540px) {
+
+	#main-wrapper {
+		padding:0!important
+	}
+
+	#canvas-main {
+		width: 50%
+	}
+
+	#header-wrapper {
+		margin: 0 4px
+	}
+
+	#header-wrapper-divider,.shadow-scroll-top,.shadow-scroll-bottom,#footer-wrapper-divider {
+		margin: 0 15px
+	}
+
+	#content p {
+		padding-left: 6px;
+		padding-right: 6px
+	}
+
+	#nav-list {
+		max-width: 354px;
+	}
+
+	#nav-list.page-list > .item_block_container {
+		margin: 10px 6px;
+	}
+
+	.item_block-disabled {
+		display: none;
+	}
+
+	#fb_components {
+		margin-left: 4px!important
+	}
+
+	#home-menu {
+		padding-left: 0!important
+	}
+
+	#home-menu > div.sidebar-nav-group {
+		padding-left: 12px!important
+	}
+
+}
+
+@media (max-width: 768px) {
+	#profile-image-container {
+		float:none!important;
+		margin: auto;
+		width: 100%
+	}
+}
+
+@media (max-width: 1120px) {
+	#menu-button {
+		margin:11px 0 0 12px!important
+	}
+}

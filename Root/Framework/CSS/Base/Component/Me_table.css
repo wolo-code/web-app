@@ -1,0 +1,43 @@
+#me-table {
+	border-spacing: 6px 8px;
+	padding-bottom: 16px
+}
+
+#me-table div {
+	overflow: hidden;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+#me-table .R1 {
+	float: left;
+	text-align: right;
+	width: 13%;
+	color: #69b7cf;
+}
+
+#me-table .R2 {
+	float: left;
+	padding-left: 10px;
+	text-align: left;
+	max-width: 80%;
+}
+
+#me-table .R2 > .separator {
+	color: #ADADAD
+}
+
+#linkedin-badge > img {
+	width: 160px;
+	height: 33px;
+	border: 0;
+}
+
+#stackoverflow-badge > img {
+	width: 208px;
+	height: 58px;
+}
+
+#facebook-badge > img {
+	border: 0;
+}

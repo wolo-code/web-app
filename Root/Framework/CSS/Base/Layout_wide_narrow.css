@@ -1,0 +1,35 @@
+@media (max-width: 900px) {
+	html[data-layout="wide"] .layout-split,
+	html[data-layout="wide"] .layout-split-reverse {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 540px) {
+	html[data-layout="wide"] {
+		--layout-gutter: 0.85rem;
+		--layout-content-inset: 0;
+		--layout-content-width: 100%;
+	}
+
+	html[data-layout="wide"] #main-wrapper {
+		padding: 0 !important;
+	}
+
+	html[data-layout="wide"] #header-wrapper {
+		left: 0;
+		right: 0;
+		margin: 0 4px;
+	}
+
+	html[data-layout="wide"] .message_left_div,
+	html[data-layout="wide"] .message_right_div,
+	html[data-layout="wide"] .message_center_div,
+	html[data-layout="wide"] #message > *,
+	html[data-layout="wide"] #nav-menu_container,
+	html[data-layout="wide"] #fb_components {
+		width: auto;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}

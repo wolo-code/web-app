@@ -1,0 +1,9 @@
+@media (max-width: 400px) {
+	.sidebar-nav-norm.item_block-placeholder {
+		display: none;
+	}
+	.sidebar-nav-norm.item_block-placeholder:first-of-type {
+		display: inline-block;
+		height: 40px !important;
+	}
+}

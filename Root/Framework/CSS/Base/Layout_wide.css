@@ -1,0 +1,79 @@
+/*
+ * Opt-in wide shell. Active only when html[data-layout="wide"].
+ * Classic article sites omit the attribute / use layout=classic and stay unchanged.
+ */
+
+html[data-layout="wide"] {
+	--layout-max: none;
+	--layout-header-max: none;
+	--layout-gutter: clamp(1rem, 2.8vw, 2.75rem);
+	--layout-content-inset: 2%;
+	--layout-content-width: 96%;
+	--layout-rail-max: min(1480px, calc(100vw - 3rem));
+}
+
+html[data-layout="wide"] #main-wrapper {
+	max-width: var(--layout-max);
+	width: 100%;
+	padding: 0 var(--layout-gutter);
+}
+
+html[data-layout="wide"] #header-wrapper {
+	max-width: var(--layout-header-max);
+	left: var(--layout-gutter);
+	right: var(--layout-gutter);
+}
+
+/* Wider reading/content column than the classic 80%/10% article gutters */
+html[data-layout="wide"] .message_left_div,
+html[data-layout="wide"] .message_right_div,
+html[data-layout="wide"] .message_center_div {
+	width: var(--layout-content-width);
+}
+
+html[data-layout="wide"] .message_center_div {
+	margin-left: var(--layout-content-inset);
+	margin-right: var(--layout-content-inset);
+}
+
+html[data-layout="wide"] #message > *,
+html[data-layout="wide"] #nav-menu_container,
+html[data-layout="wide"] #fb_components {
+	margin-left: var(--layout-content-inset);
+	width: var(--layout-content-width);
+}
+
+/* Shared width rail for marketing / landing compositions */
+html[data-layout="wide"] .layout-rail {
+	width: 100%;
+	max-width: var(--layout-rail-max);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+html[data-layout="wide"] .layout-split {
+	display: grid;
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+	gap: clamp(1.25rem, 3vw, 3rem);
+	align-items: center;
+}
+
+html[data-layout="wide"] .layout-split-reverse {
+	grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+html[data-layout="wide"] .layout-start {
+	justify-items: start;
+	text-align: left;
+}
+
+html[data-layout="wide"] .shadow-scroll-top,
+html[data-layout="wide"] .shadow-scroll-bottom {
+	margin-left: 8%;
+	margin-right: 8%;
+}
+
+html[data-layout="wide"] #footer-wrapper-divider {
+	margin-left: 12%;
+	margin-right: 12%;
+}

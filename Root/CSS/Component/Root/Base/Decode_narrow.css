@@ -4,4 +4,31 @@
 		z-index: 101;
 	}
 
+	.decode #account {
+		left: unset;
+		right: 10px;
+	}
+
+	.decode.decode-icon-guide #decode_city_source_controls {
+		gap: 28px;
+	}
+
+	.decode_icon_caption {
+		font-size: 0.68em;
+		max-width: 68px;
+		padding: 2px 4px;
+	}
+
+	.decode_chrome_caption {
+		max-width: none;
+	}
+
+}
+
+@media (max-height: 420px) {
+	body.decode.decode-icon-guide:has(#notification_bottom:not(.hide)) #decode_input_container {
+		margin-bottom: 0;
+		top: 8px;
+		bottom: auto;
+	}
 }

@@ -35,6 +35,7 @@ function updateThemeControls(theme, resolvedTheme) {
 		var selected = options[i].getAttribute('data-theme') === theme;
 		options[i].classList.toggle('theme-option-active', selected);
 		options[i].setAttribute('aria-checked', selected ? 'true' : 'false');
+		options[i].removeAttribute('title');
 		if(!options[i].getAttribute('aria-label')) {
 			options[i].setAttribute('aria-label', options[i].getAttribute('data-theme') || 'Theme');
 		}

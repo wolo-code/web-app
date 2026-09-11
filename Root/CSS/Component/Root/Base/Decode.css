@@ -20,8 +20,99 @@
 	/* padding-top: 20px !important; */
 }
 
+.decode.decode-icon-guide #decode_input_container {
+	max-height: 210px;
+}
+
+.decode_icon_caption {
+	background: rgb(255 255 255 / 72%);
+	border-radius: 10px;
+	box-sizing: border-box;
+	color: #69B7CF;
+	display: none;
+	font-family: Abel, 'Roboto Condensed', sans-serif;
+	font-size: 0.72em;
+	left: 50%;
+	letter-spacing: 0.02em;
+	line-height: 1.15;
+	max-width: 76px;
+	padding: 2px 6px;
+	pointer-events: none;
+	position: absolute;
+	text-align: center;
+	top: calc(100% + 6px);
+	transform: translateX(-50%);
+	white-space: normal;
+	width: max-content;
+	z-index: 3;
+}
+
+.decode.decode-icon-guide .decode_icon_caption {
+	display: block;
+}
+
+.decode.decode-icon-guide #decode_city_context {
+	gap: 36px;
+	transform: translateY(-30px);
+}
+
+.decode.decode-icon-guide #decode_city_source_controls {
+	gap: 44px;
+}
+
+.decode.decode-icon-guide .decode_city_source_button {
+	overflow: visible;
+	position: relative;
+}
+
+#decode_input_button {
+	position: relative;
+}
+
+#decode_input_button .decode_icon_caption {
+	max-width: 48px;
+	top: calc(100% - 10px);
+}
+
+.decode_chrome_caption {
+	left: 0;
+	max-width: none;
+	right: 0;
+	transform: none;
+	white-space: nowrap;
+	width: auto;
+}
+
+#account .decode_chrome_caption {
+	top: calc(100% - 2px);
+}
+
+#action_menu_info .decode_chrome_caption,
+#location_button .decode_chrome_caption,
+#decode_map_view_button .decode_chrome_caption {
+	bottom: calc(100% + 4px);
+	top: auto;
+}
+
+#action_menu {
+	overflow: visible;
+}
+
+#action_menu_info {
+	height: 39px;
+	width: 39px;
+}
+
+#location_button,
+#decode_map_view_button,
+#action_menu_info {
+	overflow: visible;
+}
+
 .decode #account {
 	left: 12px;
+	overflow: visible;
+	right: auto;
 }
 
 #decode_input_container {
@@ -181,35 +272,32 @@ body.apple .map_type_icon_apple,
 body.esri .map_type_icon_esri,
 body.microsoft .map_type_icon_microsoft,
 body:not(.decode) .view_toggle_icon_code,
-.decode .view_toggle_icon_map,
-.decode #decode_map_view_button .map_type_icon_terrain {
+.decode .view_toggle_icon_map {
 	display: block;
 }
 
-.decode.map-source-default-osm #decode_map_view_button .map_type_icon_terrain,
-.decode.map-source-default-apple #decode_map_view_button .map_type_icon_terrain,
-.decode.map-source-default-esri #decode_map_view_button .map_type_icon_terrain,
-.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_terrain {
+#map_type_button .map_type_icon > span,
+#action_menu_map .map_type_icon > span {
 	display: none;
 }
 
-.decode.map-source-default-osm #decode_map_view_button .map_type_icon_osm,
-.decode.map-source-default-apple #decode_map_view_button .map_type_icon_apple,
-.decode.map-source-default-esri #decode_map_view_button .map_type_icon_esri,
-.decode.map-source-default-microsoft #decode_map_view_button .map_type_icon_microsoft {
+#map_type_button[data-map-next='roadmap'] .map_type_icon_terrain,
+#map_type_button[data-map-next='satellite'] .map_type_icon_satellite,
+#map_type_button[data-map-next='osm'] .map_type_icon_osm,
+#map_type_button[data-map-next='apple'] .map_type_icon_apple,
+#map_type_button[data-map-next='esri'] .map_type_icon_esri,
+#map_type_button[data-map-next='microsoft'] .map_type_icon_microsoft,
+#action_menu_map[data-map-next='roadmap'] .map_type_icon_terrain,
+#action_menu_map[data-map-next='satellite'] .map_type_icon_satellite,
+#action_menu_map[data-map-next='osm'] .map_type_icon_osm,
+#action_menu_map[data-map-next='apple'] .map_type_icon_apple,
+#action_menu_map[data-map-next='esri'] .map_type_icon_esri,
+#action_menu_map[data-map-next='microsoft'] .map_type_icon_microsoft {
 	display: block;
 }
 
 body.map-source-single #action_menu_map {
 	display: none;
-}
-
-.decode #action_menu_map .map_type_icon_terrain {
-	display: none;
-}
-
-.decode #action_menu_map .map_type_icon_satellite {
-	display: block;
 }
 
 #decode_input_city {
@@ -219,7 +307,7 @@ body.map-source-single #action_menu_map {
 #decode_map_view_button {
 	background: transparent;
 	border: none;
-	bottom: 26px;
+	bottom: 31px;
 	cursor: pointer;
 	display: none;
 	margin: -8px;

@@ -297,7 +297,7 @@ function createAppleMap() {
 			isUserInteractionEnabled: false
 		};
 		if(typeof mapkit.Padding === 'function') {
-			appleMapOptions.padding = new mapkit.Padding(0, 8, 8, 8);
+			appleMapOptions.padding = new mapkit.Padding(0, 8, 2, 8);
 		}
 		appleMap = new mapkit.Map(el, appleMapOptions);
 		syncAppleMapAppearance();
@@ -455,7 +455,11 @@ function syncOsmAttribution() {
 	var layer = getCurrentMapLayer();
 	var i;
 	for(i = 0; i < attributions.length; i++) {
-	if(attributions[i].getAttribute('data-map-layer') === layer) {
+		var attributionLayer = attributions[i].getAttribute('data-map-layer');
+		if(attributionLayer === MAP_LAYER_APPLE) {
+			attributions[i].classList.add('hide');
+		}
+		else if(attributionLayer === layer) {
 			attributions[i].classList.remove('hide');
 		}
 		else {
@@ -474,6 +478,7 @@ function setMapLayer(layer) {
 	}
 	initOsmMapType();
 	clearMapViewClasses();
+	document.body.classList.remove('decode');
 	if(layer !== MAP_LAYER_APPLE) {
 		hideAppleMapStage();
 	}
@@ -766,9 +771,51 @@ function setControlTooltip(el, label) {
 	el.setAttribute('title', label);
 }
 
+function getMapLayerIconKey(layer) {
+	if(layer === MAP_LAYER_SATELLITE) {
+		return 'satellite';
+	}
+	if(layer === MAP_LAYER_OSM) {
+		return 'osm';
+	}
+	if(layer === MAP_LAYER_APPLE) {
+		return 'apple';
+	}
+	if(layer === MAP_LAYER_ESRI) {
+		return 'esri';
+	}
+	if(layer === MAP_LAYER_MICROSOFT) {
+		return 'microsoft';
+	}
+	return 'roadmap';
+}
+
+function getMapSwitcherTargetLayer() {
+	if(document.body.classList.contains('decode')) {
+		if(isMapLayerEnabled(MAP_LAYER_SATELLITE)) {
+			return MAP_LAYER_SATELLITE;
+		}
+		return getDefaultMapLayer();
+	}
+	return getNextMapLayer(getCurrentMapLayer() || getDefaultMapLayer());
+}
+
+function syncMapTypeSwitcherIcons() {
+	var next = getMapSwitcherTargetLayer();
+	var key = getMapLayerIconKey(next);
+	var mapTypeButton = document.getElementById('map_type_button');
+	var actionMenuMap = document.getElementById('action_menu_map');
+	if(mapTypeButton) {
+		mapTypeButton.setAttribute('data-map-next', key);
+	}
+	if(actionMenuMap) {
+		actionMenuMap.setAttribute('data-map-next', key);
+	}
+}
+
 function getMapLayerLabel(layer) {
 	if(layer === MAP_LAYER_SATELLITE) {
-		return 'Satellite map';
+		return 'Google Satellite view';
 	}
 	if(layer === MAP_LAYER_OSM) {
 		return MAP_SOURCE_LABELS.osm;
@@ -790,6 +837,10 @@ function fillMissingControlTooltips() {
 	var i;
 	var label;
 	for(i = 0; i < nodes.length; i++) {
+		if(nodes[i].classList.contains('theme-option')) {
+			nodes[i].removeAttribute('title');
+			continue;
+		}
 		label = nodes[i].getAttribute('aria-label');
 		if(label && !nodes[i].getAttribute('title')) {
 			nodes[i].setAttribute('title', label);
@@ -800,18 +851,19 @@ function fillMissingControlTooltips() {
 function syncMapChromeTooltips() {
 	var decodeView = document.body.classList.contains('decode');
 	var defaultLabel = getDefaultMapSourceLabel();
-	var nextLabel = getMapLayerLabel(getNextMapLayer(getCurrentMapLayer() || getDefaultMapLayer()));
+	var nextLayer = getMapSwitcherTargetLayer();
+	var nextLabel = getMapLayerLabel(nextLayer);
+	syncMapTypeSwitcherIcons();
 	setControlTooltip(document.getElementById('decode_map_view_button'), defaultLabel + ' view');
 	setControlTooltip(document.getElementById('map_type_button'), 'Switch to ' + nextLabel);
 	setControlTooltip(
 		document.getElementById('action_menu_map'),
 		decodeView
-			? (isMapLayerEnabled(MAP_LAYER_SATELLITE) ? 'Satellite map view' : defaultLabel + ' view')
+			? (nextLayer === MAP_LAYER_SATELLITE ? nextLabel : nextLabel + ' view')
 			: 'Switch to ' + nextLabel
 	);
 	setControlTooltip(document.getElementById('action_menu_decode'), decodeView ? defaultLabel + ' view' : 'Wolo Code input');
 	setControlTooltip(document.getElementById('action_menu_info'), 'Info');
-	setControlTooltip(document.getElementById('action_menu_toggle'), 'Actions');
 	setControlTooltip(document.getElementById('location_button'), 'Locate');
 	setControlTooltip(document.getElementById('account'), 'Account');
 	setControlTooltip(document.getElementById('decode_button'), 'Go');
@@ -839,6 +891,8 @@ function syncMapSourceControls() {
 	}
 	document.body.classList.toggle('map-source-single', getMapLayerCycle().length < 2);
 
+	if(typeof closeActionMenu == 'function')
+		closeActionMenu();
 	syncMapChromeTooltips();
 
 	for(i = 0; i < toggles.length; i++) {

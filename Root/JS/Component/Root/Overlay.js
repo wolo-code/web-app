@@ -8,6 +8,8 @@ function hideOverlay(e) {
 			document.getElementById('overlay').classList.add('hide');
 			visible_div.classList.add('hide');
 		}
+	if(typeof syncDecodeIconGuide == 'function')
+		syncDecodeIconGuide();
 }
 
 function showOverlay(e) {
@@ -18,4 +20,6 @@ function showOverlay(e) {
 		document.getElementById('overlay').classList.remove('hide');
 	if(e.classList.contains('hide'))
 		e.classList.remove('hide');
+	if(typeof syncDecodeIconGuide == 'function')
+		syncDecodeIconGuide();
 }

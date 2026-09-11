@@ -11,41 +11,45 @@
 
 .theme-selector .theme-option {
 	flex: 1 1 0;
+	min-height: 58px;
 	min-width: 0;
 	appearance: none;
 	align-items: center;
 	background: #f4f4f4;
 	border: 1px solid #e0e0e0;
 	border-radius: 6px;
+	box-sizing: border-box;
 	color: #777;
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 	font-size: 0.9em;
-	gap: 4px;
+	gap: 0;
 	justify-content: center;
-	padding: 8px 6px 22px;
+	padding: 8px 6px;
 	position: relative;
 	transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .theme-selector .theme-option-label {
-	bottom: 4px;
 	font-size: 0.75em;
-	left: 50%;
+	height: 0;
 	line-height: 1.2;
+	margin-top: 0;
+	max-height: 0;
 	opacity: 0;
+	overflow: hidden;
 	pointer-events: none;
-	position: absolute;
-	top: auto;
-	transform: translateX(-50%);
-	transition: opacity 0.15s;
+	transition: opacity 0.2s, max-height 0.2s, height 0.2s, margin-top 0.2s;
 	white-space: nowrap;
 }
 
 .theme-selector .theme-option:hover .theme-option-label,
 .theme-selector .theme-option:focus-visible .theme-option-label {
+	height: 1.2em;
+	margin-top: 4px;
+	max-height: 1.2em;
 	opacity: 1;
 }
 
@@ -53,14 +57,21 @@
 .theme-selector .theme-option:focus-visible {
 	background: #ebebeb;
 	border-color: #d0d0d0;
-	color: #555;
+	color: #69B7CF;
 	outline: none;
 }
 
 .theme-selector .theme-option-active {
-	background: #69B7CF;
-	border-color: #69B7CF;
-	color: #fff;
+	background: #f4f4f4;
+	border-color: #e0e0e0;
+	color: #69B7CF;
+}
+
+.theme-selector .theme-option-active:hover,
+.theme-selector .theme-option-active:focus-visible {
+	background: #ebebeb;
+	border-color: #d0d0d0;
+	color: #69B7CF;
 }
 
 .map-source-selector {
@@ -148,6 +159,7 @@
 	height: 28px;
 	justify-content: center;
 	padding: 0;
+	transition: opacity 0.15s, color 0.2s;
 	width: 28px;
 }
 
@@ -159,11 +171,31 @@
 .map-source-default:disabled {
 	color: #ddd;
 	cursor: not-allowed;
-	opacity: 0.45;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.map-source-default:not(.map-source-default-active):not(:disabled) {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.map-source-selector:hover .map-source-default:not(:disabled),
+.map-source-selector:focus-within .map-source-default:not(:disabled) {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.map-source-selector:hover .map-source-default:disabled,
+.map-source-selector:focus-within .map-source-default:disabled {
+	opacity: 0;
+	pointer-events: none;
 }
 
 .map-source-default-active:not(:disabled) {
 	color: #69B7CF;
+	opacity: 1;
+	pointer-events: auto;
 }
 
 .map-source-default-icon,
@@ -180,6 +212,16 @@
 .theme-option-icon,
 .theme-option-icon svg {
 	display: block;
+	flex: 0 0 auto;
+	height: 28px;
+	transition: height 0.2s, width 0.2s;
+	width: 28px;
+}
+
+.theme-selector .theme-option:hover .theme-option-icon,
+.theme-selector .theme-option:hover .theme-option-icon svg,
+.theme-selector .theme-option:focus-visible .theme-option-icon,
+.theme-selector .theme-option:focus-visible .theme-option-icon svg {
 	height: 18px;
 	width: 18px;
 }
@@ -227,6 +269,11 @@ html.dark-mode .suggestion_result > div {
 html.dark-mode body .decode_city_source_button {
 	background: rgb(34 34 68 / 70%);
 	color: #9a9a9a;
+}
+
+html.dark-mode .decode_icon_caption {
+	background: rgb(34 34 68 / 78%);
+	color: #69B7CF;
 }
 
 html.dark-mode body .decode_city_source_button.active,
@@ -353,7 +400,7 @@ html.dark-mode #info_message {
 html.dark-mode .message_dialog_label,
 html.dark-mode .overlay h3,
 html.dark-mode .dialog-sub-label {
-	color: #888;
+	color: #888 !important;
 }
 
 html.dark-mode .message_dialog_body {
@@ -421,15 +468,22 @@ html.dark-mode .theme-selector .theme-option {
 
 html.dark-mode .theme-selector .theme-option:hover,
 html.dark-mode .theme-selector .theme-option:focus-visible {
-	background: #33335a;
-	border-color: #44446a;
-	color: #ddd;
+	background: #4a4a68;
+	border-color: #6a6a8a;
+	color: #e8e8e8;
 }
 
 html.dark-mode .theme-selector .theme-option-active {
-	background: #69B7CF;
-	border-color: #69B7CF;
-	color: #fff;
+	background: #2a2a4a;
+	border-color: #33335a;
+	color: #69B7CF;
+}
+
+html.dark-mode .theme-selector .theme-option-active:hover,
+html.dark-mode .theme-selector .theme-option-active:focus-visible {
+	background: #4a4a68;
+	border-color: #6a6a8a;
+	color: #f2f2f2;
 }
 
 html.dark-mode .map-source-label {
@@ -455,6 +509,12 @@ html.dark-mode .map-source-default {
 
 html.dark-mode .map-source-default:disabled {
 	color: #555;
+	opacity: 0;
+}
+
+html.dark-mode .map-source-selector:hover .map-source-default:disabled,
+html.dark-mode .map-source-selector:focus-within .map-source-default:disabled {
+	opacity: 0;
 }
 
 html.dark-mode .map-source-default-active:not(:disabled) {

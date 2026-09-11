@@ -149,9 +149,15 @@ function saveDecodeCity(city) {
 		return getDecodeCityHistoryKey(entry) != getDecodeCityHistoryKey(saved_city);
 	});
 	history.unshift(saved_city);
-	history = history.slice(0, 8);
-	localStorage[getDecodeCityStorageKey()] = JSON.stringify(history);
+	persistDecodeCityHistory(history.slice(0, 8));
+}
+
+function persistDecodeCityHistory(history) {
+	if(typeof(Storage) === 'undefined')
+		return;
+
 	decode_city_history = history;
+	localStorage[getDecodeCityStorageKey()] = JSON.stringify(history);
 	syncDecodeCityHistoryControl();
 }
 
@@ -189,19 +195,13 @@ function syncDecodeCityHistoryControl() {
 
 function showDecodeCityHistoryMessage() {
 	var toggle = document.getElementById('decode_city_history_toggle');
-	var container = document.getElementById('decode_city_history_message_list');
-	if(!toggle || !container || decode_city_history.length == 0)
+	if(!toggle || decode_city_history.length == 0)
 		return;
 
 	toggle.classList.add('activating');
-	clearDecodeCityHistoryList();
-	for(var i = 0; i < decode_city_history.length; i++) {
-		var row = document.createElement('div');
-		row.innerText = getDecodeCityDisplayName(decode_city_history[i]);
-		row.data_id = i;
-		row.addEventListener('click', chooseDecodeCityFromHistory);
-		container.appendChild(row);
-	}
+	initDecodeCityHistoryDeleteControls();
+	hideDecodeCityHistoryDeletePrompt();
+	renderDecodeCityHistoryList();
 	toggle.setAttribute('aria-expanded', true);
 	showOverlay(document.getElementById('decode_city_history_message'));
 }
@@ -209,6 +209,7 @@ function showDecodeCityHistoryMessage() {
 function hideDecodeCityHistoryMessage() {
 	hideOverlay(document.getElementById('decode_city_history_message'));
 	clearDecodeCityHistoryList();
+	hideDecodeCityHistoryDeletePrompt();
 	var toggle = document.getElementById('decode_city_history_toggle');
 	if(toggle) {
 		toggle.setAttribute('aria-expanded', false);
@@ -216,10 +217,32 @@ function hideDecodeCityHistoryMessage() {
 	}
 }
 
+function renderDecodeCityHistoryList() {
+	var container = document.getElementById('decode_city_history_message_list');
+	if(!container)
+		return;
+
+	clearDecodeCityHistoryList();
+	container.classList.remove('hide');
+	for(var i = 0; i < decode_city_history.length; i++) {
+		var row = document.createElement('div');
+		row.innerText = getDecodeCityDisplayName(decode_city_history[i]);
+		row.data_id = i;
+		row.title = 'Press and hold to remove';
+		row.addEventListener('contextmenu', preventDecodeCityHistoryContextMenu);
+		addLongpressListener(row, chooseDecodeCityFromHistory, showDeleteDecodeCityOption);
+		container.appendChild(row);
+	}
+}
+
 function clearDecodeCityHistoryList() {
 	var container = document.getElementById('decode_city_history_message_list');
 	if(container)
 		container.innerHTML = '';
+}
+
+function preventDecodeCityHistoryContextMenu(e) {
+	e.preventDefault();
 }
 
 function chooseDecodeCityFromHistory(e) {
@@ -230,6 +253,81 @@ function chooseDecodeCityFromHistory(e) {
 		setDecodeCity(city, 'history', true);
 		hideDecodeCityHistoryMessage();
 	}
+}
+
+function showDeleteDecodeCityOption(e) {
+	var index = parseInt(e.currentTarget.data_id, 10);
+	var city = decode_city_history[index];
+	var prompt = document.getElementById('decode_city_history_delete');
+	var name = document.getElementById('decode_city_history_delete_name');
+	var list = document.getElementById('decode_city_history_message_list');
+	if(!city || !prompt || !name || !list)
+		return;
+
+	pending_delete_decode_city_index = index;
+	name.innerText = getDecodeCityDisplayName(city);
+	list.classList.add('hide');
+	prompt.classList.remove('hide');
+}
+
+function hideDecodeCityHistoryDeletePrompt() {
+	pending_delete_decode_city_index = null;
+	var prompt = document.getElementById('decode_city_history_delete');
+	var list = document.getElementById('decode_city_history_message_list');
+	if(prompt)
+		prompt.classList.add('hide');
+	if(list)
+		list.classList.remove('hide');
+}
+
+function cancelDeleteDecodeCity() {
+	hideDecodeCityHistoryDeletePrompt();
+}
+
+function confirmDeleteDecodeCity() {
+	if(pending_delete_decode_city_index == null)
+		return;
+
+	var removed = decode_city_history[pending_delete_decode_city_index];
+	if(!removed) {
+		hideDecodeCityHistoryDeletePrompt();
+		return;
+	}
+
+	var removed_key = getDecodeCityHistoryKey(removed);
+	var history = getDecodeCityHistory().filter(function(entry) {
+		return getDecodeCityHistoryKey(entry) != removed_key;
+	});
+	persistDecodeCityHistory(history);
+
+	var selected_key = selected_decode_city ? getDecodeCityHistoryKey(selected_decode_city) : null;
+	if(selected_key == removed_key) {
+		if(history.length > 0)
+			setDecodeCity(history[0], 'history', false);
+		else
+			selectIpDecodeCity();
+	}
+
+	if(history.length == 0) {
+		hideDecodeCityHistoryMessage();
+		return;
+	}
+
+	hideDecodeCityHistoryDeletePrompt();
+	renderDecodeCityHistoryList();
+}
+
+function initDecodeCityHistoryDeleteControls() {
+	var confirm_button = document.getElementById('decode_city_history_delete_confirm');
+	var cancel_button = document.getElementById('decode_city_history_delete_cancel');
+	if(confirm_button && !confirm_button.data_bound)
+		confirm_button.addEventListener('click', confirmDeleteDecodeCity);
+	if(cancel_button && !cancel_button.data_bound)
+		cancel_button.addEventListener('click', cancelDeleteDecodeCity);
+	if(confirm_button)
+		confirm_button.data_bound = true;
+	if(cancel_button)
+		cancel_button.data_bound = true;
 }
 
 function syncDecodeCitySourceButtons() {
@@ -671,6 +769,17 @@ function notInRange(position) {
 	showAddress();
 	infoWindow_setContent("<div class='control' onclick='showChooseCity_by_periphery_Message();'>Not in <span class='blue'>selected<span> city's range</div>");
 	showChooseCity_by_periphery_Message();
+}
+
+function areaNotCovered(position) {
+	code_wcode = null;
+	if(position)
+		showMarker(position);
+	showNotification("Area not covered");
+	showAddress();
+	infoWindow_setContent("<div>Area not covered</div>");
+	if(typeof wait_loader != 'undefined' && wait_loader)
+		wait_loader.classList.add('hide');
 }
 
 function submitCity() {

@@ -21,13 +21,9 @@ function lng_span_half(lat) {
 
 function encodeData(value, d) {
 	const i = Math.round(value/d);
-	if(i < 0 || i > N) {
-		console.log("Error: Out of data limit");
-		console.log("Value: " + value);
-		console.log("d: " + d);
-	}
-	else
-		return i;
+	if(!isFinite(i) || i < 0 || i >= N)
+		return null;
+	return i;
 }
 
 function decodeData(data, d) {
@@ -40,17 +36,29 @@ function getCityBegin(cityCenter) {
 	return {'lat': lat, 'lng': lng};
 }
 
+function isValidWoloIndexCode(code) {
+	if(!code || code.length != 3)
+		return false;
+	for(var i = 0; i < 3; i++) {
+		var index = code[i];
+		if(index !== (index | 0) || index < 0 || index > 1023)
+			return false;
+	}
+	return true;
+}
+
 function encode_(city, position) {
+	if(!city || !city.center) {
+		areaNotCovered(position);
+		return;
+	}
+	const code = encode__(getCityBegin(city.center), position);
+	if(!isValidWoloIndexCode(code)) {
+		areaNotCovered(position);
+		return;
+	}
 	code_city = city;
 	setDecodeCity(city, 'history', true);
-	const code = encode__(getCityBegin(city.center), position);
-	for(var i of code)
-		if(i < 0 || i > 1023) {
-			console.log("Error: Out of WCode index limit");
-			noCity(position);
-			notification_top.classList.remove('hide');
-			wait_loader.classList.add('hide');
-		}
 	setCodeWords(code, city, position);
 }
 
@@ -79,12 +87,12 @@ function decode_(city, code) {
 function encode__(city_begin, position) {
 	const lat_diff = encodeData(position.lat - city_begin.lat, lat_span_half(city_begin.lat)*2);
 	const lng_diff = encodeData(position.lng - city_begin.lng, lng_span_half(city_begin.lat)*2);
+	if(lat_diff == null || lng_diff == null)
+		return null;
 	const word_index_1 = lat_diff >> 5;
 	const word_index_2 = lng_diff >> 5;
 	const word_index_3 = (lat_diff & 0x001F) << 5 | (lng_diff & 0x001F);
-	const code = [word_index_1, word_index_2, word_index_3];
-
-	return code;
+	return [word_index_1, word_index_2, word_index_3];
 }
 
 function decode__(city_begin, code) {

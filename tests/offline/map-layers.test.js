@@ -26,6 +26,15 @@ test('ensureMapViewForLocation leaves decode view for map layers', () => {
 	assert.match(mapLayers, /classList\.remove\('decode'\)/);
 });
 
+test('locate and map-type toggle leave Wolo Code input view', () => {
+	const locateJs = read('Root/JS/Base/Locate.js');
+	const mapJs = read('Root/JS/Component/Root/Map.js');
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	assert.match(locateJs, /ensureMapViewForLocation/);
+	assert.match(mapJs, /if\(document\.body\.classList\.contains\('decode'\)\) \{\s*activateMapType\(\);/);
+	assert.match(mapLayers, /clearMapViewClasses\(\);\s*document\.body\.classList\.remove\('decode'\);/);
+});
+
 test('map view toggle cycles enabled map layers', () => {
 	const mapJs = read('Root/JS/Component/Root/Map.js');
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
@@ -127,6 +136,9 @@ test('profile menu can affix google, osm, apple, esri, and microsoft map sources
 	assert.match(mapLayers, /showAppleMapStage\(\)/);
 	assert.match(mapLayers, /function setControlTooltip/);
 	assert.match(mapLayers, /function syncMapChromeTooltips/);
+	assert.match(mapLayers, /Google Satellite view/);
+	assert.match(mapLayers, /function syncMapTypeSwitcherIcons/);
+	assert.match(mapLayers, /data-map-next/);
 	assert.match(mapLayers, /arcgisonline\.com/);
 	assert.match(mapLayers, /virtualearth\.net/);
 	assert.match(selector, /data-map-source='google'/);
@@ -154,6 +166,8 @@ test('decode flow recognizes DIGIPIN and plus-code input', () => {
 	assert.match(mapJs, /showAddress/);
 	assert.match(mapJs, /showInvalidCodeDialog/);
 	assert.match(mapJs, /searchMapWithQuery/);
+	assert.match(mapJs, /keepAddressPanelOpen = true/);
+	assert.match(mapJs, /showAddress\(\)/);
 	assert.match(utilJs, /function looksLikePlusCode/);
 	assert.match(utilJs, /syncDecodeInputCaseSource/);
 });
@@ -202,7 +216,7 @@ test('unrecognized-code dialog and decode input tip are wired', () => {
 	const themeCss = read('Root/CSS/Component/Root/Base/Theme.css');
 	assert.match(dialogCss, /#invalid_code_query_wrap/);
 	assert.match(dialogCss, /text-align:\s*center/);
-	assert.match(dialogCss, /column-gap:\s*16px/);
+	assert.match(dialogCss, /#invalid_code_message \.message_dialog_body \{[\s\S]*?padding:\s*8px 20px 20px/);
 	assert.match(dialogCss, /invalid_code_actions button \{[\s\S]*?background:\s*#69B7CF/);
 	assert.match(themeCss, /html\.dark-mode #invalid_code_message #invalid_code_query/);
 	assert.match(themeCss, /html\.dark-mode #invalid_code_message \.invalid_code_actions button \{[\s\S]*?background:\s*#69B7CF/);
@@ -219,15 +233,22 @@ test('info links include OSM, Esri, Microsoft, and DIGIPIN attribution', () => {
 
 test('root index exposes OSM, Apple, Esri, and Microsoft map icons and attribution', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
+	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	assert.match(index, /map_type_icon_osm/);
 	assert.match(index, /map_type_icon_apple/);
 	assert.match(index, /map_type_icon_esri/);
 	assert.match(index, /map_type_icon_microsoft/);
+	assert.match(decodeCss, /#map_type_button\[data-map-next='satellite'\]/);
+	assert.match(decodeCss, /#action_menu_map\[data-map-next='osm'\]/);
 	assert.match(index, /osm_attribution/);
 	assert.match(index, /id='apple_map'/);
 	assert.match(index, /id='map_stage'/);
 	assert.match(index, /esri_attribution/);
 	assert.match(index, /microsoft_attribution/);
+	const decodeMapButton = index.match(/id='decode_map_view_button'[\s\S]*?<\/button>/)[0];
+	assert.match(decodeMapButton, /Map-terrain/);
+	assert.doesNotMatch(decodeMapButton, /Map-osm|Map-apple|Map-esri|Map-microsoft|Map-satellite/);
+	assert.doesNotMatch(decodeCss, /#decode_map_view_button \.map_type_icon_/);
 });
 
 test('apple maps follows google camera without animated region snaps', () => {
@@ -257,6 +278,8 @@ test('theme selector shows labels on hover', () => {
 	const themeCss = read('Root/CSS/Component/Root/Base/Theme.css');
 	assert.match(themeHtml, /theme-option-label/);
 	assert.match(themeCss, /\.theme-option:hover \.theme-option-label/);
+	assert.match(themeCss, /\.theme-option:hover \.theme-option-icon/);
+	assert.match(themeCss, /height:\s*18px/);
 });
 
 test('non-Google map views hide Google branding and keep Apple Maps transparent', () => {
@@ -272,6 +295,24 @@ test('chrome controls include native tooltips', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
-	assert.match(index, /id='action_menu_toggle'[\s\S]*title='Actions'/);
+	assert.match(index, /id='action_menu_info'[\s\S]*title='Info'/);
 	assert.match(index, /id='account'[\s\S]*title='Account'/);
+});
+
+test('Wolo Code Input View has first-launch icon captions', () => {
+	const index = read('root/HTML/Component/Root/Index.php');
+	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
+	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
+	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
+	assert.match(index, /class='decode_icon_caption'[\s\S]*IP city/);
+	assert.match(index, /class='decode_icon_caption'[\s\S]*GPS city/);
+	assert.match(index, /class='decode_icon_caption'[\s\S]*Previous/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Account/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Info/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Locate/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Map/);
+	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
+	assert.match(guideJs, /wolo-decode-icon-guide-launches/);
+	assert.match(decodeCss, /\.decode\.decode-icon-guide \.decode_icon_caption/);
+	assert.match(decodeNarrowCss, /:has\(#notification_bottom:not\(\.hide\)\) #decode_input_container/);
 });

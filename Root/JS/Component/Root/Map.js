@@ -431,7 +431,9 @@ function searchMapWithQuery(query) {
 			searchIcon.classList.add('hide');
 		}
 	}
-	syncProceedButtons();
+	if(typeof syncProceedButtons == 'function') {
+		syncProceedButtons();
+	}
 	var placesLib = typeof getGooglePlacesLibrary == 'function' ? getGooglePlacesLibrary() : null;
 	if(!placesLib || !placesLib.PlacesService || !map) {
 		showNotification('Map search is unavailable');
@@ -443,10 +445,13 @@ function searchMapWithQuery(query) {
 			return false;
 		}
 		var pos = resolveLatLng(place.geometry.location);
+		keepAddressPanelOpen = true;
 		focus___(pos);
 		encode(pos);
 		clearAddress();
+		latLng_p = pos;
 		getAddress(pos);
+		showAddress();
 		return true;
 	};
 	service.findPlaceFromQuery({query: query, fields: ['name', 'geometry']}, function(results, status) {
@@ -564,6 +569,8 @@ function activateMapType() {
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
 	}
+	if(typeof closeActionMenu == 'function')
+		closeActionMenu();
 	setMapLayer(getDefaultMapLayer());
 }
 
@@ -571,6 +578,8 @@ function activateSatelliteMapType() {
 	if(document.body.classList.contains('decode')) {
 		document.body.classList.remove('decode');
 	}
+	if(typeof closeActionMenu == 'function')
+		closeActionMenu();
 	if(isMapLayerEnabled(MAP_LAYER_SATELLITE)) {
 		setMapLayer(MAP_LAYER_SATELLITE);
 	}
@@ -582,7 +591,7 @@ function activateSatelliteMapType() {
 function toggleMapType() {
 	var layer = getCurrentMapLayer();
 	if(document.body.classList.contains('decode')) {
-		setMapLayer(getDefaultMapLayer());
+		activateMapType();
 	}
 	else if(layer === MAP_LAYER_SATELLITE) {
 		document.body.classList.remove('satellite');
@@ -590,6 +599,9 @@ function toggleMapType() {
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
+		if(typeof closeActionMenu == 'function') {
+			closeActionMenu();
+		}
 		if(typeof syncMapChromeTooltips === 'function') {
 			syncMapChromeTooltips();
 		}
@@ -618,6 +630,9 @@ function toggleDecodeView() {
 		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
+		if(typeof closeActionMenu == 'function') {
+			closeActionMenu();
+		}
 		if(typeof syncMapChromeTooltips === 'function') {
 			syncMapChromeTooltips();
 		}

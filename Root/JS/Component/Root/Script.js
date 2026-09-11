@@ -1,6 +1,4 @@
 // var syncLocate_engage;
-var actionMenuTimeout = null;
-var actionMenuTimeoutDuration = 5000;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState === 'interactive') {
@@ -123,11 +121,6 @@ function setupControls() {
 	document.getElementById('info_message_close').addEventListener('click', closeInfo);
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
-	document.getElementById('action_menu_toggle').addEventListener('click', toggleActionMenu);
-	document.getElementById('action_menu').addEventListener('pointerdown', refreshActionMenuTimeout);
-	document.getElementById('action_menu').addEventListener('pointermove', refreshActionMenuTimeout);
-	document.getElementById('action_menu').addEventListener('focusin', refreshActionMenuTimeout);
-	document.getElementById('action_menu').addEventListener('keydown', refreshActionMenuTimeout);
 	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
 	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);
 	document.getElementById('action_menu_decode').addEventListener('click', toggleDecodeViewFromActionMenu);
@@ -170,6 +163,10 @@ function setupControls() {
 	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
 	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
 	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
+	if(typeof initDecodeCityHistoryDeleteControls == 'function')
+		initDecodeCityHistoryDeleteControls();
+	if(typeof initDecodeIconGuide == 'function')
+		initDecodeIconGuide();
 	document.getElementById('external_close').addEventListener('click', external_close);
 	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
 	addLongpressListener(document.getElementById('qr_download'), downloadQR, onQRDialogSave);
@@ -182,49 +179,36 @@ function setupControls() {
 			clearCacheAndReload();
 		});
 	}
+	closeActionMenu();
 }
 
 if(typeof initLoad !== 'undefined')
 	initLoad();
 
-function toggleActionMenu() {
-	var action_menu = document.getElementById('action_menu');
-	var is_open = action_menu.classList.toggle('open');
-	document.getElementById('action_menu_toggle').setAttribute('aria-expanded', is_open);
-	document.getElementById('action_menu_info').tabIndex = is_open ? 0 : -1;
-	document.getElementById('action_menu_map').tabIndex = is_open ? 0 : -1;
-	document.getElementById('action_menu_decode').tabIndex = is_open ? 0 : -1;
-	if(is_open)
-		refreshActionMenuTimeout();
-	else
-		clearActionMenuTimeout();
+function isDecodeView() {
+	return document.body.classList.contains('decode');
+}
+
+function isMapTypeSwitcherVisible() {
+	return !document.body.classList.contains('map-source-single');
+}
+
+function syncActionMenuAccess() {
+	var decodeView = isDecodeView();
+	var switcherVisible = isMapTypeSwitcherVisible();
+	document.getElementById('action_menu_info').tabIndex = decodeView ? 0 : -1;
+	document.getElementById('action_menu_map').tabIndex = -1;
+	document.getElementById('action_menu_decode').tabIndex = decodeView ? -1 : 0;
+	document.getElementById('map_type_button').tabIndex = !decodeView && switcherVisible ? 6 : -1;
+	if(typeof syncDecodeIconGuide == 'function')
+		syncDecodeIconGuide();
 }
 
 function closeActionMenu() {
-	document.getElementById('action_menu').classList.remove('open');
-	document.getElementById('action_menu_toggle').setAttribute('aria-expanded', false);
-	document.getElementById('action_menu_info').tabIndex = -1;
-	document.getElementById('action_menu_map').tabIndex = -1;
-	document.getElementById('action_menu_decode').tabIndex = -1;
-	clearActionMenuTimeout();
-}
-
-function refreshActionMenuTimeout() {
-	if(!document.getElementById('action_menu').classList.contains('open'))
-		return;
-	clearActionMenuTimeout();
-	actionMenuTimeout = setTimeout(closeActionMenu, actionMenuTimeoutDuration);
-}
-
-function clearActionMenuTimeout() {
-	if(actionMenuTimeout) {
-		clearTimeout(actionMenuTimeout);
-		actionMenuTimeout = null;
-	}
+	syncActionMenuAccess();
 }
 
 function showInfoFromActionMenu() {
-	closeActionMenu();
 	showInfo();
 }
 

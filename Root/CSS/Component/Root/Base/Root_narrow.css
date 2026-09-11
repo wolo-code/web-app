@@ -16,13 +16,15 @@
 	}
 
 	.map_attribution {
-		bottom: 30px;
+		bottom: 4px;
 		font-size: 0.65em;
 		left: 66px;
+		line-height: 1.3;
 		max-width: calc(50vw - 120px);
-		padding: 4px 8px;
+		padding: 3px 6px;
+		white-space: normal;
 	}
-	
+
 }
 
 @media (max-width: 390px) {

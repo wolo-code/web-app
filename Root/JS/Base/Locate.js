@@ -206,8 +206,10 @@ function processPositionButtonDown() {
 		hideAddress();
 	}
 	clearMap();
-	if(document.body.classList.contains('decode'))
-		toggleMapType();
+	if(typeof ensureMapViewForLocation == 'function')
+		ensureMapViewForLocation();
+	if(typeof closeActionMenu == 'function')
+		closeActionMenu();
 	selfBoundsChangedCount = 1;
 	locate_button_pressed = true;
 	location_button_begin_time = (new Date).getTime();

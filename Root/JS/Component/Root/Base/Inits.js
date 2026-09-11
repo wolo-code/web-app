@@ -112,3 +112,4 @@ var geoIP_city;
 var selected_decode_city;
 var selected_decode_city_source;
 var decode_city_history;
+var pending_delete_decode_city_index;

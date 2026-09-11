@@ -73,19 +73,6 @@ button.border {
 	z-index: 0;
 }
 
-body.apple #map_stage::after {
-	-webkit-backdrop-filter: blur(10px);
-	backdrop-filter: blur(10px);
-	bottom: 16px;
-	content: '';
-	height: 40px;
-	left: 0;
-	pointer-events: none;
-	position: absolute;
-	width: 168px;
-	z-index: 0;
-}
-
 #map {
 	height: 100%;
 	background: var(--app-background-current);

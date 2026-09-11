@@ -7,12 +7,13 @@
 }
 
 #authentication_header_close_container {
-	position: static;
+	height: 0;
+	position: relative;
 }
 
 #authentication_header_close {
 	right: 0;
-	top: 4px;
+	top: 8px;
 }
 
 #authentication_header h2 {

@@ -9,7 +9,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | First-run cookie consent screen | Cookie Consent View | cookie/privacy copy inside `#overlay` | First visit state shown before the app accepts anonymous cookies and third-party service usage. |
 | Wolo Code input page | Wolo Code Input View | `body.decode`, `#decode_interface_overlay`, `#decode_input` | Entry state for typing, pasting, or resolving a Wolo Code before moving into the map flow. |
 | Terrain map page | Terrain Map View | `body.map`, Google Maps `ROADMAP`, `#map`, `#pac-input` | Primary map interaction state for searching places, selecting points, encoding locations, and viewing decoded results on the standard Google map. |
-| Satellite map page | Satellite Map View | `body.satellite`, Google Maps `SATELLITE`, `#map`, `#pac-input` | Imagery-based map interaction state for the same location workflows when satellite context is useful. |
+| Google Satellite map page | Google Satellite View | `body.satellite`, Google Maps `SATELLITE`, `#map`, `#pac-input` | Imagery-based map interaction state for the same location workflows when satellite context is useful. |
 | OpenStreetMap page | OSM Map View | `body.osm`, OSM tiles, `#map`, `#pac-input` | Map interaction state using OpenStreetMap tiles when that source is enabled or affixed as default. |
 | Apple Maps page | Apple Maps View | `body.apple`, `#apple_map` MapKit JS, `#map`, `#pac-input` | Map interaction state using Apple MapKit JS for tiles when `apple_maps_token` is configured. Google Maps remains the interaction layer for encode/decode, search, and city add. Apple tiles follow the Google camera during drag with a CSS transform instead of committing MapKit’s region on every move. |
 | Esri page | Esri Map View | `body.esri`, Esri World Street Map tiles, `#map`, `#pac-input` | Map interaction state using Esri street tiles when that source is enabled or affixed as default. |
@@ -41,11 +41,12 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Alternate-code tip | Decode Input Alternate Tip | `#notification_bottom`, `showDecodeInputAltTip()` | Bottom notification while the Wolo Code Input is focused | Notes that DIGIPIN and plus codes can also be entered, then fades out. |
 | City hint row | Input City Hint | `#decode_city_context`, `#decode_input_city` | Slightly above centered Wolo Code Input, below city source controls | Shows the current or inferred city context for decoding after the city value is validated; startup uses a previous city when available and otherwise falls back to IP city without requesting browser geolocation. During geolocation city lookup, it shows `Loading...`. |
 | City source controls | Input City Source Controls | `#decode_city_geolocation`, `#decode_city_ip`, `#decode_city_history_toggle` | Above Input City Hint | Lets the user request coarse geolocation, switch to IP city, or open the previous-city popup using action-sized, widely spaced controls whose full circular button grows slightly on hover, active, or opening states and animates back when inactive. The selected source uses the primary icon accent; inactive sources stay muted. Unsupported, invalid, or non-gesture geolocation attempts use the standard city lookup failure state. |
-| Previous city popup | Input Previous City Popup | `#decode_city_history_message`, `#decode_city_history_message_list` | Center overlay when opened | Lists previously used cities cached from Wolo Code input, decoded/encoded cities, or geolocation-derived city selection. |
+| Icon caption overlay | Input Icon Guide | `body.decode-icon-guide`, `.decode_icon_caption`, `DecodeIconGuide.js` | Vertically centered with the input cluster; chrome captions sit by Account, Info, Locate, and Map | Names each unlabeled icon on Wolo Code Input View for the first two launches (`localStorage` `wolo-decode-icon-guide-launches`). Hidden while a modal overlay is open. On very small screens the centered cluster can shift up so bottom notifications stay visible. |
+| Previous city popup | Input Previous City Popup | `#decode_city_history_message`, `#decode_city_history_message_list` | Center overlay when opened | Lists previously used cities cached from Wolo Code input, decoded/encoded cities, or geolocation-derived city selection. A tap selects a city; a long-press offers Remove to delete that city from the list. |
 | Input suggestions | Wolo Code Suggestions | `#decode_input_suggestion_result` | Above or near centered Wolo Code Input | Shows suggested Wolo Code tokens and resizes the input as needed. |
 | Submit control | Wolo Code Proceed Button | `#decode_input_button` | Immediately right of Wolo Code Input | Starts decode from the input page. |
-| Unrecognized input dialog | Unrecognized Code Dialog | `#invalid_code_message`, `showInvalidCodeDialog()` | Overlay | Explains that decode did not recognize a Wolo Code, DIGIPIN, or plus code. Centers the typed value and shows matching primary-accent Edit code (reverse-play) and Search map (play) buttons on the left and right edges with a minimum gap. |
-| Terrain map control | Terrain Map View Button | `#decode_map_view_button`, `toggleDecodeView()` | Bottom-right | Switches from Wolo Code Input View to the affixed default map source (Google terrain, OSM, Apple Maps, Esri, or Microsoft Maps). |
+| Unrecognized input dialog | Unrecognized Code Dialog | `#invalid_code_message`, `showInvalidCodeDialog()` | Overlay | Explains that decode did not recognize a Wolo Code, DIGIPIN, or plus code. Centers the typed value and shows padded, matching primary-accent Edit code (reverse-play) and Search map (play) buttons. Search map opens Map View and the Address Panel. |
+| Terrain map control | Terrain Map View Button | `#decode_map_view_button`, `toggleDecodeView()` | Bottom-right | Always shows the terrain SVG. Switches from Wolo Code Input View to the affixed default map source (Google terrain, OSM, Apple Maps, Esri, or Microsoft Maps). |
 
 ## Terrain Map View
 
@@ -57,20 +58,20 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Shows suggestions for the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
-| Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-center when shown | Switches from Terrain Map View to Satellite Map View. |
+| Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right corner when shown | Cycles to the next enabled map layer. The icon and tooltip both show that next layer (Google Satellite view after Google Maps). |
 | Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. |
 | Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions. |
 
-## Satellite Map View
+## Google Satellite View
 
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
-| Map canvas | Satellite Map Canvas | `#map`, Google Maps `SATELLITE` | Full viewport | Imagery map surface for selection, pan, zoom, and place context. |
+| Map canvas | Google Satellite Map Canvas | `#map`, Google Maps `SATELLITE` | Full viewport | Imagery map surface for selection, pan, zoom, and place context. |
 | Search field | Place Search Input | `#pac-input` | Top-left | Same search and code entry field used in Terrain Map View. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Same suggestion surface used by the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
-| Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-center when shown | Switches from Satellite Map View back to Terrain Map View. |
+| Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right corner when shown | Cycles from Google Satellite View to the next enabled map layer. |
 | Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. |
 | Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions. |
 
@@ -122,12 +123,13 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- | --- |
 | Account overlay dialog | Account Address Book View | `#account_dialog_container`, `#account_dialog` | Center overlay | Shows the logged-in account profile and saved Wolo Code address tools. |
 | Account title | Account Dialog Title | `#account_dialog_label` | Top of dialog | Shows `Account`. |
-| Account close control | Account Dialog Close Button | `#account_dialog_close` | Top-right of dialog | Closes the account dialog. |
+| Account close control | Account Dialog Close Button | `#account_dialog_close` | Top-right of dialog, inset equally from the dialog edge | Closes the account dialog. |
 | Profile summary | Account Profile Summary | `#account_dialog_main` | Top section of dialog | Groups the signed-in user's display name, email, and logout action. |
 | Display name | Account Display Name | `#account_dialog_display_name` | Top profile summary | Shows the signed-in user's name. |
 | Email address | Account Email | `#account_dialog_email` | Under display name | Shows the signed-in user's email address. |
-| Appearance selector | Account Theme Selector | `.theme-selector` | Profile summary | Sets light, dark, or system theme. Buttons are icon-only; System/Light/Dark labels appear on hover and keyboard focus. |
-| Map source selector | Account Map Source Selector | `.map-source-selector`, `Map_source_selector.php` | Under Appearance | Each map source has an enable/disable toggle beside its label and a set-default star that is active only while that source is enabled. |
+| Appearance selector | Account Theme Selector | `.theme-selector` | Profile summary | Sets light, dark, or system theme. Icons stay large until hover or focus, then shrink so System/Light/Dark labels can appear. Native tooltips stay off; dark-mode hover uses a white/gray highlight instead of a filled primary-accent button. |
+| Section heading | Account Section Label | `.dialog-sub-label` | Above Appearance, Map source, Current, and Saved | Uses the muted dialog label color, not the primary accent. |
+| Map source selector | Account Map Source Selector | `.map-source-selector`, `Map_source_selector.php` | Under Appearance | Each map source has an enable/disable toggle beside its label. Only the active default star stays visible; other enabled stars appear on hover or focus. |
 | Logout control | Account Logout Button | `#account_dialog_logout_button` | Profile summary controls | Signs the user out. |
 | Current section | Current Address Section | `#account_dialog_options` under `Current` | Middle section of dialog | Lets the user save the current Wolo Code address. |
 | Current title field | Save Title Field | `#save_title_main` | Current Address Section | Captures the saved address title. |
@@ -181,10 +183,10 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- | --- |
 | Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. `#logo_surface` draws an 8px padded frosted rectangle around the Wolo + CODE lockup. |
 | Account entry | Account Button | `#account` | Wolo Code Input View: top-left; map views desktop: top-right beside App Logo; mobile: top-right | Opens sign-in, account, and saved-address flows. |
-| Expandable action control | Action Menu | `#action_menu`, `#action_menu_toggle`, `toggleActionMenu()` | Bottom-left | Opens the bottom-left radial action controls. |
-| About/help action | Info Action | `#action_menu_info`, `showInfo()` | Above Action Menu when expanded | Opens app information and related links. |
-| View toggle action | Wolo Code Input Action | `#action_menu_decode`, `toggleDecodeView()` | Up/right from Action Menu when expanded | Switches between the map views and Wolo Code Input View. |
-| Map-type action | Map View Action | `#action_menu_map`, `toggleMapViewType()` | Right of Action Menu when expanded | Cycles enabled map layers; from Wolo Code Input View it opens Satellite Map View when Google Maps is enabled. Hidden when only one map layer is available. Native `title` tooltips name the next map. |
+| Bottom-left chrome host | Action Menu | `#action_menu` | Bottom-left | Hosts the Info Action on Wolo Code Input View and the Wolo Code Input Action on map views. The expandable radial menu is withdrawn. |
+| About/help action | Info Action | `#action_menu_info`, `showInfo()` | Bottom-left on Wolo Code Input View | Opens app information and related links. Hidden on map views. |
+| View toggle action | Wolo Code Input Action | `#action_menu_decode`, `toggleDecodeView()` | Bottom-left on map views | Switches from map views to Wolo Code Input View. Hidden on Wolo Code Input View; use Terrain Map View Button instead. |
+| Map-type action | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right on map views | Cycles enabled map layers. Hidden on Wolo Code Input View and when only one map layer is available. Native `title` tooltips and icons both name the next map. |
 | Notifications | Notification Bars | `#notification_top`, `#notification_bottom` | Top-center and in `#map_bottom_stack` above the Address Panel | Shows short guidance, errors, and flow feedback. The bottom bar stacks with the Address Panel and Location Accuracy Indicator; the top bar stays below search. |
 | Address panel | Address Panel | `#address_text` and Address fragment | Bottom of `#map_bottom_stack`, above Locate/footer | Shows and copies the resolved address for a selected Wolo Code. DIGIPIN (India) and plus code rows keep labels on the left and values on the right; plus code is encoded locally if geocoding omits it. Theme follows light/dark mode. Drag-selected text copies only the selection. Steering with a DIGIPIN or plus code keeps the panel open. Locate hides the panel. |
 | Modal layer | Overlay Layer | `#overlay` | Full viewport | Hosts info, redirects, city selection, QR, account, and browser-support dialogs. |
@@ -192,7 +194,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | QR label dialog | QR Label View | `#qr_container` | Center overlay | Builds, previews, downloads, and prints a Wolo Code label. |
 | Account dialog | Account Address Book View | `#account_dialog_container`, `#account_dialog` | Center overlay | Shows profile, logout, current address save fields, and saved addresses. |
 | Footer credit | Footer Credit | `#footer-content-container`, `#footer-content` | Bottom-center | Shows license year and author credit. |
-| Map source credit | Map Source Attribution | `.map_attribution`, MapKit legal on `#apple_map` | Bottom-left, after a gap from the Action Menu | Credits OSM, Esri, Microsoft, or Apple for non-Google map tiles. Stays visible while the Action Menu is open; the menu paints above it. |
+| Map source credit | Map Source Attribution | `.map_attribution`, MapKit logo on `#apple_map` | Bottom-left, close to the bottom edge after a gap from the bottom-left chrome; one line on widescreen | Credits OSM, Esri, or Microsoft for non-Google map tiles. Apple Maps uses MapKit’s logo only (no extra Apple text). |
 | Bottom info-card dock | Map Bottom Stack | `#map_bottom_stack` | Bottom-center, `80px` above Locate/footer (`128px`/`140px` on Console) | Flex column that stacks the bottom notification, Location Accuracy Indicator, and Address Panel with an 8px gap so variable-height cards do not overlap. Overlay dialogs and `#notification_top` are not in this dock. Bottom notifications fade out when they expire. |
 
 ## Responsive Placement Notes
@@ -207,16 +209,19 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Notification Top Bar | Top-center below desktop search/logo area | Lower top-center, below mobile search row | `#notification_top`, `Base_narrow.css` |
 | Map Bottom Stack | Bottom-center above Locate Button | Same band; Console uses a higher dock offset | `#map_bottom_stack`, `Base.css` |
 | Footer Credit | Bottom-center | Bottom-center with smaller text | `#footer-content-container`, `Base_narrow.css` |
-| Map Source Attribution | Bottom-left, after a gap from the Action Menu | Bottom-left, after a gap from the Action Menu; narrower so it stops before Locate | `.map_attribution`, `Root_narrow.css` |
-| Action Menu | Bottom-left | Bottom-left | `#action_menu` |
+| Map Source Attribution | Bottom-left, close to the bottom edge after a gap from the bottom-left chrome; one line on widescreen | Bottom-left, close to the bottom edge after a gap from the bottom-left chrome; narrower so it stops before Locate | `.map_attribution`, `Root_narrow.css` |
+| Info Action | Bottom-left on Wolo Code Input View | Bottom-left on Wolo Code Input View | `#action_menu_info` |
+| Wolo Code Input Action | Bottom-left on map views | Bottom-left on map views | `#action_menu_decode` |
+| Map Type Button | Bottom-right corner | Bottom-right corner | `#map_type_button` |
 | Locate Button | Bottom-center | Bottom-center | `#location_button` |
+| Camera D-pad | Bottom-right, same 39px disc as Map Type Button, with a small gap to its left | Bottom-right, same 39px disc as Map Type Button, with a small gap to its left | `#map gmp-internal-camera-control` |
 
-Chrome icon controls (Account, Go, Locate, Map Type, Action Menu, and city-source buttons) show a native tooltip from `title`. Appearance theme buttons show System/Light/Dark labels on hover and focus.
+Chrome icon controls (Account, Go, Locate, Map Type, Info Action, Wolo Code Input Action, and city-source buttons) show a native tooltip from `title`. The first two launches also show on-screen captions for those icons on Wolo Code Input View. Appearance theme buttons omit native tooltips; hovering or focusing shrinks the icon so the System/Light/Dark label can appear. Dark-mode hover uses a white/gray highlight instead of a filled primary-accent button.
 
 Related naming:
 
 - `Terrain Map View` is the preferred product name for the current `body.map` roadmap state.
-- `Satellite Map View` is a full view, not just a skin, because it has its own `body.satellite` state and theme background.
+- `Google Satellite View` is a full view, not just a skin, because it has its own `body.satellite` state and theme background.
 - `Wolo Code Input View` replaces the older `Decode View` wording in product-facing docs. Use `decode` only when referring to implementation state or functions.
 - Table positions describe the default desktop layout unless a row explicitly calls out mobile behavior.
 - Use `Responsive Placement Notes` when documenting controls whose positions change between desktop and mobile layouts.

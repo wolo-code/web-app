@@ -26,6 +26,13 @@
 	border-radius: 5px;
 	padding: 2px 0 2px 8px;
 	border: 1px solid #69B7CF;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.choose_city_message_list div.longpress {
+	opacity: .75;
 }
 
 .choose_city_message_list div:hover, #choose_city_by_periphery_message_current_city div:hover {

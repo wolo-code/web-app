@@ -7,6 +7,8 @@ function showNotification(message, duration) {
 	clearNotificationTimer();
 	notification_bottom.innerHTML = message;
 	notification_bottom.classList.remove('hide', 'fade-out');
+	if(typeof layoutDecodeIconGuide == 'function')
+		layoutDecodeIconGuide();
 	notification_timer = setTimeout(function() {
 		fadeOutNotification();
 	}, duration);
@@ -27,6 +29,8 @@ function fadeOutNotification() {
 		notification_bottom.classList.add('hide');
 		notification_bottom.classList.remove('fade-out');
 		notification_timer = null;
+		if(typeof layoutDecodeIconGuide == 'function')
+			layoutDecodeIconGuide();
 	}, NOTIFICATION_FADE_MS);
 }
 

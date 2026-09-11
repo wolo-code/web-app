@@ -137,9 +137,9 @@ function initMap() {
 	var markers = [];
 	if(searchBox) {
 		searchBox.addListener('places_changed', function() {
-		var places = searchBox.getPlaces();
+		var places = typeof getSearchBoxPlaceList == 'function' ? getSearchBoxPlaceList(searchBox) : searchBox.getPlaces();
 
-		if (places.length == 0) {
+		if (!places || !places.length) {
 			return;
 		}
 

@@ -10,17 +10,28 @@ function showChooseCity_by_periphery_Message() {
 	showOverlay(document.getElementById('choose_city_by_periphery_message'));
 }
 
+function isChooseCityCurrentCodeCity(city) {
+	if(!city || typeof code_city == 'undefined' || !code_city) {
+		return false;
+	}
+	return city.id == code_city.id;
+}
+
 function showChooseCity_by_periphery_List() {
 	var container = document.getElementById('choose_city_by_periphery_message_list');
 	var chooseCity_by_periphery_List_gpids_ = [];
 	for(let key in chooseCity_by_periphery_List) {
-		if(!chooseCity_by_periphery_List_gpids_.includes(chooseCity_by_periphery_List[key].city.gp_id) && !chooseCity_by_periphery_List_gpids.includes(chooseCity_by_periphery_List[key].city.gp_id) && !(chooseCity_by_periphery_List[key].city.id == code_city.id)) {
+		var city = chooseCity_by_periphery_List[key] && chooseCity_by_periphery_List[key].city;
+		if(!city) {
+			continue;
+		}
+		if(!chooseCity_by_periphery_List_gpids_.includes(city.gp_id) && !chooseCity_by_periphery_List_gpids.includes(city.gp_id) && !isChooseCityCurrentCodeCity(city)) {
 			var row = document.createElement('div');
-			row.innerHTML = getFullCity(chooseCity_by_periphery_List[key].city);
+			row.innerHTML = getFullCity(city);
 			container.appendChild(row);
 			row.addEventListener('click', chooseCity_by_periphery_Continue);
 			row.data_id = key;
-			chooseCity_by_periphery_List_gpids_.push(chooseCity_by_periphery_List[key].city.gp_id);
+			chooseCity_by_periphery_List_gpids_.push(city.gp_id);
 		}
 	}
 }
@@ -52,6 +63,9 @@ function chooseCity_by_periphery_Continue(e) {
 }
 
 function showChooseCity_by_periphery_gpid() {
+	if(typeof code_city == 'undefined' || !code_city) {
+		return;
+	}
 	var container = document.getElementById('choose_city_by_periphery_message_current_city');
 	var row = document.createElement('div');
 	row.innerHTML = getFullCity(code_city);

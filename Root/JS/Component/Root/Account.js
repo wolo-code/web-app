@@ -58,16 +58,30 @@ function onAccountDialogSave() {
 	}
 }
 
+function buildSaveAddressPayload(title, segment, address, city, code) {
+	if(!city || city.id == null || city.id === '') {
+		return null;
+	}
+	if(!code || !code.length) {
+		return null;
+	}
+	return {
+		city_id: city.id,
+		code: code,
+		title: title,
+		segment: segment,
+		address: address
+	};
+}
+
 function saveAddress(title, segment, address, callback) {
 	if(firebase.auth().currentUser) {
-		var payload = {
-			uid: uid,
-			city_id: getCodeCity().id,
-			code: getCodeWCode(),
-			title: title,
-			segment: segment,
-			address: address
-		};
+		var payload = buildSaveAddressPayload(title, segment, address, getCodeCity(), getCodeWCode());
+		if(!payload) {
+			showNotification('No location to save');
+			return;
+		}
+		payload.uid = uid;
 		if (isOfflineMode()) {
 			enqueueOfflineSave(payload).then(function() {
 				if(typeof callback != 'undefined')

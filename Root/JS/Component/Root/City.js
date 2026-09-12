@@ -491,7 +491,7 @@ function getCityFromIdThenEncode(city_id, city_center, latLng) {
 }
 
 function getCityFromPositionThenDecode(latLng, wcode) {
-	var nearCity = new Object;
+	var nearCity = null;
 
 	geoFireInit();
 	var geoQuery = geoFire.query({
@@ -503,10 +503,14 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 	geoQuery.on('ready', function() {
 		popLoader();
 		geoQuery.cancel();
-		if(nearCity == null)
+		if(!nearCity || nearCity.id == null)
 			decode_continue(null, wcode);
 		else
 			getCityFromId(nearCity.id, function(city) {
+				if(!city) {
+					decode_continue(null, wcode);
+					return;
+				}
 				city.center = nearCity.center;
 				decode_continue(city, wcode);
 			});
@@ -746,6 +750,11 @@ function getCityCenterFromId_session(city, session_id, callback) {
 }
 
 function getCityCenterFromId(city, callback, options) {
+	if(!city) {
+		if(typeof callback == 'function')
+			callback(null);
+		return;
+	}
 	var refresh = options && options.refresh;
 
 	function finish(center) {
@@ -945,6 +954,9 @@ function tryDefaultCity() {
 }
 
 function getFullCity(city) {
+	if(!city) {
+		return '';
+	}
 	locality = typeof city.locality != 'undefined'? city.locality : null; 
 	cityGroupName = getCityGroupName(city, ' \\ ');
 	properCityAccent = getProperCityAccent(city);

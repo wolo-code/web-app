@@ -219,6 +219,22 @@ function onAccountDialogSave() {
 	});
 }
 
+function buildSaveAddressPayload(title, segment, address, city, code) {
+	if(!city || city.id == null || city.id === '') {
+		return null;
+	}
+	if(!code || !code.length) {
+		return null;
+	}
+	return {
+		city_id: city.id,
+		code: code,
+		title: title,
+		segment: segment,
+		address: address
+	};
+}
+
 function saveAddress(title, segment, savedAddress, callback) {
 	var user = firebase.auth().currentUser;
 	if(!user) {
@@ -228,19 +244,20 @@ function saveAddress(title, segment, savedAddress, callback) {
 	uid = user.uid;
 	var city = typeof getCodeCity == 'function' ? getCodeCity() : null;
 	var code = normalizeSavedWcode(typeof getCodeWCode == 'function' ? getCodeWCode() : null);
-	if(!city || typeof city.id == 'undefined' || city.id == null || !code.length) {
+	var basePayload = buildSaveAddressPayload(title, segment, savedAddress, city, code);
+	if(!basePayload) {
 		showNotification('Locate or decode a Wolo Code first');
 		return;
 	}
 	var payload = {
 		uid: uid,
-		city_id: city.id,
+		city_id: basePayload.city_id,
 		gp_id: city.gp_id || null,
 		city_name: typeof getProperCityAccent == 'function' ? getProperCityAccent(city) : (city.name || ''),
-		code: code,
-		title: title,
-		segment: segment,
-		address: savedAddress
+		code: basePayload.code,
+		title: basePayload.title,
+		segment: basePayload.segment,
+		address: basePayload.address
 	};
 	if (isOfflineMode()) {
 		enqueueOfflineSave(payload).then(function() {
@@ -456,16 +473,24 @@ function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
 		var entry = saveList[row.data_key] || {};
 		var savedCode = row.data_code && row.data_code.length ? row.data_code : normalizeSavedWcode(entry.code);
+		var title = document.getElementById('address_text_title');
+		var segment = document.getElementById('address_text_segment');
+		var content = document.getElementById('address_text_content');
+		var panel = typeof getAddressPanel == 'function' ? getAddressPanel() : (typeof address_text != 'undefined' ? address_text : null);
 		if(typeof beginProgrammaticMapFocus == 'function')
 			beginProgrammaticMapFocus();
 		if(typeof setAddressPanelHeading == 'function')
 			setAddressPanelHeading(entry.title, entry.segment);
 		else {
-			document.getElementById('address_text_title').innerText = entry.title || '';
-			document.getElementById('address_text_segment').innerText = entry.segment || '';
+			if(title)
+				title.innerText = entry.title || '';
+			if(segment)
+				segment.innerText = entry.segment || '';
 		}
-		document.getElementById('address_text_content').innerText = entry.address || '';
-		address_text.classList.remove('hide');
+		if(content)
+			content.innerText = entry.address || '';
+		if(panel && panel.classList)
+			panel.classList.remove('hide');
 		current_title = entry.title;
 		current_segment = entry.segment;
 		current_address = entry.address;

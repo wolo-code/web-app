@@ -3,6 +3,7 @@
 	<h2 class='message_dialog_label section-to-not-print'>
 		Label
 	</h2>
+	<div id='qr_save' class="message_dialog_close message_dialog_leading_action control section-to-not-print" title='Save' aria-label='Save'>save</div>
 	<div id='qr_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
@@ -18,8 +19,8 @@
 			</div>
 		</div>
 		<div id='qr_title_container' class='center'>
-			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title">
-			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment">
+			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title – e.g. Home">
+			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment – e.g. Main gate">
 		</div>
 		<div id='qr_wcode'>
 			<div id='qr_wcode_container' class='center'>

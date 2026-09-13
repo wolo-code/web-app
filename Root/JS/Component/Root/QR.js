@@ -28,6 +28,18 @@ function showQR() {
 	window.addEventListener('afterprint', afterQRprint);
 }
 
+function isQROverlayDismissTarget(target) {
+	var qr = document.getElementById('qr_container');
+	if(!qr || qr.classList.contains('hide'))
+		return false;
+	return !qr.contains(target);
+}
+
+function onQROverlayClick(event) {
+	if(event && isQROverlayDismissTarget(event.target))
+		closeQR();
+}
+
 function closeQR() {
 	hideOverlay(document.getElementById('qr_container'));
 	previewQR_deactivate()
@@ -88,6 +100,12 @@ function toggleQRpreview() {
 		previewQR_activate();
 }
 
+function setQRChromeHidden(hidden) {
+	var method = hidden ? 'add' : 'remove';
+	document.getElementById('qr_close').classList[method]('hide');
+	document.getElementById('qr_save').classList[method]('hide');
+}
+
 function beforeQRprint() {
 	document.body.classList.add('print');
 	if(!mode_preview) {
@@ -96,7 +114,7 @@ function beforeQRprint() {
 	}
 	document.getElementById('overlay').classList.remove('overlay');
 	document.getElementById('overlay').classList.add('section-to-print');
-	document.getElementById('qr_close').classList.add('hide');
+	setQRChromeHidden(true);
 	document.getElementById('overlay').classList.add('raster');
 }
 
@@ -104,7 +122,7 @@ function afterQRprint() {
 	document.body.classList.remove('print');
 	document.getElementById('overlay').classList.add('overlay');
 	document.getElementById('overlay').classList.remove('section-to-print');
-	document.getElementById('qr_close').classList.remove('hide');
+	setQRChromeHidden(false);
 	document.getElementById('overlay').classList.remove('raster');
 	if(mode_preview_activated)
 		toggleQRpreview();
@@ -124,6 +142,7 @@ function downloadQR() {
 		mode_preview_activated = true;
 	}
 	document.getElementById('qr_close').classList.add('hide');
+	document.getElementById('qr_save').classList.add('hide');
 	document.getElementById('qr_controls').classList.add('hide');
 	document.getElementById('overlay').classList.add('raster');
 	document.getElementById('qr_body').setAttribute( 'style',
@@ -135,6 +154,7 @@ function downloadQR() {
 		document.getElementById('overlay').classList.remove('raster');
 		document.getElementById('qr_body').removeAttribute('style');
 		document.getElementById('qr_close').classList.remove('hide');
+		document.getElementById('qr_save').classList.remove('hide');
 		document.getElementById('qr_controls').classList.remove('hide');
 		var qrImage = canvas.toDataURL("image/png");
 		downloadURI(qrImage, "Wolo Code - " + getCodeFull_text() + ".png");
@@ -148,6 +168,7 @@ function downloadQR_minimal() {
 		mode_preview_activated = true;
 	}
 	document.getElementById('qr_close').classList.add('hide');
+	document.getElementById('qr_save').classList.add('hide');
 	document.getElementById('qr_controls').classList.add('hide');
 	document.getElementById('overlay').classList.add('raster');
 	document.getElementById('overlay').classList.add('qr_minimal');
@@ -161,6 +182,7 @@ function downloadQR_minimal() {
 		document.getElementById('qr_label').classList.remove('hide');
 		document.getElementById('qr_webapp_url').classList.remove('hide');
 		document.getElementById('qr_close').classList.remove('hide');
+		document.getElementById('qr_save').classList.remove('hide');
 		document.getElementById('qr_controls').classList.remove('hide');
 
 		window.jsPDF = window.jspdf.jsPDF;
@@ -230,7 +252,15 @@ function onQRDialogSave() {
 		showNotification("Still locating..");
 		return;
 	}
-	saveAddress( document.getElementById('qr_title_main').value,
-		 document.getElementById('qr_title_segment').value,
-		 document.getElementById('qr_address').innerText );
+	var user = firebase.auth().currentUser;
+	if(user != null)
+		uid = user.uid;
+	var saveAddr = document.getElementById('qr_address').innerText;
+	if(qr_address_active_first || saveAddr == '\xa0\xa0Address' || saveAddr.trim() == 'Address' || saveAddr == '')
+		saveAddr = address;
+	current_title = document.getElementById('qr_title_main').value;
+	current_segment = document.getElementById('qr_title_segment').value;
+	if(!qr_address_active_first)
+		current_address = document.getElementById('qr_address').innerText;
+	saveAddress(current_title, current_segment, saveAddr);
 }

@@ -446,10 +446,16 @@ html.dark-mode .overlay {
 html.dark-mode .message_dialog,
 html.dark-mode #account_dialog,
 html.dark-mode #authentication_header,
-html.dark-mode #info_message {
+html.dark-mode #info_message,
+html.dark-mode #no_city_message {
 	background-color: #222244;
 	border-color: #33335a;
 	color: #b8b8b8;
+}
+
+html.dark-mode #no_city_message .loader {
+	border-color: #33335a;
+	border-top-color: #69B7CF;
 }
 
 html.dark-mode #info_message {
@@ -698,6 +704,7 @@ html.dark-mode,
 html.dark-mode body,
 html.dark-mode .message_dialog,
 html.dark-mode #account_dialog,
-html.dark-mode #info_message {
+html.dark-mode #info_message,
+html.dark-mode #no_city_message {
 	transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }

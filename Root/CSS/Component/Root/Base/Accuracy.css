@@ -3,69 +3,118 @@
 }
 
 #accuracy_container > div {
-	padding: 0px 0 0px 12px;
+	align-items: center;
 	background: rgba(237, 240, 233, 0.75);
-	border-radius: 25px;
-	color: #707070;
 	border: 1px solid #DDDDDD;
-	text-align: center;
+	border-radius: 25px;
+	box-sizing: border-box;
+	color: #707070;
+	display: inline-flex;
 	font-size: large;
-	display: inline-block;
+	height: 32px;
+	line-height: 1;
+	padding: 0 0 0 12px;
+	white-space: nowrap;
 }
 
 #accuracy_container.highlight > div {
-	padding-right: 12px;
 	background-color: #FFFFFF;
 }
 
 #accuracy_indicator {
-	padding-left: 15px;
-	margin-right: 3px;
 	border-radius: 50%;
+	box-sizing: border-box;
+	display: inline-block;
+	flex: 0 0 10px;
+	font-size: 0;
+	height: 10px;
+	line-height: 0;
+	margin-right: 8px;
+	overflow: hidden;
+	padding: 0;
+	width: 10px;
 }
 
 #accuracy_meter {
+	display: inline-block;
 	font-family: monospace;
-	line-height: 32px;
-	min-width: 18px;
+	font-variant-numeric: tabular-nums;
+	margin-left: 0.35em;
+	text-align: right;
+	width: 3ch;
 }
 
 #accuracy_meter_unit {
-	padding-right: 4px;
+	padding-left: 0.25em;
+	padding-right: 8px;
 }
 
 .highlight #accuracy_meter {
 	font-weight: bold;
 }
 
-#proceed_button {
-	position: relative;
-	overflow: hidden;
+#proceed_container {
+	align-items: stretch;
+	align-self: stretch;
 	display: inline-flex;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+	flex: 0 0 auto;
+}
+
+#accuracy_container #proceed_container.hide {
+	display: inline-flex !important;
+	pointer-events: none;
+	visibility: hidden;
+}
+
+#proceed_button {
+	align-items: center;
+	align-self: stretch;
+	background: transparent;
+	border: none;
+	border-radius: 0 24px 24px 0;
+	box-shadow: none;
+	box-sizing: border-box;
 	color: #444;
+	cursor: pointer;
+	display: inline-flex;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
-	background-color: rgb(255, 255, 255);
-	padding: 6px 28px;
-	border: none;
-	border-radius: 28px;	
+	height: 100%;
+	justify-content: center;
+	overflow: hidden;
+	padding: 0 16px;
+	position: relative;
+}
+
+#proceed_label_length,
+#proceed_label {
+	align-items: center;
+	display: inline-flex;
+	height: 100%;
+	justify-content: center;
+}
+
+#proceed_label_length img,
+#proceed_label img {
+	display: block;
 }
 
 #proceed_progress {
-	position: absolute;
+	background: #3b93ff;
+	bottom: 0;
 	left: 0;
+	position: absolute;
 	right: 0;
 	top: 0;
-	bottom: 0;
 	width: 0%;
-	background: #3b93ff;
 }
 
 #proceed_label {
-	position: absolute;
+	bottom: 0;
 	left: 0;
+	position: absolute;
 	right: 0;
+	top: 0;
 }
 
 #location_icon_dot.blinking {

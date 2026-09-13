@@ -215,7 +215,10 @@ body.decode-icon-guide-fade #map_icon_guide_dim {
 }
 
 body:not(.decode).decode-icon-guide #map .gm-bundled-control,
-body:not(.decode).decode-icon-guide #map gmp-internal-camera-control {
+body:not(.decode).decode-icon-guide #map gmp-internal-camera-control,
+body:not(.decode).decode-icon-guide #map .gm-style > :has(#map_search_bar),
+body:not(.decode).decode-icon-guide #map .gmnoprint:has(#map_search_bar),
+body:not(.decode).decode-icon-guide #map_search_bar {
 	position: relative;
 	z-index: 1000001 !important;
 }

@@ -396,6 +396,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /function layoutMapCameraCaption/);
 	assert.match(guideJs, /gmp-internal-camera-control/);
 	assert.match(guideJs, /function layoutMapSearchCaptions/);
+	assert.match(guideJs, /function raiseMapSearchBarForGuide/);
+	assert.match(guideJs, /function getMapSearchBarControlHost/);
 	assert.match(guideJs, /function pinGuideCaptionBeside/);
 	assert.match(guideJs, /map_icon_guide_dim/);
 	assert.doesNotMatch(guideJs, /closest\('#map_stage'\)/);
@@ -403,6 +405,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.doesNotMatch(infoCss, /#info_show_icon_labels:hover[\s\S]{0,80}text-decoration:\s*underline/);
 	assert.match(decodeCss, /#action_menu_decode \.decode_chrome_caption \{[\s\S]*left:\s*calc\(100% \+ 8px\)/);
 	assert.match(decodeCss, /#map_icon_guide_dim/);
+	assert.match(decodeCss, /:has\(#map_search_bar\)/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #decode_icon_guide_scrim/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #map_icon_guide_dim/);
 	assert.match(decodeCss, /--app-background-wcode/);

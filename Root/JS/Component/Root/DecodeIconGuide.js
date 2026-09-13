@@ -15,6 +15,8 @@ var decodeIconGuideReady = false;
 var decodeIconGuideLaunchRecorded = false;
 var decodeIconGuideCameraTimer = null;
 var decodeIconGuidePinnedCaptions = [];
+var decodeIconGuideRaisedSearchHost = null;
+var decodeIconGuideRaisedSearchZ = '';
 
 function getDecodeIconGuideLaunchCount() {
 	if(typeof(Storage) === 'undefined')
@@ -198,6 +200,49 @@ function pinGuideCaptionBeside(el, target, side) {
 	return true;
 }
 
+function restoreMapSearchBarStacking() {
+	var bar = document.getElementById('map_search_bar');
+	if(decodeIconGuideRaisedSearchHost) {
+		decodeIconGuideRaisedSearchHost.style.removeProperty('z-index');
+		if(decodeIconGuideRaisedSearchZ)
+			decodeIconGuideRaisedSearchHost.style.zIndex = decodeIconGuideRaisedSearchZ;
+		decodeIconGuideRaisedSearchHost = null;
+		decodeIconGuideRaisedSearchZ = '';
+	}
+	if(bar)
+		bar.style.removeProperty('z-index');
+}
+
+function getMapSearchBarControlHost() {
+	var bar = document.getElementById('map_search_bar');
+	var gmStyle;
+	var node;
+	if(!bar)
+		return null;
+	gmStyle = document.querySelector('#map .gm-style');
+	if(!gmStyle || !gmStyle.contains(bar))
+		return bar;
+	node = bar;
+	while(node.parentNode && node.parentNode !== gmStyle)
+		node = node.parentNode;
+	return node;
+}
+
+function raiseMapSearchBarForGuide() {
+	var host = getMapSearchBarControlHost();
+	if(!host || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
+		restoreMapSearchBarStacking();
+		return;
+	}
+	if(decodeIconGuideRaisedSearchHost && decodeIconGuideRaisedSearchHost !== host)
+		restoreMapSearchBarStacking();
+	if(decodeIconGuideRaisedSearchHost !== host) {
+		decodeIconGuideRaisedSearchHost = host;
+		decodeIconGuideRaisedSearchZ = host.style.zIndex;
+	}
+	host.style.setProperty('z-index', '1000001', 'important');
+}
+
 function removeMapIconGuideDim() {
 	var dim = document.getElementById('map_icon_guide_dim');
 	if(dim && dim.parentNode)
@@ -228,6 +273,7 @@ function layoutMapSearchCaptions() {
 	var input;
 	var inputRect;
 	syncMapIconGuideDim();
+	raiseMapSearchBarForGuide();
 	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide'))
 		return;
 	input = document.getElementById('pac-input');
@@ -242,6 +288,7 @@ function layoutMapSearchCaptions() {
 
 function restoreMapSearchBarFromGuide() {
 	restorePinnedGuideCaptions();
+	restoreMapSearchBarStacking();
 }
 
 function unwatchMapCameraCaption() {

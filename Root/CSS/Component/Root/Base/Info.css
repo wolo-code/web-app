@@ -49,6 +49,34 @@
 	width: 152px;
 }
 
+#info_show_icon_labels {
+	position: absolute;
+	bottom: 8px;
+	left: 12px;
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	border: none;
+	color: #69B7CF;
+	cursor: pointer;
+	font-family: Abel, sans-serif;
+	font-size: 0.78em;
+	line-height: 1;
+	margin: 0;
+	padding: 0;
+}
+
+#info_show_icon_labels:hover,
+#info_show_icon_labels:focus-visible {
+	color: #4a9bb5;
+	outline: none;
+	text-decoration: underline;
+}
+
+#info_intro:not(.hide) ~ #info_show_icon_labels {
+	display: none;
+}
+
 #info_version_indicator {
 	position: absolute;
 	bottom: 8px;
@@ -138,6 +166,7 @@
 }
 
 #info_agency {
+	padding-left: 120px;
 	text-align: right;
 }
 

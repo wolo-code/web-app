@@ -2,11 +2,13 @@
 	
 	#overlay {
 		background-color: white;
+		box-sizing: border-box;
+		padding: 20px 0;
 	}
-	
+
 	#overlay > div {
-		margin-top: 20px !important;
-		margin-bottom: 20px !important;
+		margin-top: auto !important;
+		margin-bottom: auto !important;
 	}
 	
 	#overlay > div > div {

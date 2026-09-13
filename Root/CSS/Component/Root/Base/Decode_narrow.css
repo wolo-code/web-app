@@ -9,6 +9,12 @@
 		right: 10px;
 	}
 
+	.decode.decode-icon-guide #account .decode_chrome_caption {
+		left: 50%;
+		top: calc(100% + 4px);
+		transform: translateX(-50%);
+	}
+
 	.decode.decode-icon-guide #decode_city_source_controls {
 		gap: 28px;
 	}
@@ -23,12 +29,4 @@
 		max-width: none;
 	}
 
-}
-
-@media (max-height: 420px) {
-	body.decode.decode-icon-guide:has(#notification_bottom:not(.hide)) #decode_input_container {
-		margin-bottom: 0;
-		top: 8px;
-		bottom: auto;
-	}
 }

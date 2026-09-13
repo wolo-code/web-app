@@ -20,4 +20,5 @@
 	<div id='info_agency'>
 		by <a class='link' href='https://wcodes.org/about_me'>Ujjwal Singh</a>
 	</div>
+	<button id='info_show_icon_labels' type='button' title='Show icon labels'>Show icon labels</button>
 </div>

@@ -1,5 +1,15 @@
 var NOTIFICATION_FADE_MS = 400;
 
+function layoutBottomNotification() {
+	var notif = document.getElementById('notification_bottom');
+	var stack = document.getElementById('map_bottom_stack');
+	if(!notif || !stack || notif.parentElement === stack)
+		return;
+	var stackH = stack.offsetHeight || 0;
+	var gap = stackH ? 8 : 0;
+	notif.style.bottom = (80 + stackH + gap) + 'px';
+}
+
 function showNotification(message, duration) {
 	if(typeof duration == 'undefined')
 		duration = NOTIFICATION_DURATION_DEFAULT;
@@ -7,6 +17,7 @@ function showNotification(message, duration) {
 	clearNotificationTimer();
 	notification_bottom.innerHTML = message;
 	notification_bottom.classList.remove('hide', 'fade-out');
+	layoutBottomNotification();
 	if(typeof layoutDecodeIconGuide == 'function')
 		layoutDecodeIconGuide();
 	notification_timer = setTimeout(function() {
@@ -29,6 +40,8 @@ function fadeOutNotification() {
 		notification_bottom.classList.add('hide');
 		notification_bottom.classList.remove('fade-out');
 		notification_timer = null;
+		if(typeof layoutBottomNotification == 'function')
+			layoutBottomNotification();
 		if(typeof layoutDecodeIconGuide == 'function')
 			layoutDecodeIconGuide();
 	}, NOTIFICATION_FADE_MS);

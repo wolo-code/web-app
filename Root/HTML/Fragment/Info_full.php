@@ -31,7 +31,7 @@
 			let the app pick your current location automatically.
 		</li>
 	</ul>
-	
+
 	<div class='message_dialog_control_container'>
 		<div class='message_dialog_control'>
 			<button id='info_full_close_button' class='button_highlight' type='button'><span class='indicator'><span class='image'><?php includeSVG('', 'Back'); ?></span></span></button>

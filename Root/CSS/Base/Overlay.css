@@ -3,24 +3,24 @@
 	right: 0px;
 	top: 0px;
 	bottom: 0px;
-	z-index: 101;
+	z-index: 300;
 	overflow-y: auto;
 	color: rgba(100, 100, 100, 1);
 	background-color: rgba(100, 100, 100, 0.75);
 	position: absolute;
 	margin: auto;
 	display: flex;
-	align-items: center;
+	align-items: safe center;
+	justify-content: center;
 }
 
 .overlay > div {
 	max-height: 100%;
-	margin-left: auto;
-	margin-right: auto;
+	margin: auto;
 }
 
-.overlay > div {
-	margin-top: 80px !important;
+.overlay > div > .hide {
+	display: none !important;
 }
 
 .overlay h2 {

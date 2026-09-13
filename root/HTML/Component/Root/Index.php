@@ -66,6 +66,7 @@
 	?>
 	</div>
 </div>
+<div id='notification_bottom' class="notification_bar hide"></div>
 <div id='logo' tabindex='1' title='Press and hold to clear cache and reload'>
 	<div id='logo_surface' class='blur_background'>
 		<a id=logo_wolo href='//wolo.codes'>
@@ -97,6 +98,7 @@
 		<span class='map_type_icon_microsoft'><?php includeSVG('', 'Map-microsoft'); ?></span>
 	</span>
 </div>
+<div id='decode_icon_guide_scrim'></div>
 <div id='action_menu' class='control' tabindex='7'>
 	<div id='action_menu_items'>
 		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info' title='Info'>
@@ -124,7 +126,6 @@
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <div id='offline_queue_badge' class='offline_queue_badge hide' aria-live='polite'></div>
 <div id='map_bottom_stack'>
-	<div id='notification_bottom' class="notification_bar hide"></div>
 	<?php require '../../HTML/Fragment/Accuracy.php' ?>
 	<?php require '../../HTML/Fragment/Address.php'; ?>
 </div>

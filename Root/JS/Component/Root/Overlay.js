@@ -10,6 +10,8 @@ function hideOverlay(e) {
 		}
 	if(typeof syncDecodeIconGuide == 'function')
 		syncDecodeIconGuide();
+	if(typeof layoutBottomNotification == 'function')
+		layoutBottomNotification();
 }
 
 function showOverlay(e) {
@@ -22,4 +24,6 @@ function showOverlay(e) {
 		e.classList.remove('hide');
 	if(typeof syncDecodeIconGuide == 'function')
 		syncDecodeIconGuide();
+	if(typeof layoutBottomNotification == 'function')
+		layoutBottomNotification();
 }

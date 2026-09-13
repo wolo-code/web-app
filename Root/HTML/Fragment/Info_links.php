@@ -60,7 +60,7 @@
 </table>
 <div id='software_info'>
 	<div id='version'>
-		Version: <span><?php echo $config['version'] ?></span>
+		Version: <span><?php echo htmlspecialchars(formatAppVersion($config), ENT_QUOTES, 'UTF-8') ?></span>
 	</div>
 	<div id='updated'>Updated:
 		<span id='updated-timestamp'>

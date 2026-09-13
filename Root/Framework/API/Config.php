@@ -25,4 +25,16 @@ function loadConfig() {
 	return $config;
 }
 
+function formatAppVersion($config) {
+	$version = isset($config['version']) ? trim($config['version']) : '';
+	$build = isset($config['build']) ? trim($config['build']) : '';
+	if ($version === '') {
+		return $build;
+	}
+	if ($build === '') {
+		return $version;
+	}
+	return $version . '.' . $build;
+}
+
 ?>

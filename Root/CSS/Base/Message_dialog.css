@@ -215,10 +215,50 @@ h2.message_dialog_label {
 	padding: 10px 0 10px 14px;
 }
 
-#exception_message .message_dialog_control button {
+#exception_message .hide {
+	display: none !important;
+}
+
+#exception_prompt_controls,
+#exception_dev_controls {
+	align-items: center;
 	box-sizing: border-box;
-	width: 168px;
-	min-width: 168px;
+	display: flex;
+	float: none;
+	justify-content: space-between;
+	left: auto;
+	margin: 0;
+	min-height: 34px;
+	width: 100%;
+}
+
+#exception_dev_controls {
+	justify-content: center;
+	margin-top: 12px;
+}
+
+#exception_message .message_dialog_control button,
+#exception_message .message_dialog_control .exception_support_link {
+	box-sizing: border-box;
+	flex: 1 1 0;
+	left: auto;
+	margin: 2px 0 10px;
+	min-width: 0;
+	position: static;
+	width: auto;
+}
+
+#exception_message .message_dialog_control .exception_support_link {
+	align-items: center;
+	color: #69B7CF;
+	display: inline-flex;
+	font-family: 'Roboto Condensed', Abel, sans-serif;
+	font-size: larger;
+	justify-content: center;
+	padding: 8px 14px;
+	text-align: center;
+	text-decoration: none;
+	word-break: break-word;
 }
 
 #exception_message.exception_log_open {

@@ -54,15 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initExceptionMessageControls() {
 	var message = document.getElementById('exception_message');
-	var close = document.getElementById('exception_message_close');
 	var continueButton = document.getElementById('exception_message_continue');
 	var reloadButton = document.getElementById('exception_message_reload');
 	var title = document.getElementById('exception_message_title');
 
-	if(!message || !close || !continueButton || message.dataset.controlsReady)
+	if(!message || !continueButton || message.dataset.controlsReady)
 		return;
 
-	close.addEventListener('click', hideExceptionMessage);
 	continueButton.addEventListener('click', hideExceptionMessage);
 	if(reloadButton)
 		reloadButton.addEventListener('click', clearCacheAndReload);
@@ -169,6 +167,7 @@ function showExceptionMessage(log) {
 	var message = document.getElementById('exception_message');
 	var logNode = document.getElementById('exception_log');
 	var controls = document.getElementById('exception_prompt_controls');
+	var continueControls = document.getElementById('exception_dev_controls');
 
 	if(!message || !logNode || !controls)
 		return;
@@ -177,6 +176,8 @@ function showExceptionMessage(log) {
 	logNode.textContent = log;
 	logNode.classList.add('hide');
 	controls.classList.remove('hide');
+	if(continueControls)
+		continueControls.classList.add('hide');
 	message.classList.remove('exception_log_open');
 
 	if(typeof showOverlay == 'function')
@@ -205,12 +206,15 @@ function showExceptionLog() {
 	var message = document.getElementById('exception_message');
 	var log = document.getElementById('exception_log');
 	var controls = document.getElementById('exception_prompt_controls');
+	var continueControls = document.getElementById('exception_dev_controls');
 
 	if(!log || !controls)
 		return;
 
 	log.classList.remove('hide');
 	controls.classList.add('hide');
+	if(continueControls)
+		continueControls.classList.remove('hide');
 	if(message)
 		message.classList.add('exception_log_open');
 }

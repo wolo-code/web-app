@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/Mail_link.php'; ?>
 <div id='info_links' class='hide'>
 
 <table>
@@ -15,7 +16,7 @@
 	</tr>
 	<tr>
 		<td>contact:</td>
-		<td><a class='link' href="mailto:ujjwal@wolo.codes?subject=Wolo">ujjwal@wolo.codes</a></td>
+		<td><?php echo renderMailLink('ujjwal', 'wolo.codes', array('class' => 'link', 'subject' => 'Wolo')); ?></td>
 	</tr>
 	<tr>
 		<td>source code:</td>

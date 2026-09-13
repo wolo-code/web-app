@@ -1,12 +1,14 @@
+<?php require_once __DIR__ . '/Mail_link.php'; ?>
 <div id='exception_message' class="message_dialog hide">
 	<h2 id='exception_message_title' class='message_dialog_label'>
 		<span class='image exception_warning_icon'><?php includeSVG('', 'Warning'); ?></span>
-		Error occured!
+		Oops an error occured!
 	</h2>
 	<div class='message_dialog_body'>
 		<div id='exception_prompt_controls' class="center message_dialog_control">
 			<button id='exception_message_reload' class="border dialog_message_primary" type='button'>Clear cache &amp; reload</button>
-			<a id='exception_message_support' class='link exception_support_link' href="mailto:ujjwal@wolo.codes?subject=Wolo crash">ujjwal@wolo.codes</a>
+			<p class='exception_support_copy'>You may contact our support team.</p>
+			<?php echo renderMailLink('support', 'wolo.codes', array('id' => 'exception_message_support', 'class' => 'link exception_support_link', 'subject' => 'Wolo web app crash')); ?>
 		</div>
 		<pre id='exception_log' class='exception_log hide'></pre>
 		<div id='exception_dev_controls' class="center message_dialog_control hide">

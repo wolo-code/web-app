@@ -259,6 +259,10 @@ test('info links include OSM, Esri, Microsoft, and DIGIPIN attribution', () => {
 	assert.match(infoLinks, /microsoft\.com\/maps/);
 	assert.match(infoLinks, /apple\.com\/maps/);
 	assert.match(infoLinks, /indiapost\.gov\.in\/digipin/);
+	assert.match(infoLinks, /renderMailLink\('ujjwal', 'wolo\.codes'/);
+	assert.match(infoLinks, /Mail_link\.php/);
+	assert.doesNotMatch(infoLinks, /mailto:/);
+	assert.doesNotMatch(infoLinks, /ujjwal@wolo/);
 });
 
 test('root index exposes OSM, Apple, Esri, and Microsoft map icons and attribution', () => {
@@ -365,10 +369,15 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	const exceptionHtml = read('Root/HTML/Fragment/Exception.html');
 	const baseScript = read('Root/JS/Base/Script.js');
 	const dialogCss = read('Root/CSS/Base/Message_dialog.css');
-	assert.match(exceptionHtml, /Error occured!/);
+	assert.match(exceptionHtml, /Oops an error occured!/);
 	assert.match(exceptionHtml, /includeSVG\('', 'Warning'\)/);
 	assert.match(exceptionHtml, /id='exception_message_title'/);
-	assert.match(exceptionHtml, /mailto:ujjwal@wolo\.codes\?subject=Wolo crash/);
+	assert.match(exceptionHtml, /You may contact our support team\./);
+	assert.match(exceptionHtml, /renderMailLink\('support', 'wolo\.codes'/);
+	assert.match(exceptionHtml, /Wolo web app crash/);
+	assert.match(exceptionHtml, /Mail_link\.php/);
+	assert.doesNotMatch(exceptionHtml, /mailto:/);
+	assert.doesNotMatch(exceptionHtml, /support@wolo/);
 	assert.match(exceptionHtml, /id='exception_dev_controls'/);
 	assert.doesNotMatch(exceptionHtml, /Unexpected Error/);
 	assert.doesNotMatch(exceptionHtml, /id='exception_message_close'/);
@@ -379,8 +388,18 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.doesNotMatch(baseScript, /exception_message_close/);
 	assert.match(baseScript, /addLongpressListener\(title, function\(\) \{\}, showExceptionLog\)/);
 	assert.match(baseScript, /exception_dev_controls/);
+	const mailJs = read('Root/JS/Base/Mail.js');
+	assert.match(mailJs, /function revealMailLink/);
+	assert.match(mailJs, /function bindMailLinks/);
+	const mailHelper = read('Root/HTML/Fragment/Mail_link.php');
+	assert.match(mailHelper, /function renderMailLink/);
+	assert.match(mailHelper, /data-u=/);
+	assert.match(mailHelper, /mail-obf/);
+	assert.doesNotMatch(mailHelper, /mailto:/);
 	assert.match(dialogCss, /#exception_message \.message_dialog_control button/);
 	assert.match(dialogCss, /#exception_prompt_controls/);
+	assert.match(dialogCss, /flex-direction:\s*column/);
+	assert.match(dialogCss, /\.exception_support_copy/);
 	assert.match(dialogCss, /#exception_message \.hide/);
 	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /#exception_message_title/);

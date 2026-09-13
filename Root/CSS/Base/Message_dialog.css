@@ -219,8 +219,12 @@ h2.message_dialog_label {
 	display: none !important;
 }
 
-#exception_prompt_controls,
-#exception_dev_controls {
+#exception_message .message_dialog_body {
+	overflow: visible;
+}
+
+#exception_message #exception_prompt_controls,
+#exception_message #exception_dev_controls {
 	align-items: center;
 	box-sizing: border-box;
 	display: flex;
@@ -229,35 +233,56 @@ h2.message_dialog_label {
 	left: auto;
 	margin: 0;
 	min-height: 34px;
+	position: static;
 	width: 100%;
 }
 
-#exception_dev_controls {
+#exception_message #exception_prompt_controls {
+	align-items: stretch;
+	flex-direction: column;
+	gap: 4px;
+}
+
+#exception_message #exception_dev_controls {
 	justify-content: center;
 	margin-top: 12px;
 }
 
-#exception_message .message_dialog_control button,
-#exception_message .message_dialog_control .exception_support_link {
+#exception_message .message_dialog_control button {
 	box-sizing: border-box;
-	flex: 1 1 0;
+	flex: none;
 	left: auto;
 	margin: 2px 0 10px;
 	min-width: 0;
 	position: static;
-	width: auto;
+	width: 100%;
+}
+
+#exception_message .exception_support_copy {
+	color: #999999;
+	font-family: Abel, sans-serif;
+	margin: 4px 0 0;
+	text-align: center;
 }
 
 #exception_message .message_dialog_control .exception_support_link {
 	align-items: center;
+	align-self: center;
+	box-sizing: border-box;
 	color: #69B7CF;
 	display: inline-flex;
+	flex: none;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 	font-size: larger;
 	justify-content: center;
-	padding: 8px 14px;
+	left: auto;
+	margin: 0 0 10px;
+	min-width: 0;
+	padding: 4px 14px 8px;
+	position: static;
 	text-align: center;
 	text-decoration: none;
+	width: auto;
 	word-break: break-word;
 }
 

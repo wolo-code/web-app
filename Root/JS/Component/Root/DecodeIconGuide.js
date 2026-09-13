@@ -15,8 +15,7 @@ var decodeIconGuideReady = false;
 var decodeIconGuideLaunchRecorded = false;
 var decodeIconGuideCameraTimer = null;
 var decodeIconGuidePinnedCaptions = [];
-var decodeIconGuideRaisedSearchHost = null;
-var decodeIconGuideRaisedSearchZ = '';
+var decodeIconGuideSearchHome = null;
 
 function getDecodeIconGuideLaunchCount() {
 	if(typeof(Storage) === 'undefined')
@@ -202,45 +201,42 @@ function pinGuideCaptionBeside(el, target, side) {
 
 function restoreMapSearchBarStacking() {
 	var bar = document.getElementById('map_search_bar');
-	if(decodeIconGuideRaisedSearchHost) {
-		decodeIconGuideRaisedSearchHost.style.removeProperty('z-index');
-		if(decodeIconGuideRaisedSearchZ)
-			decodeIconGuideRaisedSearchHost.style.zIndex = decodeIconGuideRaisedSearchZ;
-		decodeIconGuideRaisedSearchHost = null;
-		decodeIconGuideRaisedSearchZ = '';
+	var home = decodeIconGuideSearchHome;
+	if(home && bar) {
+		if(home.next && home.next.parentNode === home.parent)
+			home.parent.insertBefore(bar, home.next);
+		else if(home.parent)
+			home.parent.appendChild(bar);
 	}
-	if(bar)
+	decodeIconGuideSearchHome = null;
+	if(bar) {
+		bar.style.removeProperty('position');
+		bar.style.removeProperty('left');
+		bar.style.removeProperty('top');
+		bar.style.removeProperty('margin');
 		bar.style.removeProperty('z-index');
-}
-
-function getMapSearchBarControlHost() {
-	var bar = document.getElementById('map_search_bar');
-	var gmStyle;
-	var node;
-	if(!bar)
-		return null;
-	gmStyle = document.querySelector('#map .gm-style');
-	if(!gmStyle || !gmStyle.contains(bar))
-		return bar;
-	node = bar;
-	while(node.parentNode && node.parentNode !== gmStyle)
-		node = node.parentNode;
-	return node;
+	}
 }
 
 function raiseMapSearchBarForGuide() {
-	var host = getMapSearchBarControlHost();
-	if(!host || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
+	var bar = document.getElementById('map_search_bar');
+	var rect;
+	if(!bar || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
 		restoreMapSearchBarStacking();
 		return;
 	}
-	if(decodeIconGuideRaisedSearchHost && decodeIconGuideRaisedSearchHost !== host)
-		restoreMapSearchBarStacking();
-	if(decodeIconGuideRaisedSearchHost !== host) {
-		decodeIconGuideRaisedSearchHost = host;
-		decodeIconGuideRaisedSearchZ = host.style.zIndex;
+	rect = bar.getBoundingClientRect();
+	if(!decodeIconGuideSearchHome) {
+		decodeIconGuideSearchHome = { parent: bar.parentNode, next: bar.nextSibling };
+		document.body.appendChild(bar);
 	}
-	host.style.setProperty('z-index', '1000001', 'important');
+	else if(bar.parentNode !== document.body)
+		document.body.appendChild(bar);
+	bar.style.position = 'fixed';
+	bar.style.left = rect.left + 'px';
+	bar.style.top = rect.top + 'px';
+	bar.style.margin = '0';
+	bar.style.zIndex = '202';
 }
 
 function removeMapIconGuideDim() {

@@ -221,17 +221,18 @@ body.decode-icon-guide-fade #map_icon_guide_dim {
 }
 
 body:not(.decode).decode-icon-guide #map .gm-bundled-control,
-body:not(.decode).decode-icon-guide #map gmp-internal-camera-control,
-body:not(.decode).decode-icon-guide #map .gm-style > :has(#map_search_bar),
-body:not(.decode).decode-icon-guide #map .gmnoprint:has(#map_search_bar),
-body:not(.decode).decode-icon-guide #map_search_bar {
+body:not(.decode).decode-icon-guide #map gmp-internal-camera-control {
 	position: relative;
 	z-index: 1000001 !important;
 }
 
+body:not(.decode).decode-icon-guide #map_search_bar {
+	z-index: 202;
+}
+
 body:not(.decode).decode-icon-guide #pac-input {
 	background-color: #fff;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 2px #69B7CF;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 1px #69B7CF;
 	color: #333;
 	opacity: 1;
 }
@@ -242,7 +243,7 @@ body:not(.decode).decode-icon-guide #search_icon path:first-child {
 
 body:not(.decode).decode-icon-guide #decode_button {
 	background-color: #fff;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 2px #69B7CF;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 1px #69B7CF;
 	color: #69B7CF;
 }
 

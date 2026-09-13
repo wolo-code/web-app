@@ -22,6 +22,11 @@
 	top: 8px;
 }
 
+.message_dialog_leading_action {
+	left: 20px;
+	right: auto;
+}
+
 .message_dialog_close .image,
 .message_dialog_close svg {
 	display: block;
@@ -189,41 +194,38 @@ h2.message_dialog_label {
 	padding: 10px 0 10px 14px;
 }
 
-.exception_summary {
-	display: flex;
-	align-items: flex-start;
-	gap: 10px;
+#exception_message .message_dialog_control button {
+	box-sizing: border-box;
+	width: 168px;
+	min-width: 168px;
 }
 
-.message_dialog_body > .exception_summary > span:first-child {
-	flex: 1;
-	min-width: 0;
-	color: inherit;
+#exception_message.exception_log_open {
+	box-sizing: border-box;
+	max-width: min(42rem, calc(100vw - 24px));
+	width: min(42rem, calc(100vw - 24px));
 }
 
-.exception_log_toggle {
-	flex: 0 0 auto;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	margin: 0;
-	border: 1px solid #dcdcdc;
-	border-radius: 50%;
-	background: white;
-	color: #69B7CF;
-	font-family: 'Roboto Condensed', Abel, sans-serif;
-	font-size: 1.1em;
-	font-weight: bold;
-	line-height: 1;
-	box-shadow: rgba(0, 0, 0, 0.285) 0px 1px 4px -1px;
+.overlay > div:has(#exception_message.exception_log_open:not(.hide)) {
+	box-sizing: border-box;
+	max-width: calc(100vw - 24px);
+	width: min(42rem, calc(100vw - 24px));
+}
+
+#exception_message.exception_log_open .message_dialog_body {
+	display: flow-root;
+	overflow: auto;
 }
 
 .exception_log {
 	box-sizing: border-box;
-	max-height: 180px;
-	margin: 0;
+	clear: both;
+	display: block;
+	float: none;
+	max-height: min(50vh, 320px);
+	margin: 12px 0 0;
+	min-width: 0;
+	max-width: 100%;
 	padding: 10px;
 	overflow: auto;
 	border: 1px solid #e0e0e0;
@@ -233,5 +235,7 @@ h2.message_dialog_label {
 	font-size: 0.78em;
 	line-height: 1.35;
 	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	width: 100%;
 	word-break: break-word;
 }

@@ -342,6 +342,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
+	const infoCss = read('Root/CSS/Component/Root/Base/Info.css');
 	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
 	assert.match(index, /class='decode_icon_caption'[\s\S]*IP city/);
 	assert.match(index, /class='decode_icon_caption'[\s\S]*GPS city/);
@@ -366,6 +367,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(scriptJs, /function showInfoIconGuide/);
 	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
 	assert.match(decodeCss, /body\.decode-icon-guide \.decode_icon_caption/);
+	assert.doesNotMatch(guideJs, /observe\(mapEl/);
+	assert.doesNotMatch(infoCss, /#info_show_icon_labels:hover[\s\S]{0,80}text-decoration:\s*underline/);
 	assert.doesNotMatch(rootCss, /body:not\(\.decode\) #action_menu_info/);
 	assert.match(rootCss, /body:not\(\.decode\) #action_menu_decode \{[\s\S]*left:\s*51px/);
 	assert.match(decodeNarrowCss, /max-width:\s*662px/);

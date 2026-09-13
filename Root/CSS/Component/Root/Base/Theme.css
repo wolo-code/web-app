@@ -457,6 +457,7 @@ html.dark-mode #info_show_icon_labels {
 html.dark-mode #info_show_icon_labels:hover,
 html.dark-mode #info_show_icon_labels:focus-visible {
 	color: #c5e6ef;
+	text-decoration: none;
 }
 
 html.dark-mode .message_dialog_label,

@@ -68,13 +68,14 @@
 	line-height: 1;
 	margin: 0;
 	padding: 0;
+	text-decoration: none;
 }
 
 #info_show_icon_labels:hover,
 #info_show_icon_labels:focus-visible {
 	color: #4a9bb5;
 	outline: none;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 #info_intro:not(.hide) ~ #info_show_icon_labels {

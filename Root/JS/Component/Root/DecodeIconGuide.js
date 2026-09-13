@@ -7,8 +7,8 @@ var DECODE_ICON_GUIDE_DISMISS_GRACE_MS = 700;
 var DECODE_ICON_GUIDE_MIN_TOP = 56;
 var DECODE_ICON_GUIDE_STACK_GAP = 12;
 var MAP_INFOCARD_CALLOUT_START_GAP = 8;
-var MAP_INFOCARD_CALLOUT_END_GAP = 14;
-var MAP_ICON_GUIDE_REPLAY_HINT = "You can view the guide again from Info button -> 'Show guide'";
+var MAP_INFOCARD_CALLOUT_END_GAP = 38;
+var MAP_ICON_GUIDE_REPLAY_HINT = "You can view the guide again from <br> 'Info' button -> 'Show guide'";
 var MAP_ICON_GUIDE_REPLAY_HINT_MS = 5000;
 var decodeIconGuideVisible = false;
 var decodeIconGuideConsumed = false;
@@ -473,7 +473,7 @@ function layoutMapInfocardGuide() {
 }
 
 function restoreMapSearchBarStacking() {
-	var bar = document.getElementById('map_search_bar');
+	var bar = document.getElementById('map_search_cluster') || document.getElementById('map_search_bar');
 	var home = decodeIconGuideSearchHome;
 	if(home && bar) {
 		if(home.next && home.next.parentNode === home.parent)
@@ -492,7 +492,7 @@ function restoreMapSearchBarStacking() {
 }
 
 function raiseMapSearchBarForGuide() {
-	var bar = document.getElementById('map_search_bar');
+	var bar = document.getElementById('map_search_cluster') || document.getElementById('map_search_bar');
 	var rect;
 	if(!bar || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
 		restoreMapSearchBarStacking();
@@ -547,6 +547,7 @@ function layoutMapSearchCaptions() {
 	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide'))
 		return;
 	input = document.getElementById('pac-input');
+	pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="previous-city"]'), document.getElementById('map_city_history_toggle'));
 	pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="search"]'), input);
 	if(!pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="go"]'), document.getElementById('decode_button'))) {
 		inputRect = input && input.getBoundingClientRect();

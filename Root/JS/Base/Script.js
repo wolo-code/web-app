@@ -13,9 +13,11 @@ function getGooglePlacesLibrary() {
 function syncInitMap() {
 	try {
 		if (document.readyState !== 'loading' && typeof google === 'object' && typeof google.maps === 'object' && typeof google.maps.Map === 'function' && typeof initMap == 'function' && pendingInitMap) {
+			var fillMinZoom = typeof getMinZoomToFillMapHeight === 'function' ? getMinZoomToFillMapHeight() : DEFAULT_INIT_ZOOM;
 			var mapOptions = {
 				center: DEFAULT_LATLNG,
-				zoom: DEFAULT_INIT_ZOOM,
+				zoom: Math.max(DEFAULT_INIT_ZOOM, fillMinZoom),
+				minZoom: fillMinZoom,
 				mapTypeControl: false,
 				fullscreenControl: false,
 				streetViewControl: false,

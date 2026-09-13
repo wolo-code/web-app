@@ -16,13 +16,26 @@
 			background-size: 24px 24px;
 		}
 	
+		#map_search_cluster {
+			box-sizing: border-box;
+			margin: 90px 8px 0;
+			width: calc(100vw - 16px);
+		}
+
+		#map_search_bar {
+			margin: 0;
+			width: auto;
+		}
+
+		#map_search_field {
+			flex: 1;
+			min-width: 0;
+		}
+
 		#pac-input {
 			box-sizing: border-box;
-			top: 100px !important;
-			left: 8px !important;
 			height: 42px !important;
-			margin-left: 0;
-			width: calc(100vw - 66px) !important
+			width: 100% !important;
 		}
 
 		#decode_button {
@@ -30,17 +43,13 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			top: 100px !important;
-			left: auto !important;
-			right: 8px !important;
 			width: 48px !important;
 			height: 42px !important;
 			padding: 8px;
 		}
 
 		#search_icon {
-			top: 110px !important;
-			left: 20px !important;
+			left: 12px !important;
 		}
 	
 		#logo {
@@ -90,18 +99,10 @@
 		padding-bottom: 2px;
 	}
 
-	#pac-input {
-		top: 126px !important;
+	#map_search_bar {
+		margin-top: 116px;
 	}
 
-	#decode_button {
-		top: 126px !important;
-	}
-
-	#search_icon {
-		top: 136px !important;
-	}
-	
 	#account {
 		left: 4px !important;
 		top: 84px !important;

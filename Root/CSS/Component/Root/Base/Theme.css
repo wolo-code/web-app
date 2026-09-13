@@ -327,6 +327,11 @@ html.dark-mode body:not(.decode).decode-icon-guide #pac-input {
 	color: #333;
 }
 
+html.dark-mode body:not(.decode).decode-icon-guide #map_city_history_toggle {
+	background-color: #fff;
+	color: #69B7CF;
+}
+
 html.dark-mode body:not(.decode).decode-icon-guide #decode_button {
 	background-color: #fff;
 	color: #69B7CF;
@@ -423,6 +428,18 @@ html.dark-mode #code_qr_value {
 html.dark-mode .map_attribution {
 	background-color: rgb(34 34 68 / 70%);
 	color: #c8d8c8;
+}
+
+@media (max-width: 662px) {
+	html.dark-mode .map_attribution:not(.expanded) {
+		background: linear-gradient(90deg, rgb(0 0 0 / 72%) 0%, rgb(0 0 0 / 38%) 55%, rgb(0 0 0 / 0%) 100%) !important;
+		color: #e8e8e8;
+	}
+
+	html.dark-mode .map_attribution.expanded {
+		background: rgb(20 20 20 / 82%) !important;
+		color: #f3f3f3;
+	}
 }
 
 html.dark-mode #account > span.image {

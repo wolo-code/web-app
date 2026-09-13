@@ -215,6 +215,9 @@ function setupControls() {
 	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
 	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
 	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
+	var mapCityHistory = document.getElementById('map_city_history_toggle');
+	if(mapCityHistory)
+		mapCityHistory.addEventListener('click', showDecodeCityHistoryMessage);
 	if(typeof initDecodeCityHistoryDeleteControls == 'function')
 		initDecodeCityHistoryDeleteControls();
 	document.getElementById('external_close').addEventListener('click', external_close);

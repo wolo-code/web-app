@@ -201,6 +201,37 @@ function onOsmTileError(zoom) {
 	}
 }
 
+function disableRasterTileGestures(node) {
+	var imgs;
+	var i;
+	if(!node) {
+		return;
+	}
+	if(node.style) {
+		node.style.pointerEvents = 'none';
+	}
+	if(node.tagName === 'IMG') {
+		imgs = [node];
+	}
+	else if(node.querySelectorAll) {
+		imgs = node.querySelectorAll('img');
+	}
+	else {
+		return;
+	}
+	for(i = 0; i < imgs.length; i++) {
+		imgs[i].draggable = false;
+		imgs[i].style.pointerEvents = 'none';
+		if(imgs[i].__woloRasterGestureBound) {
+			continue;
+		}
+		imgs[i].__woloRasterGestureBound = true;
+		imgs[i].addEventListener('dragstart', function(event) {
+			event.preventDefault();
+		});
+	}
+}
+
 function bindOsmTileNode(node, zoom) {
 	var imgs;
 	var i;
@@ -558,8 +589,8 @@ function activateAppleMapLayer() {
 			return;
 		}
 		showAppleMapStage();
-		map.setMapTypeId(MAP_LAYER_APPLE);
-		if(typeof map.setOptions === 'function') {
+		setGoogleMapTypeId(MAP_LAYER_APPLE);
+		if(isGoogleMapReady() && typeof map.setOptions === 'function') {
 			map.setOptions({backgroundColor: 'transparent', styles: []});
 		}
 		syncAppleMapFromGoogle();
@@ -583,14 +614,15 @@ function setRasterMapType(id, name, template, maxZoom) {
 		maxZoom: maxZoom,
 		alt: name
 	});
-	if(id === MAP_LAYER_OSM) {
-		var originalGetTile = mapType.getTile.bind(mapType);
-		mapType.getTile = function(coord, zoom, ownerDocument) {
-			var tile = originalGetTile(coord, zoom, ownerDocument);
+	var originalGetTile = mapType.getTile.bind(mapType);
+	mapType.getTile = function(coord, zoom, ownerDocument) {
+		var tile = originalGetTile(coord, zoom, ownerDocument);
+		disableRasterTileGestures(tile);
+		if(id === MAP_LAYER_OSM) {
 			bindOsmTileNode(tile, zoom);
-			return tile;
-		};
-	}
+		}
+		return tile;
+	};
 	map.mapTypes.set(id, mapType);
 }
 
@@ -634,6 +666,64 @@ function getCurrentMapLayer() {
 	return null;
 }
 
+function isNarrowMapAttribution() {
+	return typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 662px)').matches;
+}
+
+function setMapAttributionExpanded(el, expanded) {
+	var toggle;
+	if(!el) {
+		return;
+	}
+	if(expanded) {
+		el.classList.add('expanded');
+	}
+	else {
+		el.classList.remove('expanded');
+	}
+	toggle = el.querySelector('.map_attribution_toggle');
+	if(toggle) {
+		toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+	}
+}
+
+function collapseMapAttributions(exceptEl) {
+	var attributions = document.querySelectorAll('.map_attribution.expanded');
+	var i;
+	for(i = 0; i < attributions.length; i++) {
+		if(attributions[i] !== exceptEl) {
+			setMapAttributionExpanded(attributions[i], false);
+		}
+	}
+}
+
+function initMapAttribution() {
+	if(document.documentElement.getAttribute('data-map-attribution-init') === '1') {
+		return;
+	}
+	document.documentElement.setAttribute('data-map-attribution-init', '1');
+	document.addEventListener('click', function(event) {
+		var attribution;
+		if(!event.target || !event.target.closest) {
+			return;
+		}
+		attribution = event.target.closest('.map_attribution');
+		if(!attribution) {
+			collapseMapAttributions();
+			return;
+		}
+		if(!isNarrowMapAttribution() || event.target.closest('a')) {
+			return;
+		}
+		setMapAttributionExpanded(attribution, !attribution.classList.contains('expanded'));
+	});
+	window.addEventListener('resize', function() {
+		if(!isNarrowMapAttribution()) {
+			collapseMapAttributions();
+		}
+	});
+}
+
 function syncOsmAttribution() {
 	var attributions = document.querySelectorAll('.map_attribution');
 	var layer = getCurrentMapLayer();
@@ -642,18 +732,32 @@ function syncOsmAttribution() {
 		var attributionLayer = attributions[i].getAttribute('data-map-layer');
 		if(attributionLayer === MAP_LAYER_APPLE) {
 			attributions[i].classList.add('hide');
+			attributions[i].classList.remove('expanded');
 		}
 		else if(attributionLayer === layer) {
 			attributions[i].classList.remove('hide');
 		}
 		else {
 			attributions[i].classList.add('hide');
+			attributions[i].classList.remove('expanded');
 		}
 	}
 }
 
 function clearMapViewClasses() {
 	document.body.classList.remove.apply(document.body.classList, MAP_VIEW_CLASSES);
+}
+
+function isGoogleMapReady() {
+	return typeof map === 'object' && !!map && typeof map.setMapTypeId === 'function';
+}
+
+function setGoogleMapTypeId(typeId) {
+	if(!isGoogleMapReady()) {
+		return false;
+	}
+	map.setMapTypeId(typeId);
+	return true;
 }
 
 function setMapLayer(layer) {
@@ -669,14 +773,16 @@ function setMapLayer(layer) {
 
 	if(layer === MAP_LAYER_SATELLITE) {
 		document.body.classList.add('satellite');
-		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+		if(typeof google === 'object' && google.maps && google.maps.MapTypeId)
+			setGoogleMapTypeId(google.maps.MapTypeId.SATELLITE);
 	}
 	else if(layer === MAP_LAYER_OSM) {
 		document.body.classList.add('osm');
-		map.setMapTypeId(MAP_LAYER_OSM);
-		watchOsmZoomFallback();
-		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
-			scheduleOsmZoomFallback(false);
+		if(setGoogleMapTypeId(MAP_LAYER_OSM)) {
+			watchOsmZoomFallback();
+			if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
+				scheduleOsmZoomFallback(false);
+			}
 		}
 	}
 	else if(layer === MAP_LAYER_APPLE) {
@@ -685,15 +791,16 @@ function setMapLayer(layer) {
 	}
 	else if(layer === MAP_LAYER_ESRI) {
 		document.body.classList.add('esri');
-		map.setMapTypeId(MAP_LAYER_ESRI);
+		setGoogleMapTypeId(MAP_LAYER_ESRI);
 	}
 	else if(layer === MAP_LAYER_MICROSOFT) {
 		document.body.classList.add('microsoft');
-		map.setMapTypeId(MAP_LAYER_MICROSOFT);
+		setGoogleMapTypeId(MAP_LAYER_MICROSOFT);
 	}
 	else {
 		document.body.classList.add('map');
-		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		if(typeof google === 'object' && google.maps && google.maps.MapTypeId)
+			setGoogleMapTypeId(google.maps.MapTypeId.ROADMAP);
 	}
 
 	syncOsmAttribution();
@@ -701,6 +808,12 @@ function setMapLayer(layer) {
 		syncAppModeBackground();
 	}
 	syncMapChromeTooltips();
+	if(typeof scheduleMapFillMinZoom === 'function') {
+		scheduleMapFillMinZoom();
+	}
+	else if(typeof applyMapFillMinZoom === 'function') {
+		applyMapFillMinZoom();
+	}
 }
 
 function isMapViewActive() {
@@ -719,6 +832,12 @@ function ensureMapViewForLocation() {
 	}
 	if(!isMapViewActive() || !isMapLayerEnabled(getCurrentMapLayer())) {
 		setMapLayer(getDefaultMapLayer());
+	}
+	else if(typeof scheduleMapFillMinZoom === 'function') {
+		scheduleMapFillMinZoom();
+	}
+	else if(typeof applyMapFillMinZoom === 'function') {
+		applyMapFillMinZoom();
 	}
 }
 

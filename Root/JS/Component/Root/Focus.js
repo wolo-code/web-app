@@ -23,36 +23,119 @@ function endProgrammaticMapFocus() {
 		lastBottomStackPanY = getBottomStackHeight();
 }
 
+var pendingTryCityZoomOut = false;
+var holdInfoWindowForTryCityZoomOut = false;
+
+function requestTryCityZoomOut() {
+	pendingTryCityZoomOut = true;
+	holdInfoWindowForTryCityZoomOut = true;
+}
+
+function revealHeldTryCityInfoWindow() {
+	holdInfoWindowForTryCityZoomOut = false;
+	if(typeof showInfoWindow === 'function' && marker)
+		showInfoWindow();
+}
+
+function getOverviewZoom() {
+	if(typeof getMinZoomToFillMapHeight === 'function')
+		return getMinZoomToFillMapHeight();
+	return typeof DEFAULT_INIT_ZOOM === 'number' ? DEFAULT_INIT_ZOOM : 2;
+}
+
+function getCityScopeBounds(pos) {
+	if(!pos || typeof google !== 'object' || !google.maps || typeof google.maps.Circle !== 'function')
+		return undefined;
+	var radiusKm = typeof CITY_RANGE_RADIUS === 'number' ? CITY_RANGE_RADIUS : 32.767;
+	return new google.maps.Circle({
+		center: pos,
+		radius: radiusKm * 1000
+	}).getBounds();
+}
+
+function getCityScopeZoom(pos) {
+	var bounds = getCityScopeBounds(pos);
+	if(bounds && typeof getZoomByBounds === 'function' && typeof map === 'object' && map)
+		return getZoomByBounds(map, bounds);
+	return 11;
+}
+
+function animateMapToCityScope(pos) {
+	if(typeof map === 'undefined' || !map || !pos)
+		return;
+
+	beginProgrammaticMapFocus();
+	stopZoom();
+
+	function zoomIn() {
+		map.panTo(pos);
+		var idleListenerPan = map.addListener('idle', function() {
+			idleListenerPan.remove();
+			smoothZoomToBounds(undefined, map, getCityScopeZoom(pos), map.getZoom());
+		});
+	}
+
+	var currentZoom = map.getZoom();
+	var overviewZoom = getOverviewZoom();
+	if(typeof currentZoom === 'number' && currentZoom > overviewZoom)
+		smoothZoomOut(map, currentZoom, overviewZoom, zoomIn);
+	else
+		zoomIn();
+}
+
+function getFocusTargetZoom(bounds) {
+	var newZoom;
+	if(typeof bounds !== 'undefined')
+		newZoom = getZoomByBounds(map, bounds);
+	else {
+		newZoom = DEFAULT_LOCATE_ZOOM;
+		if (typeof accuCircle !== 'undefined') {
+			accuCircle.setOptions({'fillOpacity': 0.10});
+		}
+		if (typeof getCurrentMapLayer === 'function' && getCurrentMapLayer() === MAP_LAYER_OSM && typeof OSM_NATIVE_MAX_ZOOM === 'number' && newZoom > OSM_NATIVE_MAX_ZOOM) {
+			newZoom = OSM_NATIVE_MAX_ZOOM;
+		}
+		else if (typeof getActiveMapTypeMaxZoom === 'function') {
+			var typeMax = getActiveMapTypeMaxZoom();
+			if (typeof typeMax === 'number' && newZoom > typeMax) {
+				newZoom = typeMax;
+			}
+		}
+	}
+	return newZoom;
+}
+
+function panThenSmoothZoomIn(pos, bounds) {
+	map.panTo(pos);
+	var idleListenerPan = map.addListener('idle', function() {
+		idleListenerPan.remove();
+		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds), map.getZoom());
+	});
+}
+
 function focus_(pos, bounds) {
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
 	stopZoom();
 
-	map.panTo(pos);
+	var zoomOutFirst = pendingTryCityZoomOut;
+	pendingTryCityZoomOut = false;
+	var currentZoom = map.getZoom();
+	var overviewZoom = getOverviewZoom();
+	if(zoomOutFirst && typeof currentZoom === 'number' && currentZoom > overviewZoom) {
+		if(typeof infoWindow !== 'undefined' && infoWindow)
+			infoWindow.close();
+		smoothZoomOut(map, currentZoom, overviewZoom, function() {
+			revealHeldTryCityInfoWindow();
+			panThenSmoothZoomIn(pos, bounds);
+		});
+		return;
+	}
 
-	var idleListenerPan = map.addListener('idle', function() {
-		idleListenerPan.remove();
-		var newZoom;
-		if(typeof bounds !== 'undefined')
-			newZoom = getZoomByBounds(map, bounds);
-		else {
-			newZoom = DEFAULT_LOCATE_ZOOM;
-			if (typeof accuCircle !== 'undefined') {
-				accuCircle.setOptions({'fillOpacity': 0.10});
-			}
-			if (typeof getCurrentMapLayer === 'function' && getCurrentMapLayer() === MAP_LAYER_OSM && typeof OSM_NATIVE_MAX_ZOOM === 'number' && newZoom > OSM_NATIVE_MAX_ZOOM) {
-				newZoom = OSM_NATIVE_MAX_ZOOM;
-			}
-			else if (typeof getActiveMapTypeMaxZoom === 'function') {
-				var typeMax = getActiveMapTypeMaxZoom();
-				if (typeof typeMax === 'number' && newZoom > typeMax) {
-					newZoom = typeMax;
-				}
-			}
-		}
-		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
-	});
+	if(holdInfoWindowForTryCityZoomOut)
+		revealHeldTryCityInfoWindow();
+	panThenSmoothZoomIn(pos, bounds);
 
 }
 
@@ -131,6 +214,28 @@ function finishSmoothZoomToBounds(bounds, map) {
 		endProgrammaticMapFocus();
 }
 
+function smoothZoomOut(map, current, min, onDone) {
+	if (current <= min) {
+		if(typeof onDone === 'function')
+			onDone();
+		return;
+	}
+	var nextZoom = current - ZOOM_ANIMATION_INCREMENT;
+	if(nextZoom < min)
+		nextZoom = min;
+	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
+		google.maps.event.removeListener(zoomChangedListener);
+		zoomChangedListener = null;
+		incMapInteractionCounter();
+		smoothZoomOut(map, nextZoom, min, onDone);
+	});
+	nextZoomTimer = setTimeout(function() {
+		if(decMapInteractionCounter()) {
+			map.setZoom(nextZoom);
+		}
+	}, ZOOM_ANIMATION_SPEED);
+}
+
 function smoothZoomToBounds(bounds, map, max, current) {
 	if (typeof getActiveMapTypeMaxZoom === 'function') {
 		var typeMax = getActiveMapTypeMaxZoom();
@@ -162,6 +267,9 @@ function smoothZoomToBounds(bounds, map, max, current) {
 function getZoomByBounds(map, bounds) {
 	var MAX_ZOOM = map.mapTypes.get(map.getMapTypeId()).maxZoom || DEFAULT_LOCATE_ZOOM;
 	var MIN_ZOOM = map.mapTypes.get(map.getMapTypeId()).minZoom || 0;
+	if(typeof getMinZoomToFillMapHeight === 'function') {
+		MIN_ZOOM = Math.max(MIN_ZOOM, getMinZoomToFillMapHeight());
+	}
 	if (typeof getCurrentMapLayer === 'function' && getCurrentMapLayer() === MAP_LAYER_OSM && typeof OSM_NATIVE_MAX_ZOOM === 'number') {
 		MAX_ZOOM = Math.min(MAX_ZOOM, OSM_NATIVE_MAX_ZOOM);
 	}

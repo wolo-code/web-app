@@ -350,6 +350,8 @@ test('non-Google map views hide Google branding and keep Apple Maps transparent'
 test('chrome controls include native tooltips', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
+	assert.match(index, /id='map_search_cluster'/);
+	assert.match(index, /id='map_city_history_toggle'/);
 	assert.match(index, /id='map_search_bar'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);
@@ -421,12 +423,19 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
 	assert.match(decodeCss, /html\.dark-mode body\.decode-icon-guide:not\(\.osm\)/);
 	assert.match(decodeCss, /#map_icon_guide_dim \{[\s\S]*--app-background-wcode/);
-	assert.match(mapJs, /map_search_bar/);
-	assert.match(mapJs, /ControlPosition\.TOP_LEFT\]\.push\(searchBar\)/);
+	assert.match(mapJs, /map_search_cluster/);
+	assert.match(mapJs, /ControlPosition\.TOP_LEFT\]\.push\(searchCluster\)/);
+	assert.match(decodeCss, /#map_search_cluster/);
 	assert.match(decodeCss, /#map_search_bar/);
 	assert.match(decodeCss, /#map_camera_label/);
 	assert.match(guideJs, /function layoutMapCameraCaption/);
 	assert.match(guideJs, /gmp-internal-camera-control/);
+	assert.match(index, /id='map_search_cluster'/);
+	assert.match(index, /id='map_city_history_toggle'/);
+	const cityJs = read('Root/JS/Component/Root/City.js');
+	assert.match(cityJs, /function getDecodeCityHistoryToggles/);
+	assert.match(cityJs, /function focusSelectedDecodeCityOnMap/);
+	assert.match(scriptJs, /map_city_history_toggle/);
 	assert.match(guideJs, /function layoutMapSearchCaptions/);
 	assert.match(guideJs, /function raiseMapSearchBarForGuide/);
 	assert.match(guideJs, /document\.body\.appendChild\(bar\)/);
@@ -444,6 +453,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /#map_icon_guide_infocard/);
 	assert.match(decodeCss, /\.map_icon_guide_callout_title/);
 	assert.match(decodeCss, /\.map_icon_guide_callout_desc/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_cluster/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff[\s\S]*opacity:\s*1/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);

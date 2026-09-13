@@ -109,14 +109,169 @@ function syncAppModeBackground() {
 	}
 }
 
+var mapDragClickGuard = false;
+var mapDragClickGuardTimer = 0;
+
+function markMapDragClickGuard() {
+	mapDragClickGuard = true;
+	if(mapDragClickGuardTimer) {
+		clearTimeout(mapDragClickGuardTimer);
+		mapDragClickGuardTimer = 0;
+	}
+}
+
+function clearMapDragClickGuard() {
+	if(mapDragClickGuardTimer) {
+		clearTimeout(mapDragClickGuardTimer);
+	}
+	mapDragClickGuardTimer = setTimeout(function() {
+		mapDragClickGuard = false;
+		mapDragClickGuardTimer = 0;
+	}, 0);
+}
+
+function mapEventPathHasSelector(event, selector) {
+	var dom = event && event.domEvent;
+	var path;
+	var i;
+	var node;
+	if(!dom) {
+		return false;
+	}
+	if(typeof dom.composedPath == 'function') {
+		path = dom.composedPath();
+		for(i = 0; i < path.length; i++) {
+			node = path[i];
+			if(node && node.matches && node.matches(selector)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	node = dom.target || dom.srcElement;
+	while(node && node !== document && node !== window) {
+		if(node.matches && node.matches(selector)) {
+			return true;
+		}
+		node = node.parentNode || node.host;
+	}
+	return false;
+}
+
+function isMapChromeClick(event) {
+	return mapEventPathHasSelector(event, 'gmp-internal-camera-control') ||
+		mapEventPathHasSelector(event, '#map_type_button') ||
+		mapEventPathHasSelector(event, '#location_button') ||
+		mapEventPathHasSelector(event, '#action_menu') ||
+		mapEventPathHasSelector(event, '.map_attribution');
+}
+
+function isIgnorableMapClick(event) {
+	return mapDragClickGuard || isMapChromeClick(event);
+}
+
+function getMapViewportSize() {
+	var el = document.getElementById('map');
+	var width = (el && el.clientWidth) ? el.clientWidth : (window.innerWidth || 0);
+	var height = (el && el.clientHeight) ? el.clientHeight : (window.innerHeight || 0);
+	if(window.visualViewport) {
+		if(window.visualViewport.width > 0) {
+			width = Math.max(width, Math.round(window.visualViewport.width));
+		}
+		if(window.visualViewport.height > 0) {
+			height = Math.max(height, Math.round(window.visualViewport.height));
+		}
+	}
+	return {width: width, height: height};
+}
+
+function getMapFillLatitude() {
+	var center;
+	if(typeof map === 'object' && map && typeof map.getCenter === 'function') {
+		center = map.getCenter();
+		if(center && typeof center.lat === 'function') {
+			return center.lat();
+		}
+		if(center && typeof center.lat === 'number') {
+			return center.lat;
+		}
+	}
+	if(typeof DEFAULT_LATLNG === 'object' && DEFAULT_LATLNG && typeof DEFAULT_LATLNG.lat === 'number') {
+		return DEFAULT_LATLNG.lat;
+	}
+	return 0;
+}
+
+function mercatorNormalizedY(latDeg) {
+	var lat = (typeof latDeg === 'number' ? latDeg : 0) * Math.PI / 180;
+	var sin;
+	if(lat > 1.4844222297453324) {
+		lat = 1.4844222297453324;
+	}
+	else if(lat < -1.4844222297453324) {
+		lat = -1.4844222297453324;
+	}
+	sin = Math.sin(lat);
+	return 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI);
+}
+
+function getZoomToCoverPixels(pixels, tile) {
+	if(!(pixels > 0) || !(tile > 0)) {
+		return typeof DEFAULT_INIT_ZOOM === 'number' ? DEFAULT_INIT_ZOOM : 2;
+	}
+	if(pixels <= tile) {
+		return 0;
+	}
+	return Math.ceil(Math.log((pixels + 1) / tile) / Math.LN2);
+}
+
+function getMinZoomToFillMapHeight() {
+	var size = getMapViewportSize();
+	var tile = typeof WORLD_MAP_TILE_SIZE === 'number' ? WORLD_MAP_TILE_SIZE : 256;
+	var y = mercatorNormalizedY(getMapFillLatitude());
+	var half = (size.height + 1) / 2;
+	var frac = Math.min(Math.max(y, 0.0001), 0.9999);
+	var coverHeight = Math.max(half / frac, half / (1 - frac), size.height);
+	return Math.max(getZoomToCoverPixels(coverHeight, tile), getZoomToCoverPixels(size.width, tile), 0);
+}
+
+function applyMapFillMinZoom() {
+	var minZoom;
+	var current;
+	if(typeof map !== 'object' || !map || typeof map.setOptions !== 'function') {
+		return;
+	}
+	minZoom = getMinZoomToFillMapHeight();
+	map.setOptions({minZoom: minZoom});
+	current = map.getZoom();
+	if(typeof current === 'number' && current < minZoom) {
+		map.setZoom(minZoom);
+	}
+}
+
+function scheduleMapFillMinZoom() {
+	applyMapFillMinZoom();
+	if(typeof requestAnimationFrame === 'function') {
+		requestAnimationFrame(function() {
+			applyMapFillMinZoom();
+		});
+	}
+}
+
 function initMap() {
 	initOsmMapType();
 
 	var input = document.getElementById('pac-input');
+	var searchCluster = document.getElementById('map_search_cluster');
+	var searchBar = document.getElementById('map_search_bar');
 	var placesLib = typeof getGooglePlacesLibrary == 'function' ? getGooglePlacesLibrary() : null;
-	var searchBox = (placesLib && placesLib.SearchBox && input) ? new placesLib.SearchBox(input) : null;
-	if(input)
+	if(searchCluster)
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchCluster);
+	else if(searchBar)
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchBar);
+	else if(input)
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+	var searchBox = (placesLib && placesLib.SearchBox && input) ? new placesLib.SearchBox(input) : null;
 
 	if(searchBox) {
 		map.addListener('bounds_changed', function() {
@@ -194,7 +349,13 @@ function initMap() {
 	});
 	}
 
+	map.addListener('dragstart', markMapDragClickGuard);
+	map.addListener('drag', markMapDragClickGuard);
+	map.addListener('idle', clearMapDragClickGuard);
 	map.addListener('click', function(event) {
+		if(isIgnorableMapClick(event)) {
+			return;
+		}
 		cleanUp(true);
 		infoWindow_setContent(MESSAGE_LOADING);
 		var pos = resolveLatLng(event.latLng);
@@ -240,7 +401,9 @@ function initMap() {
 	
 	clickHandler = new ClickEventHandler(map);
 
-	if(init_map_mode == 'satellite')
+	if(typeof isMapViewActive == 'function' && isMapViewActive())
+		setMapLayer(getCurrentMapLayer() || getDefaultMapLayer());
+	else if(init_map_mode == 'satellite')
 		setMapLayer(MAP_LAYER_SATELLITE);
 	else if(init_map_mode == 'osm')
 		setMapLayer(MAP_LAYER_OSM);
@@ -255,6 +418,12 @@ function initMap() {
 
 	postMap();
 	trackMapViewport();
+	scheduleMapFillMinZoom();
+	window.addEventListener('resize', applyMapFillMinZoom);
+	if(window.visualViewport && !window.visualViewport._woloFillZoom) {
+		window.visualViewport._woloFillZoom = true;
+		window.visualViewport.addEventListener('resize', applyMapFillMinZoom);
+	}
 
 }
 
@@ -604,7 +773,8 @@ function toggleMapType() {
 	else if(layer === MAP_LAYER_SATELLITE) {
 		document.body.classList.remove('satellite');
 		document.body.classList.add('decode');
-		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		if(typeof setGoogleMapTypeId === 'function' && typeof google === 'object' && google.maps && google.maps.MapTypeId)
+			setGoogleMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
 		if(typeof closeActionMenu == 'function') {
@@ -635,7 +805,8 @@ function toggleDecodeView() {
 	else {
 		clearMapViewClasses();
 		document.body.classList.add('decode');
-		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		if(typeof setGoogleMapTypeId === 'function' && typeof google === 'object' && google.maps && google.maps.MapTypeId)
+			setGoogleMapTypeId(google.maps.MapTypeId.ROADMAP);
 		syncOsmAttribution();
 		syncAppModeBackground();
 		if(typeof closeActionMenu == 'function') {

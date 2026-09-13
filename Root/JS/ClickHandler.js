@@ -6,6 +6,9 @@ var ClickEventHandler = function(map) {
 };
 
 ClickEventHandler.prototype.handleClick = function(event) {
+	if(typeof isIgnorableMapClick == 'function' && isIgnorableMapClick(event)) {
+		return;
+	}
 	document.getElementById('pac-input').blur();
 	if (event.placeId) {
 		// Calling e.stop() on the event prevents the default info window from showing.

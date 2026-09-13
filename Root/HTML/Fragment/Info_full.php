@@ -28,7 +28,7 @@
 		</li>
 		<li>
 			You may also search for a particular place. Or,<br>
-			let the app pick your current location automatically.
+			let the app pick up your current location automatically.
 		</li>
 	</ul>
 

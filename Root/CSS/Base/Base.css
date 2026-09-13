@@ -184,14 +184,27 @@ body.satellite #map {
 }
 
 body > #pac-input,
+.decode #map_search_cluster,
 .decode #map_search_bar {
 	display: none;
+}
+
+#map_search_cluster {
+	align-items: center;
+	display: flex;
+	gap: 0;
+	margin: 26px 0 0 12px;
+	overflow: visible;
+	position: relative;
+	z-index: 1;
 }
 
 #map_search_bar {
 	align-items: stretch;
 	display: flex;
-	margin: 26px 0 0 12px;
+	flex: 1 1 auto;
+	margin: 0;
+	min-width: 0;
 	overflow: visible;
 	position: relative;
 	z-index: 1;

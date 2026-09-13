@@ -46,6 +46,7 @@
 
 #logo_codes_info {
 	justify-self: start;
+	margin-bottom: 6px;
 }
 
 #logo_wolo_info > .image > svg {

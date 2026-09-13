@@ -44,12 +44,14 @@ body.decode-icon-guide #action_menu,
 body.decode-icon-guide #location_button,
 body.decode-icon-guide #decode_map_view_button,
 body.decode-icon-guide #map_type_button,
+body.decode-icon-guide #map_search_cluster,
 body.decode-icon-guide #map_search_bar,
 body.decode-icon-guide #map_camera_label,
 body.decode-icon-guide #logo {
 	z-index: 202;
 }
 
+body.decode-icon-guide #map_search_cluster,
 body.decode-icon-guide #map_search_bar,
 body.decode-icon-guide #map_search_field,
 body.decode-icon-guide #decode_button,
@@ -57,6 +59,7 @@ body.decode-icon-guide #map .gmnoprint {
 	overflow: visible;
 }
 
+body.decode-icon-guide #map_search_cluster .decode_icon_caption,
 body.decode-icon-guide #map_search_bar .decode_icon_caption {
 	z-index: 203;
 }
@@ -198,6 +201,7 @@ body:not(.decode).decode-icon-guide #account .decode_chrome_caption {
 	transform: translateY(-50%);
 }
 
+body.decode-icon-guide #map_city_history_toggle .decode_chrome_caption,
 body.decode-icon-guide #map_search_field .decode_chrome_caption,
 body.decode-icon-guide #decode_button .decode_chrome_caption {
 	bottom: auto;
@@ -385,8 +389,15 @@ html.dark-mode .map_icon_guide_callout_desc {
 	}
 }
 
+body:not(.decode).decode-icon-guide #map_search_cluster,
 body:not(.decode).decode-icon-guide #map_search_bar {
 	z-index: 202;
+}
+
+body:not(.decode).decode-icon-guide #map_city_history_toggle {
+	background-color: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 1px #69B7CF;
+	color: #69B7CF;
 }
 
 body:not(.decode).decode-icon-guide #pac-input {
@@ -555,6 +566,7 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 	margin-left: -10px;
 }
 
+.decode #map_search_cluster,
 .decode #map_search_bar,
 .decode #decode_button, .decode #map_input_suggestion_result {
 	display: none;

@@ -54,7 +54,8 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Map canvas | Terrain Map Canvas | `#map`, Google Maps `ROADMAP` | Full viewport | Standard map surface for selection, pan, zoom, and place context. |
-| Search field | Place Search Input | `#pac-input` | Top-left | Accepts place names and Wolo Codes while in the map flow. CSS shows DIGIPIN and plus-code values in uppercase while the field is `:valid`; other input stays lowercase. |
+| Search field | Place Search Input | `#pac-input` | Top-left, inside `#map_search_bar` | Accepts place names and Wolo Codes while in the map flow. CSS shows DIGIPIN and plus-code values in uppercase while the field is `:valid`; other input stays lowercase. |
+| Previous city control | Map Previous City Button | `#map_city_history_toggle`, `#map_search_cluster` | Immediately left of Place Search Input, outside the search field, flush with no gap | Opens the same Input Previous City Popup used on Wolo Code Input View. On Map View the control is a 5px-rounded rectangle. Disabled when no previous cities are stored. Choosing a city sets decode city context, zooms out to the viewport-fill overview if needed, then pans to that city center and animates zoom-in to city-scope (the ~32.8 km encode coverage). |
 | Search affordance | Search Icon | `#search_icon` | Inside left edge of Place Search Input | Visual cue for the map search field before input focus. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Shows suggestions for the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |
@@ -69,6 +70,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- | --- |
 | Map canvas | Google Satellite Map Canvas | `#map`, Google Maps `SATELLITE` | Full viewport | Imagery map surface for selection, pan, zoom, and place context. |
 | Search field | Place Search Input | `#pac-input` | Top-left | Same search and code entry field used in Terrain Map View. |
+| Previous city control | Map Previous City Button | `#map_city_history_toggle` | Immediately left of Place Search Input, outside the search field | Same previous-city list control used in Terrain Map View. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Same suggestion surface used by the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
@@ -145,7 +147,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Current address field | Save Address Field | `#save_address` | Current Address Section | Captures or edits the address text for the current Wolo Code. |
 | Cancel save control | Cancel Address Button | `#account_dialog_cancel_button`, `onAccountDialogCancel()` | Left side under Save Address Field | Closes the add/edit form without saving. |
 | Save control | Save Address Button | `#account_dialog_save_button` | Right side under Save Address Field | Saves the current Wolo Code address to the signed-in user's data. Requires a located or decoded Wolo Code. |
-| Saved section | Saved Addresses Section | `#account_dialog_save_list_container` under `Saved` | Lower section of dialog, hidden until the list caret is expanded | Lists the user's saved Wolo Code addresses. This region scrolls with reserved scrollbar space so tile width stays stable; the scrollbar follows light/dark theme. Account details above it stay in place. |
+| Saved section | Saved Addresses Section | `#account_dialog_save_list_container` under `Saved` | Lower section of dialog, hidden until the list caret is expanded | Lists the user's saved Wolo Code addresses. This region scrolls with the scrollbar in the tile inset and matching left space so tiles stay centered and keep a stable width; the scrollbar follows light/dark theme. Account details above it stay in place. |
 | Saved loader | Saved Addresses Loader | `#account_dialog_save_list_loader` | Saved Addresses Section | Shows loading state while saved addresses are fetched. |
 | Saved empty state | Saved Addresses Empty State | `#account_dialog_save_list_placeholder` | Saved Addresses Section | Shows empty state when no addresses are saved. |
 | Saved address list | Saved Address List | `#account_dialog_save_list` | Saved Addresses Section | Contains saved address rows. |
@@ -219,7 +221,8 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- |
 | App Logo | Top-right in desktop map views | Top-center, horizontal lockup | `#logo`, `Base.css`, `Base_narrow.css` |
 | Account Button | Top-left in Wolo Code Input View; top-right beside App Logo in desktop map views | Top-right | `#account`, `.decode #account`, `Base_narrow.css` |
-| Place Search Input | Top-left | Lower than desktop, near top with width `calc(100vw - 66px)` | `#pac-input`, `Base_narrow.css` |
+| Place Search Input | Top-left | Lower than desktop, near top with width `calc(100vw - 16px)` for the search cluster | `#pac-input`, `#map_search_cluster`, `Base_narrow.css` |
+| Map Previous City Button | Left of Place Search Input, outside the field | Same row, left of the mobile search field | `#map_city_history_toggle` |
 | Map Proceed Button | Right of Place Search Input | Top-right beside mobile Place Search Input | `#decode_button`, `Base_narrow.css` |
 | Search Icon | Inside Place Search Input | Moves with mobile Place Search Input | `#search_icon`, `Base_narrow.css` |
 | Notification Top Bar | Top-center below desktop search/logo area | Lower top-center, below mobile search row | `#notification_top`, `Base_narrow.css` |

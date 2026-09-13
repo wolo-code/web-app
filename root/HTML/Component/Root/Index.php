@@ -17,15 +17,21 @@
 	<span class='map_attribution_full'>&copy; <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a></span>
 </div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
-<div id='map_search_bar'>
-	<div id='map_search_field'>
-		<span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
-		<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?' >
-		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='search' aria-hidden='true'>Search</span>
-	</div>
-	<div id='decode_button' class='control' tabindex='4' title='Go' aria-label='Go'>
-		<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
-		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='go' aria-hidden='true'>Go</span>
+<div id='map_search_cluster'>
+	<button id='map_city_history_toggle' class='decode_city_source_button' type='button' aria-label='Choose previous city' title='Choose previous city' aria-expanded='false'>
+		<span class='image'><?php includeSVG('', 'List'); ?></span>
+		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='previous-city' aria-hidden='true'>Previous</span>
+	</button>
+	<div id='map_search_bar'>
+		<div id='map_search_field'>
+			<span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
+			<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?' >
+			<span class='decode_icon_caption decode_chrome_caption' data-guide-id='search' aria-hidden='true'>Search</span>
+		</div>
+		<div id='decode_button' class='control' tabindex='4' title='Go' aria-label='Go'>
+			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+			<span class='decode_icon_caption decode_chrome_caption' data-guide-id='go' aria-hidden='true'>Go</span>
+		</div>
 	</div>
 </div>
 <div id='decode_interface_overlay'>

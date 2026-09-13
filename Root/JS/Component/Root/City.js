@@ -185,24 +185,42 @@ function getDecodeCityHistoryKey(city) {
 	return city.id || city.gp_id || city.name;
 }
 
+function getDecodeCityHistoryToggles() {
+	return [
+		document.getElementById('decode_city_history_toggle'),
+		document.getElementById('map_city_history_toggle')
+	].filter(Boolean);
+}
+
 function syncDecodeCityHistoryControl() {
 	decode_city_history = getDecodeCityHistory();
 
-	var toggle = document.getElementById('decode_city_history_toggle');
-	if(toggle)
-		toggle.disabled = decode_city_history.length == 0;
+	var disabled = decode_city_history.length == 0;
+	var toggles = getDecodeCityHistoryToggles();
+	for(var i = 0; i < toggles.length; i++)
+		toggles[i].disabled = disabled;
+}
+
+function setDecodeCityHistoryExpanded(expanded) {
+	var toggles = getDecodeCityHistoryToggles();
+	for(var i = 0; i < toggles.length; i++) {
+		toggles[i].setAttribute('aria-expanded', expanded ? 'true' : 'false');
+		if(expanded)
+			toggles[i].classList.add('activating');
+		else
+			toggles[i].classList.remove('activating');
+	}
 }
 
 function showDecodeCityHistoryMessage() {
-	var toggle = document.getElementById('decode_city_history_toggle');
-	if(!toggle || decode_city_history.length == 0)
+	decode_city_history = getDecodeCityHistory();
+	if(decode_city_history.length == 0)
 		return;
 
-	toggle.classList.add('activating');
 	initDecodeCityHistoryDeleteControls();
 	hideDecodeCityHistoryDeletePrompt();
 	renderDecodeCityHistoryList();
-	toggle.setAttribute('aria-expanded', true);
+	setDecodeCityHistoryExpanded(true);
 	showOverlay(document.getElementById('decode_city_history_message'));
 }
 
@@ -210,11 +228,7 @@ function hideDecodeCityHistoryMessage() {
 	hideOverlay(document.getElementById('decode_city_history_message'));
 	clearDecodeCityHistoryList();
 	hideDecodeCityHistoryDeletePrompt();
-	var toggle = document.getElementById('decode_city_history_toggle');
-	if(toggle) {
-		toggle.setAttribute('aria-expanded', false);
-		toggle.classList.remove('activating');
-	}
+	setDecodeCityHistoryExpanded(false);
 }
 
 function renderDecodeCityHistoryList() {
@@ -245,6 +259,39 @@ function preventDecodeCityHistoryContextMenu(e) {
 	e.preventDefault();
 }
 
+function focusSelectedDecodeCityOnMap(city) {
+	if(!city)
+		return;
+	if(typeof isDecodeView == 'function' && isDecodeView())
+		return;
+	if(typeof map == 'undefined' || !map)
+		return;
+
+	function go(resolved) {
+		var center = resolved && resolved.center;
+		var lat;
+		var lng;
+		if(!center)
+			return;
+		lat = typeof center.lat == 'function' ? center.lat() : center.lat;
+		lng = typeof center.lng == 'function' ? center.lng() : center.lng;
+		if(lat == null || lng == null)
+			return;
+		if(typeof animateMapToCityScope == 'function')
+			animateMapToCityScope({ lat: lat, lng: lng });
+		else {
+			map.panTo({ lat: lat, lng: lng });
+			if(typeof map.getZoom == 'function' && map.getZoom() < 11)
+				map.setZoom(11);
+		}
+	}
+
+	if(city.id && typeof getCityCenterFromId == 'function')
+		getCityCenterFromId(city, go);
+	else
+		go(city);
+}
+
 function chooseDecodeCityFromHistory(e) {
 	var id = e.currentTarget.data_id;
 	var city = decode_city_history[parseInt(id, 10)];
@@ -252,6 +299,7 @@ function chooseDecodeCityFromHistory(e) {
 	if(city) {
 		setDecodeCity(city, 'history', true);
 		hideDecodeCityHistoryMessage();
+		focusSelectedDecodeCityOnMap(city);
 	}
 }
 
@@ -336,13 +384,20 @@ function syncDecodeCitySourceButtons() {
 		ip: document.getElementById('decode_city_ip'),
 		history: document.getElementById('decode_city_history_toggle')
 	};
+	var mapHistory = document.getElementById('map_city_history_toggle');
+	var source;
 
-	for(var source in controls) {
+	for(source in controls) {
 		if(controls[source]) {
 			controls[source].classList.toggle('active', selected_decode_city_source == source);
 			if(selected_decode_city_source == source)
 				controls[source].classList.remove('activating');
 		}
+	}
+	if(mapHistory) {
+		mapHistory.classList.toggle('active', selected_decode_city_source == 'history');
+		if(selected_decode_city_source == 'history')
+			mapHistory.classList.remove('activating');
 	}
 }
 
@@ -881,6 +936,8 @@ function execSubmitCity() {
 }
 
 function tryDefaultCity() {
+	if(typeof requestTryCityZoomOut === 'function')
+		requestTryCityZoomOut();
 	decode(DEFAULT_WCODE);
 	notification_top.classList.add('hide');
 	if(typeof infoWindow != 'undefined')

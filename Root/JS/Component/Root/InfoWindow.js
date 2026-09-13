@@ -78,5 +78,7 @@ function isInfoWindowOpen() {
 
 function showInfoWindow() {
 	initInfoWindow();
+	if(typeof holdInfoWindowForTryCityZoomOut !== 'undefined' && holdInfoWindowForTryCityZoomOut)
+		return;
 	infoWindow.open(map, marker);
 }

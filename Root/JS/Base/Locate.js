@@ -6,6 +6,23 @@
 // var watch_location_id;
 // var watch_location_notice_timer;
 // var pendingFocusPos;
+var WATCH_LOCATION_POOR_ACCURACY = 99.5;
+var WATCH_LOCATION_POOR_ACCURACY_STREAK = 5;
+var poorAccuracyStreak = 0;
+
+function resetPoorAccuracyStreak() {
+	poorAccuracyStreak = 0;
+}
+
+function shouldFastForwardPoorAccuracy(accuracy) {
+	if(!(accuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
+		poorAccuracyStreak = 0;
+		return false;
+	}
+	poorAccuracyStreak += 1;
+	return poorAccuracyStreak >= WATCH_LOCATION_POOR_ACCURACY_STREAK;
+}
+
 function initLocate(override_dnd, callback) {
 	if(!locationAccessInitCheck()) {
 		locateRight_callback = callback;
@@ -38,6 +55,7 @@ function locateExec(failure) {
 		pushLoader();
 		if (navigator.geolocation) {
 			locating = true;
+			resetPoorAccuracyStreak();
 			if(myLocDot)
 				myLocDot.setMap(null);
 			if(accuCircle)
@@ -89,7 +107,7 @@ function locateExec(failure) {
 						accuCircle.setCenter(pos);
 						accuCircle.setRadius(position.coords.accuracy);
 					}
-					if(position.coords.accuracy >= 99.5) {
+					if(position.coords.accuracy >= WATCH_LOCATION_POOR_ACCURACY) {
 						document.getElementById('accuracy_meter').innerText = "99+";
 						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: #FF0000');
 					}
@@ -123,7 +141,9 @@ function locateExec(failure) {
 						myLocDot.setPosition(pos);
 					}
 
-					if(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY && !locate_button_pressed)
+					var fastForwardPoor = shouldFastForwardPoorAccuracy(position.coords.accuracy);
+					if(!locate_button_pressed &&
+							(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY || fastForwardPoor))
 						processPosition(pos);
 
 				},
@@ -267,6 +287,7 @@ function clearLocating(hideAccuracyContainer) {
 	if(hideAccuracyContainer)
 		document.getElementById('accuracy_container').classList.add('hide');
 	locating = false;
+	resetPoorAccuracyStreak();
 	popLoader();
 	removeClassIfPresent(typeof location_icon_dot == 'undefined' ? null : location_icon_dot, 'blinking');
 	removeClassIfPresent(typeof accuracy_indicator == 'undefined' ? null : accuracy_indicator, 'blinking');

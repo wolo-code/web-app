@@ -73,12 +73,40 @@ body.decode-icon-guide #account {
 	display: none;
 	left: 0;
 	opacity: 1;
+	overflow: hidden;
 	pointer-events: auto;
 	position: fixed;
 	right: 0;
 	top: 0;
 	transition: opacity 400ms ease;
 	z-index: 200;
+}
+
+#decode_icon_guide_scrim .map_icon_guide_world {
+	display: none;
+	height: 100%;
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+}
+
+body:not(.decode).decode-icon-guide #decode_icon_guide_scrim .map_icon_guide_world {
+	display: block;
+}
+
+#decode_icon_guide_scrim .map_icon_guide_world_land {
+	fill: #00aa88;
+	fill-opacity: 0.22;
+	stroke: #dedede;
+	stroke-linejoin: round;
+	stroke-width: 1.5;
+}
+
+html.dark-mode body:not(.decode).decode-icon-guide #decode_icon_guide_scrim .map_icon_guide_world_land {
+	fill: #69B7CF;
+	fill-opacity: 0.32;
+	stroke: #3a3a58;
 }
 
 body.decode-icon-guide #decode_icon_guide_scrim {
@@ -198,6 +226,7 @@ body:not(.decode).decode-icon-guide #map {
 #map_icon_guide_dim {
 	background: var(--app-background-wcode);
 	inset: 0;
+	overflow: hidden;
 	pointer-events: auto;
 	position: absolute;
 	transition: opacity 400ms ease;
@@ -205,9 +234,13 @@ body:not(.decode).decode-icon-guide #map {
 }
 
 html.dark-mode body.decode-icon-guide:not(.osm) #decode_icon_guide_scrim,
-html.dark-mode .decode.decode-icon-guide #decode_interface_overlay::before,
-html.dark-mode body.decode-icon-guide:not(.osm) #map_icon_guide_dim {
+html.dark-mode .decode.decode-icon-guide #decode_interface_overlay::before {
 	background: rgba(0, 0, 0, 0.8);
+}
+
+html.dark-mode body:not(.decode).decode-icon-guide #decode_icon_guide_scrim,
+html.dark-mode body:not(.decode).decode-icon-guide #map_icon_guide_dim {
+	background: var(--app-background-wcode);
 }
 
 body.osm.decode-icon-guide:not(.decode) #decode_icon_guide_scrim,

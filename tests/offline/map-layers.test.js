@@ -377,6 +377,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);
 	assert.match(index, /id='decode_button'[\s\S]*Go/);
 	assert.match(index, /id='decode_icon_guide_scrim'/);
+	assert.match(index, /includeSVG\('', 'World-map'\)/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_DISMISS_GRACE_MS/);
@@ -407,6 +408,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.doesNotMatch(infoCss, /#info_show_icon_labels:hover[\s\S]{0,80}text-decoration:\s*underline/);
 	assert.match(decodeCss, /#action_menu_decode \.decode_chrome_caption \{[\s\S]*left:\s*calc\(100% \+ 8px\)/);
 	assert.match(decodeCss, /#map_icon_guide_dim/);
+	assert.match(decodeCss, /map_icon_guide_world_land/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_icon_guide_scrim \.map_icon_guide_world/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff[\s\S]*opacity:\s*1/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);

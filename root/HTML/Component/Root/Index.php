@@ -109,7 +109,7 @@
 <div id='map_camera_label' aria-hidden='true'>
 	<span class='decode_icon_caption decode_chrome_caption' data-guide-id='dpad'>D-pad</span>
 </div>
-<div id='decode_icon_guide_scrim'></div>
+<div id='decode_icon_guide_scrim'><?php includeSVG('', 'World-map'); ?></div>
 <div id='action_menu' class='control' tabindex='7'>
 	<div id='action_menu_items'>
 		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info' title='Info'>

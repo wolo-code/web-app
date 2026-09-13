@@ -3,15 +3,11 @@
 	font-family: Abel;
 	margin: 0 auto;
 	border: transparent solid 20px;
-	padding: 2px 20px 8px;
+	padding: 2px 20px 28px;
 	text-align: left;
 	background-color: #FFFFFF;
 	color: #999999;
 	max-width: 400px;
-}
-
-#info_message.info-version-expanded {
-	padding-bottom: 28px;
 }
 
 #wolo_about {
@@ -27,7 +23,9 @@
 }
 
 #logo_info {
-	text-align: center;
+	align-items: end;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 }
 
 #info_message > p {
@@ -35,7 +33,6 @@
 }
 
 #logo_info > a {
-	display: inline-block;
 	border-radius: 6px;
 	border-width: thin;
 	border-color: #f0f7fa;
@@ -43,14 +40,30 @@
 	padding: 3px;
 }
 
+#logo_wolo_info {
+	justify-self: end;
+}
+
+#logo_codes_info {
+	justify-self: start;
+}
+
 #logo_wolo_info > .image > svg {
 	height: 50px;
 }
 
+#logo_codes_info > .image {
+	display: block;
+	overflow: hidden;
+	width: 38px;
+}
+
 #logo_codes_info > .image > svg {
+	display: block;
 	padding-top: 4px;
 	height: 14px;
 	width: 152px;
+	margin-left: -57px;
 }
 
 #info_show_icon_labels {
@@ -80,48 +93,6 @@
 
 #info_intro:not(.hide) ~ #info_show_icon_labels {
 	display: none;
-}
-
-#info_version_indicator {
-	position: absolute;
-	bottom: 8px;
-	right: 12px;
-	-webkit-appearance: none;
-	appearance: none;
-	align-items: flex-end;
-	background: transparent;
-	border: none;
-	color: #bbbbbb;
-	cursor: pointer;
-	display: flex;
-	flex-direction: column;
-	font-family: Abel, sans-serif;
-	font-size: 0.78em;
-	gap: 3px;
-	line-height: 1.15;
-	margin: 0;
-	max-width: calc(100% - 132px);
-	padding: 0;
-	text-align: right;
-}
-
-#info_version_indicator .info_version_stamp {
-	font-size: 0.86em;
-	font-weight: normal;
-	white-space: nowrap;
-}
-
-#info_version_value {
-	-webkit-appearance: none;
-	appearance: none;
-	background: transparent;
-	border: none;
-	color: inherit;
-	cursor: pointer;
-	font: inherit;
-	font-weight: bold;
-	margin: 0;
-	padding: 0;
 }
 
 #info_intro {
@@ -172,22 +143,6 @@
 #map_data_credits {
 	font-size: smaller;
 	margin-top: 8px;
-}
-
-#software_info {
-	padding: 6px 0 20px;
-}
-
-#version {
-	font-size: smaller;
-}
-
-#updated {
-	font-size: smaller;
-}
-
-#version > span, #version > button, #updated > span {
-	font-weight: bold;
 }
 
 #overlay .message_dialog_control {

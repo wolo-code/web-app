@@ -73,8 +73,10 @@ function activateOverlayInfo_full() {
 }
 
 function activateOverlayInfo_links() {
+	info_intro.classList.add('hide');
 	info_full.classList.add('hide');
 	info_links.classList.remove('hide');
+	info_message_close.classList.remove('hide');
 	info_agency.classList.remove('hide');
 }
 

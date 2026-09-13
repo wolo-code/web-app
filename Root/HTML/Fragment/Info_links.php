@@ -16,7 +16,7 @@
 	</tr>
 	<tr>
 		<td>contact:</td>
-		<td><?php echo renderMailLink('ujjwal', 'wolo.codes', array('class' => 'link', 'subject' => 'Wolo')); ?></td>
+		<td><?php echo renderMailLink('support', 'wolo.codes', array('class' => 'link', 'subject' => 'Wolo')); ?></td>
 	</tr>
 	<tr>
 		<td>source code:</td>
@@ -47,7 +47,7 @@
 <table id='map_data_credits'>
 	<tr>
 		<td>Map tiles:</td>
-		<td><a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a>, <a class='link' href='https://www.esri.com/' target='_blank' rel='noopener noreferrer'>Esri</a>, <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a>, <a class='link' href='https://www.apple.com/maps/' target='_blank' rel='noopener noreferrer'>Apple Maps</a> (when configured), terrain/satellite via Google Maps</td>
+		<td><a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a>, <a class='link' href='https://www.esri.com/' target='_blank' rel='noopener noreferrer'>Esri</a>, <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a>, <a class='link' href='https://www.apple.com/maps/' target='_blank' rel='noopener noreferrer'>Apple Maps</a>, <a class='link' href='https://www.google.com/maps' target='_blank' rel='noopener noreferrer'>Google Maps</a></td>
 	</tr>
 	<tr>
 		<td>DIGIPIN:</td>
@@ -58,17 +58,4 @@
 		<td><a class='link' href='https://plus.codes' target='_blank' rel='noopener noreferrer'>plus.codes</a> (<a class='link' href='https://github.com/google/open-location-code' target='_blank' rel='noopener noreferrer'>Open Location Code</a>)</td>
 	</tr>
 </table>
-<div id='software_info'>
-	<div id='version'>
-		Version: <button type='button' id='info_version_value' class='info_version_toggle' data-version-short='<?php echo htmlspecialchars($appVersionShort, ENT_QUOTES, 'UTF-8') ?>' data-version-full='<?php echo htmlspecialchars($appVersionFull, ENT_QUOTES, 'UTF-8') ?>' aria-expanded='false'><span class='info_version_text'><?php echo htmlspecialchars($appVersionShort, ENT_QUOTES, 'UTF-8') ?></span></button>
-	</div>
-	<div id='updated'>Updated:
-		<span id='updated-timestamp'>
-		<?php
-			echo date('Y M d H:i:s').' '.'UTC';
-		?>
-		</span> ~<span id='updated-timediff'></span> ago
-	</div>
-</div>
-
 </div>

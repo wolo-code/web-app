@@ -203,7 +203,7 @@ function setupControls() {
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
 	document.getElementById('qr_close').addEventListener('click', closeQR);
-	document.getElementById('overlay').addEventListener('click', onQROverlayClick);
+	document.getElementById('overlay').addEventListener('click', onOverlayBackdropClick);
 	document.getElementById('qr_save').addEventListener('click', onQRDialogSave);
 	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
 	document.getElementById('qr_print').addEventListener('click', printQR);

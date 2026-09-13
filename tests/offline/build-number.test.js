@@ -42,17 +42,16 @@ test('Vars.tsv has a numeric build row', () => {
 	assert.ok(Number.parseInt(match[1], 10) >= 1);
 });
 
-test('Info fragments show short version and keep full version for tap', () => {
+test('Info modal omits version number and updated timestamp', () => {
 	const info = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info.php'), 'utf8');
 	const links = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info_links.php'), 'utf8');
-	const config = fs.readFileSync(path.join(repoRoot, 'Root', 'Framework', 'API', 'Config.php'), 'utf8');
 	const infoJs = fs.readFileSync(path.join(repoRoot, 'Root', 'JS', 'Component', 'Root', 'Info.js'), 'utf8');
-	assert.match(config, /function formatAppVersionShort/);
-	assert.match(info, /data-version-short/);
-	assert.match(info, /data-version-full/);
-	assert.match(info, /\$appVersionShortLabel/);
-	assert.match(links, /\$appVersionShort/);
-	assert.match(info, /info_version_stamp/);
-	assert.match(infoJs, /function toggleInfoVersionDisplay/);
-	assert.match(infoJs, /getInfoUpdatedTimestamp/);
+	assert.doesNotMatch(info, /info_version_indicator/);
+	assert.doesNotMatch(info, /\$appVersion/);
+	assert.doesNotMatch(links, /software_info/);
+	assert.doesNotMatch(links, /info_version_value/);
+	assert.doesNotMatch(links, /updated-timestamp/);
+	assert.doesNotMatch(infoJs, /toggleInfoVersionDisplay/);
+	assert.match(info, /id='info_show_icon_labels'/);
+	assert.match(info, /show guide/);
 });

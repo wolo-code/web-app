@@ -274,11 +274,15 @@ test('info links include OSM, Esri, Microsoft, and DIGIPIN attribution', () => {
 	assert.match(infoLinks, /esri\.com/);
 	assert.match(infoLinks, /microsoft\.com\/maps/);
 	assert.match(infoLinks, /apple\.com\/maps/);
+	assert.match(infoLinks, /google\.com\/maps/);
 	assert.match(infoLinks, /indiapost\.gov\.in\/digipin/);
-	assert.match(infoLinks, /renderMailLink\('ujjwal', 'wolo\.codes'/);
+	assert.match(infoLinks, /renderMailLink\('support', 'wolo\.codes'/);
 	assert.match(infoLinks, /Mail_link\.php/);
 	assert.doesNotMatch(infoLinks, /mailto:/);
 	assert.doesNotMatch(infoLinks, /ujjwal@wolo/);
+	assert.doesNotMatch(infoLinks, /software_info/);
+	assert.doesNotMatch(infoLinks, /info_version_value/);
+	assert.doesNotMatch(infoLinks, /updated-timestamp/);
 });
 
 test('root index exposes OSM, Apple, Esri, and Microsoft map icons and attribution', () => {

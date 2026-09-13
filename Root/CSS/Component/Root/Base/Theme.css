@@ -348,8 +348,6 @@ html.dark-mode #decode_map_view_button svg {
 	background-color: rgb(34 34 68 / 70%);
 }
 
-html.dark-mode #logo_surface,
-html.dark-mode #logo.plain_background #logo_surface,
 html.dark-mode .decode #logo_surface,
 html.dark-mode .decode #logo.plain_background #logo_surface {
 	background: transparent;

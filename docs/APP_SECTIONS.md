@@ -194,7 +194,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
-| Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. `#logo_surface` draws an 8px padded frosted rectangle around the Wolo + CODE lockup in light mode; dark mode keeps the padding without that plate. |
+| Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. `#logo_surface` draws an 8px padded frosted rectangle around the Wolo + CODE lockup on map views in light and dark mode. Wolo Code Input View in dark mode keeps the padding without that plate. |
 | Account entry | Account Button | `#account` | Wolo Code Input View: top-left; map views desktop: top-right beside App Logo; mobile: top-right | Opens sign-in, account, and saved-address flows. |
 | Bottom-left chrome host | Action Menu | `#action_menu` | Bottom-left | Hosts the Info Action on Wolo Code Input View, and both Info Action and Wolo Code Input Action on map views (Info first). The expandable radial menu is withdrawn. |
 | About/help action | Info Action | `#action_menu_info`, `showInfo()` | Bottom-left on Wolo Code Input View; immediately before Wolo Code Input Action on map views | Opens app information and related links. |

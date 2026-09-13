@@ -11,3 +11,5 @@ ui-debug.log
 public
 interim
 Manage
+
+.playwright-cli/

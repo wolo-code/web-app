@@ -390,9 +390,16 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_DISMISS_GRACE_MS/);
 	assert.match(guideJs, /wolo-decode-icon-guide-launches/);
+	assert.match(guideJs, /wolo-map-icon-guide-launches/);
 	assert.match(guideJs, /fadeDecodeIconGuide/);
 	assert.match(guideJs, /decodeIconGuideConsumed = true/);
+	assert.match(guideJs, /mapIconGuideConsumed = true/);
 	assert.match(guideJs, /recordDecodeIconGuideLaunch/);
+	assert.match(guideJs, /recordMapIconGuideVisit/);
+	assert.match(guideJs, /shouldShowMapIconGuide/);
+	assert.match(guideJs, /MAP_ICON_GUIDE_REPLAY_HINT/);
+	assert.match(guideJs, /function mapInfocardCalloutTarget/);
+	assert.match(guideJs, /MAP_INFOCARD_CALLOUT_END_GAP/);
 	assert.match(guideJs, /function requestDecodeIconGuide/);
 	assert.doesNotMatch(guideJs, /toggleDecodeView/);
 	assert.match(infoPhp, /id='info_show_icon_labels'/);

@@ -1,21 +1,30 @@
 var DECODE_ICON_GUIDE_STORAGE_KEY = 'wolo-decode-icon-guide-launches';
+var MAP_ICON_GUIDE_STORAGE_KEY = 'wolo-map-icon-guide-launches';
 var DECODE_ICON_GUIDE_MAX_LAUNCHES = 2;
 var DECODE_ICON_GUIDE_HOLD_MS = 3000;
 var DECODE_ICON_GUIDE_FADE_MS = 400;
 var DECODE_ICON_GUIDE_DISMISS_GRACE_MS = 700;
 var DECODE_ICON_GUIDE_MIN_TOP = 56;
 var DECODE_ICON_GUIDE_STACK_GAP = 12;
+var MAP_INFOCARD_CALLOUT_START_GAP = 8;
+var MAP_INFOCARD_CALLOUT_END_GAP = 14;
+var MAP_ICON_GUIDE_REPLAY_HINT = 'You can open this guide again from Info (i), then Show guide.';
+var MAP_ICON_GUIDE_REPLAY_HINT_MS = 5000;
 var decodeIconGuideVisible = false;
 var decodeIconGuideConsumed = false;
+var mapIconGuideConsumed = false;
 var decodeIconGuideForced = false;
 var decodeIconGuideTimer = null;
 var decodeIconGuideFadeTimer = null;
 var decodeIconGuideReadyTimer = null;
 var decodeIconGuideReady = false;
 var decodeIconGuideLaunchRecorded = false;
+var mapIconGuideVisitRecorded = false;
 var decodeIconGuideCameraTimer = null;
 var decodeIconGuidePinnedCaptions = [];
 var decodeIconGuideSearchHome = null;
+var decodeIconGuideReplayHint = false;
+var decodeIconGuideShownOnDecode = false;
 
 function getDecodeIconGuideLaunchCount() {
 	if(typeof(Storage) === 'undefined')
@@ -49,6 +58,71 @@ function recordDecodeIconGuideLaunch() {
 function shouldShowDecodeIconGuide() {
 	var count = getDecodeIconGuideLaunchCount();
 	return count > 0 && count <= DECODE_ICON_GUIDE_MAX_LAUNCHES;
+}
+
+function getMapIconGuideLaunchCount() {
+	if(typeof(Storage) === 'undefined')
+		return DECODE_ICON_GUIDE_MAX_LAUNCHES;
+	try {
+		var raw = localStorage.getItem(MAP_ICON_GUIDE_STORAGE_KEY);
+		var count = parseInt(raw, 10);
+		if(isNaN(count) || count < 0)
+			return 0;
+		return count;
+	}
+	catch(error) {
+		return DECODE_ICON_GUIDE_MAX_LAUNCHES;
+	}
+}
+
+function recordMapIconGuideLaunch() {
+	if(typeof(Storage) === 'undefined')
+		return DECODE_ICON_GUIDE_MAX_LAUNCHES + 1;
+	var count = getMapIconGuideLaunchCount() + 1;
+	try {
+		localStorage.setItem(MAP_ICON_GUIDE_STORAGE_KEY, String(count));
+	}
+	catch(error) {}
+	return count;
+}
+
+function recordMapIconGuideVisit() {
+	if(mapIconGuideVisitRecorded)
+		return getMapIconGuideLaunchCount();
+	mapIconGuideVisitRecorded = true;
+	return recordMapIconGuideLaunch();
+}
+
+function shouldShowMapIconGuide() {
+	var count = getMapIconGuideLaunchCount();
+	return count > 0 && count <= DECODE_ICON_GUIDE_MAX_LAUNCHES;
+}
+
+function isDecodeIconGuideView() {
+	return typeof isDecodeView == 'function'
+		? isDecodeView()
+		: document.body.classList.contains('decode');
+}
+
+function isDecodeIconGuideConsumed() {
+	return isDecodeIconGuideView() ? decodeIconGuideConsumed : mapIconGuideConsumed;
+}
+
+function markDecodeIconGuideConsumed() {
+	if(isDecodeIconGuideView())
+		decodeIconGuideConsumed = true;
+	else
+		mapIconGuideConsumed = true;
+}
+
+function shouldHintMapIconGuideReplay() {
+	return !decodeIconGuideForced && !isDecodeIconGuideView() && shouldShowMapIconGuide();
+}
+
+function showMapIconGuideReplayHint() {
+	if(typeof showNotification != 'function')
+		return;
+	showNotification(MAP_ICON_GUIDE_REPLAY_HINT, MAP_ICON_GUIDE_REPLAY_HINT_MS);
 }
 
 function isAppOverlayOpen() {
@@ -250,13 +324,25 @@ function placeMapInfocardCallout(el, hx, hy, side, gap, dx, hostRect, cardRect) 
 }
 
 function mapInfocardCalloutAnchor(box, side) {
+	var gap = MAP_INFOCARD_CALLOUT_START_GAP;
 	if(side === 'left')
-		return { x: box.left + box.width, y: box.top + Math.min(18, box.height * 0.38) };
+		return { x: box.left + box.width + gap, y: box.top + Math.min(18, box.height * 0.38) };
 	if(side === 'right')
-		return { x: box.left, y: box.top + Math.min(18, box.height * 0.38) };
+		return { x: box.left - gap, y: box.top + Math.min(18, box.height * 0.38) };
 	if(side === 'top')
-		return { x: box.left + box.width / 2, y: box.top + box.height };
-	return { x: box.left + box.width / 2, y: box.top };
+		return { x: box.left + box.width / 2, y: box.top + box.height + gap };
+	return { x: box.left + box.width / 2, y: box.top - gap };
+}
+
+function mapInfocardCalloutTarget(hx, hy, side) {
+	var gap = MAP_INFOCARD_CALLOUT_END_GAP;
+	if(side === 'left')
+		return { x: hx - gap, y: hy };
+	if(side === 'right')
+		return { x: hx + gap, y: hy };
+	if(side === 'top')
+		return { x: hx, y: hy - gap };
+	return { x: hx, y: hy + gap };
 }
 
 function mapInfocardCalloutPath(from, to, side) {
@@ -355,7 +441,7 @@ function layoutMapInfocardGuide() {
 		hy = hotspotRect.top + hotspotRect.height / 2 - hostRect.top;
 		box = placeMapInfocardCallout(callout, hx, hy, spec.side, spec.gap, spec.dx, hostRect, cardRect);
 		from = mapInfocardCalloutAnchor(box, spec.side);
-		drawMapInfocardCalloutLine(svg, from, { x: hx, y: hy }, spec.side);
+		drawMapInfocardCalloutLine(svg, from, mapInfocardCalloutTarget(hx, hy, spec.side), spec.side);
 	}
 }
 
@@ -567,23 +653,28 @@ function onDecodeIconGuideDismiss(event) {
 	fadeDecodeIconGuide();
 }
 
-function hideDecodeIconGuide() {
+function hideDecodeIconGuide(fromFade) {
+	var hintReplay = fromFade && decodeIconGuideReplayHint;
 	clearDecodeIconGuideTimers();
 	unbindDecodeIconGuideDismiss();
 	decodeIconGuideVisible = false;
 	decodeIconGuideReady = false;
+	decodeIconGuideReplayHint = false;
 	document.body.classList.remove('decode-icon-guide', 'decode-icon-guide-fade');
 	resetDecodeIconGuideOffset();
 	unwatchMapCameraCaption();
 	restoreMapSearchBarFromGuide();
 	removeMapIconGuideDim();
 	layoutMapCameraCaption();
+	if(hintReplay)
+		showMapIconGuideReplayHint();
 }
 
 function fadeDecodeIconGuide() {
 	if(!decodeIconGuideVisible)
 		return;
-	decodeIconGuideConsumed = true;
+	decodeIconGuideReplayHint = shouldHintMapIconGuideReplay();
+	markDecodeIconGuideConsumed();
 	decodeIconGuideForced = false;
 	clearDecodeIconGuideTimers();
 	unbindDecodeIconGuideDismiss();
@@ -591,7 +682,7 @@ function fadeDecodeIconGuide() {
 	document.body.classList.add('decode-icon-guide-fade');
 	decodeIconGuideFadeTimer = setTimeout(function() {
 		decodeIconGuideFadeTimer = null;
-		hideDecodeIconGuide();
+		hideDecodeIconGuide(true);
 	}, DECODE_ICON_GUIDE_FADE_MS);
 }
 
@@ -612,8 +703,11 @@ function beginDecodeIconGuideTimers() {
 function startDecodeIconGuide(force) {
 	if(force) {
 		decodeIconGuideConsumed = false;
+		mapIconGuideConsumed = false;
 		decodeIconGuideForced = true;
+		decodeIconGuideReplayHint = false;
 		if(decodeIconGuideVisible) {
+			decodeIconGuideShownOnDecode = isDecodeIconGuideView();
 			document.body.classList.remove('decode-icon-guide-fade');
 			layoutDecodeIconGuide();
 			watchMapCameraCaption();
@@ -623,9 +717,10 @@ function startDecodeIconGuide(force) {
 			return;
 		}
 	}
-	if(decodeIconGuideVisible || decodeIconGuideConsumed)
+	if(decodeIconGuideVisible || isDecodeIconGuideConsumed())
 		return;
 	decodeIconGuideVisible = true;
+	decodeIconGuideShownOnDecode = isDecodeIconGuideView();
 	document.body.classList.add('decode-icon-guide');
 	document.body.classList.remove('decode-icon-guide-fade');
 	layoutDecodeIconGuide();
@@ -640,11 +735,23 @@ function requestDecodeIconGuide() {
 }
 
 function syncDecodeIconGuide() {
-	var decodeView = typeof isDecodeView == 'function'
-		? isDecodeView()
-		: document.body.classList.contains('decode');
-	var allow = (decodeIconGuideForced || (decodeView && shouldShowDecodeIconGuide())) && !isAppOverlayOpen();
-	if(allow && !decodeIconGuideConsumed && !decodeIconGuideVisible)
+	var decodeView = isDecodeIconGuideView();
+	var autoShow;
+	var allow;
+	if(decodeIconGuideVisible && decodeIconGuideShownOnDecode !== decodeView) {
+		if(decodeIconGuideShownOnDecode)
+			decodeIconGuideConsumed = true;
+		hideDecodeIconGuide();
+	}
+	if(decodeView) {
+		mapIconGuideVisitRecorded = false;
+		mapIconGuideConsumed = false;
+	}
+	else
+		recordMapIconGuideVisit();
+	autoShow = decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide();
+	allow = (decodeIconGuideForced || autoShow) && !isAppOverlayOpen();
+	if(allow && !isDecodeIconGuideConsumed() && !decodeIconGuideVisible)
 		startDecodeIconGuide();
 	else if(!allow && decodeIconGuideVisible)
 		hideDecodeIconGuide();

@@ -373,6 +373,7 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.match(exceptionHtml, /includeSVG\('', 'Warning'\)/);
 	assert.match(exceptionHtml, /id='exception_message_title'/);
 	assert.match(exceptionHtml, /You may contact our support team\./);
+	assert.match(exceptionHtml, /class='exception_support_copy hide'/);
 	assert.match(exceptionHtml, /renderMailLink\('support', 'wolo\.codes'/);
 	assert.match(exceptionHtml, /Wolo web app crash/);
 	assert.match(exceptionHtml, /Mail_link\.php/);
@@ -388,6 +389,12 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.doesNotMatch(baseScript, /exception_message_close/);
 	assert.match(baseScript, /addLongpressListener\(title, function\(\) \{\}, showExceptionLog\)/);
 	assert.match(baseScript, /exception_dev_controls/);
+	assert.match(baseScript, /wolo_exception_reload_attempted/);
+	assert.match(baseScript, /function setExceptionReloadAttempted/);
+	assert.match(baseScript, /function clearExceptionReloadAttempt/);
+	assert.match(baseScript, /syncExceptionSupportVisibility/);
+	assert.match(baseScript, /setExceptionReloadAttempted\(\);/);
+	assert.match(baseScript, /if\(!pendingExceptionLogs\.length\)\s+clearExceptionReloadAttempt\(\);/);
 	const mailJs = read('Root/JS/Base/Mail.js');
 	assert.match(mailJs, /function revealMailLink/);
 	assert.match(mailJs, /function bindMailLinks/);

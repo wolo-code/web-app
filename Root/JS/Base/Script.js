@@ -2,6 +2,7 @@ var pendingInitMap;
 var clickHandler;
 var map;
 var pendingExceptionLogs = [];
+var EXCEPTION_RELOAD_ATTEMPTED_KEY = 'wolo_exception_reload_attempted';
 
 function getGooglePlacesLibrary() {
 	if(typeof google == 'object' && google.maps && google.maps.places)
@@ -46,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		initExceptionMessageControls();
 		flushExceptionPrompt();
+		if(!pendingExceptionLogs.length)
+			clearExceptionReloadAttempt();
 	}
 	catch(error) {
 		showErrorPrompt(error);
@@ -69,7 +72,34 @@ function initExceptionMessageControls() {
 	message.dataset.controlsReady = 'true';
 }
 
+function setExceptionReloadAttempted() {
+	if(typeof sessionStorage != 'undefined')
+		sessionStorage.setItem(EXCEPTION_RELOAD_ATTEMPTED_KEY, '1');
+}
+
+function hadExceptionReloadAttempt() {
+	return typeof sessionStorage != 'undefined' && sessionStorage.getItem(EXCEPTION_RELOAD_ATTEMPTED_KEY) === '1';
+}
+
+function clearExceptionReloadAttempt() {
+	if(typeof sessionStorage != 'undefined')
+		sessionStorage.removeItem(EXCEPTION_RELOAD_ATTEMPTED_KEY);
+}
+
+function syncExceptionSupportVisibility() {
+	var support = document.querySelector('#exception_message .exception_support_copy');
+
+	if(!support)
+		return;
+
+	if(hadExceptionReloadAttempt())
+		support.classList.remove('hide');
+	else
+		support.classList.add('hide');
+}
+
 function clearCacheAndReload() {
+	setExceptionReloadAttempted();
 	var reload = function() {
 		if (typeof sessionStorage != 'undefined') {
 			sessionStorage.wolo_sw_reloading = '1';
@@ -173,6 +203,7 @@ function showExceptionMessage(log) {
 		return;
 
 	initExceptionMessageControls();
+	syncExceptionSupportVisibility();
 	logNode.textContent = log;
 	logNode.classList.add('hide');
 	controls.classList.remove('hide');

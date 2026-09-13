@@ -25,7 +25,7 @@
 }
 
 .decode.decode-icon-guide #decode_interface_overlay::before {
-	background: rgba(0, 0, 0, 0.8);
+	background: var(--app-background-wcode);
 	content: '';
 	inset: 0;
 	pointer-events: none;
@@ -68,7 +68,7 @@ body.decode-icon-guide #account {
 }
 
 #decode_icon_guide_scrim {
-	background: rgba(0, 0, 0, 0.8);
+	background: var(--app-background-wcode);
 	bottom: 0;
 	display: none;
 	left: 0;
@@ -196,12 +196,18 @@ body:not(.decode).decode-icon-guide #map {
 }
 
 #map_icon_guide_dim {
-	background: rgba(0, 0, 0, 0.8);
+	background: var(--app-background-wcode);
 	inset: 0;
 	pointer-events: auto;
 	position: absolute;
 	transition: opacity 400ms ease;
 	z-index: 999999;
+}
+
+html.dark-mode body.decode-icon-guide:not(.osm) #decode_icon_guide_scrim,
+html.dark-mode .decode.decode-icon-guide #decode_interface_overlay::before,
+html.dark-mode body.decode-icon-guide:not(.osm) #map_icon_guide_dim {
+	background: rgba(0, 0, 0, 0.8);
 }
 
 body.osm.decode-icon-guide:not(.decode) #decode_icon_guide_scrim,

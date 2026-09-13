@@ -389,6 +389,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(infoPhp, /id='info_show_icon_labels'/);
 	assert.match(scriptJs, /function showInfoIconGuide/);
 	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
+	assert.match(decodeCss, /html\.dark-mode body\.decode-icon-guide:not\(\.osm\)/);
+	assert.match(decodeCss, /#map_icon_guide_dim \{[\s\S]*--app-background-wcode/);
 	assert.match(mapJs, /map_search_bar/);
 	assert.match(mapJs, /ControlPosition\.TOP_LEFT\]\.push\(searchBar\)/);
 	assert.match(decodeCss, /#map_search_bar/);

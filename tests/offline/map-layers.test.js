@@ -400,7 +400,9 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.match(dialogCss, /#exception_prompt_controls/);
 	assert.match(dialogCss, /flex-direction:\s*column/);
 	assert.match(dialogCss, /\.exception_support_copy/);
+	assert.match(dialogCss, /white-space:\s*nowrap/);
 	assert.match(dialogCss, /#exception_message \.hide/);
+	assert.match(dialogCss, /min\(36rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /#exception_message_title/);
 });

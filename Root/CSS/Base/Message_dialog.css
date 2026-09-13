@@ -166,8 +166,9 @@ h2.message_dialog_label {
 	cursor: default;
 	display: flex;
 	flex-direction: row;
-	gap: 8px;
+	gap: 12px;
 	justify-content: center;
+	margin: 1em 1.2em 0.85em;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	user-select: none;
@@ -215,12 +216,21 @@ h2.message_dialog_label {
 	padding: 10px 0 10px 14px;
 }
 
+#exception_message {
+	box-sizing: border-box;
+	max-width: min(36rem, calc(100vw - 24px));
+	min-width: min(22rem, calc(100vw - 24px));
+	padding: 12px 8px 8px;
+	width: min(36rem, calc(100vw - 24px));
+}
+
 #exception_message .hide {
 	display: none !important;
 }
 
 #exception_message .message_dialog_body {
 	overflow: visible;
+	padding: 8px 28px 28px;
 }
 
 #exception_message #exception_prompt_controls,
@@ -240,50 +250,61 @@ h2.message_dialog_label {
 #exception_message #exception_prompt_controls {
 	align-items: stretch;
 	flex-direction: column;
-	gap: 4px;
+	gap: 20px;
 }
 
 #exception_message #exception_dev_controls {
 	justify-content: center;
-	margin-top: 12px;
+	margin-top: 20px;
 }
 
 #exception_message .message_dialog_control button {
 	box-sizing: border-box;
 	flex: none;
 	left: auto;
-	margin: 2px 0 10px;
+	margin: 0;
 	min-width: 0;
+	padding: 12px 18px;
 	position: static;
 	width: 100%;
 }
 
 #exception_message .exception_support_copy {
+	align-items: baseline;
 	color: #999999;
+	display: flex;
+	flex-wrap: nowrap;
 	font-family: Abel, sans-serif;
+	gap: 0.45em;
+	justify-content: center;
 	margin: 4px 0 0;
 	text-align: center;
+	white-space: nowrap;
 }
 
 #exception_message .message_dialog_control .exception_support_link {
-	align-items: center;
-	align-self: center;
-	box-sizing: border-box;
+	align-items: baseline;
 	color: #69B7CF;
-	display: inline-flex;
+	display: inline;
 	flex: none;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 	font-size: larger;
-	justify-content: center;
 	left: auto;
-	margin: 0 0 10px;
+	margin: 0;
 	min-width: 0;
-	padding: 4px 14px 8px;
+	overflow-wrap: normal;
+	padding: 0;
 	position: static;
-	text-align: center;
 	text-decoration: none;
+	white-space: nowrap;
 	width: auto;
-	word-break: break-word;
+	word-break: normal;
+}
+
+.overlay > div:has(#exception_message:not(.hide)) {
+	box-sizing: border-box;
+	max-width: calc(100vw - 24px);
+	width: min(36rem, calc(100vw - 24px));
 }
 
 #exception_message.exception_log_open {

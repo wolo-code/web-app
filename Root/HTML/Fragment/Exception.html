@@ -7,8 +7,7 @@
 	<div class='message_dialog_body'>
 		<div id='exception_prompt_controls' class="center message_dialog_control">
 			<button id='exception_message_reload' class="border dialog_message_primary" type='button'>Clear cache &amp; reload</button>
-			<p class='exception_support_copy'>You may contact our support team.</p>
-			<?php echo renderMailLink('support', 'wolo.codes', array('id' => 'exception_message_support', 'class' => 'link exception_support_link', 'subject' => 'Wolo web app crash')); ?>
+			<p class='exception_support_copy'>You may contact our support team. <?php echo renderMailLink('support', 'wolo.codes', array('id' => 'exception_message_support', 'class' => 'link exception_support_link', 'subject' => 'Wolo web app crash')); ?></p>
 		</div>
 		<pre id='exception_log' class='exception_log hide'></pre>
 		<div id='exception_dev_controls' class="center message_dialog_control hide">

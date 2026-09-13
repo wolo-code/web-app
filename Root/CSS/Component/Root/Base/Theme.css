@@ -322,8 +322,13 @@ html.dark-mode #decode_input_button.active {
 	color: #69B7CF;
 }
 
+html.dark-mode body:not(.decode).decode-icon-guide #pac-input {
+	background-color: #fff;
+	color: #333;
+}
+
 html.dark-mode body:not(.decode).decode-icon-guide #decode_button {
-	background-color: #222244;
+	background-color: #fff;
 	color: #69B7CF;
 }
 

@@ -224,15 +224,24 @@ body:not(.decode).decode-icon-guide #map_search_bar {
 }
 
 body:not(.decode).decode-icon-guide #pac-input {
+	background-color: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 2px #69B7CF;
+	color: #333;
 	opacity: 1;
+}
+
+body:not(.decode).decode-icon-guide #search_icon path:first-child {
+	fill: #69B7CF;
 }
 
 body:not(.decode).decode-icon-guide #decode_button {
 	background-color: #fff;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), 0 0 0 2px #69B7CF;
 	color: #69B7CF;
 }
 
 body:not(.decode).decode-icon-guide #decode_button .proceed_button_shape {
+	fill: #69B7CF;
 	opacity: 1;
 }
 

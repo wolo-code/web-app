@@ -407,8 +407,9 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /#map_icon_guide_dim/);
 	assert.match(decodeCss, /:has\(#map_search_bar\)/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
-	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*opacity:\s*1/);
-	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff[\s\S]*opacity:\s*1/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);
+	assert.match(decodeCss, /0 0 0 2px #69B7CF/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #decode_icon_guide_scrim/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #map_icon_guide_dim/);
 	assert.match(decodeCss, /--app-background-wcode/);

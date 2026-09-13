@@ -10,6 +10,14 @@
 			<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 		</a>
 	</div>
+<?php
+	$appVersionShort = formatAppVersionShort($config);
+	$appVersionFull = formatAppVersion($config);
+	$appVersionShortLabel = 'v' . $appVersionShort;
+	$appVersionFullLabel = 'v' . $appVersionFull;
+	$appUpdatedUtc = date('Y M d H:i:s') . ' UTC';
+?>
+	<button type='button' id='info_version_indicator' class='info_version_toggle' data-version-short='<?php echo htmlspecialchars($appVersionShortLabel, ENT_QUOTES, 'UTF-8') ?>' data-version-full='<?php echo htmlspecialchars($appVersionFullLabel, ENT_QUOTES, 'UTF-8') ?>' data-updated='<?php echo htmlspecialchars($appUpdatedUtc, ENT_QUOTES, 'UTF-8') ?>' aria-expanded='false' aria-label='Version'><span class='info_version_text'><?php echo htmlspecialchars($appVersionShortLabel, ENT_QUOTES, 'UTF-8') ?></span><span class='info_version_stamp' hidden></span></button>
 	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
 	<?php
 		require '../../HTML/Fragment/Info_intro.php';

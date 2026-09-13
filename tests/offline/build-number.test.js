@@ -42,22 +42,23 @@ test('Vars.tsv has a numeric build row', () => {
 	assert.ok(Number.parseInt(match[1], 10) >= 1);
 });
 
-test('Info modal omits version number and updated timestamp', () => {
+test('Info corner version is restored and credits modal omits version details', () => {
 	const info = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info.php'), 'utf8');
 	const links = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info_links.php'), 'utf8');
 	const infoJs = fs.readFileSync(path.join(repoRoot, 'Root', 'JS', 'Component', 'Root', 'Info.js'), 'utf8');
 	const rootJs = fs.readFileSync(path.join(repoRoot, 'Root', 'JS', 'Component', 'Root', 'Script.js'), 'utf8');
-	assert.doesNotMatch(info, /info_version_indicator/);
-	assert.doesNotMatch(info, /\$appVersion/);
+	const infoCss = fs.readFileSync(path.join(repoRoot, 'Root', 'CSS', 'Component', 'Root', 'Base', 'Info.css'), 'utf8');
+	assert.match(info, /info_version_indicator/);
+	assert.match(info, /\$appVersionShortLabel/);
+	assert.match(info, /data-updated/);
 	assert.doesNotMatch(links, /software_info/);
 	assert.doesNotMatch(links, /info_version_value/);
 	assert.doesNotMatch(links, /updated-timestamp/);
-	assert.doesNotMatch(infoJs, /toggleInfoVersionDisplay/);
-	assert.doesNotMatch(rootJs, /info_version_indicator/);
+	assert.match(infoJs, /function toggleInfoVersionDisplay/);
+	assert.match(rootJs, /info_version_indicator/);
 	assert.doesNotMatch(rootJs, /info_version_value/);
-	assert.doesNotMatch(rootJs, /toggleInfoVersionDisplay/);
 	assert.match(info, /id='info_show_icon_labels'/);
 	assert.match(info, /show guide/);
-	const infoCss = fs.readFileSync(path.join(repoRoot, 'Root', 'CSS', 'Component', 'Root', 'Base', 'Info.css'), 'utf8');
 	assert.match(infoCss, /#info_links:not\(\.hide\)\s*~\s*#info_show_icon_labels/);
+	assert.match(infoCss, /#info_message:has\(#info_links:not\(\.hide\)\)\s*#info_version_indicator/);
 });

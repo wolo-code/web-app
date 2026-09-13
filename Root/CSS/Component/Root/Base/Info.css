@@ -96,6 +96,39 @@
 	display: none;
 }
 
+#info_version_indicator {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	-webkit-appearance: none;
+	appearance: none;
+	align-items: flex-end;
+	background: transparent;
+	border: none;
+	color: #bbbbbb;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	font-family: Abel, sans-serif;
+	font-size: 0.78em;
+	gap: 3px;
+	line-height: 1.15;
+	margin: 0;
+	max-width: calc(100% - 132px);
+	padding: 0;
+	text-align: right;
+}
+
+#info_message:has(#info_links:not(.hide)) #info_version_indicator {
+	display: none;
+}
+
+#info_version_indicator .info_version_stamp {
+	font-size: 0.86em;
+	font-weight: normal;
+	white-space: nowrap;
+}
+
 #info_intro {
 	margin: 30% 6%;
 }

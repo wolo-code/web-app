@@ -46,12 +46,16 @@ test('Info modal omits version number and updated timestamp', () => {
 	const info = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info.php'), 'utf8');
 	const links = fs.readFileSync(path.join(repoRoot, 'Root', 'HTML', 'Fragment', 'Info_links.php'), 'utf8');
 	const infoJs = fs.readFileSync(path.join(repoRoot, 'Root', 'JS', 'Component', 'Root', 'Info.js'), 'utf8');
+	const rootJs = fs.readFileSync(path.join(repoRoot, 'Root', 'JS', 'Component', 'Root', 'Script.js'), 'utf8');
 	assert.doesNotMatch(info, /info_version_indicator/);
 	assert.doesNotMatch(info, /\$appVersion/);
 	assert.doesNotMatch(links, /software_info/);
 	assert.doesNotMatch(links, /info_version_value/);
 	assert.doesNotMatch(links, /updated-timestamp/);
 	assert.doesNotMatch(infoJs, /toggleInfoVersionDisplay/);
+	assert.doesNotMatch(rootJs, /info_version_indicator/);
+	assert.doesNotMatch(rootJs, /info_version_value/);
+	assert.doesNotMatch(rootJs, /toggleInfoVersionDisplay/);
 	assert.match(info, /id='info_show_icon_labels'/);
 	assert.match(info, /show guide/);
 });

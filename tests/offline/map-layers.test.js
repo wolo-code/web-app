@@ -12,11 +12,40 @@ function read(filePath) {
 	return fs.readFileSync(path.join(repoRoot, filePath), 'utf8');
 }
 
-test('map layer module defines OSM tile endpoint and layer helpers', () => {
+test('OSM high zoom falls back when tiles are missing', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
-	assert.match(mapLayers, /MAP_LAYER_OSM/);
-	assert.match(mapLayers, /tile\.openstreetmap\.org/);
-	assert.match(mapLayers, /function setMapLayer/);
+	const focusJs = read('Root/JS/Component/Root/Focus.js');
+	assert.match(mapLayers, /OSM_NATIVE_MAX_ZOOM = 19/);
+	assert.match(mapLayers, /OSM_MAP_DATA_UNAVAILABLE_MESSAGE = 'Map data not yet available'/);
+	assert.match(mapLayers, /function getOsmFallbackZoom/);
+	assert.match(mapLayers, /function scheduleOsmZoomFallback/);
+	assert.match(mapLayers, /function watchOsmZoomFallback/);
+	assert.match(mapLayers, /bindOsmTileNode/);
+	assert.match(mapLayers, /zoom > OSM_NATIVE_MAX_ZOOM/);
+	assert.match(focusJs, /getActiveMapTypeMaxZoom/);
+	assert.match(focusJs, /OSM_NATIVE_MAX_ZOOM/);
+	assert.doesNotMatch(focusJs, /notifyOsmMapDataUnavailable/);
+	assert.match(mapLayers, /if\(tilesMissing\)\s*notifyOsmMapDataUnavailable/);
+});
+
+function loadOsmZoomFallbackApi() {
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	const start = mapLayers.indexOf('function getOsmFallbackZoom(');
+	const end = mapLayers.indexOf('function getActiveMapTypeMaxZoom(');
+	const sandbox = {
+		OSM_ZOOM_FALLBACK_MIN: 1
+	};
+	vm.createContext(sandbox);
+	vm.runInContext(mapLayers.slice(start, end), sandbox);
+	return sandbox;
+}
+
+test('getOsmFallbackZoom steps back to native max or previous zoom', () => {
+	const api = loadOsmZoomFallbackApi();
+	assert.equal(api.getOsmFallbackZoom(24, 19, false), 19);
+	assert.equal(api.getOsmFallbackZoom(19, 19, false), 19);
+	assert.equal(api.getOsmFallbackZoom(19, 19, true), 18);
+	assert.equal(api.getOsmFallbackZoom(1, 19, true), 1);
 });
 
 test('ensureMapViewForLocation leaves decode view for map layers', () => {
@@ -148,6 +177,7 @@ test('profile menu can affix google, osm, apple, esri, and microsoft map sources
 	assert.match(selector, /data-map-source='microsoft'/);
 	assert.match(selector, /map-source-toggle/);
 	assert.match(selector, /map-source-default/);
+	assert.match(mapLayers, /map-source-row-default/);
 	assert.match(mapLayers, /MAP_SOURCE_STATE_DEFAULT/);
 	assert.match(mapLayers, /MAP_SOURCE_STATE_ON/);
 	assert.match(mapLayers, /MAP_SOURCE_STATE_OFF/);
@@ -280,6 +310,8 @@ test('theme selector shows labels on hover', () => {
 	assert.match(themeCss, /\.theme-option:hover \.theme-option-label/);
 	assert.match(themeCss, /\.theme-option:hover \.theme-option-icon/);
 	assert.match(themeCss, /height:\s*18px/);
+	assert.match(themeCss, /\.theme-option-active \.theme-option-label \{[\s\S]*color:\s*#69B7CF/);
+	assert.match(themeCss, /\.map-source-row-default \.map-source-label \{[\s\S]*color:\s*#69B7CF/);
 });
 
 test('non-Google map views hide Google branding and keep Apple Maps transparent', () => {
@@ -302,6 +334,8 @@ test('chrome controls include native tooltips', () => {
 test('Wolo Code Input View has first-launch icon captions', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
+	const infoFull = read('Root/HTML/Fragment/Info_full.php');
+	const infoJs = read('Root/JS/Component/Root/Info.js');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
 	assert.match(index, /class='decode_icon_caption'[\s\S]*IP city/);
@@ -311,8 +345,33 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Info/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Locate/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Map/);
+	assert.match(index, /id='decode_icon_guide_scrim'/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
+	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
+	assert.match(guideJs, /DECODE_ICON_GUIDE_DISMISS_GRACE_MS/);
 	assert.match(guideJs, /wolo-decode-icon-guide-launches/);
+	assert.match(guideJs, /fadeDecodeIconGuide/);
+	assert.match(guideJs, /decodeIconGuideConsumed = true/);
+	assert.match(guideJs, /recordDecodeIconGuideLaunch/);
+	assert.match(guideJs, /function requestDecodeIconGuide/);
+	assert.match(infoFull, /id='info_show_icon_labels'/);
+	assert.match(infoJs, /function showInfoIconGuide/);
+	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
 	assert.match(decodeCss, /\.decode\.decode-icon-guide \.decode_icon_caption/);
-	assert.match(decodeNarrowCss, /:has\(#notification_bottom:not\(\.hide\)\) #decode_input_container/);
+	assert.match(decodeNarrowCss, /max-width:\s*662px/);
+});
+
+test('unexpected error dialog uses equal-width actions without an info toggle', () => {
+	const exceptionHtml = read('Root/HTML/Fragment/Exception.html');
+	const baseScript = read('Root/JS/Base/Script.js');
+	const dialogCss = read('Root/CSS/Base/Message_dialog.css');
+	assert.match(exceptionHtml, /Error occured!/);
+	assert.doesNotMatch(exceptionHtml, /Unexpected Error/);
+	assert.doesNotMatch(exceptionHtml, /id='exception_log_toggle'/);
+	assert.doesNotMatch(exceptionHtml, />i</);
+	assert.doesNotMatch(baseScript, /addLongpressListener\(toggle/);
+	assert.match(dialogCss, /#exception_message \.message_dialog_control button/);
+	assert.match(dialogCss, /width:\s*168px/);
+	assert.match(dialogCss, /min-width:\s*168px/);
+	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
 });

@@ -49,17 +49,22 @@ function initApp() {
 
 function signedIn() {
 	document.getElementById('account_default_image').classList.remove('inactive');
-	document.getElementById('account_dialog_logout').classList.remove('hide');
 	document.getElementById('account_dialog_display_name').innerText = firebase.auth().currentUser.displayName;
 	document.getElementById('account_dialog_email').innerText = firebase.auth().currentUser.email;
 	if(typeof firebase.auth().currentUser.photoURL != 'undefined' && firebase.auth().currentUser.photoURL != null && firebase.auth().currentUser.photoURL.length) {
 		document.getElementById('account_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
 		document.getElementById('account_user_image').classList.remove('hide');
 		document.getElementById('account_default_image').classList.add('hide');
+		document.getElementById('account_dialog_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
+		document.getElementById('account_dialog_user_image').classList.remove('hide');
+		document.getElementById('account_dialog_default_image').classList.add('hide');
 	}
 	else {
 		document.getElementById('account_default_image').classList.remove('inactive');
 		document.getElementById('account_default_image').classList.remove('hide');
+		document.getElementById('account_dialog_user_image').classList.add('hide');
+		document.getElementById('account_dialog_user_image').setAttribute('src', 'data:,');
+		document.getElementById('account_dialog_default_image').classList.remove('hide');
 	}
 	loadSaveList();
 }
@@ -86,12 +91,20 @@ function syncBottomStackMapPan() {
 	if(typeof map == 'undefined' || !map) {
 		return;
 	}
+	if(typeof isAppOverlayOpen == 'function' && isAppOverlayOpen()) {
+		if(typeof layoutBottomNotification == 'function')
+			layoutBottomNotification();
+		return;
+	}
 	var next = getBottomStackHeight();
 	var delta = next - lastBottomStackPanY;
 	if(delta) {
-		map.panBy(0, -delta);
+		if(!programmaticMapFocus)
+			map.panBy(0, -delta);
 		lastBottomStackPanY = next;
 	}
+	if(typeof layoutBottomNotification == 'function')
+		layoutBottomNotification();
 }
 
 function initBottomStackMapPan() {
@@ -108,19 +121,50 @@ function initBottomStackMapPan() {
 	window.addEventListener('resize', syncBottomStackMapPan);
 }
 
+function showInfoIconGuide(event) {
+	if(event && event.preventDefault)
+		event.preventDefault();
+	closeInfo();
+	if(typeof requestDecodeIconGuide == 'function')
+		requestDecodeIconGuide();
+	else if(typeof startDecodeIconGuide == 'function')
+		startDecodeIconGuide(true);
+}
+
 function setupControls() {
 	initBottomStackMapPan();
 	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
-	document.getElementById('account').addEventListener('click', showAccountDialog);
 	document.getElementById('authentication_header_close').addEventListener('click', hideAuthenticationDialog);
 	document.getElementById('account_dialog_close').addEventListener('click', hideAccountDialog);
 	document.getElementById('account').addEventListener('click', onAccount);
-	document.getElementById('account_dialog_logout').addEventListener('click', onLogout);
+	document.getElementById('account_dialog_logout_button').addEventListener('click', onLogout);
 	document.getElementById('save_address').addEventListener('focus', onAccountDialogAddressActive);
-	document.getElementById('account_dialog_save').addEventListener('click', onAccountDialogSave);
+	document.getElementById('account_dialog_cancel_button').addEventListener('click', onAccountDialogCancel);
+	document.getElementById('account_dialog_save_button').addEventListener('click', onAccountDialogSave);
+	document.getElementById('account_dialog_add_toggle').addEventListener('click', toggleAccountDialogAdd);
+	document.getElementById('account_dialog_saves_hit').addEventListener('click', toggleAccountDialogSaves);
+	document.getElementById('account_dialog_row_edit').addEventListener('click', editSaveEntry);
+	document.getElementById('account_dialog_row_delete').addEventListener('click', deleteSaveEntry);
+	document.getElementById('account_dialog_row_menu').addEventListener('click', function(event) {
+		if(event && event.stopPropagation)
+			event.stopPropagation();
+	});
+	document.addEventListener('click', function(event) {
+		if(event && event.target && (event.target.closest('.row-menu-toggle') || event.target.closest('#account_dialog_row_menu')))
+			return;
+		closeSaveEntryMenus();
+	});
+	document.addEventListener('keydown', function(event) {
+		if(event.key === 'Escape')
+			closeSaveEntryMenus();
+	});
+	var saveListInner = document.querySelector('#account_dialog_save_list_container > .account_dialog_fold_inner');
+	if(saveListInner)
+		saveListInner.addEventListener('scroll', closeSaveEntryMenus);
 	document.getElementById('info_message_close').addEventListener('click', closeInfo);
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
+	document.getElementById('info_show_icon_labels').addEventListener('click', showInfoIconGuide);
 	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
 	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);
 	document.getElementById('action_menu_decode').addEventListener('click', toggleDecodeViewFromActionMenu);
@@ -153,8 +197,11 @@ function setupControls() {
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
 	document.getElementById('qr_close').addEventListener('click', closeQR);
+	document.getElementById('overlay').addEventListener('click', onQROverlayClick);
+	document.getElementById('qr_save').addEventListener('click', onQRDialogSave);
 	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
 	document.getElementById('qr_print').addEventListener('click', printQR);
+	document.getElementById('qr_download').addEventListener('click', downloadQR);
 	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
 	document.getElementById('decode_input').addEventListener('input', resizeInput);
 	if(typeof syncProceedButtons == 'function') {
@@ -165,11 +212,8 @@ function setupControls() {
 	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
 	if(typeof initDecodeCityHistoryDeleteControls == 'function')
 		initDecodeCityHistoryDeleteControls();
-	if(typeof initDecodeIconGuide == 'function')
-		initDecodeIconGuide();
 	document.getElementById('external_close').addEventListener('click', external_close);
 	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
-	addLongpressListener(document.getElementById('qr_download'), downloadQR, onQRDialogSave);
 	var logo = document.getElementById('logo');
 	if(logo && typeof clearCacheAndReload == 'function') {
 		logo.setAttribute('title', 'Press and hold to clear cache and reload');
@@ -179,7 +223,11 @@ function setupControls() {
 			clearCacheAndReload();
 		});
 	}
+	if(typeof recordDecodeIconGuideLaunch == 'function')
+		recordDecodeIconGuideLaunch();
 	closeActionMenu();
+	if(typeof initDecodeIconGuide == 'function')
+		initDecodeIconGuide();
 }
 
 if(typeof initLoad !== 'undefined')

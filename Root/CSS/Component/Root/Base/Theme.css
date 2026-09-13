@@ -5,7 +5,7 @@
 
 .theme-selector {
 	display: flex;
-	gap: 6px;
+	gap: 10px;
 	margin-top: 6px;
 }
 
@@ -57,20 +57,39 @@
 .theme-selector .theme-option:focus-visible {
 	background: #ebebeb;
 	border-color: #d0d0d0;
-	color: #69B7CF;
+	color: #555;
 	outline: none;
 }
 
 .theme-selector .theme-option-active {
 	background: #f4f4f4;
 	border-color: #e0e0e0;
+	color: #444;
+}
+
+.theme-selector .theme-option-active .theme-option-label {
 	color: #69B7CF;
+	height: 1.2em;
+	margin-top: 4px;
+	max-height: 1.2em;
+	opacity: 1;
+}
+
+.theme-selector .theme-option-active .theme-option-icon,
+.theme-selector .theme-option-active .theme-option-icon svg {
+	height: 18px;
+	width: 18px;
 }
 
 .theme-selector .theme-option-active:hover,
 .theme-selector .theme-option-active:focus-visible {
 	background: #ebebeb;
 	border-color: #d0d0d0;
+	color: #444;
+}
+
+.theme-selector .theme-option-active:hover .theme-option-label,
+.theme-selector .theme-option-active:focus-visible .theme-option-label {
 	color: #69B7CF;
 }
 
@@ -79,6 +98,7 @@
 	flex-direction: column;
 	gap: 8px;
 	margin-top: 10px;
+	padding-bottom: 12px;
 }
 
 .map-source-row {
@@ -92,6 +112,10 @@
 	color: #777;
 	font-family: 'Roboto Condensed', Abel, sans-serif;
 	font-size: 0.9em;
+}
+
+.map-source-row-default .map-source-label {
+	color: #69B7CF;
 }
 
 .map-source-controls {
@@ -180,14 +204,14 @@
 	pointer-events: none;
 }
 
-.map-source-selector:hover .map-source-default:not(:disabled),
-.map-source-selector:focus-within .map-source-default:not(:disabled) {
+.map-source-row:hover .map-source-default:not(.map-source-default-active):not(:disabled),
+.map-source-row:focus-within .map-source-default:not(.map-source-default-active):not(:disabled) {
 	opacity: 1;
 	pointer-events: auto;
 }
 
-.map-source-selector:hover .map-source-default:disabled,
-.map-source-selector:focus-within .map-source-default:disabled {
+.map-source-row:hover .map-source-default:disabled,
+.map-source-row:focus-within .map-source-default:disabled {
 	opacity: 0;
 	pointer-events: none;
 }
@@ -314,9 +338,13 @@ html.dark-mode #decode_map_view_button svg {
 	background-color: rgb(34 34 68 / 70%);
 }
 
+html.dark-mode #logo_surface,
+html.dark-mode #logo.plain_background #logo_surface,
 html.dark-mode .decode #logo_surface,
 html.dark-mode .decode #logo.plain_background #logo_surface {
-	background-color: rgb(34 34 68 / 10%);
+	background: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
 }
 
 html.dark-mode #map gmp-internal-camera-control > button,
@@ -354,6 +382,11 @@ html.dark-mode #address_text {
 	color: #d0d0d0;
 }
 
+html.dark-mode #address_text_title {
+	color: #f2f2f2;
+}
+
+html.dark-mode #address_text_segment,
 html.dark-mode #address_text_content {
 	color: #c8c8d8;
 }
@@ -397,6 +430,23 @@ html.dark-mode #info_message {
 	color: #b8b8b8;
 }
 
+html.dark-mode #info_message {
+	border-color: transparent;
+}
+
+html.dark-mode #logo_info > a {
+	border-color: transparent;
+}
+
+html.dark-mode #info_show_icon_labels {
+	color: #69B7CF;
+}
+
+html.dark-mode #info_show_icon_labels:hover,
+html.dark-mode #info_show_icon_labels:focus-visible {
+	color: #c5e6ef;
+}
+
 html.dark-mode .message_dialog_label,
 html.dark-mode .overlay h3,
 html.dark-mode .dialog-sub-label {
@@ -428,10 +478,37 @@ html.dark-mode #invalid_code_message .invalid_code_actions button svg {
 	color: #ffffff;
 }
 
-html.dark-mode #account_dialog_save button,
-html.dark-mode #account_dialog_logout button {
+html.dark-mode #account_dialog_logout_button {
 	background: transparent;
 	box-shadow: none;
+	color: #69B7CF;
+}
+
+html.dark-mode #account_dialog_avatar {
+	background: rgb(34 34 68 / 70%);
+}
+
+html.dark-mode .account_dialog_heading_action {
+	background: transparent;
+}
+
+html.dark-mode #account_dialog_add_toggle[aria-expanded='true'] {
+	background: #2a2a4a;
+}
+
+html.dark-mode #account_dialog_cancel button,
+html.dark-mode #account_dialog_save button {
+	background: transparent;
+	box-shadow: none;
+}
+
+html.dark-mode .row-menu-toggle {
+	background: #69B7CF;
+	color: #ffffff;
+}
+
+html.dark-mode .row-menu-toggle circle {
+	fill: #ffffff;
 }
 
 html.dark-mode #save_title_main,
@@ -440,6 +517,23 @@ html.dark-mode #save_address {
 	background-color: #222244;
 	border-color: #33335a;
 	color: #aaa;
+}
+
+html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner {
+	scrollbar-color: #4a4a68 #222244;
+}
+
+html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar,
+html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-track {
+	background: #222244;
+}
+
+html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb {
+	background: #4a4a68;
+}
+
+html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb:hover {
+	background: #6a6a8a;
 }
 
 html.dark-mode .hr-separator {
@@ -458,6 +552,20 @@ html.dark-mode .row-address {
 
 html.dark-mode #account_dialog_save_list_end {
 	color: #555;
+}
+
+html.dark-mode #account_dialog_row_menu {
+	background: #2a2a4a;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+html.dark-mode #account_dialog_row_menu button {
+	color: #69B7CF;
+}
+
+html.dark-mode #account_dialog_row_menu button:hover,
+html.dark-mode #account_dialog_row_menu button:focus-visible {
+	background: #4a4a68;
 }
 
 html.dark-mode .theme-selector .theme-option {
@@ -486,8 +594,18 @@ html.dark-mode .theme-selector .theme-option-active:focus-visible {
 	color: #f2f2f2;
 }
 
+html.dark-mode .theme-selector .theme-option-active .theme-option-label,
+html.dark-mode .theme-selector .theme-option-active:hover .theme-option-label,
+html.dark-mode .theme-selector .theme-option-active:focus-visible .theme-option-label {
+	color: #69B7CF;
+}
+
 html.dark-mode .map-source-label {
 	color: #aaa;
+}
+
+html.dark-mode .map-source-row-default .map-source-label {
+	color: #69B7CF;
 }
 
 html.dark-mode .map-source-toggle,
@@ -512,8 +630,8 @@ html.dark-mode .map-source-default:disabled {
 	opacity: 0;
 }
 
-html.dark-mode .map-source-selector:hover .map-source-default:disabled,
-html.dark-mode .map-source-selector:focus-within .map-source-default:disabled {
+html.dark-mode .map-source-row:hover .map-source-default:disabled,
+html.dark-mode .map-source-row:focus-within .map-source-default:disabled {
 	opacity: 0;
 }
 
@@ -534,11 +652,6 @@ html.dark-mode .exception_log {
 	background: #1a1a2e;
 	border-color: #33335a;
 	color: #aaa;
-}
-
-html.dark-mode .exception_log_toggle {
-	background: #2a2a4a;
-	border-color: #33335a;
 }
 
 html.dark-mode #wcode_format > span {

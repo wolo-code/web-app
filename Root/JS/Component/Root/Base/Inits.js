@@ -93,6 +93,7 @@ var mode_preview_activated = false;
 var NOTIFICATION_DURATION_DEFAULT = 2500;
 var NOTIFICATION_DURATION_LONG = 10000;
 var lastBottomStackPanY = 0;
+var programmaticMapFocus = false;
 
 // Account Dialog
 var saveList;

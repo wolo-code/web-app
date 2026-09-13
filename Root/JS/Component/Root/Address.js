@@ -76,6 +76,8 @@ function showAddress() {
 		setAddressPanelHeading(current_title, current_segment);
 	address_text_content.innerText = address || '';
 	refreshAddressCodes();
+	if(typeof syncAddressQRButtons == 'function')
+		syncAddressQRButtons();
 	address_text.classList.remove('hide');
 }
 
@@ -84,6 +86,8 @@ function hideAddress() {
 	setAddressPanelHeading('', '');
 	address_text_content.innerText = '';
 	clearAddressCodeRows();
+	if(typeof syncAddressQRButtons == 'function')
+		syncAddressQRButtons();
 	address_text.classList.add('hide');
 }
 
@@ -93,12 +97,16 @@ function clearAddress() {
 	code_plus_code = null;
 	address_text_content.innerText = '';
 	clearAddressCodeRows();
+	if(typeof syncAddressQRButtons == 'function')
+		syncAddressQRButtons();
 }
 
 function refreshAddress() {
 	address_text_content.innerText = address;
 	external_address.innerText = address;
 	refreshAddressCodes();
+	if(typeof syncAddressQRButtons == 'function')
+		syncAddressQRButtons();
 }
 
 function refreshAddressCodes() {

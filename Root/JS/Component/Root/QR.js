@@ -38,6 +38,8 @@ function isQROverlayDismissTarget(target) {
 function onQROverlayClick(event) {
 	if(event && isQROverlayDismissTarget(event.target))
 		closeQR();
+	if(event && typeof isCodeQROverlayDismissTarget == 'function' && isCodeQROverlayDismissTarget(event.target))
+		closeCodeQR();
 }
 
 function closeQR() {

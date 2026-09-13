@@ -407,6 +407,18 @@ html.dark-mode .address_text_code_value {
 	color: #f2f2f2;
 }
 
+html.dark-mode .address_qr_button {
+	color: #69B7CF;
+}
+
+html.dark-mode #code_qr_image {
+	background: #ffffff;
+}
+
+html.dark-mode #code_qr_value {
+	color: #f2f2f2;
+}
+
 html.dark-mode .map_attribution {
 	background-color: rgb(34 34 68 / 70%);
 	color: #c8d8c8;

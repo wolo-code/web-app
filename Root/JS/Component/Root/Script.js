@@ -193,6 +193,10 @@ function setupControls() {
 	document.getElementById('address_text_plus').addEventListener('click', function(event) {
 		copyPlusCode(event);
 	});
+	var qrButtons = document.querySelectorAll('.address_qr_button');
+	for(var i = 0; i < qrButtons.length; i++)
+		qrButtons[i].addEventListener('click', onCodeQRButtonClick);
+	document.getElementById('code_qr_close').addEventListener('click', closeCodeQR);
 	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
 	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
 	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);

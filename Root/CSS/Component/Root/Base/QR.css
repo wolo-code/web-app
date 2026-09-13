@@ -179,3 +179,30 @@
 	right: auto;
 	top: 10px;
 }
+
+#code_qr_message {
+	min-width: 260px;
+}
+
+#code_qr_image {
+	background: #ffffff;
+	border-radius: 8px;
+	margin: 0 auto 12px;
+	max-width: 220px;
+	padding: 8px;
+}
+
+#code_qr_image svg {
+	display: block;
+	height: auto;
+	width: 100%;
+}
+
+#code_qr_value {
+	color: #444444;
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.95em;
+	letter-spacing: 0.02em;
+	text-align: center;
+	word-break: break-word;
+}

@@ -16,6 +16,7 @@ const DEFAULT_ASSETS = [
 	'/console.js',
 	'/geofire.min.js',
 	'/html2canvas.min.js',
+	'/qrcode.min.js',
 	'/sw.js',
 	'/precache-manifest.json',
 	'/manifest.json',

@@ -43,9 +43,13 @@
 }
 
 #address_text_caption {
+	align-items: center;
+	color: #69B7CF;
+	display: inline-flex;
 	font-family: 'Abel';
 	font-size: large;
-	color: #69B7CF;
+	gap: 6px;
+	justify-content: center;
 }
 
 #address_text_header {
@@ -92,7 +96,7 @@
 }
 
 .address_text_code_row {
-	align-items: baseline;
+	align-items: center;
 	display: flex;
 	gap: 12px;
 	justify-content: space-between;
@@ -100,13 +104,40 @@
 }
 
 .address_text_code_label {
+	align-items: center;
 	color: #69B7CF;
+	display: inline-flex;
 	flex: 0 0 auto;
 	font-family: 'Abel', sans-serif;
 	font-size: 0.85em;
+	gap: 6px;
 	letter-spacing: 0.04em;
 	text-align: left;
 	text-transform: uppercase;
+}
+
+.address_qr_button {
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	border: none;
+	color: #69B7CF;
+	cursor: pointer;
+	display: inline-flex;
+	flex: 0 0 auto;
+	height: 16px;
+	line-height: 0;
+	margin: 0;
+	padding: 0;
+	text-transform: none;
+	width: 16px;
+}
+
+.address_qr_button .image,
+.address_qr_button svg {
+	display: block;
+	height: 16px;
+	width: 16px;
 }
 
 .address_text_code_value {

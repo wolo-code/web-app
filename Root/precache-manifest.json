@@ -1,6 +1,6 @@
 {
   "version": "wolo-offline-v1",
-  "generatedAt": "2026-09-12T21:09:42.678Z",
+  "generatedAt": "2026-09-13T06:32:08.596Z",
   "assets": [
     "/",
     "/.well-known/assetlinks.json",
@@ -23,7 +23,8 @@
     "/manifest.json",
     "/offline-data/WordList.json",
     "/precache-manifest.json",
-    "/root-365373978.min.js",
+    "/qrcode.min.js",
+    "/root-132328167.min.js",
     "/root-deadbeef.min.js",
     "/root.js",
     "/social.png",

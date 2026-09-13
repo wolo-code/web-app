@@ -33,9 +33,8 @@
 }
 
 #address_text_main {
-	display: inline-block;
-	/* float: left; */
-	/* min-width: 89%; */
+	display: block;
+	width: 100%;
 }
 
 #address_text_label {
@@ -43,13 +42,9 @@
 }
 
 #address_text_caption {
-	align-items: center;
-	color: #69B7CF;
-	display: inline-flex;
 	font-family: 'Abel';
 	font-size: large;
-	gap: 6px;
-	justify-content: center;
+	color: #69B7CF;
 }
 
 #address_text_header {
@@ -78,14 +73,26 @@
 	display: none;
 }
 
+#address_text_body {
+	align-items: flex-end;
+	display: flex;
+	gap: 6px;
+	width: 100%;
+}
+
 #address_text_content {
 	display: block;
+	flex: 1 1 auto;
 	font-family: 'Roboto';
 	min-height: 48px;
-	max-width: 306px;
+	min-width: 0;
 	text-align: left;
 	padding: 6px 4px;
 	color: #888888;
+}
+
+#address_text_address_qr {
+	margin-bottom: 8px;
 }
 
 #address_text_codes {
@@ -104,16 +111,22 @@
 }
 
 .address_text_code_label {
-	align-items: center;
 	color: #69B7CF;
-	display: inline-flex;
 	flex: 0 0 auto;
 	font-family: 'Abel', sans-serif;
 	font-size: 0.85em;
-	gap: 6px;
 	letter-spacing: 0.04em;
 	text-align: left;
 	text-transform: uppercase;
+}
+
+.address_text_code_value_wrap {
+	align-items: center;
+	display: flex;
+	flex: 1 1 auto;
+	gap: 6px;
+	justify-content: flex-end;
+	min-width: 0;
 }
 
 .address_qr_button {
@@ -143,7 +156,7 @@
 .address_text_code_value {
 	color: #333333;
 	cursor: pointer;
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	font-family: 'Roboto', sans-serif;
 	font-size: 0.95em;
 	letter-spacing: 0.03em;

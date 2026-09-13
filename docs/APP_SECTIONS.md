@@ -105,7 +105,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | --- | --- | --- | --- | --- |
 | QR overlay dialog | QR Label View | `#qr_container` | Center overlay | Shows the printable/shareable Wolo Code label editor. Clicking the dimmed overlay outside the dialog closes it. |
 | QR title | QR Label Title | `#qr_container h2` | Top of QR Label View | Labels the dialog as `Label`. |
-| QR save control | QR Label Save Button | `#qr_save` | Top-left of QR Label View | `save` text that saves the current title, segment, and address for the signed-in user and confirms with `Address saved` above the overlay. |
+| QR save control | QR Label Save Button | `#qr_save` | Top-left of QR Label View | Address-book icon that saves the current title, segment, and address for the signed-in user and confirms with `Address saved` above the overlay. |
 | QR close control | QR Label Close Button | `#qr_close` | Top-right of QR Label View | Closes the QR label overlay. |
 | QR label surface | QR Label Surface | `#qr_label` | Main body of QR Label View | Contains the composed label preview. |
 | QR brand area | QR Label Brand | `#logo_qr`, `#logo_wolo_qr`, `#logo_codes_qr` | Top of QR Label Surface | Identifies the label as Wolo Code. |

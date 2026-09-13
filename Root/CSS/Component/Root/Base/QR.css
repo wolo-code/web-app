@@ -169,15 +169,19 @@
 
 #qr_save {
 	align-items: center;
-	color: #69B7CF;
 	cursor: pointer;
 	display: flex;
-	font-family: 'Roboto Condensed', Abel, sans-serif;
-	font-size: larger;
 	height: auto;
 	left: 20px;
 	right: auto;
 	top: 10px;
+}
+
+#qr_save .image,
+#qr_save svg {
+	display: block;
+	height: 22px;
+	width: 22px;
 }
 
 #code_qr_message {

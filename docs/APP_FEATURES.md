@@ -58,7 +58,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Copy Variants | `copyWcodeFull()`, `copyWcodeCode()`, `copyWcodeLink()`, `copyWcodeJumpLink()` | Supports copying full code, short code, link, and jump link variants. |
 | QR Label | `QR.php`, `showQR()`, `toggleQRpreview()`, `onQROverlayClick()` | Builds a printable/shareable Wolo Code label with title, segment, code, address, and app URL. Title and Segment fields hint with `e.g. Home` and `e.g. Main gate`. Clicking the dimmed overlay outside the dialog closes it. Preview uses the eye-only `Preview.svg` icon. |
 | Code QR | `Code_qr.php`, `showCodeQR()`, `.address_qr_button` | Overlay dialog that shows a QR for the Address Panel street address, DIGIPIN, or plus code. Clicking the dimmed overlay outside the dialog closes it. |
-| QR Save | `#qr_save`, `onQRDialogSave()` | Top-left `save` text on QR Label View persists title, segment, and address for the signed-in user. Success shows `Address saved` above the overlay without shifting the map. Reloading the saved list looks up city metadata quietly so a missing city id does not replace that confirmation with `City not found`. |
+| QR Save | `#qr_save`, `onQRDialogSave()`, `Save.svg` | Top-left address-book icon on QR Label View persists title, segment, and address for the signed-in user. Success shows `Address saved` above the overlay without shifting the map. Reloading the saved list looks up city metadata quietly so a missing city id does not replace that confirmation with `City not found`. |
 | QR Download | `qr_download`, `downloadQR()` | Downloads QR/label output. |
 | QR Print | `qr_print`, `printQR()` | Opens print-oriented QR label mode. |
 
@@ -105,6 +105,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `Proceed.svg` | Submit/proceed action for map and decode inputs, and Search map in the unrecognized-code dialog. |
 | `Reverse.svg` | Left-facing play triangle for Edit code in the unrecognized-code dialog. |
 | `Preview.svg` | Eye-only preview toggle on QR Label View. |
+| `Save.svg` | Address-book icon on QR Label View that saves the current label to the signed-in address book. |
 | `Plus.svg` | Expand the add-current-address form on Account Address Book View. |
 | `Caret.svg` | Expand or collapse the saved address list on Account Address Book View. |
 | `Logout.svg` | Sign out from Account Address Book View. |

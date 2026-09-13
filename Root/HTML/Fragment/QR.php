@@ -3,7 +3,9 @@
 	<h2 class='message_dialog_label section-to-not-print'>
 		Label
 	</h2>
-	<div id='qr_save' class="message_dialog_close message_dialog_leading_action control section-to-not-print" title='Save' aria-label='Save'>save</div>
+	<div id='qr_save' class="message_dialog_close message_dialog_leading_action control section-to-not-print" title='Save to address book' aria-label='Save to address book'>
+		<span class='image'><?php includeSVG('', 'Save'); ?></span>
+	</div>
 	<div id='qr_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>

@@ -10,7 +10,17 @@ function getVisibleOverlayDialog() {
 }
 
 function isBlockingOverlayDialog(dialog) {
-	return !!(dialog && dialog.id === 'exception_message');
+	var intro;
+	if(!dialog)
+		return false;
+	if(dialog.id === 'exception_message')
+		return true;
+	if(dialog.id === 'info_message') {
+		intro = document.getElementById('info_intro');
+		if(intro && !intro.classList.contains('hide'))
+			return true;
+	}
+	return false;
 }
 
 function isOverlayBackdropTarget(target) {

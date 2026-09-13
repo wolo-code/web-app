@@ -1,14 +1,14 @@
 var DECODE_ICON_GUIDE_STORAGE_KEY = 'wolo-decode-icon-guide-launches';
 var MAP_ICON_GUIDE_STORAGE_KEY = 'wolo-map-icon-guide-launches';
 var DECODE_ICON_GUIDE_MAX_LAUNCHES = 2;
-var DECODE_ICON_GUIDE_HOLD_MS = 3000;
+var DECODE_ICON_GUIDE_HOLD_MS = getDecodeIconGuideHoldMs();
 var DECODE_ICON_GUIDE_FADE_MS = 400;
 var DECODE_ICON_GUIDE_DISMISS_GRACE_MS = 700;
 var DECODE_ICON_GUIDE_MIN_TOP = 56;
 var DECODE_ICON_GUIDE_STACK_GAP = 12;
 var MAP_INFOCARD_CALLOUT_START_GAP = 8;
 var MAP_INFOCARD_CALLOUT_END_GAP = 14;
-var MAP_ICON_GUIDE_REPLAY_HINT = 'You can open this guide again from Info (i), then Show guide.';
+var MAP_ICON_GUIDE_REPLAY_HINT = "You can view the guide again from Info button -> 'Show guide'";
 var MAP_ICON_GUIDE_REPLAY_HINT_MS = 5000;
 var decodeIconGuideVisible = false;
 var decodeIconGuideConsumed = false;
@@ -25,6 +25,29 @@ var decodeIconGuidePinnedCaptions = [];
 var decodeIconGuideSearchHome = null;
 var decodeIconGuideReplayHint = false;
 var decodeIconGuideShownOnDecode = false;
+var decodeIconGuideAwaitingIntro = false;
+
+function getDecodeIconGuideHoldMs() {
+	if(typeof WOLO_ICON_GUIDE_TIMEOUT_MS === 'number' && WOLO_ICON_GUIDE_TIMEOUT_MS > 0)
+		return WOLO_ICON_GUIDE_TIMEOUT_MS;
+	return 4000;
+}
+
+function markDecodeIconGuideAwaitingIntro() {
+	decodeIconGuideAwaitingIntro = true;
+	if(decodeIconGuideVisible)
+		hideDecodeIconGuide();
+}
+
+function clearDecodeIconGuideAwaitingIntro() {
+	decodeIconGuideAwaitingIntro = false;
+}
+
+function isInfoIntroOpen() {
+	var overlay = document.getElementById('overlay');
+	var intro = document.getElementById('info_intro');
+	return !!(overlay && intro && !overlay.classList.contains('hide') && !intro.classList.contains('hide'));
+}
 
 function getDecodeIconGuideLaunchCount() {
 	if(typeof(Storage) === 'undefined')
@@ -128,6 +151,10 @@ function showMapIconGuideReplayHint() {
 function isAppOverlayOpen() {
 	var overlay = document.getElementById('overlay');
 	return !!(overlay && !overlay.classList.contains('hide'));
+}
+
+function shouldHoldDecodeIconGuide() {
+	return decodeIconGuideAwaitingIntro || isInfoIntroOpen() || isAppOverlayOpen();
 }
 
 function resetDecodeIconGuideOffset() {
@@ -701,6 +728,8 @@ function beginDecodeIconGuideTimers() {
 }
 
 function startDecodeIconGuide(force) {
+	if(!force && shouldHoldDecodeIconGuide())
+		return;
 	if(force) {
 		decodeIconGuideConsumed = false;
 		mapIconGuideConsumed = false;
@@ -750,7 +779,7 @@ function syncDecodeIconGuide() {
 	else
 		recordMapIconGuideVisit();
 	autoShow = decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide();
-	allow = (decodeIconGuideForced || autoShow) && !isAppOverlayOpen();
+	allow = (decodeIconGuideForced || autoShow) && !shouldHoldDecodeIconGuide();
 	if(allow && !isDecodeIconGuideConsumed() && !decodeIconGuideVisible)
 		startDecodeIconGuide();
 	else if(!allow && decodeIconGuideVisible)

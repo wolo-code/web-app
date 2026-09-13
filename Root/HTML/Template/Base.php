@@ -46,7 +46,14 @@
 	require '../HTML/Fragment/Head.php';
 ?>
 	<script><?php require '../JS/Fragment/Firebase_inits.php' ?></script>
-	<script>var WOLO_APPLE_MAPS_TOKEN = <?php echo json_encode(isset($config['apple_maps_token']) ? $config['apple_maps_token'] : ''); ?>;</script>
+	<script>var WOLO_APPLE_MAPS_TOKEN = <?php echo json_encode(isset($config['apple_maps_token']) ? $config['apple_maps_token'] : ''); ?>;
+	var WOLO_ICON_GUIDE_TIMEOUT_MS = <?php
+		$iconGuideTimeout = isset($config['icon_guide_timeout']) ? (int) $config['icon_guide_timeout'] : 4;
+		if ($iconGuideTimeout < 1) {
+			$iconGuideTimeout = 4;
+		}
+		echo $iconGuideTimeout * 1000;
+	?>;</script>
 <?php
 	if($bPublish) { ?>
 		<script <?php require '../JS/Fragment/Sentry_version.php' ?>></script>

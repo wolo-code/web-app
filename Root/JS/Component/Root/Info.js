@@ -98,6 +98,8 @@ function toggleInfoVersionDisplay(event) {
 }
 
 function closeInfo() {
+	if(typeof clearDecodeIconGuideAwaitingIntro == 'function')
+		clearDecodeIconGuideAwaitingIntro();
 	hideInfo();
 	activateOverlayInfo_full();
 	// if(!syncLocate_engage) {

@@ -28,6 +28,22 @@ test('OSM high zoom falls back when tiles are missing', () => {
 	assert.match(mapLayers, /if\(tilesMissing\)\s*notifyOsmMapDataUnavailable/);
 });
 
+test('OSM and raster tiles do not steal map click or drag', () => {
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	const mapJs = read('Root/JS/Component/Root/Map.js');
+	const clickHandler = read('Root/JS/ClickHandler.js');
+	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
+	assert.match(mapLayers, /function disableRasterTileGestures/);
+	assert.match(mapLayers, /pointerEvents = 'none'/);
+	assert.match(mapLayers, /disableRasterTileGestures\(tile\)/);
+	assert.match(mapJs, /function isIgnorableMapClick/);
+	assert.match(mapJs, /gmp-internal-camera-control/);
+	assert.match(mapJs, /markMapDragClickGuard/);
+	assert.match(clickHandler, /isIgnorableMapClick/);
+	assert.match(rootCss, /right:\s*88px\s*!important/);
+	assert.doesNotMatch(rootCss, /gmp-internal-camera-control \{[\s\S]*transform:\s*translate/);
+});
+
 function loadOsmZoomFallbackApi() {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const start = mapLayers.indexOf('function getOsmFallbackZoom(');
@@ -330,7 +346,10 @@ test('non-Google map views hide Google branding and keep Apple Maps transparent'
 test('chrome controls include native tooltips', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
+	assert.match(index, /id='map_search_bar'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);
+	assert.match(index, /id='decode_button'[\s\S]*Go/);
 	assert.match(index, /id='action_menu_info'[\s\S]*title='Info'/);
 	assert.match(index, /id='account'[\s\S]*title='Account'/);
 });
@@ -340,6 +359,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
 	const infoPhp = read('Root/HTML/Fragment/Info.php');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
+	const mapJs = read('Root/JS/Component/Root/Map.js');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
 	const infoCss = read('Root/CSS/Component/Root/Base/Info.css');
@@ -353,6 +373,9 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Map/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Wolo Code/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Switch map/);
+	assert.match(index, /id='map_camera_label'[\s\S]*D-pad/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);
+	assert.match(index, /id='decode_button'[\s\S]*Go/);
 	assert.match(index, /id='decode_icon_guide_scrim'/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
@@ -366,9 +389,24 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(infoPhp, /id='info_show_icon_labels'/);
 	assert.match(scriptJs, /function showInfoIconGuide/);
 	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
-	assert.match(decodeCss, /body\.decode-icon-guide \.decode_icon_caption/);
+	assert.match(mapJs, /map_search_bar/);
+	assert.match(mapJs, /ControlPosition\.TOP_LEFT\]\.push\(searchBar\)/);
+	assert.match(decodeCss, /#map_search_bar/);
+	assert.match(decodeCss, /#map_camera_label/);
+	assert.match(guideJs, /function layoutMapCameraCaption/);
+	assert.match(guideJs, /gmp-internal-camera-control/);
+	assert.match(guideJs, /function layoutMapSearchCaptions/);
+	assert.match(guideJs, /function pinGuideCaptionBeside/);
+	assert.match(guideJs, /map_icon_guide_dim/);
+	assert.doesNotMatch(guideJs, /closest\('#map_stage'\)/);
 	assert.doesNotMatch(guideJs, /observe\(mapEl/);
 	assert.doesNotMatch(infoCss, /#info_show_icon_labels:hover[\s\S]{0,80}text-decoration:\s*underline/);
+	assert.match(decodeCss, /#action_menu_decode \.decode_chrome_caption \{[\s\S]*left:\s*calc\(100% \+ 8px\)/);
+	assert.match(decodeCss, /#map_icon_guide_dim/);
+	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #decode_icon_guide_scrim/);
+	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #map_icon_guide_dim/);
+	assert.match(decodeCss, /--app-background-wcode/);
+	assert.match(decodeCss, /#location_button \{[\s\S]*width:\s*39px/);
 	assert.doesNotMatch(rootCss, /body:not\(\.decode\) #action_menu_info/);
 	assert.match(rootCss, /body:not\(\.decode\) #action_menu_decode \{[\s\S]*left:\s*51px/);
 	assert.match(decodeNarrowCss, /max-width:\s*662px/);

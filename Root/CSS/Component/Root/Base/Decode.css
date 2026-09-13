@@ -204,6 +204,11 @@ body:not(.decode).decode-icon-guide #map {
 	z-index: 999999;
 }
 
+body.osm.decode-icon-guide:not(.decode) #decode_icon_guide_scrim,
+body.osm.decode-icon-guide:not(.decode) #map_icon_guide_dim {
+	background: var(--app-background-wcode);
+}
+
 body.decode-icon-guide-fade #map_icon_guide_dim {
 	opacity: 0;
 	pointer-events: none;

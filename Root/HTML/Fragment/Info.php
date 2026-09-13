@@ -10,7 +10,13 @@
 			<span class='image'><?php includeSVG('', 'logo_code'); ?></span>
 		</a>
 	</div>
-	<div id='info_version_indicator'>v<?php echo htmlspecialchars(formatAppVersion($config), ENT_QUOTES, 'UTF-8') ?></div>
+<?php
+	$appVersionShort = formatAppVersionShort($config);
+	$appVersionFull = formatAppVersion($config);
+	$appVersionShortLabel = 'v' . $appVersionShort;
+	$appVersionFullLabel = 'v' . $appVersionFull;
+?>
+	<button type='button' id='info_version_indicator' class='info_version_toggle' data-version-short='<?php echo htmlspecialchars($appVersionShortLabel, ENT_QUOTES, 'UTF-8') ?>' data-version-full='<?php echo htmlspecialchars($appVersionFullLabel, ENT_QUOTES, 'UTF-8') ?>' aria-expanded='false' aria-label='Version'><span class='info_version_text'><?php echo htmlspecialchars($appVersionShortLabel, ENT_QUOTES, 'UTF-8') ?></span><span class='info_version_stamp' hidden></span></button>
 	<?php echo file_get_contents('../../HTML/Fragment/Info_common.html'); ?>
 	<?php
 		require '../../HTML/Fragment/Info_intro.php';
@@ -20,5 +26,5 @@
 	<div id='info_agency'>
 		by <a class='link' href='https://wcodes.org/about_me'>Ujjwal Singh</a>
 	</div>
-	<button id='info_show_icon_labels' type='button' title='Show icon labels'>Show icon labels</button>
+	<button id='info_show_icon_labels' type='button' title='Show labels'>Show labels</button>
 </div>

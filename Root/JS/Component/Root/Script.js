@@ -164,6 +164,8 @@ function setupControls() {
 	document.getElementById('info_message_close').addEventListener('click', closeInfo);
 	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
 	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
+	document.getElementById('info_version_indicator').addEventListener('click', toggleInfoVersionDisplay);
+	document.getElementById('info_version_value').addEventListener('click', toggleInfoVersionDisplay);
 	document.getElementById('info_show_icon_labels').addEventListener('click', showInfoIconGuide);
 	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
 	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);

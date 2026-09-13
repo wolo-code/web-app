@@ -10,6 +10,10 @@
 	max-width: 400px;
 }
 
+#info_message.info-version-expanded {
+	padding-bottom: 28px;
+}
+
 #wolo_about {
 	text-align: center;
 	margin-top: 15px;
@@ -81,9 +85,42 @@
 	position: absolute;
 	bottom: 8px;
 	right: 12px;
+	-webkit-appearance: none;
+	appearance: none;
+	align-items: flex-end;
+	background: transparent;
+	border: none;
 	color: #bbbbbb;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	font-family: Abel, sans-serif;
 	font-size: 0.78em;
-	line-height: 1;
+	gap: 3px;
+	line-height: 1.15;
+	margin: 0;
+	max-width: calc(100% - 132px);
+	padding: 0;
+	text-align: right;
+}
+
+#info_version_indicator .info_version_stamp {
+	font-size: 0.86em;
+	font-weight: normal;
+	white-space: nowrap;
+}
+
+#info_version_value {
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
 }
 
 #info_intro {
@@ -148,7 +185,7 @@
 	font-size: smaller;
 }
 
-#version > span, #updated > span {
+#version > span, #version > button, #updated > span {
 	font-weight: bold;
 }
 

@@ -171,7 +171,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Intro proceed control | Info Intro Proceed Button | `#info_intro_close_button` | Bottom of Info Intro View | Closes the intro prompt and continues into the app. |
 | Full explanation view | Info Full View | `#info_full` | Main body when full info is active | Explains Wolo Code structure and app usage steps. |
 | Icon labels control | Info Icon Labels Button | `#info_show_icon_labels`, `showInfoIconGuide()` | Bottom-left of Info Modal View | Closes Info Modal View and shows Input Icon Guide overlay labels on the current view (Wolo Code Input View or Map View). Hidden during Info Intro View. |
-| Version indicator | Info Version Indicator | `#info_version_indicator`, `formatAppVersion()` | Bottom-right of Info Modal View | Shows `v` plus `version.build` from `Vars.tsv`. Production bake increments `build` on each deploy. |
+| Version indicator | Info Version Indicator | `#info_version_indicator`, `.info_version_stamp`, `toggleInfoVersionDisplay()` | Bottom-right of Info Modal View | Shows `v` plus the three-part `version` from `Vars.tsv`. A tap expands it to `version.build` and the bake timestamp from `#updated-timestamp`. Production bake increments `build` on each deploy. |
 | Wolo Code format line | Info Wolo Code Format | `#wcode_format` | Top of Info Full View | Shows `\ City Word 1 Word 2 Word 3 /`. |
 | Wolo Code example line | Info Wolo Code Example | `#wcode_example` | Under Info Wolo Code Format | Shows `e.g. \ Bengaluru cat apple tomato /`. |
 | Address explanation | Info Address Parts Explanation | ordered list inside `#info_full` | Middle of Info Full View | Explains that an address has a city part and three-word location part. |
@@ -186,7 +186,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Social links | Info Social Links | `#social-links` | Middle of Info Links View | Links to Twitter, Facebook, and YouTube. |
 | App download link | Info App Download Link | `#download-unified-url`, `#download-android-bottom` | Lower Info Links View | Links to app download routes and Google Play. |
 | Credits link | Info Credits Link | `#credits` | Lower Info Links View | Links to open-source credits. |
-| Version details | Info Version Details | `#software_info`, `#version`, `#updated`, `formatAppVersion()` | Bottom of Info Links View | Shows `version.build` from `Vars.tsv` and the bake timestamp. |
+| Version details | Info Version Details | `#software_info`, `#version`, `#info_version_value`, `#updated`, `toggleInfoVersionDisplay()` | Bottom of Info Links View | Shows the three-part `version` from `Vars.tsv` and the bake timestamp. A tap expands the version to `version.build`. |
 | Info author credit | Info Author Credit | `#info_agency` | Bottom of Info Modal View | Shows the creator credit. |
 
 ## Shared App Parts

@@ -37,4 +37,12 @@ function formatAppVersion($config) {
 	return $version . '.' . $build;
 }
 
+function formatAppVersionShort($config) {
+	$version = isset($config['version']) ? trim($config['version']) : '';
+	if ($version !== '') {
+		return $version;
+	}
+	return formatAppVersion($config);
+}
+
 ?>

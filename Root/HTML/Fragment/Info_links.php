@@ -60,7 +60,7 @@
 </table>
 <div id='software_info'>
 	<div id='version'>
-		Version: <span><?php echo htmlspecialchars(formatAppVersion($config), ENT_QUOTES, 'UTF-8') ?></span>
+		Version: <button type='button' id='info_version_value' class='info_version_toggle' data-version-short='<?php echo htmlspecialchars($appVersionShort, ENT_QUOTES, 'UTF-8') ?>' data-version-full='<?php echo htmlspecialchars($appVersionFull, ENT_QUOTES, 'UTF-8') ?>' aria-expanded='false'><span class='info_version_text'><?php echo htmlspecialchars($appVersionShort, ENT_QUOTES, 'UTF-8') ?></span></button>
 	</div>
 	<div id='updated'>Updated:
 		<span id='updated-timestamp'>

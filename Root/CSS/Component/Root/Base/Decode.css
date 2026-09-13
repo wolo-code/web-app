@@ -176,13 +176,43 @@ body.decode-icon-guide #decode_button .decode_chrome_caption {
 }
 
 body.decode-icon-guide #action_menu_info .decode_chrome_caption,
-body.decode-icon-guide #action_menu_decode .decode_chrome_caption,
 body.decode-icon-guide #location_button .decode_chrome_caption,
 body.decode-icon-guide #decode_map_view_button .decode_chrome_caption,
-body.decode-icon-guide #map_type_button .decode_chrome_caption,
-body.decode-icon-guide #map_camera_label .decode_chrome_caption {
+body.decode-icon-guide #map_type_button .decode_chrome_caption {
 	bottom: calc(100% + 6px);
 	top: auto;
+}
+
+body:not(.decode).decode-icon-guide #action_menu_decode .decode_chrome_caption {
+	bottom: auto;
+	left: calc(100% + 8px);
+	right: auto;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+body:not(.decode).decode-icon-guide #map {
+	z-index: 201;
+}
+
+#map_icon_guide_dim {
+	background: rgba(0, 0, 0, 0.8);
+	inset: 0;
+	pointer-events: auto;
+	position: absolute;
+	transition: opacity 400ms ease;
+	z-index: 999999;
+}
+
+body.decode-icon-guide-fade #map_icon_guide_dim {
+	opacity: 0;
+	pointer-events: none;
+}
+
+body:not(.decode).decode-icon-guide #map .gm-bundled-control,
+body:not(.decode).decode-icon-guide #map gmp-internal-camera-control {
+	position: relative;
+	z-index: 1000001 !important;
 }
 
 #map_camera_label {
@@ -211,6 +241,15 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 #action_menu_info,
 #action_menu_decode {
 	overflow: visible;
+}
+
+#location_button {
+	height: 39px;
+	width: 39px;
+}
+
+#location_button svg {
+	margin: 0 auto;
 }
 
 .decode #account {

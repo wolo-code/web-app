@@ -144,7 +144,7 @@ function restorePinnedGuideCaptions() {
 	decodeIconGuidePinnedCaptions = [];
 }
 
-function pinGuideCaptionAt(el, left, top) {
+function pinGuideCaptionAt(el, left, top, transform) {
 	if(!el)
 		return;
 	decodeIconGuidePinnedCaptions.push({ el: el, parent: el.parentNode, next: el.nextSibling });
@@ -154,7 +154,7 @@ function pinGuideCaptionAt(el, left, top) {
 	el.style.top = top + 'px';
 	el.style.right = 'auto';
 	el.style.bottom = 'auto';
-	el.style.transform = 'translateX(-50%)';
+	el.style.transform = transform || 'translateX(-50%)';
 	el.style.zIndex = '203';
 }
 
@@ -172,10 +172,51 @@ function pinGuideCaption(el, target, above) {
 	return true;
 }
 
+function pinGuideCaptionBeside(el, target, side) {
+	var rect;
+	if(!el || !target)
+		return false;
+	rect = target.getBoundingClientRect();
+	if(rect.width < 8 || rect.height < 8)
+		return false;
+	if(side === 'left')
+		pinGuideCaptionAt(el, rect.left - 8, rect.top + rect.height / 2, 'translate(-100%, -50%)');
+	else
+		pinGuideCaptionAt(el, rect.right + 8, rect.top + rect.height / 2, 'translateY(-50%)');
+	return true;
+}
+
+function removeMapIconGuideDim() {
+	var dim = document.getElementById('map_icon_guide_dim');
+	if(dim && dim.parentNode)
+		dim.parentNode.removeChild(dim);
+}
+
+function syncMapIconGuideDim() {
+	var map = document.getElementById('map');
+	var dim = document.getElementById('map_icon_guide_dim');
+	var gmStyle;
+	if(!map || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
+		removeMapIconGuideDim();
+		return;
+	}
+	if(!dim) {
+		dim = document.createElement('div');
+		dim.id = 'map_icon_guide_dim';
+		dim.addEventListener('click', onDecodeIconGuideDismiss);
+	}
+	gmStyle = map.querySelector('.gm-style');
+	if(!gmStyle)
+		return;
+	if(dim.parentNode !== gmStyle)
+		gmStyle.appendChild(dim);
+}
+
 function layoutMapSearchCaptions() {
 	var input;
 	var inputRect;
 	restorePinnedGuideCaptions();
+	syncMapIconGuideDim();
 	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide'))
 		return;
 	input = document.getElementById('pac-input');
@@ -185,7 +226,7 @@ function layoutMapSearchCaptions() {
 		if(inputRect && inputRect.width >= 8 && inputRect.top >= 0 && inputRect.top < window.innerHeight)
 			pinGuideCaptionAt(document.querySelector('.decode_icon_caption[data-guide-id="go"]'), inputRect.right - 22, inputRect.bottom + 6);
 	}
-	pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="dpad"]'), document.querySelector('#map gmp-internal-camera-control'), true);
+	pinGuideCaptionBeside(document.querySelector('.decode_icon_caption[data-guide-id="dpad"]'), document.querySelector('#map gmp-internal-camera-control'), 'left');
 }
 
 function restoreMapSearchBarFromGuide() {
@@ -288,8 +329,6 @@ function isDecodeIconGuideDismissEvent(event) {
 	if(typeof event.detail === 'number' && event.detail === 0)
 		return false;
 	target = event.target;
-	if(target && target.closest && (target.closest('#map_stage') || target.closest('#map') || target.closest('#apple_map')))
-		return false;
 	overlay = document.getElementById('overlay');
 	if(overlay && !overlay.classList.contains('hide') && overlay.contains(target))
 		return false;
@@ -317,6 +356,7 @@ function hideDecodeIconGuide() {
 	resetDecodeIconGuideOffset();
 	unwatchMapCameraCaption();
 	restoreMapSearchBarFromGuide();
+	removeMapIconGuideDim();
 	layoutMapCameraCaption();
 }
 

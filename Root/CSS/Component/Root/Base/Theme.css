@@ -654,6 +654,11 @@ html.dark-mode .exception_log {
 	color: #aaa;
 }
 
+html.dark-mode #exception_message_title .exception_warning_icon,
+html.dark-mode #exception_message_title .exception_warning_icon svg {
+	color: #f0b429;
+}
+
 html.dark-mode #wcode_format > span {
 	background: #2a2a4a;
 }

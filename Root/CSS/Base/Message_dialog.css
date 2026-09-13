@@ -161,6 +161,27 @@ h2.message_dialog_label {
 	margin: 0.5em;
 }
 
+#exception_message_title {
+	align-items: center;
+	cursor: default;
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+	justify-content: center;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#exception_message_title .exception_warning_icon,
+#exception_message_title .exception_warning_icon svg {
+	color: #e6a23c;
+	display: block;
+	flex: 0 0 auto;
+	height: 28px;
+	width: 28px;
+}
+
 .message_dialog_body > p > span:first-child {
 	display: block;
 	color: #B5B5B5

@@ -57,6 +57,7 @@ function initExceptionMessageControls() {
 	var close = document.getElementById('exception_message_close');
 	var continueButton = document.getElementById('exception_message_continue');
 	var reloadButton = document.getElementById('exception_message_reload');
+	var title = document.getElementById('exception_message_title');
 
 	if(!message || !close || !continueButton || message.dataset.controlsReady)
 		return;
@@ -65,6 +66,8 @@ function initExceptionMessageControls() {
 	continueButton.addEventListener('click', hideExceptionMessage);
 	if(reloadButton)
 		reloadButton.addEventListener('click', clearCacheAndReload);
+	if(title && typeof addLongpressListener == 'function')
+		addLongpressListener(title, function() {}, showExceptionLog);
 	message.dataset.controlsReady = 'true';
 }
 

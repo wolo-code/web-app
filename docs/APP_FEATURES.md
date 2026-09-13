@@ -81,7 +81,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | Unrecognized Code Dialog | `Invalid_code.php`, `showInvalidCodeDialog()` | Explains that the input is not a Wolo Code, DIGIPIN, or plus code. The typed value is centered in a theme-aware teal. Matching primary-accent Edit code and Search map buttons sit on the left and right with dialog padding, a minimum gap, and reverse-play / play icons. Search map opens Map View and the Address Panel for the first matching place. |
 | Locate Permission Dialog | `LocateRight.php` | User-facing location permission request flow. |
 | Incompatible Browser Dialog | `Incompatible_browser.html` | Allows the app to warn and optionally continue when browser support is insufficient. |
-| Unexpected Error Dialog | `#exception_message`, `showErrorPrompt()` | Recoverable runtime-error prompt titled `Error occured!`. Continue and Clear cache & reload share equal width. |
+| Unexpected Error Dialog | `#exception_message`, `showErrorPrompt()` | Recoverable runtime-error prompt titled `Error occured!` with a warning icon. Press and hold the title to show the crash message. Continue and Clear cache & reload share equal width. |
 | Notifications | `#notification_top`, `#notification_bottom`, `showNotification()` | Lightweight messaging for examples, copy results, decode input hints, and status. Bottom notifications share `#map_bottom_stack` with the Address Panel and Location Accuracy Indicator so they stack above those cards instead of overlapping them, and they fade out when dismissed. Overlay dialogs and `#notification_top` stay outside that dock. |
 
 ## Icon Resources
@@ -108,6 +108,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | `Caret.svg` | Expand or collapse the saved address list on Account Address Book View. |
 | `Logout.svg` | Sign out from Account Address Book View. |
 | `Default.svg` | Set-default inbound diagonal arrow on map source rows. |
+| `Warning.svg` | Warning triangle on Unexpected Error Dialog. |
 
 ## Implementation Notes
 

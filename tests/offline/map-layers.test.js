@@ -366,12 +366,16 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	const baseScript = read('Root/JS/Base/Script.js');
 	const dialogCss = read('Root/CSS/Base/Message_dialog.css');
 	assert.match(exceptionHtml, /Error occured!/);
+	assert.match(exceptionHtml, /includeSVG\('', 'Warning'\)/);
+	assert.match(exceptionHtml, /id='exception_message_title'/);
 	assert.doesNotMatch(exceptionHtml, /Unexpected Error/);
 	assert.doesNotMatch(exceptionHtml, /id='exception_log_toggle'/);
 	assert.doesNotMatch(exceptionHtml, />i</);
 	assert.doesNotMatch(baseScript, /addLongpressListener\(toggle/);
+	assert.match(baseScript, /addLongpressListener\(title, function\(\) \{\}, showExceptionLog\)/);
 	assert.match(dialogCss, /#exception_message \.message_dialog_control button/);
 	assert.match(dialogCss, /width:\s*168px/);
 	assert.match(dialogCss, /min-width:\s*168px/);
 	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
+	assert.match(dialogCss, /#exception_message_title/);
 });

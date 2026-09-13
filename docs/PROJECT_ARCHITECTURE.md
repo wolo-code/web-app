@@ -79,7 +79,7 @@ Firebase Auth is used for account identity. The browser initializes Auth when av
 
 Firebase Hosting serves the generated app from `public/`. The source of truth remains under `root/`, `functions/`, `config/`, and `docs/`.
 
-App `version` and `build` live in `root/Config/Vars.tsv`. `project/render-native.ps1` and `project/render.sh` increment `build` before the app bake so each production merge gets a new number. Use `-SkipBuildIncrement` or `TIGGU_SKIP_BUILD_INCREMENT=1` for a bake that must not change the number. Commit the updated `Vars.tsv` with the bake. The Info dialog does not display version or bake timestamp.
+App `version` and `build` live in `root/Config/Vars.tsv`. `project/render-native.ps1` and `project/render.sh` increment `build` before the app bake so each production merge gets a new number. Use `-SkipBuildIncrement` or `TIGGU_SKIP_BUILD_INCREMENT=1` for a bake that must not change the number. Commit the updated `Vars.tsv` with the bake. The Info dialog bottom-right control shows `version`; a tap reveals `version.build` and the UTC bake timestamp above it without moving the version, and hover shows that timestamp in local time. The credits/links view omits that control.
 
 The README records the production hosting deploy command:
 

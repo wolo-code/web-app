@@ -50,7 +50,13 @@ test('Info corner version is restored and credits modal omits version details', 
 	const infoCss = fs.readFileSync(path.join(repoRoot, 'Root', 'CSS', 'Component', 'Root', 'Base', 'Info.css'), 'utf8');
 	assert.match(info, /info_version_indicator/);
 	assert.match(info, /\$appVersionShortLabel/);
-	assert.match(info, /data-updated/);
+	assert.match(info, /info_version_stamp_utc/);
+	assert.match(info, /info_version_stamp_local/);
+	assert.match(info, /info_version_width/);
+	assert.match(infoJs, /function fillInfoVersionStamps/);
+	assert.match(infoJs, /function formatInfoTimestamp/);
+	assert.match(infoCss, /#info_version_indicator:hover \.info_version_stamp_local/);
+	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_stamp_utc/);
 	assert.doesNotMatch(links, /software_info/);
 	assert.doesNotMatch(links, /info_version_value/);
 	assert.doesNotMatch(links, /updated-timestamp/);

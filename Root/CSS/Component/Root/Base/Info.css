@@ -123,10 +123,49 @@
 	display: none;
 }
 
+#info_version_indicator .info_version_text {
+	display: grid;
+	justify-items: end;
+}
+
+#info_version_indicator .info_version_width,
+#info_version_indicator .info_version_label {
+	grid-area: 1 / 1;
+}
+
 #info_version_indicator .info_version_stamp {
 	font-size: 0.86em;
 	font-weight: normal;
+	min-height: 1.15em;
+	position: relative;
+	width: 100%;
+}
+
+#info_version_indicator .info_version_stamp_utc,
+#info_version_indicator .info_version_stamp_local {
+	position: absolute;
+	right: 0;
+	top: 0;
+	visibility: hidden;
 	white-space: nowrap;
+}
+
+#info_version_indicator .info_version_width {
+	visibility: hidden;
+}
+
+#info_version_indicator[aria-expanded='true'] .info_version_stamp_utc {
+	visibility: visible;
+}
+
+#info_version_indicator:hover .info_version_stamp_utc,
+#info_version_indicator:focus-visible .info_version_stamp_utc {
+	visibility: hidden;
+}
+
+#info_version_indicator:hover .info_version_stamp_local,
+#info_version_indicator:focus-visible .info_version_stamp_local {
+	visibility: visible;
 }
 
 #info_intro {

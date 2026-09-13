@@ -183,20 +183,33 @@ body.satellite #map {
 	width: 152px;
 }
 
-body > #pac-input {
+body > #pac-input,
+.decode #map_search_bar {
 	display: none;
 }
 
+#map_search_bar {
+	align-items: stretch;
+	display: flex;
+	margin: 26px 0 0 12px;
+	overflow: visible;
+	position: relative;
+	z-index: 1;
+}
+
+#map_search_field {
+	overflow: visible;
+	position: relative;
+}
+
 #pac-input {
-	position: absolute;
-	left: 0px !important;
-	top: 36px !important;
+	box-sizing: content-box;
 	height: 26px;
 	background-color: #fff;
 	font-family: Roboto;
 	font-size: 1.38em;
 	font-weight: 300;
-	margin-left: 12px;
+	margin: 0;
 	padding: 8px;
 	border: none;
 	text-overflow: ellipsis;

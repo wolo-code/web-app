@@ -44,8 +44,21 @@ body.decode-icon-guide #action_menu,
 body.decode-icon-guide #location_button,
 body.decode-icon-guide #decode_map_view_button,
 body.decode-icon-guide #map_type_button,
+body.decode-icon-guide #map_search_bar,
+body.decode-icon-guide #map_camera_label,
 body.decode-icon-guide #logo {
 	z-index: 202;
+}
+
+body.decode-icon-guide #map_search_bar,
+body.decode-icon-guide #map_search_field,
+body.decode-icon-guide #decode_button,
+body.decode-icon-guide #map .gmnoprint {
+	overflow: visible;
+}
+
+body.decode-icon-guide #map_search_bar .decode_icon_caption {
+	z-index: 203;
 }
 
 body.decode-icon-guide #account {
@@ -156,13 +169,31 @@ body:not(.decode).decode-icon-guide #account .decode_chrome_caption {
 	transform: translateY(-50%);
 }
 
+body.decode-icon-guide #map_search_field .decode_chrome_caption,
+body.decode-icon-guide #decode_button .decode_chrome_caption {
+	bottom: auto;
+	top: calc(100% + 6px);
+}
+
 body.decode-icon-guide #action_menu_info .decode_chrome_caption,
 body.decode-icon-guide #action_menu_decode .decode_chrome_caption,
 body.decode-icon-guide #location_button .decode_chrome_caption,
 body.decode-icon-guide #decode_map_view_button .decode_chrome_caption,
-body.decode-icon-guide #map_type_button .decode_chrome_caption {
+body.decode-icon-guide #map_type_button .decode_chrome_caption,
+body.decode-icon-guide #map_camera_label .decode_chrome_caption {
 	bottom: calc(100% + 6px);
 	top: auto;
+}
+
+#map_camera_label {
+	display: none;
+	pointer-events: none;
+	position: fixed;
+	z-index: 202;
+}
+
+body:not(.decode).decode-icon-guide #map_camera_label {
+	display: block;
 }
 
 #action_menu {
@@ -289,6 +320,7 @@ body.decode-icon-guide #map_type_button .decode_chrome_caption {
 	margin-left: -10px;
 }
 
+.decode #map_search_bar,
 .decode #decode_button, .decode #map_input_suggestion_result {
 	display: none;
 }

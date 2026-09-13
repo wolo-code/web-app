@@ -13,6 +13,8 @@ var decodeIconGuideFadeTimer = null;
 var decodeIconGuideReadyTimer = null;
 var decodeIconGuideReady = false;
 var decodeIconGuideLaunchRecorded = false;
+var decodeIconGuideCameraObserver = null;
+var decodeIconGuidePinnedCaptions = [];
 
 function getDecodeIconGuideLaunchCount() {
 	if(typeof(Storage) === 'undefined')
@@ -122,7 +124,118 @@ function applyDecodeIconGuideOffset() {
 		container.style.transform = 'translateY(' + (-shift) + 'px)';
 }
 
+function restorePinnedGuideCaptions() {
+	var i;
+	var item;
+	for(i = decodeIconGuidePinnedCaptions.length - 1; i >= 0; i--) {
+		item = decodeIconGuidePinnedCaptions[i];
+		if(item.next && item.next.parentNode === item.parent)
+			item.parent.insertBefore(item.el, item.next);
+		else if(item.parent)
+			item.parent.appendChild(item.el);
+		item.el.style.position = '';
+		item.el.style.left = '';
+		item.el.style.top = '';
+		item.el.style.right = '';
+		item.el.style.bottom = '';
+		item.el.style.transform = '';
+		item.el.style.zIndex = '';
+	}
+	decodeIconGuidePinnedCaptions = [];
+}
+
+function pinGuideCaptionAt(el, left, top) {
+	if(!el)
+		return;
+	decodeIconGuidePinnedCaptions.push({ el: el, parent: el.parentNode, next: el.nextSibling });
+	document.body.appendChild(el);
+	el.style.position = 'fixed';
+	el.style.left = left + 'px';
+	el.style.top = top + 'px';
+	el.style.right = 'auto';
+	el.style.bottom = 'auto';
+	el.style.transform = 'translateX(-50%)';
+	el.style.zIndex = '203';
+}
+
+function pinGuideCaption(el, target, above) {
+	var rect;
+	if(!el || !target)
+		return false;
+	rect = target.getBoundingClientRect();
+	if(rect.width < 8 || rect.height < 8 || rect.top < 0 || rect.bottom > window.innerHeight - 8)
+		return false;
+	if(above)
+		pinGuideCaptionAt(el, rect.left + rect.width / 2, rect.top - 23);
+	else
+		pinGuideCaptionAt(el, rect.left + rect.width / 2, rect.bottom + 6);
+	return true;
+}
+
+function layoutMapSearchCaptions() {
+	var input;
+	var inputRect;
+	restorePinnedGuideCaptions();
+	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide'))
+		return;
+	input = document.getElementById('pac-input');
+	pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="search"]'), input);
+	if(!pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="go"]'), document.getElementById('decode_button'))) {
+		inputRect = input && input.getBoundingClientRect();
+		if(inputRect && inputRect.width >= 8 && inputRect.top >= 0 && inputRect.top < window.innerHeight)
+			pinGuideCaptionAt(document.querySelector('.decode_icon_caption[data-guide-id="go"]'), inputRect.right - 22, inputRect.bottom + 6);
+	}
+	pinGuideCaption(document.querySelector('.decode_icon_caption[data-guide-id="dpad"]'), document.querySelector('#map gmp-internal-camera-control'), true);
+}
+
+function restoreMapSearchBarFromGuide() {
+	restorePinnedGuideCaptions();
+}
+
+function unwatchMapCameraCaption() {
+	if(decodeIconGuideCameraObserver) {
+		decodeIconGuideCameraObserver.disconnect();
+		decodeIconGuideCameraObserver = null;
+	}
+}
+
+function watchMapCameraCaption() {
+	var mapEl = document.getElementById('map');
+	if(decodeIconGuideCameraObserver || !mapEl || typeof MutationObserver === 'undefined')
+		return;
+	decodeIconGuideCameraObserver = new MutationObserver(function() {
+		layoutMapSearchCaptions();
+	});
+	decodeIconGuideCameraObserver.observe(mapEl, { childList: true, subtree: true });
+}
+
+function layoutMapCameraCaption() {
+	var host = document.getElementById('map_camera_label');
+	var camera;
+	if(!host)
+		return;
+	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
+		host.removeAttribute('style');
+		return;
+	}
+	camera = document.querySelector('#map gmp-internal-camera-control');
+	if(!camera) {
+		host.removeAttribute('style');
+		return;
+	}
+	var rect = camera.getBoundingClientRect();
+	if(rect.width < 8 || rect.height < 8) {
+		host.removeAttribute('style');
+		return;
+	}
+	host.style.top = rect.top + 'px';
+	host.style.left = rect.left + 'px';
+	host.style.width = rect.width + 'px';
+	host.style.height = rect.height + 'px';
+}
+
 function layoutDecodeIconGuide() {
+	layoutMapSearchCaptions();
 	var container = document.getElementById('decode_input_container');
 	if(!container || !document.body.classList.contains('decode-icon-guide') || !document.body.classList.contains('decode')) {
 		resetDecodeIconGuideOffset();
@@ -202,6 +315,9 @@ function hideDecodeIconGuide() {
 	decodeIconGuideReady = false;
 	document.body.classList.remove('decode-icon-guide', 'decode-icon-guide-fade');
 	resetDecodeIconGuideOffset();
+	unwatchMapCameraCaption();
+	restoreMapSearchBarFromGuide();
+	layoutMapCameraCaption();
 }
 
 function fadeDecodeIconGuide() {
@@ -239,6 +355,9 @@ function startDecodeIconGuide(force) {
 		if(decodeIconGuideVisible) {
 			document.body.classList.remove('decode-icon-guide-fade');
 			layoutDecodeIconGuide();
+			watchMapCameraCaption();
+			setTimeout(layoutDecodeIconGuide, 250);
+			setTimeout(layoutDecodeIconGuide, 700);
 			beginDecodeIconGuideTimers();
 			return;
 		}
@@ -249,6 +368,9 @@ function startDecodeIconGuide(force) {
 	document.body.classList.add('decode-icon-guide');
 	document.body.classList.remove('decode-icon-guide-fade');
 	layoutDecodeIconGuide();
+	watchMapCameraCaption();
+	setTimeout(layoutDecodeIconGuide, 250);
+	setTimeout(layoutDecodeIconGuide, 700);
 	beginDecodeIconGuideTimers();
 }
 

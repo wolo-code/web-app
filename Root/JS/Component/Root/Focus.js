@@ -27,6 +27,7 @@ function focus_(pos, bounds) {
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
+	stopZoom();
 
 	map.panTo(pos);
 
@@ -99,58 +100,63 @@ function decMapInteractionCounter() {
 function stopZoom() {
 	if(zoomChangedListener != null)
 		google.maps.event.removeListener(zoomChangedListener);
+	zoomChangedListener = null;
 	if(nextZoomTimer != null)
 		clearTimeout(nextZoomTimer);
+	nextZoomTimer = null;
 }
 
 const ZOOM_ANIMATION_INCREMENT = 1;
 const ZOOM_BOUND_PADDING = 36;
-var smoothZoomToBounds_callCount = 0;
 var zoomChangedListener;
 var nextZoomTimer;
+function finishSmoothZoomToBounds(bounds, map) {
+	if(typeof bounds !== 'undefined')
+		setTimeout(function() {
+			if(pendingFocusPos) {
+				var temPos = Object.assign({}, pendingFocusPos);
+				pendingFocusPos = null;
+				focus___(temPos);
+			}
+			else {
+				map.fitBounds(bounds, ZOOM_BOUND_PADDING);
+				var idleListenerPanBy = map.addListener('idle', function() {
+						idleListenerPanBy.remove();
+						applyMapChromePan();
+						endProgrammaticMapFocus();
+					});
+			}
+		}, ZOOM_ANIMATION_SPEED);
+	else
+		endProgrammaticMapFocus();
+}
+
 function smoothZoomToBounds(bounds, map, max, current) {
+	if (typeof getActiveMapTypeMaxZoom === 'function') {
+		var typeMax = getActiveMapTypeMaxZoom();
+		if (typeof typeMax === 'number' && max > typeMax)
+			max = typeMax;
+	}
 	if (current >= max) {
 		if(current > max)
 			map.setZoom(max);
-		if(smoothZoomToBounds_callCount-- == 0) {
-			if(typeof bounds !== 'undefined')
-				setTimeout(function() {
-					if(pendingFocusPos) {
-						var temPos = Object.assign({}, pendingFocusPos);
-						pendingFocusPos = null;
-						focus___(temPos);
-					}
-					else {
-						if(decMapInteractionCounter) {
-							map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-							var idleListenerPanBy = map.addListener('idle', function() {
-									idleListenerPanBy.remove();
-									applyMapChromePan();
-									endProgrammaticMapFocus();
-								});
-						}
-						else
-							endProgrammaticMapFocus();
-					}
-				}, ZOOM_ANIMATION_SPEED);
-			else
-				endProgrammaticMapFocus();
-		}
+		finishSmoothZoomToBounds(bounds, map);
 		return;
 	}
-	else {
-		smoothZoomToBounds_callCount++;
-		zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
-			google.maps.event.removeListener(zoomChangedListener);
-			incMapInteractionCounter();
-			smoothZoomToBounds(bounds, map, max, current + ZOOM_ANIMATION_INCREMENT);
-		});
-		nextZoomTimer = setTimeout(function() {
-			if(decMapInteractionCounter()) {
-				map.setZoom(current);
-			}
-		}, ZOOM_ANIMATION_SPEED);
-	}
+	var nextZoom = current + ZOOM_ANIMATION_INCREMENT;
+	if(nextZoom > max)
+		nextZoom = max;
+	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
+		google.maps.event.removeListener(zoomChangedListener);
+		zoomChangedListener = null;
+		incMapInteractionCounter();
+		smoothZoomToBounds(bounds, map, max, nextZoom);
+	});
+	nextZoomTimer = setTimeout(function() {
+		if(decMapInteractionCounter()) {
+			map.setZoom(nextZoom);
+		}
+	}, ZOOM_ANIMATION_SPEED);
 }
 
 function getZoomByBounds(map, bounds) {

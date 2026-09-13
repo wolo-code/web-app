@@ -61,6 +61,7 @@
 		require '../../HTML/Fragment/Exception.html';
 		require '../../HTML/Fragment/Incompatible_browser.html';
 		require '../../HTML/Fragment/QR.php';
+		require '../../HTML/Fragment/Code_qr.php';
 		require '../../HTML/Fragment/Authentication.php';
 		require '../../HTML/Fragment/Account_Dialog.php';
 	?>

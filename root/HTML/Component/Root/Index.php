@@ -3,10 +3,19 @@
 	<div id='apple_map' class='hide' aria-hidden='true'></div>
 	<div id='map'></div>
 </div>
-<div id='osm_attribution' class='map_attribution hide blur_background' data-map-layer='osm'>Map data &copy; <a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> contributors</div>
+<div id='osm_attribution' class='map_attribution hide blur_background' data-map-layer='osm'>
+	<button type='button' class='map_attribution_toggle' aria-expanded='false'>Map &copy; OpenStreetMap</button>
+	<span class='map_attribution_full'>Map data &copy; <a class='link' href='https://www.openstreetmap.org/copyright' target='_blank' rel='noopener noreferrer'>OpenStreetMap</a> contributors</span>
+</div>
 <div id='apple_attribution' class='map_attribution hide' data-map-layer='apple' hidden></div>
-<div id='esri_attribution' class='map_attribution hide blur_background' data-map-layer='esri'>Tiles &copy; <a class='link' href='https://www.esri.com/' target='_blank' rel='noopener noreferrer'>Esri</a> &mdash; Esri, OpenStreetMap contributors, and the GIS user community</div>
-<div id='microsoft_attribution' class='map_attribution hide blur_background' data-map-layer='microsoft'>&copy; <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a></div>
+<div id='esri_attribution' class='map_attribution hide blur_background' data-map-layer='esri'>
+	<button type='button' class='map_attribution_toggle' aria-expanded='false'>Map &copy; Esri</button>
+	<span class='map_attribution_full'>Tiles &copy; <a class='link' href='https://www.esri.com/' target='_blank' rel='noopener noreferrer'>Esri</a> &mdash; Esri, OpenStreetMap contributors, and the GIS user community</span>
+</div>
+<div id='microsoft_attribution' class='map_attribution hide blur_background' data-map-layer='microsoft'>
+	<button type='button' class='map_attribution_toggle' aria-expanded='false'>Map &copy; Microsoft</button>
+	<span class='map_attribution_full'>&copy; <a class='link' href='https://www.microsoft.com/maps' target='_blank' rel='noopener noreferrer'>Microsoft</a></span>
+</div>
 <div id='map_input_suggestion_result' class='suggestion_result' data-input='pac-input' data-resize_input='false'></div>
 <div id='map_search_bar'>
 	<div id='map_search_field'>
@@ -109,7 +118,40 @@
 <div id='map_camera_label' aria-hidden='true'>
 	<span class='decode_icon_caption decode_chrome_caption' data-guide-id='dpad'>D-pad</span>
 </div>
-<div id='decode_icon_guide_scrim'><?php includeSVG('', 'World-map'); ?></div>
+<div id='decode_icon_guide_scrim'>
+	<?php includeSVG('', 'World-map'); ?>
+	<div id='map_icon_guide_infocard' aria-hidden='true'>
+		<div class='map_icon_guide_infocard_card'>
+			<?php includeSVG('', 'Wolo-infocard-sample'); ?>
+			<span class='map_icon_guide_hotspot' data-guide-id='infocard-city'></span>
+			<span class='map_icon_guide_hotspot' data-guide-id='infocard-code'></span>
+			<span class='map_icon_guide_hotspot' data-guide-id='infocard-address'></span>
+			<span class='map_icon_guide_hotspot' data-guide-id='infocard-launch'></span>
+			<span class='map_icon_guide_hotspot' data-guide-id='infocard-share'></span>
+		</div>
+		<svg class='map_icon_guide_infocard_lines' aria-hidden='true'></svg>
+		<div class='map_icon_guide_callout' data-guide-id='infocard-city'>
+			<span class='map_icon_guide_callout_title'>City</span>
+			<span class='map_icon_guide_callout_desc'>Place this Wolo Code belongs to</span>
+		</div>
+		<div class='map_icon_guide_callout' data-guide-id='infocard-code'>
+			<span class='map_icon_guide_callout_title'>Wolo Code</span>
+			<span class='map_icon_guide_callout_desc'>Three words for this point</span>
+		</div>
+		<div class='map_icon_guide_callout' data-guide-id='infocard-address'>
+			<span class='map_icon_guide_callout_title'>Address</span>
+			<span class='map_icon_guide_callout_desc'>Street details and plus codes</span>
+		</div>
+		<div class='map_icon_guide_callout' data-guide-id='infocard-launch'>
+			<span class='map_icon_guide_callout_title'>Open</span>
+			<span class='map_icon_guide_callout_desc'>Launch in another maps app</span>
+		</div>
+		<div class='map_icon_guide_callout' data-guide-id='infocard-share'>
+			<span class='map_icon_guide_callout_title'>Label</span>
+			<span class='map_icon_guide_callout_desc'>Share, print, or save a QR</span>
+		</div>
+	</div>
+</div>
 <div id='action_menu' class='control' tabindex='7'>
 	<div id='action_menu_items'>
 		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info' title='Info'>

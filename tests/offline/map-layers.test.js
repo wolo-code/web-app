@@ -382,6 +382,10 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(index, /id='decode_button'[\s\S]*Go/);
 	assert.match(index, /id='decode_icon_guide_scrim'/);
 	assert.match(index, /includeSVG\('', 'World-map'\)/);
+	assert.match(index, /includeSVG\('', 'Wolo-infocard-sample'\)/);
+	assert.match(index, /id='map_icon_guide_infocard'/);
+	assert.match(index, /class='map_icon_guide_callout_title'/);
+	assert.match(index, /class='map_icon_guide_callout_desc'/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_DISMISS_GRACE_MS/);
@@ -407,6 +411,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /document\.body\.appendChild\(bar\)/);
 	assert.match(guideJs, /function pinGuideCaptionBeside/);
 	assert.match(guideJs, /map_icon_guide_dim/);
+	assert.match(guideJs, /function layoutMapInfocardGuide/);
+	assert.match(guideJs, /drawMapInfocardCalloutLine/);
 	assert.doesNotMatch(guideJs, /closest\('#map_stage'\)/);
 	assert.doesNotMatch(guideJs, /observe\(mapEl/);
 	assert.doesNotMatch(infoCss, /#info_show_icon_labels:hover[\s\S]{0,80}text-decoration:\s*underline/);
@@ -414,6 +420,9 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /#map_icon_guide_dim/);
 	assert.match(decodeCss, /map_icon_guide_world_land/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_icon_guide_scrim \.map_icon_guide_world/);
+	assert.match(decodeCss, /#map_icon_guide_infocard/);
+	assert.match(decodeCss, /\.map_icon_guide_callout_title/);
+	assert.match(decodeCss, /\.map_icon_guide_callout_desc/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff[\s\S]*opacity:\s*1/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);

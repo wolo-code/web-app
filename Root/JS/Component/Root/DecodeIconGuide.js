@@ -199,6 +199,166 @@ function pinGuideCaptionBeside(el, target, side) {
 	return true;
 }
 
+function clearMapInfocardGuideLines(svg) {
+	while(svg.firstChild)
+		svg.removeChild(svg.firstChild);
+}
+
+function placeMapInfocardCallout(el, hx, hy, side, gap, dx, hostRect, cardRect) {
+	var width;
+	var height;
+	var left;
+	var top;
+	var cardLeft = cardRect ? cardRect.left - hostRect.left : hx;
+	var cardRight = cardRect ? cardRect.right - hostRect.left : hx;
+	var cardTop = cardRect ? cardRect.top - hostRect.top : hy;
+	var cardBottom = cardRect ? cardRect.bottom - hostRect.top : hy;
+	el.classList.remove('map_icon_guide_callout_left', 'map_icon_guide_callout_right');
+	if(side === 'left')
+		el.classList.add('map_icon_guide_callout_left');
+	else if(side === 'right')
+		el.classList.add('map_icon_guide_callout_right');
+	el.style.left = '0px';
+	el.style.top = '0px';
+	el.style.right = 'auto';
+	el.style.bottom = 'auto';
+	el.style.transform = 'none';
+	width = el.offsetWidth;
+	height = el.offsetHeight;
+	if(side === 'left') {
+		left = cardLeft - gap - width;
+		top = hy - height * 0.35;
+	}
+	else if(side === 'right') {
+		left = cardRight + gap;
+		top = hy - height * 0.35;
+	}
+	else if(side === 'top') {
+		left = hx - width / 2;
+		top = cardTop - gap - height;
+	}
+	else {
+		left = hx - width / 2;
+		top = cardBottom + gap;
+	}
+	left += dx || 0;
+	left = Math.max(12, Math.min(left, hostRect.width - width - 12));
+	top = Math.max(68, Math.min(top, hostRect.height - height - 78));
+	el.style.left = left + 'px';
+	el.style.top = top + 'px';
+	return { left: left, top: top, width: width, height: height };
+}
+
+function mapInfocardCalloutAnchor(box, side) {
+	if(side === 'left')
+		return { x: box.left + box.width, y: box.top + Math.min(18, box.height * 0.38) };
+	if(side === 'right')
+		return { x: box.left, y: box.top + Math.min(18, box.height * 0.38) };
+	if(side === 'top')
+		return { x: box.left + box.width / 2, y: box.top + box.height };
+	return { x: box.left + box.width / 2, y: box.top };
+}
+
+function mapInfocardCalloutPath(from, to, side) {
+	var mid;
+	if(side === 'left' || side === 'right') {
+		mid = (from.x + to.x) / 2;
+		return 'M' + from.x.toFixed(1) + ',' + from.y.toFixed(1) + ' H' + mid.toFixed(1) + ' V' + to.y.toFixed(1) + ' H' + to.x.toFixed(1);
+	}
+	mid = (from.y + to.y) / 2;
+	return 'M' + from.x.toFixed(1) + ',' + from.y.toFixed(1) + ' V' + mid.toFixed(1) + ' H' + to.x.toFixed(1) + ' V' + to.y.toFixed(1);
+}
+
+function drawMapInfocardCalloutLine(svg, from, to, side) {
+	var ns = 'http://www.w3.org/2000/svg';
+	var path = document.createElementNS(ns, 'path');
+	var ring = document.createElementNS(ns, 'circle');
+	var dot = document.createElementNS(ns, 'circle');
+	path.setAttribute('d', mapInfocardCalloutPath(from, to, side));
+	path.setAttribute('fill', 'none');
+	path.setAttribute('stroke', '#69B7CF');
+	path.setAttribute('stroke-width', '1.7');
+	path.setAttribute('stroke-linecap', 'round');
+	path.setAttribute('stroke-linejoin', 'round');
+	ring.setAttribute('cx', to.x.toFixed(1));
+	ring.setAttribute('cy', to.y.toFixed(1));
+	ring.setAttribute('r', '5.4');
+	ring.setAttribute('fill', '#fff');
+	ring.setAttribute('stroke', '#69B7CF');
+	ring.setAttribute('stroke-width', '1.6');
+	dot.setAttribute('cx', to.x.toFixed(1));
+	dot.setAttribute('cy', to.y.toFixed(1));
+	dot.setAttribute('r', '2.4');
+	dot.setAttribute('fill', '#69B7CF');
+	svg.appendChild(path);
+	svg.appendChild(ring);
+	svg.appendChild(dot);
+}
+
+function layoutMapInfocardGuide() {
+	var host = document.getElementById('map_icon_guide_infocard');
+	var svg;
+	var hostRect;
+	var card;
+	var cardRect;
+	var compact;
+	var specs;
+	var i;
+	var spec;
+	var callout;
+	var hotspot;
+	var hotspotRect;
+	var hx;
+	var hy;
+	var box;
+	var from;
+	if(!host)
+		return;
+	svg = host.querySelector('.map_icon_guide_infocard_lines');
+	if(!svg)
+		return;
+	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
+		clearMapInfocardGuideLines(svg);
+		return;
+	}
+	hostRect = host.getBoundingClientRect();
+	if(hostRect.width < 8 || hostRect.height < 8)
+		return;
+	card = host.querySelector('.map_icon_guide_infocard_card');
+	cardRect = card ? card.getBoundingClientRect() : hostRect;
+	svg.setAttribute('viewBox', '0 0 ' + hostRect.width + ' ' + hostRect.height);
+	clearMapInfocardGuideLines(svg);
+	compact = window.innerWidth < 720 || window.innerHeight < 560;
+	specs = compact
+		? [
+			{ id: 'infocard-city', side: 'top', gap: 18, dx: -40 },
+			{ id: 'infocard-code', side: 'top', gap: 18, dx: 52 },
+			{ id: 'infocard-address', side: 'bottom', gap: 22, dx: -78 },
+			{ id: 'infocard-launch', side: 'bottom', gap: 22, dx: 0 },
+			{ id: 'infocard-share', side: 'bottom', gap: 22, dx: 78 }
+		]
+		: [
+			{ id: 'infocard-city', side: 'left', gap: 28, dx: 0 },
+			{ id: 'infocard-code', side: 'right', gap: 28, dx: 0 },
+			{ id: 'infocard-address', side: 'left', gap: 28, dx: 0 },
+			{ id: 'infocard-launch', side: 'bottom', gap: 36, dx: 0 },
+			{ id: 'infocard-share', side: 'right', gap: 28, dx: 0 }
+		];
+	for(i = 0; i < specs.length; i++) {
+		spec = specs[i];
+		callout = host.querySelector('.map_icon_guide_callout[data-guide-id="' + spec.id + '"]');
+		hotspot = host.querySelector('.map_icon_guide_hotspot[data-guide-id="' + spec.id + '"]');
+		if(!callout || !hotspot)
+			continue;
+		hotspotRect = hotspot.getBoundingClientRect();
+		hx = hotspotRect.left + hotspotRect.width / 2 - hostRect.left;
+		hy = hotspotRect.top + hotspotRect.height / 2 - hostRect.top;
+		box = placeMapInfocardCallout(callout, hx, hy, spec.side, spec.gap, spec.dx, hostRect, cardRect);
+		from = mapInfocardCalloutAnchor(box, spec.side);
+		drawMapInfocardCalloutLine(svg, from, { x: hx, y: hy }, spec.side);
+	}
+}
+
 function restoreMapSearchBarStacking() {
 	var bar = document.getElementById('map_search_bar');
 	var home = decodeIconGuideSearchHome;
@@ -270,6 +430,7 @@ function layoutMapSearchCaptions() {
 	var inputRect;
 	syncMapIconGuideDim();
 	raiseMapSearchBarForGuide();
+	layoutMapInfocardGuide();
 	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide'))
 		return;
 	input = document.getElementById('pac-input');

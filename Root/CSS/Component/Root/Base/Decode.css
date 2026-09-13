@@ -223,6 +223,19 @@ body:not(.decode).decode-icon-guide #map_search_bar {
 	z-index: 1000001 !important;
 }
 
+body:not(.decode).decode-icon-guide #pac-input {
+	opacity: 1;
+}
+
+body:not(.decode).decode-icon-guide #decode_button {
+	background-color: #fff;
+	color: #69B7CF;
+}
+
+body:not(.decode).decode-icon-guide #decode_button .proceed_button_shape {
+	opacity: 1;
+}
+
 #map_camera_label {
 	display: none;
 	pointer-events: none;

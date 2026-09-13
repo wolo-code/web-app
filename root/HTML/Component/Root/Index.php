@@ -97,6 +97,7 @@
 		<span class='map_type_icon_esri'><?php includeSVG('', 'Map-esri'); ?></span>
 		<span class='map_type_icon_microsoft'><?php includeSVG('', 'Map-microsoft'); ?></span>
 	</span>
+	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Switch map</span>
 </div>
 <div id='decode_icon_guide_scrim'></div>
 <div id='action_menu' class='control' tabindex='7'>
@@ -110,6 +111,7 @@
 				<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
 				<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
 			</span>
+			<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Wolo Code</span>
 		</button>
 		<button id='action_menu_map' class='action_menu_item' type='button' tabindex='-1' aria-label='Map view' title='Map view'>
 			<span class='image map_type_icon'>

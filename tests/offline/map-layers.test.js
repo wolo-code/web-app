@@ -519,4 +519,7 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	assert.doesNotMatch(scriptJs, /onQROverlayClick/);
 	assert.doesNotMatch(qrJs, /onQROverlayClick/);
 	assert.doesNotMatch(qrJs, /isQROverlayDismissTarget/);
+	assert.match(overlayJs, /function hideOverlay[\s\S]*syncDecodeIconGuide/);
+	assert.match(overlayJs, /function showOverlay[\s\S]*hideDecodeIconGuide/);
+	assert.doesNotMatch(overlayJs, /function showOverlay[\s\S]*syncDecodeIconGuide/);
 });

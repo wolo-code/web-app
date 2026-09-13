@@ -74,8 +74,8 @@ function showOverlay(e) {
 		document.getElementById('overlay').classList.remove('hide');
 	if(e.classList.contains('hide'))
 		e.classList.remove('hide');
-	if(typeof syncDecodeIconGuide == 'function')
-		syncDecodeIconGuide();
+	if(typeof decodeIconGuideVisible != 'undefined' && decodeIconGuideVisible && typeof hideDecodeIconGuide == 'function')
+		hideDecodeIconGuide();
 	if(typeof layoutBottomNotification == 'function')
 		layoutBottomNotification();
 }

@@ -9,8 +9,10 @@
 		right: 10px;
 	}
 
-	.decode.decode-icon-guide #account .decode_chrome_caption {
+	.decode.decode-icon-guide #account .decode_chrome_caption,
+	body:not(.decode).decode-icon-guide #account .decode_chrome_caption {
 		left: 50%;
+		right: auto;
 		top: calc(100% + 4px);
 		transform: translateX(-50%);
 	}

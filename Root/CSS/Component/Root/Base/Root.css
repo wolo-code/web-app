@@ -195,14 +195,17 @@ html body .decode_city_source_button.activating svg {
 	transform: none;
 }
 
-body:not(.decode) #action_menu_info,
 .decode #action_menu_decode,
 #action_menu #action_menu_map {
 	display: none;
 }
 
 body:not(.decode) #action_menu {
-	width: 39px;
+	width: 90px;
+}
+
+body:not(.decode) #action_menu_decode {
+	left: 51px;
 }
 
 #map_type_button {
@@ -265,9 +268,9 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 	color: #444;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.72em;
-	left: 70px;
+	left: 121px;
 	line-height: 1.2;
-	max-width: calc(100vw - 160px);
+	max-width: calc(100vw - 210px);
 	padding: 2px 8px;
 	position: absolute;
 	right: auto;
@@ -296,9 +299,9 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 	.map_attribution {
 		bottom: 4px;
 		font-size: 0.65em;
-		left: 66px;
+		left: 117px;
 		line-height: 1.3;
-		max-width: calc(50vw - 120px);
+		max-width: calc(50vw - 145px);
 		padding: 3px 6px;
 		white-space: normal;
 	}

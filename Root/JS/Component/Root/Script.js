@@ -244,7 +244,7 @@ function isMapTypeSwitcherVisible() {
 function syncActionMenuAccess() {
 	var decodeView = isDecodeView();
 	var switcherVisible = isMapTypeSwitcherVisible();
-	document.getElementById('action_menu_info').tabIndex = decodeView ? 0 : -1;
+	document.getElementById('action_menu_info').tabIndex = 0;
 	document.getElementById('action_menu_map').tabIndex = -1;
 	document.getElementById('action_menu_decode').tabIndex = decodeView ? -1 : 0;
 	document.getElementById('map_type_button').tabIndex = !decodeView && switcherVisible ? 6 : -1;

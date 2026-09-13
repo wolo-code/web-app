@@ -299,11 +299,11 @@ test('map source attribution sits after a gap from the action menu', () => {
 	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
 	const narrowCss = read('Root/CSS/Component/Root/Base/Root_narrow.css');
 	const baseCss = read('Root/CSS/Base/Base.css');
-	assert.match(rootCss, /\.map_attribution \{[\s\S]*left:\s*70px/);
-	assert.match(rootCss, /@media \(max-width:\s*662px\) \{[\s\S]*\.map_attribution \{[\s\S]*left:\s*66px/);
+	assert.match(rootCss, /\.map_attribution \{[\s\S]*left:\s*121px/);
+	assert.match(rootCss, /@media \(max-width:\s*662px\) \{[\s\S]*\.map_attribution \{[\s\S]*left:\s*117px/);
 	assert.doesNotMatch(rootCss, /#action_menu\.open\) \.map_attribution/);
-	assert.match(narrowCss, /\.map_attribution \{[\s\S]*left:\s*66px/);
-	assert.match(narrowCss, /max-width:\s*calc\(50vw - 120px\)/);
+	assert.match(narrowCss, /\.map_attribution \{[\s\S]*left:\s*117px/);
+	assert.match(narrowCss, /max-width:\s*calc\(50vw - 145px\)/);
 	assert.match(baseCss, /body\.apple #map_stage::after/);
 });
 
@@ -338,10 +338,11 @@ test('chrome controls include native tooltips', () => {
 test('Wolo Code Input View has first-launch icon captions', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
-	const infoFull = read('Root/HTML/Fragment/Info_full.php');
-	const infoJs = read('Root/JS/Component/Root/Info.js');
+	const infoPhp = read('Root/HTML/Fragment/Info.php');
+	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
 	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
+	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
 	assert.match(index, /class='decode_icon_caption'[\s\S]*IP city/);
 	assert.match(index, /class='decode_icon_caption'[\s\S]*GPS city/);
 	assert.match(index, /class='decode_icon_caption'[\s\S]*Previous/);
@@ -349,6 +350,8 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Info/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Locate/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Map/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Wolo Code/);
+	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Switch map/);
 	assert.match(index, /id='decode_icon_guide_scrim'/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_MAX_LAUNCHES = 2/);
 	assert.match(guideJs, /DECODE_ICON_GUIDE_HOLD_MS = 3000/);
@@ -358,10 +361,13 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /decodeIconGuideConsumed = true/);
 	assert.match(guideJs, /recordDecodeIconGuideLaunch/);
 	assert.match(guideJs, /function requestDecodeIconGuide/);
-	assert.match(infoFull, /id='info_show_icon_labels'/);
-	assert.match(infoJs, /function showInfoIconGuide/);
+	assert.doesNotMatch(guideJs, /toggleDecodeView/);
+	assert.match(infoPhp, /id='info_show_icon_labels'/);
+	assert.match(scriptJs, /function showInfoIconGuide/);
 	assert.match(decodeCss, /rgba\(0,\s*0,\s*0,\s*0\.8\)/);
-	assert.match(decodeCss, /\.decode\.decode-icon-guide \.decode_icon_caption/);
+	assert.match(decodeCss, /body\.decode-icon-guide \.decode_icon_caption/);
+	assert.doesNotMatch(rootCss, /body:not\(\.decode\) #action_menu_info/);
+	assert.match(rootCss, /body:not\(\.decode\) #action_menu_decode \{[\s\S]*left:\s*51px/);
 	assert.match(decodeNarrowCss, /max-width:\s*662px/);
 });
 

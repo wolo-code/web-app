@@ -39,15 +39,17 @@
 	z-index: 1;
 }
 
-.decode.decode-icon-guide #account,
-.decode.decode-icon-guide #action_menu,
-.decode.decode-icon-guide #location_button,
-.decode.decode-icon-guide #decode_map_view_button,
-.decode.decode-icon-guide #logo {
+body.decode-icon-guide #account,
+body.decode-icon-guide #action_menu,
+body.decode-icon-guide #location_button,
+body.decode-icon-guide #decode_map_view_button,
+body.decode-icon-guide #map_type_button,
+body.decode-icon-guide #logo {
 	z-index: 202;
 }
 
-.decode.decode-icon-guide #account {
+body.decode-icon-guide #account {
+	overflow: visible;
 	position: absolute;
 	width: 39px;
 }
@@ -66,13 +68,13 @@
 	z-index: 200;
 }
 
-.decode.decode-icon-guide #decode_icon_guide_scrim {
+body.decode-icon-guide #decode_icon_guide_scrim {
 	display: block;
 }
 
-.decode.decode-icon-guide.decode-icon-guide-fade #decode_icon_guide_scrim,
+body.decode-icon-guide.decode-icon-guide-fade #decode_icon_guide_scrim,
 .decode.decode-icon-guide.decode-icon-guide-fade #decode_interface_overlay::before,
-.decode.decode-icon-guide.decode-icon-guide-fade .decode_icon_caption {
+body.decode-icon-guide.decode-icon-guide-fade .decode_icon_caption {
 	opacity: 0;
 	pointer-events: none;
 }
@@ -100,7 +102,7 @@
 	z-index: 3;
 }
 
-.decode.decode-icon-guide .decode_icon_caption {
+body.decode-icon-guide .decode_icon_caption {
 	display: block;
 	opacity: 1;
 	transition: opacity 400ms ease;
@@ -129,7 +131,7 @@
 	top: calc(100% - 10px);
 }
 
-.decode.decode-icon-guide .decode_chrome_caption {
+body.decode-icon-guide .decode_chrome_caption {
 	left: 50%;
 	max-width: none;
 	right: auto;
@@ -146,9 +148,19 @@
 	transform: translateY(-50%);
 }
 
-.decode.decode-icon-guide #action_menu_info .decode_chrome_caption,
-.decode.decode-icon-guide #location_button .decode_chrome_caption,
-.decode.decode-icon-guide #decode_map_view_button .decode_chrome_caption {
+body:not(.decode).decode-icon-guide #account .decode_chrome_caption {
+	bottom: auto;
+	left: auto;
+	right: calc(100% + 8px);
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+body.decode-icon-guide #action_menu_info .decode_chrome_caption,
+body.decode-icon-guide #action_menu_decode .decode_chrome_caption,
+body.decode-icon-guide #location_button .decode_chrome_caption,
+body.decode-icon-guide #decode_map_view_button .decode_chrome_caption,
+body.decode-icon-guide #map_type_button .decode_chrome_caption {
 	bottom: calc(100% + 6px);
 	top: auto;
 }
@@ -164,7 +176,9 @@
 
 #location_button,
 #decode_map_view_button,
-#action_menu_info {
+#map_type_button,
+#action_menu_info,
+#action_menu_decode {
 	overflow: visible;
 }
 

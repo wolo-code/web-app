@@ -106,7 +106,7 @@ function getDecodeIconGuideMinTop() {
 function applyDecodeIconGuideOffset() {
 	var container = document.getElementById('decode_input_container');
 	var stack = document.getElementById('map_bottom_stack');
-	if(!container || !document.body.classList.contains('decode-icon-guide')) {
+	if(!container || !document.body.classList.contains('decode-icon-guide') || !document.body.classList.contains('decode')) {
 		resetDecodeIconGuideOffset();
 		return;
 	}
@@ -124,7 +124,7 @@ function applyDecodeIconGuideOffset() {
 
 function layoutDecodeIconGuide() {
 	var container = document.getElementById('decode_input_container');
-	if(!container || !document.body.classList.contains('decode-icon-guide')) {
+	if(!container || !document.body.classList.contains('decode-icon-guide') || !document.body.classList.contains('decode')) {
 		resetDecodeIconGuideOffset();
 		return;
 	}
@@ -253,23 +253,20 @@ function startDecodeIconGuide(force) {
 }
 
 function requestDecodeIconGuide() {
-	var decodeView = typeof isDecodeView == 'function'
-		? isDecodeView()
-		: document.body.classList.contains('decode');
-	if(!decodeView && typeof toggleDecodeView == 'function')
-		toggleDecodeView();
 	startDecodeIconGuide(true);
 }
 
 function syncDecodeIconGuide() {
-	var allow = typeof isDecodeView == 'function'
+	var decodeView = typeof isDecodeView == 'function'
 		? isDecodeView()
 		: document.body.classList.contains('decode');
-	allow = allow && (decodeIconGuideForced || shouldShowDecodeIconGuide()) && !isAppOverlayOpen();
+	var allow = (decodeIconGuideForced || (decodeView && shouldShowDecodeIconGuide())) && !isAppOverlayOpen();
 	if(allow && !decodeIconGuideConsumed && !decodeIconGuideVisible)
 		startDecodeIconGuide();
 	else if(!allow && decodeIconGuideVisible)
 		hideDecodeIconGuide();
+	else if(decodeIconGuideVisible)
+		layoutDecodeIconGuide();
 }
 
 function initDecodeIconGuide() {

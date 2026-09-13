@@ -500,12 +500,20 @@ function syncBottomStackMapPan() {
 	if(typeof map == 'undefined' || !map) {
 		return;
 	}
+	if(typeof isAppOverlayOpen == 'function' && isAppOverlayOpen()) {
+		if(typeof layoutBottomNotification == 'function')
+			layoutBottomNotification();
+		return;
+	}
 	var next = getBottomStackHeight();
 	var delta = next - lastBottomStackPanY;
 	if(delta) {
-		map.panBy(0, -delta);
+		if(!programmaticMapFocus)
+			map.panBy(0, -delta);
 		lastBottomStackPanY = next;
 	}
+	if(typeof layoutBottomNotification == 'function')
+		layoutBottomNotification();
 }
 
 function initBottomStackMapPan() {

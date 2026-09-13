@@ -31,8 +31,11 @@ function decodeData(data, d) {
 }
 
 function getCityBegin(cityCenter) {
-	const lat = cityCenter.lat - lat_span_half(cityCenter.lat)*N;
-	const lng = cityCenter.lng - lng_span_half(cityCenter.lat)*N;
+	var center = typeof plainCityCenter == 'function' ? plainCityCenter(cityCenter) : cityCenter;
+	if(!center)
+		return null;
+	const lat = center.lat - lat_span_half(center.lat)*N;
+	const lng = center.lng - lng_span_half(center.lat)*N;
 	return {'lat': lat, 'lng': lng};
 }
 
@@ -52,7 +55,12 @@ function encode_(city, position) {
 		areaNotCovered(position);
 		return;
 	}
-	const code = encode__(getCityBegin(city.center), position);
+	const cityBegin = getCityBegin(city.center);
+	if(!cityBegin) {
+		areaNotCovered(position);
+		return;
+	}
+	const code = encode__(cityBegin, position);
 	if(!isValidWoloIndexCode(code)) {
 		areaNotCovered(position);
 		return;
@@ -72,13 +80,28 @@ function setCodeWords(code, city, position) {
 }
 
 function decode_(city, code) {
+	if(typeof normalizeSavedWcode == 'function')
+		code = normalizeSavedWcode(code);
+	else if(code && code.length > 3)
+		code = code.slice(-3);
+	var cityBegin = city && getCityBegin(city.center);
+	if(!city || !cityBegin || !code || code.length != 3) {
+		if(typeof showNotification == 'function')
+			showNotification('Could not open saved address');
+		return;
+	}
 	code_city = city;
 	setDecodeCity(city, selected_decode_city_source || 'history', true);
 	var data = [];
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);
 	data[2] = wordList.indexOf(code[2]);
-	var position = decode__(getCityBegin(city.center), data)	;
+	if(data[0] < 0 || data[1] < 0 || data[2] < 0) {
+		if(typeof showNotification == 'function')
+			showNotification('Could not open saved address');
+		return;
+	}
+	var position = decode__(cityBegin, data);
 	setCodeCoord(city, position, code);
 	notification_top.classList.add('hide');
 	wait_loader.classList.add('hide');

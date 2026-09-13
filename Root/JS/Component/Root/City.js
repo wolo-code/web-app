@@ -486,46 +486,113 @@ function getCityFromCityGp_idThenDecode(city_gp_id, wcode) {
 	getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, callback_failure )
 }
 
+function isUsableCityId(id) {
+	return id != null && id !== '' && id !== 'undefined' && id !== 'null';
+}
+
+function getCityMatchingId(id) {
+	if (!isUsableCityId(id))
+		return null;
+	if (typeof code_city != 'undefined' && code_city
+		&& (code_city.id == id || code_city.gp_id == id))
+		return code_city;
+	return null;
+}
+
 // only detail, not center
-function getCityFromId(id, callback) {
-	function finish(city) {
+function getCityFromId(id, callback, options) {
+	var notify = !(options && options.notify === false);
+	var reportFailure = options && options.notify === false;
+	var useLoader = notify;
+
+	function succeed(city) {
 		if (city) {
+			if (!isUsableCityId(city.id))
+				city.id = id;
 			rememberCity(city);
 			callback(city);
 			return;
 		}
-		if (isOfflineMode()) {
-			getCityFromCache(id, function(cached) {
-				if (cached) {
-					callback(cached);
-				} else {
-					showNotification('City not available offline. Open this city once while online.');
-				}
-			});
+		if (notify) {
+			if (isOfflineMode())
+				showNotification('City not available offline. Open this city once while online.');
+			else
+				showNotification("Error: City not found!");
+		}
+		if (reportFailure && typeof callback == 'function')
+			callback(null);
+	}
+
+	function lookupByGpId() {
+		if (typeof getCityFromCityGp_id != 'function') {
+			succeed(null);
 			return;
 		}
-		showNotification("Error: City not found!");
+		getCityFromCityGp_id(id, function(city) {
+			succeed(city || null);
+		}, function() {
+			succeed(null);
+		});
+	}
+
+	function lookupCacheThenGpId() {
+		var memoryCity = getCityMatchingId(id);
+		if (memoryCity) {
+			succeed(memoryCity);
+			return;
+		}
+		if (typeof getCityFromCache != 'function') {
+			if (isOfflineMode())
+				succeed(null);
+			else
+				lookupByGpId();
+			return;
+		}
+		getCityFromCache(id, function(cached) {
+			if (cached) {
+				succeed(cached);
+				return;
+			}
+			if (isOfflineMode())
+				succeed(null);
+			else
+				lookupByGpId();
+		});
+	}
+
+	if (!isUsableCityId(id)) {
+		succeed(null);
+		return;
+	}
+
+	var memoryCity = getCityMatchingId(id);
+	if (memoryCity) {
+		succeed(memoryCity);
+		return;
 	}
 
 	if (isOfflineMode()) {
-		getCityFromCache(id, finish);
+		lookupCacheThenGpId();
 		return;
 	}
 
 	var ref = database.ref('CityDetail'+'/'+id);
-	pushLoader();
+	if (useLoader)
+		pushLoader();
 	ref.once('value').then(function(snapshot) {
-		popLoader();
+		if (useLoader)
+			popLoader();
 		var city = snapshot.val();
 		if (city) {
 			city.id = id;
-			finish(city);
+			succeed(city);
 		} else {
-			finish(null);
+			lookupCacheThenGpId();
 		}
 	}).catch(function() {
-		popLoader();
-		getCityFromCache(id, finish);
+		if (useLoader)
+			popLoader();
+		lookupCacheThenGpId();
 	});
 }
 
@@ -623,10 +690,13 @@ function getCityCenterFromId_session(city, session_id, callback) {
 		}] );
 }
 
-function getCityCenterFromId(city, callback) {
+function getCityCenterFromId(city, callback, options) {
+	var refresh = options && options.refresh;
+
 	function finish(center) {
-		if (center) {
-			city.center = center;
+		var plain = typeof plainCityCenter == 'function' ? plainCityCenter(center) : center;
+		if (plain) {
+			city.center = plain;
 			rememberCity(city);
 			callback(city);
 			return;
@@ -639,7 +709,11 @@ function getCityCenterFromId(city, callback) {
 		callback(city);
 	}
 
-	if (city.center && city.center.lat != null && city.center.lng != null) {
+	var existing = !refresh && typeof plainCityCenter == 'function'
+		? plainCityCenter(city.center)
+		: (!refresh && city.center && city.center.lat != null && typeof city.center.lat != 'function' ? city.center : null);
+	if (existing) {
+		city.center = existing;
 		rememberCity(city);
 		callback(city);
 		return;

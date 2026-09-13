@@ -37,11 +37,21 @@ var mapSourcePrefs = {
 	microsoft: MAP_SOURCE_STATE_ON
 };
 var OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+var OSM_NATIVE_MAX_ZOOM = 19;
+var OSM_ZOOM_FALLBACK_MIN = 1;
+var OSM_TILE_ERROR_FALLBACK_COUNT = 3;
+var OSM_MAP_DATA_UNAVAILABLE_MESSAGE = 'Map data not yet available';
 var MAPKIT_SCRIPT_URL = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
 var TRANSPARENT_TILE_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 var ESRI_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 var MICROSOFT_TILE_URL = 'https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{q}?mkt=en-US&it=G,L&shading=hill&n=z';
 var rasterMapTypesInitialized = false;
+var osmZoomFallbackInitialized = false;
+var osmZoomFallbackTimer = 0;
+var osmZoomFallbackNotifiedAt = 0;
+var osmTileErrorStreak = 0;
+var osmTileOkStreak = 0;
+var osmFallbackApplying = false;
 var appleMap = null;
 var appleMapkitReady = false;
 var appleMapkitLoading = false;
@@ -85,6 +95,161 @@ function rasterTileUrl(template, coord, zoom) {
 		.replace('{z}', String(zoom))
 		.replace('{x}', String(x))
 		.replace('{y}', String(y));
+}
+
+function isOsmMapLayerActive() {
+	return getCurrentMapLayer() === MAP_LAYER_OSM;
+}
+
+function getOsmFallbackZoom(currentZoom, nativeMaxZoom, tilesMissing) {
+	var zoom = Number(currentZoom);
+	var nativeMax = Number(nativeMaxZoom);
+	if(!(zoom >= 0) || !(nativeMax >= 0)) {
+		return currentZoom;
+	}
+	if(zoom > nativeMax) {
+		return nativeMax;
+	}
+	if(tilesMissing && zoom > OSM_ZOOM_FALLBACK_MIN) {
+		return zoom - 1;
+	}
+	return zoom;
+}
+
+function getActiveMapTypeMaxZoom() {
+	var mapType;
+	if(typeof map !== 'object' || !map || typeof map.getMapTypeId !== 'function') {
+		return typeof DEFAULT_LOCATE_ZOOM === 'number' ? DEFAULT_LOCATE_ZOOM : OSM_NATIVE_MAX_ZOOM;
+	}
+	mapType = map.mapTypes.get(map.getMapTypeId());
+	if(mapType && typeof mapType.maxZoom === 'number') {
+		return mapType.maxZoom;
+	}
+	return typeof DEFAULT_LOCATE_ZOOM === 'number' ? DEFAULT_LOCATE_ZOOM : OSM_NATIVE_MAX_ZOOM;
+}
+
+function notifyOsmMapDataUnavailable() {
+	var now = Date.now();
+	if(now - osmZoomFallbackNotifiedAt < 2500) {
+		return;
+	}
+	osmZoomFallbackNotifiedAt = now;
+	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
+		if(typeof notifyOfflineMapTilesMissing === 'function') {
+			notifyOfflineMapTilesMissing();
+		}
+		return;
+	}
+	if(typeof showNotification === 'function') {
+		showNotification(OSM_MAP_DATA_UNAVAILABLE_MESSAGE);
+	}
+}
+
+function applyOsmFallbackZoom(tilesMissing) {
+	var current;
+	var next;
+	if(typeof map !== 'object' || !map || !isOsmMapLayerActive() || osmFallbackApplying) {
+		return;
+	}
+	current = map.getZoom();
+	next = getOsmFallbackZoom(current, OSM_NATIVE_MAX_ZOOM, tilesMissing);
+	if(next === current) {
+		return;
+	}
+	osmFallbackApplying = true;
+	osmTileErrorStreak = 0;
+	map.setZoom(next);
+	if(tilesMissing)
+		notifyOsmMapDataUnavailable();
+	setTimeout(function() {
+		osmFallbackApplying = false;
+	}, 350);
+}
+
+function scheduleOsmZoomFallback(tilesMissing) {
+	if(osmZoomFallbackTimer) {
+		clearTimeout(osmZoomFallbackTimer);
+	}
+	osmZoomFallbackTimer = setTimeout(function() {
+		osmZoomFallbackTimer = 0;
+		applyOsmFallbackZoom(tilesMissing);
+	}, 80);
+}
+
+function onOsmTileLoad() {
+	osmTileOkStreak++;
+	if(osmTileOkStreak > 2) {
+		osmTileErrorStreak = 0;
+	}
+}
+
+function onOsmTileError(zoom) {
+	if(!isOsmMapLayerActive()) {
+		return;
+	}
+	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
+		return;
+	}
+	if(zoom > OSM_NATIVE_MAX_ZOOM) {
+		scheduleOsmZoomFallback(false);
+		return;
+	}
+	osmTileErrorStreak++;
+	osmTileOkStreak = 0;
+	if(osmTileErrorStreak >= OSM_TILE_ERROR_FALLBACK_COUNT) {
+		scheduleOsmZoomFallback(true);
+	}
+}
+
+function bindOsmTileNode(node, zoom) {
+	var imgs;
+	var i;
+	if(!node) {
+		return;
+	}
+	if(node.tagName === 'IMG') {
+		imgs = [node];
+	}
+	else if(node.querySelectorAll) {
+		imgs = node.querySelectorAll('img');
+	}
+	else {
+		return;
+	}
+	for(i = 0; i < imgs.length; i++) {
+		if(imgs[i].__woloOsmBound) {
+			continue;
+		}
+		imgs[i].__woloOsmBound = true;
+		imgs[i].addEventListener('load', onOsmTileLoad);
+		imgs[i].addEventListener('error', function() {
+			onOsmTileError(zoom);
+		});
+	}
+}
+
+function watchOsmZoomFallback() {
+	if(osmZoomFallbackInitialized || typeof map !== 'object' || !map) {
+		return;
+	}
+	osmZoomFallbackInitialized = true;
+	map.addListener('zoom_changed', function() {
+		if(!isOsmMapLayerActive() || osmFallbackApplying) {
+			return;
+		}
+		osmTileErrorStreak = 0;
+		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
+			scheduleOsmZoomFallback(false);
+		}
+	});
+	map.addListener('idle', function() {
+		if(!isOsmMapLayerActive() || osmFallbackApplying) {
+			return;
+		}
+		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
+			scheduleOsmZoomFallback(false);
+		}
+	});
 }
 
 function getAppleMapsToken() {
@@ -405,15 +570,28 @@ function activateAppleMapLayer() {
 }
 
 function setRasterMapType(id, name, template, maxZoom) {
-	map.mapTypes.set(id, new google.maps.ImageMapType({
+	var mapType = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
+			if(id === MAP_LAYER_OSM && zoom > OSM_NATIVE_MAX_ZOOM) {
+				scheduleOsmZoomFallback(false);
+				return null;
+			}
 			return rasterTileUrl(template, coord, zoom);
 		},
 		tileSize: new google.maps.Size(256, 256),
 		name: name,
 		maxZoom: maxZoom,
 		alt: name
-	}));
+	});
+	if(id === MAP_LAYER_OSM) {
+		var originalGetTile = mapType.getTile.bind(mapType);
+		mapType.getTile = function(coord, zoom, ownerDocument) {
+			var tile = originalGetTile(coord, zoom, ownerDocument);
+			bindOsmTileNode(tile, zoom);
+			return tile;
+		};
+	}
+	map.mapTypes.set(id, mapType);
 }
 
 function initOsmMapType() {
@@ -421,11 +599,17 @@ function initOsmMapType() {
 		return;
 	}
 
-	setRasterMapType(MAP_LAYER_OSM, 'OpenStreetMap', OSM_TILE_URL, 19);
+	setRasterMapType(
+		MAP_LAYER_OSM,
+		'OpenStreetMap',
+		OSM_TILE_URL,
+		OSM_NATIVE_MAX_ZOOM
+	);
 	setBlankMapType(MAP_LAYER_APPLE, 'Apple Maps');
 	setRasterMapType(MAP_LAYER_ESRI, 'Esri', ESRI_TILE_URL, 19);
 	setRasterMapType(MAP_LAYER_MICROSOFT, 'Microsoft Maps', MICROSOFT_TILE_URL, 19);
 	rasterMapTypesInitialized = true;
+	watchOsmZoomFallback();
 }
 
 function getCurrentMapLayer() {
@@ -490,6 +674,10 @@ function setMapLayer(layer) {
 	else if(layer === MAP_LAYER_OSM) {
 		document.body.classList.add('osm');
 		map.setMapTypeId(MAP_LAYER_OSM);
+		watchOsmZoomFallback();
+		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
+			scheduleOsmZoomFallback(false);
+		}
 	}
 	else if(layer === MAP_LAYER_APPLE) {
 		document.body.classList.add('apple');
@@ -913,6 +1101,8 @@ function syncMapSourceControls() {
 		defaults[i].classList.toggle('map-source-default-active', selected);
 		defaults[i].setAttribute('aria-pressed', selected ? 'true' : 'false');
 		setControlTooltip(defaults[i], selected ? label + ' is the default map' : 'Set ' + label + ' as default');
+		if(defaults[i].parentElement && defaults[i].parentElement.parentElement)
+			defaults[i].parentElement.parentElement.classList.toggle('map-source-row-default', selected);
 	}
 }
 

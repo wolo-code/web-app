@@ -13,9 +13,20 @@ function focus___(pos, bounds) {
 
 const ZOOM_ANIMATION_SPEED = 250;
 var firstFocus = true;
+function beginProgrammaticMapFocus() {
+	programmaticMapFocus = true;
+}
+
+function endProgrammaticMapFocus() {
+	programmaticMapFocus = false;
+	if(typeof getBottomStackHeight == 'function')
+		lastBottomStackPanY = getBottomStackHeight();
+}
+
 function focus_(pos, bounds) {
 
 	hideNoCityMessage();
+	beginProgrammaticMapFocus();
 
 	map.panTo(pos);
 
@@ -28,6 +39,15 @@ function focus_(pos, bounds) {
 			newZoom = DEFAULT_LOCATE_ZOOM;
 			if (typeof accuCircle !== 'undefined') {
 				accuCircle.setOptions({'fillOpacity': 0.10});
+			}
+			if (typeof getCurrentMapLayer === 'function' && getCurrentMapLayer() === MAP_LAYER_OSM && typeof OSM_NATIVE_MAX_ZOOM === 'number' && newZoom > OSM_NATIVE_MAX_ZOOM) {
+				newZoom = OSM_NATIVE_MAX_ZOOM;
+			}
+			else if (typeof getActiveMapTypeMaxZoom === 'function') {
+				var typeMax = getActiveMapTypeMaxZoom();
+				if (typeof typeMax === 'number' && newZoom > typeMax) {
+					newZoom = typeMax;
+				}
 			}
 		}
 		smoothZoomToBounds(bounds, map, newZoom, map.getZoom());
@@ -90,6 +110,8 @@ var zoomChangedListener;
 var nextZoomTimer;
 function smoothZoomToBounds(bounds, map, max, current) {
 	if (current >= max) {
+		if(current > max)
+			map.setZoom(max);
 		if(smoothZoomToBounds_callCount-- == 0) {
 			if(typeof bounds !== 'undefined')
 				setTimeout(function() {
@@ -104,10 +126,15 @@ function smoothZoomToBounds(bounds, map, max, current) {
 							var idleListenerPanBy = map.addListener('idle', function() {
 									idleListenerPanBy.remove();
 									applyMapChromePan();
+									endProgrammaticMapFocus();
 								});
 						}
+						else
+							endProgrammaticMapFocus();
 					}
 				}, ZOOM_ANIMATION_SPEED);
+			else
+				endProgrammaticMapFocus();
 		}
 		return;
 	}
@@ -129,6 +156,9 @@ function smoothZoomToBounds(bounds, map, max, current) {
 function getZoomByBounds(map, bounds) {
 	var MAX_ZOOM = map.mapTypes.get(map.getMapTypeId()).maxZoom || DEFAULT_LOCATE_ZOOM;
 	var MIN_ZOOM = map.mapTypes.get(map.getMapTypeId()).minZoom || 0;
+	if (typeof getCurrentMapLayer === 'function' && getCurrentMapLayer() === MAP_LAYER_OSM && typeof OSM_NATIVE_MAX_ZOOM === 'number') {
+		MAX_ZOOM = Math.min(MAX_ZOOM, OSM_NATIVE_MAX_ZOOM);
+	}
 
 	var ne = map.getProjection().fromLatLngToPoint( bounds.getNorthEast() );
 	var sw = map.getProjection().fromLatLngToPoint( bounds.getSouthWest() );

@@ -257,7 +257,7 @@ body > #pac-input {
 }
 
 .notification_bar {
-	z-index: 100;
+	z-index: 301;
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -300,16 +300,24 @@ body > #pac-input {
 	right: auto;
 }
 
-#map_bottom_stack #notification_bottom {
+#notification_bottom {
+	bottom: 80px;
 	max-width: 100%;
 	opacity: 1;
-	transition: opacity 400ms ease;
+	transition: opacity 400ms ease, bottom 200ms ease;
 	width: 350px;
+	z-index: 301;
 }
 
-#map_bottom_stack #notification_bottom.fade-out {
+#notification_bottom.fade-out {
 	opacity: 0;
 	pointer-events: none;
+}
+
+#map_bottom_stack #notification_bottom {
+	bottom: auto;
+	position: relative;
+	z-index: 100;
 }
 
 .offline_status_banner {

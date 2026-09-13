@@ -91,7 +91,8 @@
 	text-decoration: none;
 }
 
-#info_intro:not(.hide) ~ #info_show_icon_labels {
+#info_intro:not(.hide) ~ #info_show_icon_labels,
+#info_links:not(.hide) ~ #info_show_icon_labels {
 	display: none;
 }
 

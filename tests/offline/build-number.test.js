@@ -58,4 +58,6 @@ test('Info modal omits version number and updated timestamp', () => {
 	assert.doesNotMatch(rootJs, /toggleInfoVersionDisplay/);
 	assert.match(info, /id='info_show_icon_labels'/);
 	assert.match(info, /show guide/);
+	const infoCss = fs.readFileSync(path.join(repoRoot, 'Root', 'CSS', 'Component', 'Root', 'Base', 'Info.css'), 'utf8');
+	assert.match(infoCss, /#info_links:not\(\.hide\)\s*~\s*#info_show_icon_labels/);
 });

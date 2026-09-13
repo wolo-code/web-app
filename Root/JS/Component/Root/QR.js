@@ -28,20 +28,6 @@ function showQR() {
 	window.addEventListener('afterprint', afterQRprint);
 }
 
-function isQROverlayDismissTarget(target) {
-	var qr = document.getElementById('qr_container');
-	if(!qr || qr.classList.contains('hide'))
-		return false;
-	return !qr.contains(target);
-}
-
-function onQROverlayClick(event) {
-	if(event && isQROverlayDismissTarget(event.target))
-		closeQR();
-	if(event && typeof isCodeQROverlayDismissTarget == 'function' && isCodeQROverlayDismissTarget(event.target))
-		closeCodeQR();
-}
-
 function closeQR() {
 	hideOverlay(document.getElementById('qr_container'));
 	previewQR_deactivate()

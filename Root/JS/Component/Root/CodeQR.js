@@ -65,13 +65,6 @@ function closeCodeQR() {
 		hideOverlay(dialog);
 }
 
-function isCodeQROverlayDismissTarget(target) {
-	var dialog = document.getElementById('code_qr_message');
-	if(!dialog || dialog.classList.contains('hide'))
-		return false;
-	return !dialog.contains(target);
-}
-
 function onCodeQRButtonClick(event) {
 	var button;
 	if(event && event.stopPropagation)

@@ -475,3 +475,17 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /#exception_message_title/);
 });
+
+test('overlay backdrop click closes dialogs except the crash dialog', () => {
+	const overlayJs = read('Root/JS/Component/Root/Overlay.js');
+	const scriptJs = read('Root/JS/Component/Root/Script.js');
+	const qrJs = read('Root/JS/Component/Root/QR.js');
+	assert.match(overlayJs, /function onOverlayBackdropClick/);
+	assert.match(overlayJs, /function isBlockingOverlayDialog/);
+	assert.match(overlayJs, /dialog\.id === 'exception_message'/);
+	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\)/);
+	assert.match(scriptJs, /addEventListener\('click', onOverlayBackdropClick\)/);
+	assert.doesNotMatch(scriptJs, /onQROverlayClick/);
+	assert.doesNotMatch(qrJs, /onQROverlayClick/);
+	assert.doesNotMatch(qrJs, /isQROverlayDismissTarget/);
+});

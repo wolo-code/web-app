@@ -20,6 +20,9 @@ function onLogout() {
 		document.getElementById('account_default_image').classList.remove('hide');
 		document.getElementById('account_default_image').classList.add('inactive');
 		document.getElementById('account_default_image').classList.remove('hide');
+		document.getElementById('account_dialog_user_image').classList.add('hide');
+		document.getElementById('account_dialog_user_image').setAttribute('src', 'data:,');
+		document.getElementById('account_dialog_default_image').classList.remove('hide');
 		document.getElementById('account_dialog_save_list_loader').classList.remove('hide');
 		document.getElementById('account_dialog_save_list_placeholder').classList.add('hide');
 		document.getElementById('account_dialog_save_list_end').classList.add('hide');

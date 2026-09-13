@@ -20,6 +20,8 @@ function getAddress(latLng, session_id, callback) {
 				}
 				if(!current_title)
 					refreshAddress();
+				else
+					refreshAddressCodes();
 				if(typeof callback != 'undefined') {
 					sessionForwarder(session_id, callback, [address_components]);
 				}
@@ -49,9 +51,29 @@ function toggleAddress() {
 		hideAddress();
 }
 
+function setAddressPanelHeading(title, segment) {
+	var titleNode = document.getElementById('address_text_title');
+	var segmentNode = document.getElementById('address_text_segment');
+	var header = document.getElementById('address_text_header');
+	var titleText = (title || '').trim();
+	var segmentText = (segment || '').trim();
+	if(titleNode)
+		titleNode.innerText = titleText;
+	if(segmentNode)
+		segmentNode.innerText = segmentText;
+	if(header) {
+		if(titleText || segmentText)
+			header.classList.remove('hide');
+		else
+			header.classList.add('hide');
+	}
+}
+
 function showAddress() {
-	document.getElementById('address_text_title').innerText = '';
-	document.getElementById('address_text_segment').innerText = '';
+	if(!current_title && !current_segment)
+		setAddressPanelHeading('', '');
+	else
+		setAddressPanelHeading(current_title, current_segment);
 	address_text_content.innerText = address || '';
 	refreshAddressCodes();
 	address_text.classList.remove('hide');
@@ -59,6 +81,7 @@ function showAddress() {
 
 function hideAddress() {
 	keepAddressPanelOpen = false;
+	setAddressPanelHeading('', '');
 	address_text_content.innerText = '';
 	clearAddressCodeRows();
 	address_text.classList.add('hide');

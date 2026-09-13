@@ -101,6 +101,8 @@ function pushOfflineSave(payload) {
 	return new Promise(function(resolve, reject) {
 		firebase.database().ref('/UserData/' + payload.uid).push({
 			city_id: payload.city_id,
+			gp_id: payload.gp_id || null,
+			city_name: payload.city_name || null,
 			code: payload.code,
 			title: payload.title,
 			segment: payload.segment,

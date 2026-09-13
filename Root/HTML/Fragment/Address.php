@@ -3,7 +3,7 @@
 		<div id='address_text_caption'>
 			Address
 		</div>
-		<div id='address_text_header'>
+		<div id='address_text_header' class='hide'>
 			<div id='address_text_title'></div>
 			<div id='address_text_segment'></div>
 		</div>

@@ -8,19 +8,88 @@
 // var pendingFocusPos;
 var WATCH_LOCATION_POOR_ACCURACY = 99.5;
 var WATCH_LOCATION_POOR_ACCURACY_STREAK = 5;
+var WATCH_LOCATION_POOR_ACCURACY_SAMPLE_MS = 1000;
 var poorAccuracyStreak = 0;
+var lastWatchAccuracy = NaN;
+var lastWatchPos = null;
+var lastPoorAccuracySampleAt = 0;
+var poorAccuracySampleTimer = 0;
 
 function resetPoorAccuracyStreak() {
 	poorAccuracyStreak = 0;
+	lastWatchAccuracy = NaN;
+	lastWatchPos = null;
+	lastPoorAccuracySampleAt = 0;
+	stopPoorAccuracySampler();
 }
 
-function shouldFastForwardPoorAccuracy(accuracy) {
-	if(!(accuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
+function stopPoorAccuracySampler() {
+	if(poorAccuracySampleTimer) {
+		clearInterval(poorAccuracySampleTimer);
+		poorAccuracySampleTimer = 0;
+	}
+}
+
+function startPoorAccuracySampler() {
+	if(poorAccuracySampleTimer)
+		return;
+	poorAccuracySampleTimer = setInterval(tickPoorAccuracySample, WATCH_LOCATION_POOR_ACCURACY_SAMPLE_MS);
+}
+
+function countPoorAccuracySample() {
+	if(!(lastWatchAccuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
 		poorAccuracyStreak = 0;
 		return false;
 	}
 	poorAccuracyStreak += 1;
+	lastPoorAccuracySampleAt = Date.now();
 	return poorAccuracyStreak >= WATCH_LOCATION_POOR_ACCURACY_STREAK;
+}
+
+function shouldFastForwardPoorAccuracy(accuracy) {
+	lastWatchAccuracy = accuracy;
+	if(!(accuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
+		poorAccuracyStreak = 0;
+		return false;
+	}
+	return countPoorAccuracySample();
+}
+
+function tickPoorAccuracySample() {
+	if(typeof locating !== 'undefined' && !locating) {
+		stopPoorAccuracySampler();
+		return;
+	}
+	if(!(lastWatchAccuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
+		poorAccuracyStreak = 0;
+		stopPoorAccuracySampler();
+		return;
+	}
+	if(Date.now() - lastPoorAccuracySampleAt < WATCH_LOCATION_POOR_ACCURACY_SAMPLE_MS - 100)
+		return;
+	if(countPoorAccuracySample())
+		processCurrentWatchPosition();
+}
+
+function processCurrentWatchPosition() {
+	if(typeof locate_button_pressed !== 'undefined' && locate_button_pressed)
+		return;
+	if(!lastWatchPos)
+		return;
+	processPosition(lastWatchPos);
+}
+
+function noteWatchAccuracy(accuracy, pos) {
+	lastWatchPos = pos || lastWatchPos;
+	if(!(accuracy >= WATCH_LOCATION_POOR_ACCURACY)) {
+		lastWatchAccuracy = accuracy;
+		poorAccuracyStreak = 0;
+		stopPoorAccuracySampler();
+		return false;
+	}
+	lastWatchAccuracy = accuracy;
+	startPoorAccuracySampler();
+	return countPoorAccuracySample();
 }
 
 function initLocate(override_dnd, callback) {
@@ -118,10 +187,6 @@ function locateExec(failure) {
 					document.getElementById('proceed_container').classList.remove('hide');
 					document.getElementById('accuracy_container').classList.remove('highlight');
 					document.getElementById('accuracy_container').classList.remove('hide');
-					if(!firstFocus || !myLocDot || !myLocDot.getMap())
-						focus_(pos, accuCircle.getBounds());
-					else
-						pendingFocusPos = pos;
 					if(!myLocDot) {
 						myLocDot = new google.maps.Marker({
 							clickable: false,
@@ -141,10 +206,17 @@ function locateExec(failure) {
 						myLocDot.setPosition(pos);
 					}
 
-					var fastForwardPoor = shouldFastForwardPoorAccuracy(position.coords.accuracy);
+					var fastForwardPoor = noteWatchAccuracy(position.coords.accuracy, pos);
 					if(!locate_button_pressed &&
-							(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY || fastForwardPoor))
+							(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY || fastForwardPoor)) {
 						processPosition(pos);
+						return;
+					}
+
+					if(!firstFocus || !myLocDot || !myLocDot.getMap())
+						focus_(pos, accuCircle.getBounds());
+					else
+						pendingFocusPos = pos;
 
 				},
 				function(error) {

@@ -12,7 +12,24 @@ const locateJs = fs.readFileSync(path.join(repoRoot, 'Root/JS/Base/Locate.js'), 
 function loadPoorAccuracyApi() {
 	const start = locateJs.indexOf('var WATCH_LOCATION_POOR_ACCURACY');
 	const end = locateJs.indexOf('function initLocate(');
-	const sandbox = {};
+	const ticks = [];
+	const sandbox = {
+		locating: true,
+		locate_button_pressed: false,
+		processed: null,
+		Date,
+		setInterval: function(fn) {
+			ticks.push(fn);
+			return 1;
+		},
+		clearInterval: function() {
+			ticks.length = 0;
+		},
+		processPosition: function(pos) {
+			sandbox.processed = pos;
+		}
+	};
+	sandbox.ticks = ticks;
 	vm.createContext(sandbox);
 	vm.runInContext(locateJs.slice(start, end), sandbox);
 	return sandbox;
@@ -35,12 +52,45 @@ test('five consecutive 99+ samples fast-forward, and a better sample resets the 
 	assert.equal(api.shouldFastForwardPoorAccuracy(99.5), true);
 });
 
+test('a stuck 99+ reading still counts one sample per second until fast-forward', () => {
+	const api = loadPoorAccuracyApi();
+	const pos = {lat: 12.9, lng: 77.6};
+	assert.equal(api.noteWatchAccuracy(120, pos), false);
+	assert.equal(api.ticks.length, 1);
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	assert.equal(api.processed, null);
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	assert.equal(api.processed, pos);
+	api.resetPoorAccuracyStreak();
+});
+
 test('locate auto-proceed from 99+ streak is skipped while long-press override is held', () => {
-	assert.match(locateJs, /resetPoorAccuracyStreak\(\)/);
-	assert.match(locateJs, /var fastForwardPoor = shouldFastForwardPoorAccuracy\(position\.coords\.accuracy\)/);
-	assert.match(
-		locateJs,
-		/if\(!locate_button_pressed &&\s*\(position\.coords\.accuracy <= WATCH_LOCATION_MIN_ACCURACY \|\| fastForwardPoor\)\)/
-	);
+	const api = loadPoorAccuracyApi();
+	api.locate_button_pressed = true;
+	const pos = {lat: 1, lng: 2};
+	assert.equal(api.noteWatchAccuracy(99.5, pos), false);
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	api.lastPoorAccuracySampleAt = 0;
+	api.ticks[0]();
+	assert.equal(api.processed, null);
+	api.resetPoorAccuracyStreak();
+
+	assert.match(locateJs, /noteWatchAccuracy\(position\.coords\.accuracy, pos\)/);
+	assert.match(locateJs, /startPoorAccuracySampler\(\)/);
 	assert.match(locateJs, /press_duration > location_button_PRESS_THRESHOLD && addClassIfPresent\(location_dot, 'blinking'\)/);
+	const notePos = locateJs.indexOf('noteWatchAccuracy(position.coords.accuracy, pos)');
+	const focusPos = locateJs.indexOf('focus_(pos, accuCircle.getBounds())');
+	assert.ok(notePos > -1);
+	assert.ok(focusPos > notePos);
 });

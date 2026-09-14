@@ -76,6 +76,7 @@ function processCurrentWatchPosition() {
 		return;
 	if(!lastWatchPos)
 		return;
+	focusLocateWatchPosition(lastWatchPos);
 	processPosition(lastWatchPos);
 }
 
@@ -89,7 +90,33 @@ function noteWatchAccuracy(accuracy, pos) {
 	}
 	lastWatchAccuracy = accuracy;
 	startPoorAccuracySampler();
+	showLocateWatchLoader();
 	return countPoorAccuracySample();
+}
+
+var locateDidFocus = false;
+
+function showLocateWatchLoader() {
+	if(typeof document === 'undefined' || !document.getElementById)
+		return;
+	var el = document.getElementById('wait_loader');
+	if(el)
+		el.classList.remove('hide');
+}
+
+function focusLocateWatchPosition(pos) {
+	if(!pos)
+		return;
+	var bounds = (typeof accuCircle !== 'undefined' && accuCircle && typeof accuCircle.getBounds === 'function')
+		? accuCircle.getBounds()
+		: undefined;
+	if(!locateDidFocus || (typeof firstFocus !== 'undefined' && !firstFocus)) {
+		if(typeof focus_ === 'function')
+			focus_(pos, bounds);
+		locateDidFocus = true;
+	}
+	else
+		pendingFocusPos = pos;
 }
 
 function initLocate(override_dnd, callback) {
@@ -122,8 +149,10 @@ function locateExec(failure) {
 		var WATCH_LOCATION_NOTICE_TIMEOUT = 5000;
 
 		pushLoader();
+		showLocateWatchLoader();
 		if (navigator.geolocation) {
 			locating = true;
+			locateDidFocus = false;
 			resetPoorAccuracyStreak();
 			if(myLocDot)
 				myLocDot.setMap(null);
@@ -206,17 +235,11 @@ function locateExec(failure) {
 						myLocDot.setPosition(pos);
 					}
 
+					focusLocateWatchPosition(pos);
 					var fastForwardPoor = noteWatchAccuracy(position.coords.accuracy, pos);
 					if(!locate_button_pressed &&
-							(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY || fastForwardPoor)) {
+							(position.coords.accuracy <= WATCH_LOCATION_MIN_ACCURACY || fastForwardPoor))
 						processPosition(pos);
-						return;
-					}
-
-					if(!firstFocus || !myLocDot || !myLocDot.getMap())
-						focus_(pos, accuCircle.getBounds());
-					else
-						pendingFocusPos = pos;
 
 				},
 				function(error) {

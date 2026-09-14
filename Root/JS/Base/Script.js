@@ -30,6 +30,7 @@ function syncInitMap() {
 			initMap();
 
 			initDecodeCityContext();
+			finishInitialLoader();
 
 			pendingInitMap = false;
 		}

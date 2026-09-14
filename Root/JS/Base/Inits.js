@@ -28,4 +28,7 @@ var _umb = {
 };
 
 // Loader
-var loaderCount = 0;
+// The loader is visible in the initial markup. Keep one ownership slot for
+// bootstrap so synchronous setup cannot hide it before startup work begins.
+var loaderCount = 1;
+var initialLoaderPending = true;

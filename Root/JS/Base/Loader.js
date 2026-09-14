@@ -12,7 +12,15 @@ function popLoader() {
 		document.getElementById('wait_loader').classList.add('hide');
 }
 
+function finishInitialLoader() {
+	if(!initialLoaderPending)
+		return;
+	initialLoaderPending = false;
+	popLoader();
+}
+
 function clearLoader() {
+	initialLoaderPending = false;
 	loaderCount = 0;
 	document.getElementById('wait_loader').classList.add('hide');
 }

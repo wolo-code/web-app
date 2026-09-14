@@ -402,16 +402,14 @@ test('apple maps follows google camera without animated region snaps', () => {
 	assert.match(mapLayers, /googleLatLngToContainerPixel/);
 });
 
-test('map source attribution sits after a gap from the action menu', () => {
+test('map source attribution stays left-aligned on wide and narrow layouts', () => {
 	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
 	const narrowCss = read('Root/CSS/Component/Root/Base/Root_narrow.css');
-	const baseCss = read('Root/CSS/Base/Base.css');
 	assert.match(rootCss, /\.map_attribution \{[\s\S]*left:\s*3px/);
-	assert.match(rootCss, /@media \(max-width:\s*662px\) \{[\s\S]*\.map_attribution \{[\s\S]*left:\s*117px/);
+	assert.match(rootCss, /@media \(max-width:\s*662px\) \{[\s\S]*\.map_attribution \{[\s\S]*left:\s*6px/);
 	assert.doesNotMatch(rootCss, /#action_menu\.open\) \.map_attribution/);
-	assert.match(narrowCss, /\.map_attribution \{[\s\S]*left:\s*117px/);
-	assert.match(narrowCss, /max-width:\s*calc\(50vw - 145px\)/);
-	assert.match(baseCss, /body\.apple #map_stage::after/);
+	assert.match(narrowCss, /\.map_attribution \{[\s\S]*left:\s*6px/);
+	assert.match(narrowCss, /max-width:\s*calc\(100vw - 12px\)/);
 });
 
 test('theme selector shows labels on hover', () => {
@@ -531,7 +529,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /style:\s*bar\.getAttribute\('style'\)/);
 	assert.match(guideJs, /bar\.setAttribute\('style', home\.style\)/);
 	assert.doesNotMatch(guideJs, /bar\.style\.removeProperty\('top'\)/);
-	assert.match(guideJs, /rect\.top <= 0/);
+	assert.match(guideJs, /rect\.top < 0 \|\| rect\.bottom > window\.innerHeight - 8/);
 	assert.match(guideJs, /function pinGuideCaptionBeside/);
 	assert.match(guideJs, /map_icon_guide_dim/);
 	assert.match(guideJs, /function layoutMapInfocardGuide/);

@@ -185,11 +185,11 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Full view back control | Info Full Back Button | `#info_full_close_button` | Bottom of Info Full View | Closes the Info modal and restores full-info state for next open. |
 | About link | Info About Link | `#wolo_about` | Bottom of Info Full View | Opens the Wolo Code about page. |
 | Links view | Info Links View | `#info_links` | Main body when links view is active | Shows about, terms, privacy, contact (`support@wolo.codes`, crawl-proof), source, social, app, and map/data credits. Does not show **show guide**, a version number, or an updated timestamp. |
-| Links table | Info Links Table | table inside `#info_links` | Top of Info Links View | Lists about, terms, privacy, contact, and source code links. |
+| Links table | Info Links Table | table inside `#info_links` | Top of Info Links View | Lists about, terms, privacy, contact, and source code links. The first column stays on one line. |
 | Social links | Info Social Links | `#social-links` | Middle of Info Links View | Links to Twitter, Facebook, and YouTube. |
 | App download link | Info App Download Link | `#download-unified-url`, `#download-android-bottom` | Lower Info Links View | Links to app download routes and Google Play. |
-| Credits link | Info Credits Link | `#credits` | Lower Info Links View | Links to open-source credits. |
-| Map data credits | Info Map Data Credits | `#map_data_credits` | Lower Info Links View | Credits OpenStreetMap, Esri, Microsoft, Apple Maps, and Google Maps, plus DIGIPIN and plus codes. |
+| Credits link | Info Credits Link | `#credits` | Lower Info Links View | Intro copy stays left; the `wolo.codes/credits` URL sits on its own centered line. |
+| Map data credits | Info Map Data Credits | `#map_data_credits` | Lower Info Links View | Credits OpenStreetMap, Esri, Microsoft, Apple Maps, and Google Maps, plus DIGIPIN and plus codes. The first column stays on one line. |
 | Info author credit | Info Author Credit | `#info_agency` | Bottom of Info Modal View | Shows the creator credit. |
 
 ## Shared App Parts

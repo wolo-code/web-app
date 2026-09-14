@@ -56,15 +56,16 @@
 #logo_codes_info > .image {
 	display: block;
 	overflow: hidden;
-	width: 38px;
+	width: 62px;
 }
 
 #logo_codes_info > .image > svg {
 	display: block;
 	padding-top: 4px;
-	height: 14px;
-	width: 152px;
-	margin-left: -57px;
+	height: 22px;
+	width: 204px;
+	margin-left: -68px;
+	font-size: large;
 }
 
 #info_show_icon_labels {
@@ -212,6 +213,12 @@
 
 #credits {
 	padding: 20px 0;
+	text-align: left;
+}
+
+#credits > .center {
+	display: block;
+	margin-top: 0.35em;
 }
 
 #map_data_credits {
@@ -230,6 +237,13 @@
 
 #overlay table td {
 	padding-left: 10px;
+}
+
+#info_links table td:first-child {
+	padding-right: 16px;
+	vertical-align: top;
+	white-space: nowrap;
+	width: 1%;
 }
 
 #info_agency {

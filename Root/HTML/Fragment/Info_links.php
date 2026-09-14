@@ -43,7 +43,11 @@
 	<a href='https://play.google.com/store/apps/details?id=codes.wolo.droid' id='site-google-play' onclick="trackOutboundLink('wolo-appandroid', 'https://play.google.com/store/apps/details?id=codes.wolo.droid')"><span class='image'><?php includeSVG('', 'Google-Play-badge'); ?></span></a>
 </div>
 
-<div id='credits'>Wolo Code makes use of these opensource projects: <a class='link' href="https://wolo.codes/credits">wolo.codes/credits</a></div>
+<div id='credits'>Wolo Code makes use of these opensource projects:
+	<div class='center'>
+		<a class='link' href="https://wolo.codes/credits">wolo.codes/credits</a>
+	</div>
+</div>
 <table id='map_data_credits'>
 	<tr>
 		<td>Map tiles:</td>

@@ -1,5 +1,5 @@
 #overlay {
-	z-index: 400;
+	z-index: 10000;
 }
 
 #info_message {
@@ -183,14 +183,14 @@
 	visibility: hidden;
 }
 
-#info_version_indicator:hover .info_version_stamp_utc,
-#info_version_indicator:focus-visible .info_version_stamp_utc {
+#info_version_indicator:hover .info_version_stamp_elapsed,
+#info_version_indicator:focus-visible .info_version_stamp_elapsed {
 	visibility: visible;
 }
 
-#info_version_indicator[aria-expanded='true'] .info_version_stamp_utc,
-#info_version_indicator[aria-expanded='true']:hover .info_version_stamp_utc,
-#info_version_indicator[aria-expanded='true']:focus-visible .info_version_stamp_utc {
+#info_version_indicator[aria-expanded='true'] .info_version_stamp_elapsed,
+#info_version_indicator[aria-expanded='true']:hover .info_version_stamp_elapsed,
+#info_version_indicator[aria-expanded='true']:focus-visible .info_version_stamp_elapsed {
 	visibility: hidden;
 }
 
@@ -198,13 +198,13 @@
 	visibility: visible;
 }
 
-#info_version_indicator .info_version_under:hover .info_version_stamp_utc,
+#info_version_indicator .info_version_under:hover .info_version_stamp_elapsed,
 #info_version_indicator .info_version_under:hover .info_version_local,
 #info_version_indicator[aria-expanded='true'] .info_version_under:hover .info_version_local {
 	visibility: hidden;
 }
 
-#info_version_indicator .info_version_under:hover .info_version_stamp_elapsed {
+#info_version_indicator .info_version_under:hover .info_version_stamp_utc {
 	visibility: visible;
 }
 

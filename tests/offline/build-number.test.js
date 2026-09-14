@@ -60,10 +60,10 @@ test('Info corner version is restored and credits modal omits version details', 
 	assert.match(infoJs, /function formatInfoTimestamp/);
 	assert.match(infoJs, /function formatInfoElapsed/);
 	assert.match(infoCss, /#info_version_indicator:hover \.info_version_width/);
-	assert.match(infoCss, /#info_version_indicator:hover \.info_version_stamp_utc/);
+	assert.match(infoCss, /#info_version_indicator:hover \.info_version_stamp_elapsed/);
 	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_width/);
 	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_local/);
-	assert.match(infoCss, /#info_version_indicator \.info_version_under:hover \.info_version_stamp_elapsed/);
+	assert.match(infoCss, /#info_version_indicator \.info_version_under:hover \.info_version_stamp_utc/);
 	assert.doesNotMatch(infoCss, /#info_version_indicator:hover \.info_version_local/);
 	assert.doesNotMatch(links, /software_info/);
 	assert.doesNotMatch(links, /info_version_value/);

@@ -289,6 +289,12 @@
 	text-align: right;
 }
 
+@media (max-width: 662px) {
+	#info_agency {
+		padding-right: 56px;
+	}
+}
+
 .button_highlight {
 	color: white !important;
 	background: #69B7CF !important;

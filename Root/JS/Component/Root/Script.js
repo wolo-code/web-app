@@ -1,7 +1,7 @@
 // var syncLocate_engage;
 
 function initLoad () {
-	if(!initLoadDone && document.readyState === 'interactive') {
+	if(!initLoadDone && document.readyState !== 'loading') {
 		initTheme();
 		initMapSource();
 		firebaseInit();
@@ -131,21 +131,29 @@ function showInfoIconGuide(event) {
 		startDecodeIconGuide(true);
 }
 
+function bindControl(id, type, handler) {
+	var node = document.getElementById(id);
+	if(!node)
+		return null;
+	node.addEventListener(type, handler);
+	return node;
+}
+
 function setupControls() {
 	initBottomStackMapPan();
-	document.getElementById('redirect_cancel').addEventListener('click', redirectCancel);
-	document.getElementById('authentication_header_close').addEventListener('click', hideAuthenticationDialog);
-	document.getElementById('account_dialog_close').addEventListener('click', hideAccountDialog);
-	document.getElementById('account').addEventListener('click', onAccount);
-	document.getElementById('account_dialog_logout_button').addEventListener('click', onLogout);
-	document.getElementById('save_address').addEventListener('focus', onAccountDialogAddressActive);
-	document.getElementById('account_dialog_cancel_button').addEventListener('click', onAccountDialogCancel);
-	document.getElementById('account_dialog_save_button').addEventListener('click', onAccountDialogSave);
-	document.getElementById('account_dialog_add_toggle').addEventListener('click', toggleAccountDialogAdd);
-	document.getElementById('account_dialog_saves_hit').addEventListener('click', toggleAccountDialogSaves);
-	document.getElementById('account_dialog_row_edit').addEventListener('click', editSaveEntry);
-	document.getElementById('account_dialog_row_delete').addEventListener('click', deleteSaveEntry);
-	document.getElementById('account_dialog_row_menu').addEventListener('click', function(event) {
+	bindControl('redirect_cancel', 'click', redirectCancel);
+	bindControl('authentication_header_close', 'click', hideAuthenticationDialog);
+	bindControl('account_dialog_close', 'click', hideAccountDialog);
+	bindControl('account', 'click', onAccount);
+	bindControl('account_dialog_logout_button', 'click', onLogout);
+	bindControl('save_address', 'focus', onAccountDialogAddressActive);
+	bindControl('account_dialog_cancel_button', 'click', onAccountDialogCancel);
+	bindControl('account_dialog_save_button', 'click', onAccountDialogSave);
+	bindControl('account_dialog_add_toggle', 'click', toggleAccountDialogAdd);
+	bindControl('account_dialog_saves_hit', 'click', toggleAccountDialogSaves);
+	bindControl('account_dialog_row_edit', 'click', editSaveEntry);
+	bindControl('account_dialog_row_delete', 'click', deleteSaveEntry);
+	bindControl('account_dialog_row_menu', 'click', function(event) {
 		if(event && event.stopPropagation)
 			event.stopPropagation();
 	});
@@ -161,67 +169,67 @@ function setupControls() {
 	var saveListInner = document.querySelector('#account_dialog_save_list_container > .account_dialog_fold_inner');
 	if(saveListInner)
 		saveListInner.addEventListener('scroll', closeSaveEntryMenus);
-	document.getElementById('info_message_close').addEventListener('click', closeInfo);
-	document.getElementById('info_intro_close_button').addEventListener('click', closeInfo);
-	document.getElementById('info_full_close_button').addEventListener('click', closeInfo);
-	document.getElementById('info_version_indicator').addEventListener('click', toggleInfoVersionDisplay);
-	document.getElementById('info_show_icon_labels').addEventListener('click', showInfoIconGuide);
-	document.getElementById('action_menu_info').addEventListener('click', showInfoFromActionMenu);
-	document.getElementById('action_menu_map').addEventListener('click', toggleMapViewTypeFromActionMenu);
-	document.getElementById('action_menu_decode').addEventListener('click', toggleDecodeViewFromActionMenu);
-	document.getElementById('decode_map_view_button').addEventListener('click', toggleDecodeView);
-	document.getElementById('footer_author').addEventListener('click', showInfoLinks);
-	document.getElementById('no_city_message_close').addEventListener('click', hideNoCityMessage);
-	document.getElementById('locate_right_message_close').addEventListener('click', hideLocateRightMessage);
-	document.getElementById('locate_right_message_yes').addEventListener('click', locateRight_grant);
-	document.getElementById('locate_right_message_no').addEventListener('click', locateRight_deny);
-	document.getElementById('invalid_code_message_close').addEventListener('click', hideInvalidCodeDialog);
-	document.getElementById('invalid_code_correct').addEventListener('click', invalidCodeCorrect);
-	document.getElementById('invalid_code_search').addEventListener('click', invalidCodeSearchMap);
-	document.getElementById('no_city_submit_yes').addEventListener('click', noCity_add);
-	document.getElementById('no_city_submit_no').addEventListener('click', noCity_cancel);
-	document.getElementById('no_city_submit_wait_continue').addEventListener('click', noCityWait_continue);
-	document.getElementById('no_city_submit_wait_stop').addEventListener('click', noCityWait_stop);
-	document.getElementById('notification_top').addEventListener('click', tryDefaultCity);
-	document.getElementById('proceed_button').addEventListener('click', proceedPosition);
-	document.getElementById('incompatible_browser_message_close').addEventListener('click', hideIncompatibleBrowserMessage);
-	document.getElementById('incompatible_browser_message_continue').addEventListener('click', hideIncompatibleBrowserMessage);
-	document.getElementById('address_text_close').addEventListener('click', hideAddress);
-	document.getElementById('address_text_main').addEventListener('click', copyAddress);
-	document.getElementById('address_text_digipin').addEventListener('click', function(event) {
+	bindControl('info_message_close', 'click', closeInfo);
+	bindControl('info_intro_close_button', 'click', closeInfo);
+	bindControl('info_full_close_button', 'click', closeInfo);
+	bindControl('info_version_indicator', 'click', toggleInfoVersionDisplay);
+	bindControl('info_show_icon_labels', 'click', showInfoIconGuide);
+	bindControl('action_menu_info', 'click', showInfoFromActionMenu);
+	bindControl('action_menu_map', 'click', toggleMapViewTypeFromActionMenu);
+	bindControl('action_menu_decode', 'click', toggleDecodeViewFromActionMenu);
+	bindControl('decode_map_view_button', 'click', toggleDecodeView);
+	bindControl('footer_author', 'click', showInfoLinks);
+	bindControl('no_city_message_close', 'click', hideNoCityMessage);
+	bindControl('locate_right_message_close', 'click', hideLocateRightMessage);
+	bindControl('locate_right_message_yes', 'click', locateRight_grant);
+	bindControl('locate_right_message_no', 'click', locateRight_deny);
+	bindControl('invalid_code_message_close', 'click', hideInvalidCodeDialog);
+	bindControl('invalid_code_correct', 'click', invalidCodeCorrect);
+	bindControl('invalid_code_search', 'click', invalidCodeSearchMap);
+	bindControl('no_city_submit_yes', 'click', noCity_add);
+	bindControl('no_city_submit_no', 'click', noCity_cancel);
+	bindControl('no_city_submit_wait_continue', 'click', noCityWait_continue);
+	bindControl('no_city_submit_wait_stop', 'click', noCityWait_stop);
+	bindControl('notification_top', 'click', tryDefaultCity);
+	bindControl('proceed_button', 'click', proceedPosition);
+	bindControl('incompatible_browser_message_close', 'click', hideIncompatibleBrowserMessage);
+	bindControl('incompatible_browser_message_continue', 'click', hideIncompatibleBrowserMessage);
+	bindControl('address_text_close', 'click', hideAddress);
+	bindControl('address_text_main', 'click', copyAddress);
+	bindControl('address_text_digipin', 'click', function(event) {
 		copyDigipin(event);
 	});
-	document.getElementById('address_text_plus').addEventListener('click', function(event) {
+	bindControl('address_text_plus', 'click', function(event) {
 		copyPlusCode(event);
 	});
 	var qrButtons = document.querySelectorAll('.address_qr_button');
 	for(var i = 0; i < qrButtons.length; i++)
 		qrButtons[i].addEventListener('click', onCodeQRButtonClick);
-	document.getElementById('code_qr_close').addEventListener('click', closeCodeQR);
-	document.getElementById('decode_city_history_message_close').addEventListener('click', hideDecodeCityHistoryMessage);
-	document.getElementById('choose_city_by_name_message_close').addEventListener('click', hideChooseCityMessage);
-	document.getElementById('choose_city_by_periphery_message_close').addEventListener('click', hideChooseCity_by_periphery_Message);
-	document.getElementById('qr_close').addEventListener('click', closeQR);
-	document.getElementById('overlay').addEventListener('click', onOverlayBackdropClick);
-	document.getElementById('qr_save').addEventListener('click', onQRDialogSave);
-	document.getElementById('qr_preview').addEventListener('click', toggleQRpreview);
-	document.getElementById('qr_print').addEventListener('click', printQR);
-	document.getElementById('qr_download').addEventListener('click', downloadQR);
-	document.getElementById('qr_address').addEventListener('focus', qr_address_active);
-	document.getElementById('decode_input').addEventListener('input', resizeInput);
+	bindControl('code_qr_close', 'click', closeCodeQR);
+	bindControl('decode_city_history_message_close', 'click', hideDecodeCityHistoryMessage);
+	bindControl('choose_city_by_name_message_close', 'click', hideChooseCityMessage);
+	bindControl('choose_city_by_periphery_message_close', 'click', hideChooseCity_by_periphery_Message);
+	bindControl('qr_close', 'click', closeQR);
+	bindControl('overlay', 'click', onOverlayBackdropClick);
+	bindControl('qr_save', 'click', onQRDialogSave);
+	bindControl('qr_preview', 'click', toggleQRpreview);
+	bindControl('qr_print', 'click', printQR);
+	bindControl('qr_download', 'click', downloadQR);
+	bindControl('qr_address', 'focus', qr_address_active);
+	bindControl('decode_input', 'input', resizeInput);
 	if(typeof syncProceedButtons == 'function') {
 		syncProceedButtons();
 	}
-	document.getElementById('decode_city_geolocation').addEventListener('click', requestDecodeCityGeolocation);
-	document.getElementById('decode_city_ip').addEventListener('click', selectIpDecodeCity);
-	document.getElementById('decode_city_history_toggle').addEventListener('click', showDecodeCityHistoryMessage);
-	var mapCityHistory = document.getElementById('map_city_history_toggle');
-	if(mapCityHistory)
-		mapCityHistory.addEventListener('click', showDecodeCityHistoryMessage);
+	bindControl('decode_city_geolocation', 'click', requestDecodeCityGeolocation);
+	bindControl('decode_city_ip', 'click', selectIpDecodeCity);
+	bindControl('decode_city_history_toggle', 'click', showDecodeCityHistoryMessage);
+	bindControl('map_city_history_toggle', 'click', showDecodeCityHistoryMessage);
 	if(typeof initDecodeCityHistoryDeleteControls == 'function')
 		initDecodeCityHistoryDeleteControls();
-	document.getElementById('external_close').addEventListener('click', external_close);
-	addLongpressListener(document.getElementById('external_proceed'), external_proceed_external, external_proceed_internal);
+	bindControl('external_close', 'click', external_close);
+	var externalProceed = document.getElementById('external_proceed');
+	if(externalProceed)
+		addLongpressListener(externalProceed, external_proceed_external, external_proceed_internal);
 	var logo = document.getElementById('logo');
 	if(logo && typeof clearCacheAndReload == 'function') {
 		logo.setAttribute('title', 'Press and hold to clear cache and reload');

@@ -493,12 +493,14 @@ function restoreMapSearchBarStacking() {
 function raiseMapSearchBarForGuide() {
 	var bar = document.getElementById('map_search_cluster') || document.getElementById('map_search_bar');
 	var rect;
+	var minimumTop;
 	if(!bar || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
 		restoreMapSearchBarStacking();
 		return;
 	}
 	rect = bar.getBoundingClientRect();
-	if(rect.width < 8 || rect.height < 8 || rect.top <= 0)
+	minimumTop = parseFloat(window.getComputedStyle(bar).marginTop) || 0;
+	if(rect.width < 8 || rect.height < 8 || rect.top <= 0 || rect.top + 0.5 < minimumTop)
 		return false;
 	if(!decodeIconGuideSearchHome) {
 		decodeIconGuideSearchHome = {

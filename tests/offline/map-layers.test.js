@@ -613,7 +613,7 @@ test('first Map Guide waits for Google search layout before lifting it', () => {
 			body: { appendChild(node) { appendCount++; node.parentNode = this; } },
 			getElementById: id => id === 'map_search_cluster' ? bar : null
 		},
-		window: {},
+		window: { getComputedStyle: () => ({ marginTop: '90px' }) },
 		setTimeout
 	};
 	context.document.body.classList = { contains: name => name === 'decode-icon-guide' };
@@ -621,6 +621,9 @@ test('first Map Guide waits for Google search layout before lifting it', () => {
 	assert.equal(context.raiseMapSearchBarForGuide(), false);
 	assert.equal(appendCount, 0);
 	assert.equal(bar.parentNode, originalParent);
+	top = 26;
+	assert.equal(context.raiseMapSearchBarForGuide(), false);
+	assert.equal(appendCount, 0);
 	top = 90;
 	assert.equal(context.raiseMapSearchBarForGuide(), true);
 	assert.equal(appendCount, 1);

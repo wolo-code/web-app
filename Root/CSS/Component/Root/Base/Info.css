@@ -1,3 +1,7 @@
+#overlay {
+	z-index: 400;
+}
+
 #info_message {
 	position: relative;
 	font-family: Abel;
@@ -137,36 +141,32 @@
 	grid-area: 1 / 1;
 }
 
-#info_version_indicator .info_version_stamp {
-	font-size: 0.86em;
-	font-weight: normal;
-	height: 1.15em;
-	position: absolute;
-	right: 0;
-	top: calc(100% + 3px);
-	width: max-content;
-}
-
-#info_version_indicator .info_version_stamp_utc,
-#info_version_indicator .info_version_stamp_elapsed {
-	position: absolute;
-	right: 0;
-	top: 0;
-	visibility: hidden;
-	white-space: nowrap;
-}
-
 #info_version_indicator .info_version_width {
 	visibility: hidden;
 }
 
-#info_version_indicator .info_version_local {
+#info_version_indicator .info_version_under {
+	display: grid;
 	font-size: 0.86em;
 	font-weight: normal;
+	justify-items: end;
 	line-height: 1.15;
+	pointer-events: none;
 	position: absolute;
 	right: 0;
 	top: calc(100% + 3px);
+}
+
+#info_version_indicator:hover .info_version_under,
+#info_version_indicator:focus-visible .info_version_under,
+#info_version_indicator[aria-expanded='true'] .info_version_under {
+	pointer-events: auto;
+}
+
+#info_version_indicator .info_version_stamp_utc,
+#info_version_indicator .info_version_stamp_elapsed,
+#info_version_indicator .info_version_local {
+	grid-area: 1 / 1;
 	visibility: hidden;
 	white-space: nowrap;
 }
@@ -195,6 +195,16 @@
 }
 
 #info_version_indicator[aria-expanded='true'] .info_version_local {
+	visibility: visible;
+}
+
+#info_version_indicator .info_version_under:hover .info_version_stamp_utc,
+#info_version_indicator .info_version_under:hover .info_version_local,
+#info_version_indicator[aria-expanded='true'] .info_version_under:hover .info_version_local {
+	visibility: hidden;
+}
+
+#info_version_indicator .info_version_under:hover .info_version_stamp_elapsed {
 	visibility: visible;
 }
 

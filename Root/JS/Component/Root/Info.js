@@ -134,6 +134,8 @@ function closeInfo(event) {
 		event.stopPropagation();
 	if(typeof clearDecodeIconGuideAwaitingIntro == 'function')
 		clearDecodeIconGuideAwaitingIntro();
+	if(fromIntroProceed && typeof(Storage) !== 'undefined')
+		localStorage.note_version = CURRENT_VERSION;
 	if(intro)
 		intro.classList.add('hide');
 	hideInfo();

@@ -54,7 +54,6 @@ function versionCheck() {
 			set = true;
 	}
 	if(set) {
-		localStorage.note_version = CURRENT_VERSION;
 		if(typeof markDecodeIconGuideAwaitingIntro == 'function')
 			markDecodeIconGuideAwaitingIntro();
 		showInfo();

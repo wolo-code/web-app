@@ -608,6 +608,7 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 
 test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	const overlayJs = read('Root/JS/Component/Root/Overlay.js');
+	const baseJs = read('Root/JS/Base/Base.js');
 	const overlayCss = read('Root/CSS/Base/Overlay.css');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	const qrJs = read('Root/JS/Component/Root/QR.js');
@@ -625,6 +626,8 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\):not\(\.hide\)/);
 	assert.match(overlayJs, /function unbindOverlayBackdropClick/);
 	assert.match(infoJs, /info_intro_close_button/);
+	assert.doesNotMatch(baseJs, /if\(set\)\s*\{\s*localStorage\.note_version/);
+	assert.match(infoJs, /if\(fromIntroProceed[^\n]*\)\s*localStorage\.note_version = CURRENT_VERSION/);
 	assert.match(overlayJs, /function bindOverlayBackdropClick/);
 	assert.match(scriptJs, /typeof bindOverlayBackdropClick == 'function'/);
 	assert.match(scriptJs, /typeof onOverlayBackdropClick == 'function'/);

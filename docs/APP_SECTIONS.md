@@ -30,7 +30,7 @@ Use these names consistently in code comments, tickets, copy docs, and design no
 | Consent card | Cookie Consent Card | cookie/privacy copy in overlay | Center of viewport | Explains anonymous cookies and third-party services before app use. |
 | Consent brand area | Cookie Consent Brand | Wolo logo and tagline links | Top of consent card | Identifies Wolo Code before the user continues. |
 | Policy link | Cookie Policy Link | `/policy` link | Inside consent copy | Opens cookie and privacy policies. |
-| Continue control | Cookie Consent Proceed Button | unlabeled proceed button with front-arrow icon | Centered below consent copy | Accepts the first-run prompt and reveals the active app view. The Input Icon Guide does not start until this control is used. Info Intro View stays until this control is used: the dimmed overlay, other dialogs, and the icon guide cannot dismiss or replace it. |
+| Continue control | Cookie Consent Proceed Button | unlabeled proceed button with front-arrow icon | Centered below consent copy | Accepts and persists the first-run prompt, then reveals the active app view. Opening the prompt alone does not persist acceptance, so reloads and navigation keep it visible until this control is used. The Input Icon Guide does not start until this control is used. Info Intro View stays until this control is used: the dimmed overlay, other dialogs, and the icon guide cannot dismiss or replace it. |
 | Author credit | Cookie Consent Credit | author link | Bottom-right of consent card | Shows the creator credit inside the first-run card. |
 
 ## Wolo Code Input View

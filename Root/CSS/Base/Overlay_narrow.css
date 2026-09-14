@@ -6,6 +6,10 @@
 		padding: 20px 0;
 	}
 
+	html.dark-mode #overlay {
+		background-color: #222244;
+	}
+
 	#overlay > div {
 		margin-top: auto !important;
 		margin-bottom: auto !important;

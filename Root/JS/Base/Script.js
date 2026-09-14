@@ -62,6 +62,7 @@ function initExceptionMessageControls() {
 	var message = document.getElementById('exception_message');
 	var continueButton = document.getElementById('exception_message_continue');
 	var reloadButton = document.getElementById('exception_message_reload');
+	var copyButton = document.getElementById('exception_log_copy');
 	var title = document.getElementById('exception_message_title');
 
 	if(!message || !continueButton || message.dataset.controlsReady)
@@ -70,9 +71,21 @@ function initExceptionMessageControls() {
 	continueButton.addEventListener('click', hideExceptionMessage);
 	if(reloadButton)
 		reloadButton.addEventListener('click', clearCacheAndReload);
+	if(copyButton)
+		copyButton.addEventListener('click', copyExceptionLog);
 	if(title && typeof addLongpressListener == 'function')
 		addLongpressListener(title, function() {}, showExceptionLog);
 	message.dataset.controlsReady = 'true';
+}
+
+function copyExceptionLog() {
+	var log = document.getElementById('exception_log');
+	if(!log)
+		return;
+	if(typeof copyPlainText == 'function')
+		copyPlainText(log.textContent || '');
+	else if(navigator.clipboard && navigator.clipboard.writeText)
+		navigator.clipboard.writeText(log.textContent || '');
 }
 
 function setExceptionReloadAttempted() {
@@ -199,6 +212,7 @@ function flushExceptionPrompt() {
 function showExceptionMessage(log) {
 	var message = document.getElementById('exception_message');
 	var logNode = document.getElementById('exception_log');
+	var logFrame = document.getElementById('exception_log_frame');
 	var controls = document.getElementById('exception_prompt_controls');
 	var continueControls = document.getElementById('exception_dev_controls');
 
@@ -208,7 +222,8 @@ function showExceptionMessage(log) {
 	initExceptionMessageControls();
 	syncExceptionSupportVisibility();
 	logNode.textContent = log;
-	logNode.classList.add('hide');
+	if(logFrame)
+		logFrame.classList.add('hide');
 	controls.classList.remove('hide');
 	if(continueControls)
 		continueControls.classList.add('hide');
@@ -239,13 +254,15 @@ function hideExceptionMessage() {
 function showExceptionLog() {
 	var message = document.getElementById('exception_message');
 	var log = document.getElementById('exception_log');
+	var logFrame = document.getElementById('exception_log_frame');
 	var controls = document.getElementById('exception_prompt_controls');
 	var continueControls = document.getElementById('exception_dev_controls');
 
 	if(!log || !controls)
 		return;
 
-	log.classList.remove('hide');
+	if(logFrame)
+		logFrame.classList.remove('hide');
 	controls.classList.add('hide');
 	if(continueControls)
 		continueControls.classList.remove('hide');

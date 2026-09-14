@@ -10,7 +10,12 @@
 			<button id='exception_message_reload' class="border dialog_message_primary" type='button'>Clear cache &amp; reload</button>
 			<p class='exception_support_copy hide'>You may contact our support team. <?php echo renderMailLink('support', 'wolo.codes', array('id' => 'exception_message_support', 'class' => 'link exception_support_link', 'subject' => 'Wolo web app crash')); ?></p>
 		</div>
-		<pre id='exception_log' class='exception_log hide'></pre>
+		<div id='exception_log_frame' class='exception_log_frame hide'>
+			<button id='exception_log_copy' class='exception_log_copy' type='button' title='Copy stack trace' aria-label='Copy stack trace'>
+				<span class='image'><?php includeSVG('', 'Copy'); ?></span>
+			</button>
+			<pre id='exception_log' class='exception_log'></pre>
+		</div>
 		<div id='exception_dev_controls' class="center message_dialog_control hide">
 			<button id='exception_message_continue' class="border dialog_message_secondary" type='button'>Continue</button>
 		</div>

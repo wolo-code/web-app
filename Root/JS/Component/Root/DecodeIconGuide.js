@@ -498,6 +498,8 @@ function raiseMapSearchBarForGuide() {
 		return;
 	}
 	rect = bar.getBoundingClientRect();
+	if(rect.width < 8 || rect.height < 8 || rect.top <= 0)
+		return false;
 	if(!decodeIconGuideSearchHome) {
 		decodeIconGuideSearchHome = {
 			parent: bar.parentNode,
@@ -513,6 +515,7 @@ function raiseMapSearchBarForGuide() {
 	bar.style.top = rect.top + 'px';
 	bar.style.margin = '0';
 	bar.style.zIndex = '202';
+	return true;
 }
 
 function removeMapIconGuideDim() {

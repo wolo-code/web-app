@@ -423,6 +423,7 @@ test('theme selector shows labels on hover', () => {
 	assert.match(themeCss, /height:\s*18px/);
 	assert.match(themeCss, /\.theme-option-active \.theme-option-label \{[\s\S]*color:\s*#69B7CF/);
 	assert.match(themeCss, /\.map-source-row-default \.map-source-label \{[\s\S]*color:\s*#69B7CF/);
+	assert.match(themeCss, /html\.dark-mode #map_camera_label > \.map_camera_guide_clone \{[\s\S]*background-color:\s*rgb\(34 34 68 \/ 70%\)/);
 });
 
 test('non-Google map views hide Google branding and keep Apple Maps transparent', () => {
@@ -530,6 +531,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /style:\s*bar\.getAttribute\('style'\)/);
 	assert.match(guideJs, /bar\.setAttribute\('style', home\.style\)/);
 	assert.doesNotMatch(guideJs, /bar\.style\.removeProperty\('top'\)/);
+	assert.match(guideJs, /rect\.top <= 0/);
 	assert.match(guideJs, /function pinGuideCaptionBeside/);
 	assert.match(guideJs, /map_icon_guide_dim/);
 	assert.match(guideJs, /function layoutMapInfocardGuide/);
@@ -592,6 +594,36 @@ test('Map Guide restores Google search positioning on wide and narrow layouts', 
 		assert.equal(bar.parentNode, parent);
 		assert.equal(currentStyle, originalStyle);
 	}
+});
+
+test('first Map Guide waits for Google search layout before lifting it', () => {
+	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
+	let top = 0;
+	let appendCount = 0;
+	const originalParent = {};
+	const bar = {
+		parentNode: originalParent,
+		nextSibling: null,
+		style: {},
+		getAttribute: () => 'position: absolute; left: 0px; top: 0px;',
+		getBoundingClientRect: () => ({ width: 500, height: 42, left: 12, top })
+	};
+	const context = {
+		document: {
+			body: { appendChild(node) { appendCount++; node.parentNode = this; } },
+			getElementById: id => id === 'map_search_cluster' ? bar : null
+		},
+		window: {},
+		setTimeout
+	};
+	context.document.body.classList = { contains: name => name === 'decode-icon-guide' };
+	vm.runInNewContext(guideJs, context);
+	assert.equal(context.raiseMapSearchBarForGuide(), false);
+	assert.equal(appendCount, 0);
+	assert.equal(bar.parentNode, originalParent);
+	top = 90;
+	assert.equal(context.raiseMapSearchBarForGuide(), true);
+	assert.equal(appendCount, 1);
 });
 
 test('unexpected error dialog uses equal-width actions without an info toggle', () => {

@@ -353,6 +353,15 @@ html.dark-mode #map gmp-internal-camera-control button img {
 	filter: brightness(0) saturate(100%) invert(72%) sepia(18%) saturate(749%) hue-rotate(152deg) brightness(93%) contrast(87%);
 }
 
+html.dark-mode #map_camera_label > .map_camera_guide_clone {
+	background-color: rgb(34 34 68 / 70%) !important;
+	background-image: none !important;
+}
+
+html.dark-mode #map_camera_label > .map_camera_guide_clone img {
+	filter: brightness(0) saturate(100%) invert(72%) sepia(18%) saturate(749%) hue-rotate(152deg) brightness(93%) contrast(87%);
+}
+
 html.dark-mode .gm-style .gm-style-iw-c {
 	background-color: #222244;
 	color: #eee;

@@ -213,7 +213,10 @@ function setupControls() {
 	bindControl('choose_city_by_name_message_close', 'click', hideChooseCityMessage);
 	bindControl('choose_city_by_periphery_message_close', 'click', hideChooseCity_by_periphery_Message);
 	bindControl('qr_close', 'click', closeQR);
-	bindControl('overlay', 'click', onOverlayBackdropClick);
+	if(typeof bindOverlayBackdropClick == 'function')
+		bindOverlayBackdropClick();
+	else if(typeof onOverlayBackdropClick == 'function')
+		bindControl('overlay', 'click', onOverlayBackdropClick);
 	bindControl('qr_save', 'click', onQRDialogSave);
 	bindControl('qr_preview', 'click', toggleQRpreview);
 	bindControl('qr_print', 'click', printQR);

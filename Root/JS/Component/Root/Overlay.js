@@ -54,6 +54,19 @@ function onOverlayBackdropClick(event) {
 		dismissVisibleOverlay();
 }
 
+function bindOverlayBackdropClick() {
+	var overlay = document.getElementById('overlay');
+	if(!overlay || overlay.dataset.backdropClickBound)
+		return;
+	overlay.dataset.backdropClickBound = 'true';
+	overlay.addEventListener('click', onOverlayBackdropClick);
+}
+
+if(document.readyState === 'loading')
+	document.addEventListener('DOMContentLoaded', bindOverlayBackdropClick);
+else
+	bindOverlayBackdropClick();
+
 function hideOverlay(e) {
 	var visible_div = getVisibleOverlayDialog();
 	if(visible_div == e) {

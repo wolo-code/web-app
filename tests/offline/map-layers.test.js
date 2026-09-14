@@ -611,7 +611,9 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	assert.match(overlayJs, /dialog\.id === 'exception_message'/);
 	assert.match(overlayJs, /info_intro/);
 	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\)/);
-	assert.match(scriptJs, /addEventListener\('click', onOverlayBackdropClick\)/);
+	assert.match(overlayJs, /function bindOverlayBackdropClick/);
+	assert.match(scriptJs, /typeof bindOverlayBackdropClick == 'function'/);
+	assert.match(scriptJs, /typeof onOverlayBackdropClick == 'function'/);
 	assert.doesNotMatch(scriptJs, /onQROverlayClick/);
 	assert.doesNotMatch(qrJs, /onQROverlayClick/);
 	assert.doesNotMatch(qrJs, /isQROverlayDismissTarget/);

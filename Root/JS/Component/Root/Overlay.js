@@ -64,6 +64,8 @@ function hideOverlay(e) {
 		syncDecodeIconGuide();
 	if(typeof layoutBottomNotification == 'function')
 		layoutBottomNotification();
+	if(typeof scheduleFocusMapSearchInput == 'function')
+		scheduleFocusMapSearchInput();
 }
 
 function showOverlay(e) {

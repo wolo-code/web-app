@@ -71,6 +71,92 @@ test('ensureMapViewForLocation leaves decode view for map layers', () => {
 	assert.match(mapLayers, /classList\.remove\('decode'\)/);
 });
 
+test('map view keeps Place Search Input ready for typing', () => {
+	const mapJs = read('Root/JS/Component/Root/Map.js');
+	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
+	const overlayJs = read('Root/JS/Component/Root/Overlay.js');
+	const clickHandler = read('Root/JS/ClickHandler.js');
+	assert.match(mapJs, /function shouldKeepMapSearchFocused/);
+	assert.match(mapJs, /function focusMapSearchInput/);
+	assert.match(mapJs, /function scheduleFocusMapSearchInput/);
+	assert.match(mapJs, /document\.addEventListener\('keydown', onMapSearchGlobalKeydown\)/);
+	assert.match(mapJs, /blurMapSearchInput\(\)/);
+	assert.match(mapLayers, /scheduleFocusMapSearchInput\(\)/);
+	assert.match(overlayJs, /scheduleFocusMapSearchInput/);
+	assert.match(clickHandler, /scheduleFocusMapSearchInput/);
+	assert.doesNotMatch(clickHandler, /getElementById\('pac-input'\)\.blur\(\)/);
+});
+
+function loadMapSearchFocusApi(options) {
+	const mapJs = read('Root/JS/Component/Root/Map.js');
+	const start = mapJs.indexOf('function isMapSearchTypingTarget(');
+	const end = mapJs.indexOf('function initMap(');
+	const pacInput = {
+		id: 'pac-input',
+		tagName: 'INPUT',
+		isContentEditable: false,
+		focusCalls: 0,
+		focus: function() {
+			this.focusCalls += 1;
+			sandbox.document.activeElement = this;
+		}
+	};
+	const otherInput = {
+		id: 'other',
+		tagName: 'INPUT',
+		isContentEditable: false
+	};
+	const bodyClasses = new Set(options.bodyClasses || ['map']);
+	const sandbox = {
+		document: {
+			body: {
+				classList: {
+					contains: function(name) {
+						return bodyClasses.has(name);
+					}
+				}
+			},
+			documentElement: {},
+			activeElement: null,
+			getElementById: function(id) {
+				return id === 'pac-input' ? pacInput : null;
+			}
+		},
+		isMapViewActive: function() {
+			return options.mapView !== false;
+		},
+		getVisibleOverlayDialog: function() {
+			return options.overlay || null;
+		}
+	};
+	if(options.active === 'other')
+		sandbox.document.activeElement = otherInput;
+	else if(options.active === 'body')
+		sandbox.document.activeElement = sandbox.document.body;
+	else
+		sandbox.document.activeElement = pacInput;
+	vm.createContext(sandbox);
+	vm.runInContext(mapJs.slice(start, end), sandbox);
+	sandbox.pacInput = pacInput;
+	return sandbox;
+}
+
+test('shouldKeepMapSearchFocused skips decode, overlays, and other fields', () => {
+	assert.equal(loadMapSearchFocusApi({}).shouldKeepMapSearchFocused(), true);
+	assert.equal(loadMapSearchFocusApi({mapView: false}).shouldKeepMapSearchFocused(), false);
+	assert.equal(loadMapSearchFocusApi({bodyClasses: ['map', 'decode']}).shouldKeepMapSearchFocused(), false);
+	assert.equal(loadMapSearchFocusApi({overlay: {}}).shouldKeepMapSearchFocused(), false);
+	assert.equal(loadMapSearchFocusApi({active: 'other'}).shouldKeepMapSearchFocused(), false);
+});
+
+test('focusMapSearchInput focuses the search field in map view', () => {
+	const api = loadMapSearchFocusApi({active: 'body'});
+	assert.equal(api.focusMapSearchInput(), true);
+	assert.equal(api.pacInput.focusCalls, 1);
+	assert.equal(api.document.activeElement, api.pacInput);
+});
+
+
 test('locate and map-type toggle leave Wolo Code input view', () => {
 	const locateJs = read('Root/JS/Base/Locate.js');
 	const mapJs = read('Root/JS/Component/Root/Map.js');

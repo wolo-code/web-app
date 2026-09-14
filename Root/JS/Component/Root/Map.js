@@ -258,6 +258,75 @@ function scheduleMapFillMinZoom() {
 	}
 }
 
+function isMapSearchTypingTarget(el) {
+	var tag;
+	if(!el || el === document.body || el === document.documentElement)
+		return false;
+	tag = el.tagName;
+	if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT')
+		return true;
+	return !!el.isContentEditable;
+}
+
+function shouldKeepMapSearchFocused() {
+	if(typeof isMapViewActive == 'function' && !isMapViewActive())
+		return false;
+	if(document.body.classList.contains('decode'))
+		return false;
+	if(typeof getVisibleOverlayDialog == 'function' && getVisibleOverlayDialog())
+		return false;
+	if(isMapSearchTypingTarget(document.activeElement) && document.activeElement.id !== 'pac-input')
+		return false;
+	return true;
+}
+
+function focusMapSearchInput() {
+	var input = document.getElementById('pac-input');
+	if(!input || !shouldKeepMapSearchFocused())
+		return false;
+	if(document.activeElement === input)
+		return true;
+	try {
+		input.focus({preventScroll: true});
+	}
+	catch(err) {
+		input.focus();
+	}
+	return document.activeElement === input;
+}
+
+function scheduleFocusMapSearchInput() {
+	if(typeof requestAnimationFrame == 'function') {
+		requestAnimationFrame(function() {
+			focusMapSearchInput();
+		});
+		return;
+	}
+	setTimeout(focusMapSearchInput, 0);
+}
+
+function blurMapSearchInput() {
+	var input = document.getElementById('pac-input');
+	if(input && document.activeElement === input)
+		input.blur();
+}
+
+function onMapSearchGlobalKeydown(event) {
+	var input;
+	if(!event || event.defaultPrevented)
+		return;
+	if(event.ctrlKey || event.metaKey || event.altKey)
+		return;
+	if(event.key && event.key.length !== 1 && event.key !== 'Backspace')
+		return;
+	if(!shouldKeepMapSearchFocused())
+		return;
+	input = document.getElementById('pac-input');
+	if(!input || document.activeElement === input)
+		return;
+	focusMapSearchInput();
+}
+
 function initMap() {
 	initOsmMapType();
 
@@ -388,6 +457,7 @@ function initMap() {
 		document.getElementById('pac-input').addEventListener('input', syncProceedButtons);
 	}
 	document.getElementById('pac-input').addEventListener('keyup', enterHandler);
+	document.addEventListener('keydown', onMapSearchGlobalKeydown);
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
 	if(typeof syncProceedButtons == 'function') {
 		document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
@@ -424,6 +494,7 @@ function initMap() {
 		window.visualViewport._woloFillZoom = true;
 		window.visualViewport.addEventListener('resize', applyMapFillMinZoom);
 	}
+	scheduleFocusMapSearchInput();
 
 }
 
@@ -783,6 +854,7 @@ function toggleMapType() {
 		if(typeof syncMapChromeTooltips === 'function') {
 			syncMapChromeTooltips();
 		}
+		blurMapSearchInput();
 	}
 	else {
 		setMapLayer(getNextMapLayer(layer));
@@ -815,5 +887,6 @@ function toggleDecodeView() {
 		if(typeof syncMapChromeTooltips === 'function') {
 			syncMapChromeTooltips();
 		}
+		blurMapSearchInput();
 	}
 }

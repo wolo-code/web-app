@@ -814,6 +814,9 @@ function setMapLayer(layer) {
 	else if(typeof applyMapFillMinZoom === 'function') {
 		applyMapFillMinZoom();
 	}
+	if(typeof scheduleFocusMapSearchInput === 'function') {
+		scheduleFocusMapSearchInput();
+	}
 }
 
 function isMapViewActive() {
@@ -838,6 +841,9 @@ function ensureMapViewForLocation() {
 	}
 	else if(typeof applyMapFillMinZoom === 'function') {
 		applyMapFillMinZoom();
+	}
+	if(typeof scheduleFocusMapSearchInput === 'function') {
+		scheduleFocusMapSearchInput();
 	}
 }
 

@@ -527,6 +527,9 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(guideJs, /function layoutMapSearchCaptions/);
 	assert.match(guideJs, /function raiseMapSearchBarForGuide/);
 	assert.match(guideJs, /document\.body\.appendChild\(bar\)/);
+	assert.match(guideJs, /style:\s*bar\.getAttribute\('style'\)/);
+	assert.match(guideJs, /bar\.setAttribute\('style', home\.style\)/);
+	assert.doesNotMatch(guideJs, /bar\.style\.removeProperty\('top'\)/);
 	assert.match(guideJs, /function pinGuideCaptionBeside/);
 	assert.match(guideJs, /map_icon_guide_dim/);
 	assert.match(guideJs, /function layoutMapInfocardGuide/);
@@ -561,6 +564,34 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.doesNotMatch(rootCss, /body:not\(\.decode\) #action_menu_info/);
 	assert.match(rootCss, /body:not\(\.decode\) #action_menu_decode \{[\s\S]*left:\s*51px/);
 	assert.match(decodeNarrowCss, /max-width:\s*662px/);
+});
+
+test('Map Guide restores Google search positioning on wide and narrow layouts', () => {
+	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
+	for(const originalStyle of [
+		'position: absolute; left: 0px; top: 0px;',
+		'position: absolute; left: 0px; top: 64px;'
+	]) {
+		let currentStyle = 'position: fixed; left: 12px; top: 90px; margin: 0px; z-index: 202;';
+		const parent = {
+			insertBefore(node) { node.parentNode = this; },
+			appendChild(node) { node.parentNode = this; }
+		};
+		const bar = {
+			parentNode: {},
+			removeAttribute(name) { if(name === 'style') currentStyle = null; },
+			setAttribute(name, value) { if(name === 'style') currentStyle = value; }
+		};
+		const context = {
+			document: { getElementById: id => id === 'map_search_cluster' ? bar : null },
+			window: {}
+		};
+		vm.runInNewContext(guideJs, context);
+		context.decodeIconGuideSearchHome = { parent, next: null, style: originalStyle };
+		context.restoreMapSearchBarStacking();
+		assert.equal(bar.parentNode, parent);
+		assert.equal(currentStyle, originalStyle);
+	}
 });
 
 test('unexpected error dialog uses equal-width actions without an info toggle', () => {

@@ -482,15 +482,12 @@ function restoreMapSearchBarStacking() {
 			home.parent.insertBefore(bar, home.next);
 		else if(home.parent)
 			home.parent.appendChild(bar);
+		if(home.style == null)
+			bar.removeAttribute('style');
+		else
+			bar.setAttribute('style', home.style);
 	}
 	decodeIconGuideSearchHome = null;
-	if(bar) {
-		bar.style.removeProperty('position');
-		bar.style.removeProperty('left');
-		bar.style.removeProperty('top');
-		bar.style.removeProperty('margin');
-		bar.style.removeProperty('z-index');
-	}
 }
 
 function raiseMapSearchBarForGuide() {
@@ -502,7 +499,11 @@ function raiseMapSearchBarForGuide() {
 	}
 	rect = bar.getBoundingClientRect();
 	if(!decodeIconGuideSearchHome) {
-		decodeIconGuideSearchHome = { parent: bar.parentNode, next: bar.nextSibling };
+		decodeIconGuideSearchHome = {
+			parent: bar.parentNode,
+			next: bar.nextSibling,
+			style: bar.getAttribute('style')
+		};
 		document.body.appendChild(bar);
 	}
 	else if(bar.parentNode !== document.body)

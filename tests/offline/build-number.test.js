@@ -60,6 +60,7 @@ test('Info corner version is restored and credits modal omits version details', 
 	assert.match(infoCss, /#info_version_indicator:hover \.info_version_width/);
 	assert.match(infoCss, /#info_version_indicator:hover \.info_version_stamp_utc/);
 	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_width/);
+	assert.match(infoCss, /#info_version_indicator:hover \.info_version_local/);
 	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_local/);
 	assert.match(infoCss, /#info_version_indicator\[aria-expanded='true'\] \.info_version_stamp_elapsed/);
 	assert.doesNotMatch(links, /software_info/);

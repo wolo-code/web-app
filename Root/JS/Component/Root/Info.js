@@ -26,10 +26,26 @@ function padInfoTimePart(value) {
 	return (value < 10 ? '0' : '') + value;
 }
 
-function formatInfoTimestamp(date) {
+function formatInfoTimestamp(date, local) {
 	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	if(!date || isNaN(date.getTime()))
 		return '';
+	if(local) {
+		var zone = '';
+		try {
+			var parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' }).formatToParts(date);
+			for(var i = 0; i < parts.length; i++) {
+				if(parts[i].type === 'timeZoneName') {
+					zone = parts[i].value;
+					break;
+				}
+			}
+		}
+		catch(error) {
+			zone = '';
+		}
+		return date.getFullYear() + ' ' + months[date.getMonth()] + ' ' + padInfoTimePart(date.getDate()) + ' ' + padInfoTimePart(date.getHours()) + ':' + padInfoTimePart(date.getMinutes()) + ':' + padInfoTimePart(date.getSeconds()) + (zone ? ' ' + zone : '');
+	}
 	return date.getUTCFullYear() + ' ' + months[date.getUTCMonth()] + ' ' + padInfoTimePart(date.getUTCDate()) + ' ' + padInfoTimePart(date.getUTCHours()) + ':' + padInfoTimePart(date.getUTCMinutes()) + ':' + padInfoTimePart(date.getUTCSeconds()) + ' UTC';
 }
 
@@ -76,12 +92,14 @@ function fillInfoVersionStamps() {
 		return;
 	var utcNode = indicator.querySelector('.info_version_stamp_utc');
 	var elapsedNode = indicator.querySelector('.info_version_stamp_elapsed');
-	if(!utcNode || !elapsedNode)
+	var localNode = indicator.querySelector('.info_version_local');
+	if(!utcNode || !elapsedNode || !localNode)
 		return;
 	var updated = getInfoUpdatedTimestamp();
 	var date = updated ? new Date(updated) : null;
 	utcNode.textContent = formatInfoTimestamp(date) || updated;
 	elapsedNode.textContent = formatInfoElapsed(date) || '';
+	localNode.textContent = formatInfoTimestamp(date, true) || updated;
 }
 
 function setInfoVersionExpanded(expanded) {

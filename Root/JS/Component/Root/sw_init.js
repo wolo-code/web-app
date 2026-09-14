@@ -1,4 +1,9 @@
 if ('serviceWorker' in navigator) {
+	// A worker taking control for the first time does not require a reload: the
+	// current page already came from the network. Only reload pages that began
+	// under an older controller and need to switch to an updated worker.
+	var hadServiceWorkerControllerAtLoad = !!navigator.serviceWorker.controller;
+
 	window.addEventListener('load', function() {
 		sessionStorage.removeItem('wolo_sw_reloading');
 		navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function(registration) {
@@ -31,6 +36,9 @@ if ('serviceWorker' in navigator) {
 		});
 
 		navigator.serviceWorker.addEventListener('controllerchange', function() {
+			if (!hadServiceWorkerControllerAtLoad) {
+				return;
+			}
 			if (sessionStorage.wolo_sw_reloading === '1') {
 				return;
 			}

@@ -125,18 +125,23 @@ function toggleInfoVersionDisplay(event) {
 	setInfoVersionExpanded(!expanded);
 }
 
-function closeInfo() {
+function closeInfo(event) {
 	var intro = document.getElementById('info_intro');
+	var fromIntroProceed = event && event.currentTarget && event.currentTarget.id === 'info_intro_close_button';
+	if(typeof isInfoIntroActive == 'function' && isInfoIntroActive() && !fromIntroProceed)
+		return;
+	if(event && event.stopPropagation)
+		event.stopPropagation();
 	if(typeof clearDecodeIconGuideAwaitingIntro == 'function')
 		clearDecodeIconGuideAwaitingIntro();
 	if(intro)
 		intro.classList.add('hide');
 	hideInfo();
 	activateOverlayInfo_full();
-	// if(!syncLocate_engage) {
-	// 	syncLocate();
-	// 	syncLocate_engage = true;
-	// }
+	if(typeof bindOverlayBackdropClick == 'function')
+		bindOverlayBackdropClick();
+	if(typeof flushExceptionPrompt == 'function')
+		flushExceptionPrompt();
 }
 
 function showInfoLinks() {

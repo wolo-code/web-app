@@ -405,7 +405,7 @@ test('map source attribution sits after a gap from the action menu', () => {
 	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
 	const narrowCss = read('Root/CSS/Component/Root/Base/Root_narrow.css');
 	const baseCss = read('Root/CSS/Base/Base.css');
-	assert.match(rootCss, /\.map_attribution \{[\s\S]*left:\s*121px/);
+	assert.match(rootCss, /\.map_attribution \{[\s\S]*left:\s*3px/);
 	assert.match(rootCss, /@media \(max-width:\s*662px\) \{[\s\S]*\.map_attribution \{[\s\S]*left:\s*117px/);
 	assert.doesNotMatch(rootCss, /#action_menu\.open\) \.map_attribution/);
 	assert.match(narrowCss, /\.map_attribution \{[\s\S]*left:\s*117px/);
@@ -456,6 +456,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	const decodeNarrowCss = read('Root/CSS/Component/Root/Base/Decode_narrow.css');
 	const infoCss = read('Root/CSS/Component/Root/Base/Info.css');
 	const rootCss = read('Root/CSS/Component/Root/Base/Root.css');
+	const themeCss = read('Root/CSS/Component/Root/Base/Theme.css');
 	assert.match(index, /class='decode_icon_caption'[\s\S]*IP city/);
 	assert.match(index, /class='decode_icon_caption'[\s\S]*GPS city/);
 	assert.match(index, /class='decode_icon_caption'[\s\S]*Previous/);
@@ -541,9 +542,12 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /\.map_icon_guide_callout_desc/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_cluster/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
-	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff[\s\S]*opacity:\s*1/);
+	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{\s*opacity:\s*1;\s*\}/);
+	assert.doesNotMatch(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[^}]*background-color:\s*#fff/);
+	assert.doesNotMatch(decodeCss, /0 0 0 1px #69B7CF/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);
-	assert.match(decodeCss, /0 0 0 1px #69B7CF/);
+	assert.match(themeCss, /html\.dark-mode body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#222244/);
+	assert.doesNotMatch(themeCss, /html\.dark-mode body:not\(\.decode\)\.decode-icon-guide #pac-input \{[\s\S]*background-color:\s*#fff/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #decode_icon_guide_scrim/);
 	assert.match(decodeCss, /body\.osm\.decode-icon-guide:not\(\.decode\) #map_icon_guide_dim/);
 	assert.match(decodeCss, /--app-background-wcode/);
@@ -604,6 +608,7 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 
 test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	const overlayJs = read('Root/JS/Component/Root/Overlay.js');
+	const overlayCss = read('Root/CSS/Base/Overlay.css');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	const qrJs = read('Root/JS/Component/Root/QR.js');
 	const infoJs = read('Root/JS/Component/Root/Info.js');
@@ -616,7 +621,10 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	assert.match(overlayJs, /info_intro/);
 	assert.match(infoJs, /intro.classList.add\('hide'\)/);
 	assert.match(guideJs, /isInfoIntroActive/);
-	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\)/);
+	assert.match(overlayCss, /#overlay\.overlay \{[\s\S]*z-index:\s*10000/);
+	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\):not\(\.hide\)/);
+	assert.match(overlayJs, /function unbindOverlayBackdropClick/);
+	assert.match(infoJs, /info_intro_close_button/);
 	assert.match(overlayJs, /function bindOverlayBackdropClick/);
 	assert.match(scriptJs, /typeof bindOverlayBackdropClick == 'function'/);
 	assert.match(scriptJs, /typeof onOverlayBackdropClick == 'function'/);

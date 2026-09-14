@@ -44,7 +44,7 @@ function dismissVisibleOverlay() {
 	var cancel;
 	if(!dialog || isBlockingOverlayDialog(dialog))
 		return;
-	close = dialog.querySelector('.message_dialog_close:not(.message_dialog_leading_action)');
+	close = dialog.querySelector('.message_dialog_close:not(.message_dialog_leading_action):not(.hide)');
 	if(close) {
 		close.click();
 		return;
@@ -64,9 +64,17 @@ function onOverlayBackdropClick(event) {
 		dismissVisibleOverlay();
 }
 
+function unbindOverlayBackdropClick() {
+	var overlay = document.getElementById('overlay');
+	if(!overlay || !overlay.dataset.backdropClickBound)
+		return;
+	overlay.removeEventListener('click', onOverlayBackdropClick);
+	delete overlay.dataset.backdropClickBound;
+}
+
 function bindOverlayBackdropClick() {
 	var overlay = document.getElementById('overlay');
-	if(!overlay || overlay.dataset.backdropClickBound)
+	if(!overlay || overlay.dataset.backdropClickBound || isInfoIntroActive())
 		return;
 	overlay.dataset.backdropClickBound = 'true';
 	overlay.addEventListener('click', onOverlayBackdropClick);
@@ -99,7 +107,7 @@ function hideOverlay(e) {
 function showOverlay(e) {
 	if(!e)
 		return;
-	if(isInfoIntroActive() && e.id !== 'info_message' && e.id !== 'exception_message')
+	if(isInfoIntroActive() && e.id !== 'info_message')
 		return;
 	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
 		if(child.nodeType == 1 && !child.classList.contains('hide') && child != e)
@@ -108,6 +116,8 @@ function showOverlay(e) {
 		document.getElementById('overlay').classList.remove('hide');
 	if(e.classList.contains('hide'))
 		e.classList.remove('hide');
+	if(isInfoIntroActive())
+		unbindOverlayBackdropClick();
 	if(typeof decodeIconGuideVisible != 'undefined' && decodeIconGuideVisible && typeof hideDecodeIconGuide == 'function')
 		hideDecodeIconGuide();
 	if(typeof layoutBottomNotification == 'function')

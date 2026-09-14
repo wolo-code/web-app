@@ -3,7 +3,7 @@
 	right: 0px;
 	top: 0px;
 	bottom: 0px;
-	z-index: 400;
+	z-index: 10000;
 	overflow-y: auto;
 	color: rgba(100, 100, 100, 1);
 	background-color: rgba(100, 100, 100, 0.75);
@@ -12,6 +12,10 @@
 	display: flex;
 	align-items: safe center;
 	justify-content: center;
+}
+
+#overlay.overlay {
+	z-index: 10000;
 }
 
 .overlay > div {

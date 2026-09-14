@@ -606,10 +606,16 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	const overlayJs = read('Root/JS/Component/Root/Overlay.js');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	const qrJs = read('Root/JS/Component/Root/QR.js');
+	const infoJs = read('Root/JS/Component/Root/Info.js');
+	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
 	assert.match(overlayJs, /function onOverlayBackdropClick/);
+	assert.match(overlayJs, /function isInfoIntroActive/);
 	assert.match(overlayJs, /function isBlockingOverlayDialog/);
 	assert.match(overlayJs, /dialog\.id === 'exception_message'/);
+	assert.match(overlayJs, /e\.id !== 'info_message'/);
 	assert.match(overlayJs, /info_intro/);
+	assert.match(infoJs, /intro.classList.add\('hide'\)/);
+	assert.match(guideJs, /isInfoIntroActive/);
 	assert.match(overlayJs, /\.message_dialog_close:not\(\.message_dialog_leading_action\)/);
 	assert.match(overlayJs, /function bindOverlayBackdropClick/);
 	assert.match(scriptJs, /typeof bindOverlayBackdropClick == 'function'/);

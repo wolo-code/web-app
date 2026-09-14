@@ -154,6 +154,8 @@ function isAppOverlayOpen() {
 }
 
 function shouldHoldDecodeIconGuide() {
+	if(typeof isInfoIntroActive == 'function' && isInfoIntroActive())
+		return true;
 	return decodeIconGuideAwaitingIntro || isInfoIntroOpen() || isAppOverlayOpen();
 }
 

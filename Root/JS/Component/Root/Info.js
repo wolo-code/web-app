@@ -126,8 +126,11 @@ function toggleInfoVersionDisplay(event) {
 }
 
 function closeInfo() {
+	var intro = document.getElementById('info_intro');
 	if(typeof clearDecodeIconGuideAwaitingIntro == 'function')
 		clearDecodeIconGuideAwaitingIntro();
+	if(intro)
+		intro.classList.add('hide');
 	hideInfo();
 	activateOverlayInfo_full();
 	// if(!syncLocate_engage) {

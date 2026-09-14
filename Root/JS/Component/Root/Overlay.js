@@ -1,6 +1,18 @@
+function isInfoIntroActive() {
+	var overlay = document.getElementById('overlay');
+	var message = document.getElementById('info_message');
+	var intro = document.getElementById('info_intro');
+	return !!(overlay && message && intro
+		&& !overlay.classList.contains('hide')
+		&& !message.classList.contains('hide')
+		&& !intro.classList.contains('hide'));
+}
+
 function getVisibleOverlayDialog() {
 	var overlay = document.getElementById('overlay');
 	var visible_div;
+	if(isInfoIntroActive())
+		return document.getElementById('info_message');
 	if(!overlay || overlay.classList.contains('hide') || !overlay.children[0])
 		return null;
 	for(var child = overlay.children[0].firstChild; child !== null; child = child.nextSibling)
@@ -10,16 +22,12 @@ function getVisibleOverlayDialog() {
 }
 
 function isBlockingOverlayDialog(dialog) {
-	var intro;
 	if(!dialog)
 		return false;
+	if(isInfoIntroActive())
+		return true;
 	if(dialog.id === 'exception_message')
 		return true;
-	if(dialog.id === 'info_message') {
-		intro = document.getElementById('info_intro');
-		if(intro && !intro.classList.contains('hide'))
-			return true;
-	}
 	return false;
 }
 
@@ -50,6 +58,8 @@ function dismissVisibleOverlay() {
 }
 
 function onOverlayBackdropClick(event) {
+	if(isInfoIntroActive())
+		return;
 	if(event && isOverlayBackdropTarget(event.target))
 		dismissVisibleOverlay();
 }
@@ -68,11 +78,16 @@ else
 	bindOverlayBackdropClick();
 
 function hideOverlay(e) {
-	var visible_div = getVisibleOverlayDialog();
+	var visible_div;
+	if(isInfoIntroActive() && (!e || e.id === 'info_message'))
+		return;
+	visible_div = getVisibleOverlayDialog();
 	if(visible_div == e) {
 		document.getElementById('overlay').classList.add('hide');
 		visible_div.classList.add('hide');
 	}
+	if(isInfoIntroActive())
+		return;
 	if(typeof syncDecodeIconGuide == 'function')
 		syncDecodeIconGuide();
 	if(typeof layoutBottomNotification == 'function')
@@ -82,6 +97,10 @@ function hideOverlay(e) {
 }
 
 function showOverlay(e) {
+	if(!e)
+		return;
+	if(isInfoIntroActive() && e.id !== 'info_message' && e.id !== 'exception_message')
+		return;
 	for(var child= document.getElementById('overlay').children[0].firstChild; child!==null; child=child.nextSibling)
 		if(child.nodeType == 1 && !child.classList.contains('hide') && child != e)
 			child.classList.add('hide');

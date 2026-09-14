@@ -26,27 +26,48 @@ function padInfoTimePart(value) {
 	return (value < 10 ? '0' : '') + value;
 }
 
-function formatInfoTimestamp(date, local) {
+function formatInfoTimestamp(date) {
 	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 	if(!date || isNaN(date.getTime()))
 		return '';
-	if(local) {
-		var zone = '';
-		try {
-			var parts = new Intl.DateTimeFormat(undefined, { timeZoneName: 'short' }).formatToParts(date);
-			for(var i = 0; i < parts.length; i++) {
-				if(parts[i].type === 'timeZoneName') {
-					zone = parts[i].value;
-					break;
-				}
-			}
-		}
-		catch(error) {
-			zone = '';
-		}
-		return date.getFullYear() + ' ' + months[date.getMonth()] + ' ' + padInfoTimePart(date.getDate()) + ' ' + padInfoTimePart(date.getHours()) + ':' + padInfoTimePart(date.getMinutes()) + ':' + padInfoTimePart(date.getSeconds()) + (zone ? ' ' + zone : '');
-	}
 	return date.getUTCFullYear() + ' ' + months[date.getUTCMonth()] + ' ' + padInfoTimePart(date.getUTCDate()) + ' ' + padInfoTimePart(date.getUTCHours()) + ':' + padInfoTimePart(date.getUTCMinutes()) + ':' + padInfoTimePart(date.getUTCSeconds()) + ' UTC';
+}
+
+function formatInfoElapsed(date) {
+	if(!date || isNaN(date.getTime()))
+		return '';
+	var ms = Date.now() - date.getTime();
+	if(ms < 0)
+		ms = 0;
+	var seconds = Math.floor(ms / 1000);
+	if(seconds < 10)
+		return 'just now';
+	if(seconds < 60)
+		return seconds + ' seconds ago';
+	var minutes = Math.floor(seconds / 60);
+	if(minutes === 1)
+		return '1 minute ago';
+	if(minutes < 60)
+		return minutes + ' minutes ago';
+	var hours = Math.floor(minutes / 60);
+	if(hours === 1)
+		return '1 hour ago';
+	if(hours < 24)
+		return hours + ' hours ago';
+	var days = Math.floor(hours / 24);
+	if(days === 1)
+		return '1 day ago';
+	if(days < 30)
+		return days + ' days ago';
+	var months = Math.floor(days / 30);
+	if(months === 1)
+		return '1 month ago';
+	if(months < 12)
+		return months + ' months ago';
+	var years = Math.floor(days / 365);
+	if(years <= 1)
+		return '1 year ago';
+	return years + ' years ago';
 }
 
 function fillInfoVersionStamps() {
@@ -54,13 +75,13 @@ function fillInfoVersionStamps() {
 	if(!indicator)
 		return;
 	var utcNode = indicator.querySelector('.info_version_stamp_utc');
-	var localNode = indicator.querySelector('.info_version_stamp_local');
-	if(!utcNode || !localNode)
+	var elapsedNode = indicator.querySelector('.info_version_stamp_elapsed');
+	if(!utcNode || !elapsedNode)
 		return;
 	var updated = getInfoUpdatedTimestamp();
 	var date = updated ? new Date(updated) : null;
-	utcNode.textContent = updated || '';
-	localNode.textContent = formatInfoTimestamp(date, true) || updated;
+	utcNode.textContent = formatInfoTimestamp(date) || updated;
+	elapsedNode.textContent = formatInfoElapsed(date) || '';
 }
 
 function setInfoVersionExpanded(expanded) {
@@ -70,18 +91,7 @@ function setInfoVersionExpanded(expanded) {
 		var node = nodes[i];
 		if(!node)
 			continue;
-		var shortVersion = node.getAttribute('data-version-short');
-		var fullVersion = node.getAttribute('data-version-full');
-		if(!shortVersion || !fullVersion)
-			continue;
-		var showFull = !!expanded && fullVersion !== shortVersion;
-		var label = node.querySelector('.info_version_label') || node.querySelector('.info_version_text') || node;
-		label.textContent = showFull ? fullVersion : shortVersion;
-		if(fullVersion === shortVersion) {
-			node.removeAttribute('aria-expanded');
-			continue;
-		}
-		node.setAttribute('aria-expanded', showFull ? 'true' : 'false');
+		node.setAttribute('aria-expanded', expanded ? 'true' : 'false');
 	}
 }
 

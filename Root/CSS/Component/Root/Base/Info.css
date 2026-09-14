@@ -144,7 +144,7 @@
 }
 
 #info_version_indicator .info_version_stamp_utc,
-#info_version_indicator .info_version_stamp_local {
+#info_version_indicator .info_version_stamp_elapsed {
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -156,18 +156,28 @@
 	visibility: hidden;
 }
 
-#info_version_indicator[aria-expanded='true'] .info_version_stamp_utc {
+#info_version_indicator:hover .info_version_width,
+#info_version_indicator:focus-visible .info_version_width {
 	visibility: visible;
+}
+
+#info_version_indicator:hover .info_version_label,
+#info_version_indicator:focus-visible .info_version_label {
+	visibility: hidden;
 }
 
 #info_version_indicator:hover .info_version_stamp_utc,
 #info_version_indicator:focus-visible .info_version_stamp_utc {
-	visibility: hidden;
+	visibility: visible;
 }
 
-#info_version_indicator:hover .info_version_stamp_local,
-#info_version_indicator:focus-visible .info_version_stamp_local {
+#info_version_indicator[aria-expanded='true'] .info_version_stamp_elapsed {
 	visibility: visible;
+}
+
+#info_version_indicator[aria-expanded='true']:hover .info_version_stamp_utc,
+#info_version_indicator[aria-expanded='true']:focus-visible .info_version_stamp_utc {
+	visibility: hidden;
 }
 
 #info_intro {

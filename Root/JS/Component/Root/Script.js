@@ -173,6 +173,9 @@ function setupControls() {
 	bindControl('info_intro_close_button', 'click', closeInfo);
 	bindControl('info_full_close_button', 'click', closeInfo);
 	bindControl('info_version_indicator', 'click', toggleInfoVersionDisplay);
+	bindControl('info_version_indicator', 'mouseenter', fillInfoVersionStamps);
+	bindControl('info_version_indicator', 'focus', fillInfoVersionStamps);
+	fillInfoVersionStamps();
 	bindControl('info_show_icon_labels', 'click', showInfoIconGuide);
 	bindControl('action_menu_info', 'click', showInfoFromActionMenu);
 	bindControl('action_menu_map', 'click', toggleMapViewTypeFromActionMenu);

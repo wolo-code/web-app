@@ -273,6 +273,8 @@ function shouldKeepMapSearchFocused() {
 		return false;
 	if(document.body.classList.contains('decode'))
 		return false;
+	if(document.body.classList.contains('decode-icon-guide'))
+		return false;
 	if(typeof getVisibleOverlayDialog == 'function' && getVisibleOverlayDialog())
 		return false;
 	if(isMapSearchTypingTarget(document.activeElement) && document.activeElement.id !== 'pac-input')

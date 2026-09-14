@@ -145,6 +145,7 @@ test('shouldKeepMapSearchFocused skips decode, overlays, and other fields', () =
 	assert.equal(loadMapSearchFocusApi({}).shouldKeepMapSearchFocused(), true);
 	assert.equal(loadMapSearchFocusApi({mapView: false}).shouldKeepMapSearchFocused(), false);
 	assert.equal(loadMapSearchFocusApi({bodyClasses: ['map', 'decode']}).shouldKeepMapSearchFocused(), false);
+	assert.equal(loadMapSearchFocusApi({bodyClasses: ['map', 'decode-icon-guide']}).shouldKeepMapSearchFocused(), false);
 	assert.equal(loadMapSearchFocusApi({overlay: {}}).shouldKeepMapSearchFocused(), false);
 	assert.equal(loadMapSearchFocusApi({active: 'other'}).shouldKeepMapSearchFocused(), false);
 });
@@ -543,6 +544,11 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_cluster/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #map_search_bar/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{\s*opacity:\s*1;\s*\}/);
+	assert.match(decodeCss, /body\.decode-icon-guide #pac-input,\s*body\.decode-icon-guide #decode_input \{\s*caret-color:\s*transparent;\s*\}/);
+	assert.match(mapJs, /classList\.contains\('decode-icon-guide'\)/);
+	assert.match(guideJs, /function blurInputsForIconGuide/);
+	assert.match(guideJs, /blurInputsForIconGuide\(\)/);
+	assert.match(guideJs, /scheduleFocusMapSearchInput/);
 	assert.doesNotMatch(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #pac-input \{[^}]*background-color:\s*#fff/);
 	assert.doesNotMatch(decodeCss, /0 0 0 1px #69B7CF/);
 	assert.match(decodeCss, /body:not\(\.decode\)\.decode-icon-guide #decode_button \{[\s\S]*background-color:\s*#fff[\s\S]*#69B7CF/);

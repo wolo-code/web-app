@@ -683,6 +683,14 @@ function onDecodeIconGuideDismiss(event) {
 	fadeDecodeIconGuide();
 }
 
+function blurInputsForIconGuide() {
+	var decodeInput = document.getElementById('decode_input');
+	if(decodeInput && document.activeElement === decodeInput)
+		decodeInput.blur();
+	if(typeof blurMapSearchInput == 'function')
+		blurMapSearchInput();
+}
+
 function hideDecodeIconGuide(fromFade) {
 	var hintReplay = fromFade && decodeIconGuideReplayHint;
 	clearDecodeIconGuideTimers();
@@ -696,6 +704,8 @@ function hideDecodeIconGuide(fromFade) {
 	restoreMapSearchBarFromGuide();
 	removeMapIconGuideDim();
 	layoutMapCameraCaption();
+	if(typeof scheduleFocusMapSearchInput == 'function')
+		scheduleFocusMapSearchInput();
 	if(hintReplay)
 		showMapIconGuideReplayHint();
 }
@@ -741,6 +751,7 @@ function startDecodeIconGuide(force) {
 		if(decodeIconGuideVisible) {
 			decodeIconGuideShownOnDecode = isDecodeIconGuideView();
 			document.body.classList.remove('decode-icon-guide-fade');
+			blurInputsForIconGuide();
 			layoutDecodeIconGuide();
 			watchMapCameraCaption();
 			setTimeout(layoutDecodeIconGuide, 250);
@@ -755,6 +766,7 @@ function startDecodeIconGuide(force) {
 	decodeIconGuideShownOnDecode = isDecodeIconGuideView();
 	document.body.classList.add('decode-icon-guide');
 	document.body.classList.remove('decode-icon-guide-fade');
+	blurInputsForIconGuide();
 	layoutDecodeIconGuide();
 	watchMapCameraCaption();
 	setTimeout(layoutDecodeIconGuide, 250);

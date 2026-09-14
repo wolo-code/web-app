@@ -404,6 +404,11 @@ body:not(.decode).decode-icon-guide #pac-input {
 	opacity: 1;
 }
 
+body.decode-icon-guide #pac-input,
+body.decode-icon-guide #decode_input {
+	caret-color: transparent;
+}
+
 body:not(.decode).decode-icon-guide #search_icon path:first-child {
 	fill: #69B7CF;
 }

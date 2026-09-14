@@ -265,8 +265,11 @@ function smoothZoomToBounds(bounds, map, max, current) {
 }
 
 function getZoomByBounds(map, bounds) {
-	var MAX_ZOOM = map.mapTypes.get(map.getMapTypeId()).maxZoom || DEFAULT_LOCATE_ZOOM;
-	var MIN_ZOOM = map.mapTypes.get(map.getMapTypeId()).minZoom || 0;
+	if(!map || !bounds)
+		return typeof DEFAULT_LOCATE_ZOOM === 'number' ? DEFAULT_LOCATE_ZOOM : 18;
+	var mapType = (map.mapTypes && typeof map.getMapTypeId === 'function') ? map.mapTypes.get(map.getMapTypeId()) : null;
+	var MAX_ZOOM = (mapType && mapType.maxZoom) || DEFAULT_LOCATE_ZOOM;
+	var MIN_ZOOM = (mapType && mapType.minZoom) || 0;
 	if(typeof getMinZoomToFillMapHeight === 'function') {
 		MIN_ZOOM = Math.max(MIN_ZOOM, getMinZoomToFillMapHeight());
 	}
@@ -274,8 +277,12 @@ function getZoomByBounds(map, bounds) {
 		MAX_ZOOM = Math.min(MAX_ZOOM, OSM_NATIVE_MAX_ZOOM);
 	}
 
-	var ne = map.getProjection().fromLatLngToPoint( bounds.getNorthEast() );
-	var sw = map.getProjection().fromLatLngToPoint( bounds.getSouthWest() );
+	var projection = typeof map.getProjection === 'function' ? map.getProjection() : null;
+	if(!projection || typeof projection.fromLatLngToPoint !== 'function')
+		return typeof map.getZoom === 'function' && typeof map.getZoom() === 'number' ? map.getZoom() : MAX_ZOOM;
+
+	var ne = projection.fromLatLngToPoint( bounds.getNorthEast() );
+	var sw = projection.fromLatLngToPoint( bounds.getSouthWest() );
 
 	var worldCoordWidth = Math.abs(ne.x-sw.x)/2;
 	var worldCoordHeight = Math.abs(ne.y-sw.y)/2;

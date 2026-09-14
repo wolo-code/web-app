@@ -87,7 +87,14 @@ test('locate auto-proceed from 99+ streak is skipped while long-press override i
 	api.resetPoorAccuracyStreak();
 
 	assert.match(locateJs, /focusLocateWatchPosition\(pos\);\s*var fastForwardPoor = noteWatchAccuracy\(position\.coords\.accuracy, pos\)/);
-	assert.match(locateJs, /showLocateWatchLoader\(\)/);
-	assert.match(locateJs, /locateDidFocus = false/);
+	assert.match(locateJs, /locateLoaderHeld = true/);
+	assert.match(locateJs, /hideLocateWatchLoader\(\)/);
+	assert.match(locateJs, /if\(locateDidFocus\) \{\s*pendingFocusPos = pos;\s*return;/);
+
+	const focusJs = fs.readFileSync(path.join(repoRoot, 'Root/JS/Component/Root/Focus.js'), 'utf8');
+	const finish = focusJs.slice(focusJs.indexOf('function finishSmoothZoomToBounds'), focusJs.indexOf('function smoothZoomOut'));
+	assert.doesNotMatch(finish, /fitBounds/);
+	assert.doesNotMatch(finish, /focus___/);
+	assert.match(finish, /applyMapChromePan/);
 	assert.match(locateJs, /press_duration > location_button_PRESS_THRESHOLD && addClassIfPresent\(location_dot, 'blinking'\)/);
 });

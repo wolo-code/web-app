@@ -194,24 +194,15 @@ const ZOOM_BOUND_PADDING = 36;
 var zoomChangedListener;
 var nextZoomTimer;
 function finishSmoothZoomToBounds(bounds, map) {
-	if(typeof bounds !== 'undefined')
-		setTimeout(function() {
-			if(pendingFocusPos) {
-				var temPos = Object.assign({}, pendingFocusPos);
-				pendingFocusPos = null;
-				focus___(temPos);
-			}
-			else {
-				map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-				var idleListenerPanBy = map.addListener('idle', function() {
-						idleListenerPanBy.remove();
-						applyMapChromePan();
-						endProgrammaticMapFocus();
-					});
-			}
-		}, ZOOM_ANIMATION_SPEED);
-	else
+	setTimeout(function() {
+		if(pendingFocusPos && map) {
+			map.panTo(pendingFocusPos);
+			pendingFocusPos = null;
+		}
+		if(typeof applyMapChromePan === 'function')
+			applyMapChromePan();
 		endProgrammaticMapFocus();
+	}, ZOOM_ANIMATION_SPEED);
 }
 
 function smoothZoomOut(map, current, min, onDone) {

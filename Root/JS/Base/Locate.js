@@ -76,7 +76,6 @@ function processCurrentWatchPosition() {
 		return;
 	if(!lastWatchPos)
 		return;
-	focusLocateWatchPosition(lastWatchPos);
 	processPosition(lastWatchPos);
 }
 
@@ -90,11 +89,11 @@ function noteWatchAccuracy(accuracy, pos) {
 	}
 	lastWatchAccuracy = accuracy;
 	startPoorAccuracySampler();
-	showLocateWatchLoader();
 	return countPoorAccuracySample();
 }
 
 var locateDidFocus = false;
+var locateLoaderHeld = false;
 
 function showLocateWatchLoader() {
 	if(typeof document === 'undefined' || !document.getElementById)
@@ -104,19 +103,33 @@ function showLocateWatchLoader() {
 		el.classList.remove('hide');
 }
 
+function hideLocateWatchLoader() {
+	if(!locateLoaderHeld)
+		return;
+	locateLoaderHeld = false;
+	if(typeof popLoader === 'function')
+		popLoader();
+	else if(typeof document !== 'undefined' && document.getElementById) {
+		var el = document.getElementById('wait_loader');
+		if(el)
+			el.classList.add('hide');
+	}
+}
+
 function focusLocateWatchPosition(pos) {
 	if(!pos)
 		return;
 	var bounds = (typeof accuCircle !== 'undefined' && accuCircle && typeof accuCircle.getBounds === 'function')
 		? accuCircle.getBounds()
 		: undefined;
-	if(!locateDidFocus || (typeof firstFocus !== 'undefined' && !firstFocus)) {
-		if(typeof focus_ === 'function')
-			focus_(pos, bounds);
-		locateDidFocus = true;
-	}
-	else
+	if(locateDidFocus) {
 		pendingFocusPos = pos;
+		return;
+	}
+	hideLocateWatchLoader();
+	if(typeof focus_ === 'function')
+		focus_(pos, bounds);
+	locateDidFocus = true;
 }
 
 function initLocate(override_dnd, callback) {
@@ -149,6 +162,7 @@ function locateExec(failure) {
 		var WATCH_LOCATION_NOTICE_TIMEOUT = 5000;
 
 		pushLoader();
+		locateLoaderHeld = true;
 		showLocateWatchLoader();
 		if (navigator.geolocation) {
 			locating = true;
@@ -383,7 +397,7 @@ function clearLocating(hideAccuracyContainer) {
 		document.getElementById('accuracy_container').classList.add('hide');
 	locating = false;
 	resetPoorAccuracyStreak();
-	popLoader();
+	hideLocateWatchLoader();
 	removeClassIfPresent(typeof location_icon_dot == 'undefined' ? null : location_icon_dot, 'blinking');
 	removeClassIfPresent(typeof accuracy_indicator == 'undefined' ? null : accuracy_indicator, 'blinking');
 	hideNotication();

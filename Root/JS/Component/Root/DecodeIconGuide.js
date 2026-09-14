@@ -492,29 +492,33 @@ function restoreMapSearchBarStacking() {
 
 function raiseMapSearchBarForGuide() {
 	var bar = document.getElementById('map_search_cluster') || document.getElementById('map_search_bar');
-	var rect;
-	var minimumTop;
+	var style;
+	var guideLeft;
+	var guideTop;
 	if(!bar || document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
 		restoreMapSearchBarStacking();
 		return;
 	}
-	rect = bar.getBoundingClientRect();
-	minimumTop = parseFloat(window.getComputedStyle(bar).marginTop) || 0;
-	if(rect.width < 8 || rect.height < 8 || rect.top <= 0 || rect.top + 0.5 < minimumTop)
-		return false;
 	if(!decodeIconGuideSearchHome) {
+		style = window.getComputedStyle(bar);
+		guideLeft = parseFloat(style.marginLeft) || 0;
+		guideTop = parseFloat(style.marginTop) || 0;
+		if(guideTop <= 0)
+			return false;
 		decodeIconGuideSearchHome = {
 			parent: bar.parentNode,
 			next: bar.nextSibling,
-			style: bar.getAttribute('style')
+			style: bar.getAttribute('style'),
+			left: guideLeft,
+			top: guideTop
 		};
 		document.body.appendChild(bar);
 	}
 	else if(bar.parentNode !== document.body)
 		document.body.appendChild(bar);
 	bar.style.position = 'fixed';
-	bar.style.left = rect.left + 'px';
-	bar.style.top = rect.top + 'px';
+	bar.style.left = decodeIconGuideSearchHome.left + 'px';
+	bar.style.top = decodeIconGuideSearchHome.top + 'px';
 	bar.style.margin = '0';
 	bar.style.zIndex = '202';
 	return true;

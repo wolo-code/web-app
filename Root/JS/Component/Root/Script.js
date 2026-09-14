@@ -4,7 +4,8 @@ function initLoad () {
 	if(!initLoadDone && document.readyState !== 'loading') {
 		initTheme();
 		initMapSource();
-		firebaseInit();
+		if(!firebaseInit())
+			return;
 		initApp();
 		dbInit();
 		initOfflineStatus();

@@ -2,6 +2,29 @@
 // var refCityCenter;
 // var geoFire;
 
+var firebaseDatabaseRetryStarted = false;
+
+function retryFirebaseDatabaseSdk() {
+	var source = document.querySelector('script[src*="/firebase-database.js"]');
+	var retry;
+	if(firebaseDatabaseRetryStarted || !source)
+		return false;
+	firebaseDatabaseRetryStarted = true;
+	retry = document.createElement('script');
+	retry.src = source.src + (source.src.indexOf('?') == -1 ? '?' : '&') + '_retry=' + Date.now();
+	retry.onload = function() {
+		firebaseDatabaseRetryStarted = false;
+		if(typeof initLoad == 'function')
+			initLoad();
+	};
+	retry.onerror = function() {
+		firebaseDatabaseRetryStarted = false;
+		showErrorPrompt(new Error('Firebase Database SDK failed to load'));
+	};
+	document.head.appendChild(retry);
+	return true;
+}
+
 function isFirebaseAuthNetworkError(error) {
 	var message = '';
 	if(error) {
@@ -63,6 +86,10 @@ function firebaseResumeRecoveryInit() {
 }
 
 function firebaseInit() {
+	if(typeof firebase != 'object' || typeof firebase.database != 'function') {
+		retryFirebaseDatabaseSdk();
+		return false;
+	}
 	firebaseResumeRecoveryInit();
 	pushLoader();
 	firebase.initializeApp(FIREBASE_CONFIG);
@@ -75,6 +102,7 @@ function firebaseInit() {
 		perf = firebase.performance();
 	database = firebase.database();
 	refCityCenter = database.ref('CityCenter');
+	return true;
 }
 
 function geoFireInit() {

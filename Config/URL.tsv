@@ -14,6 +14,7 @@ Path	Name	Extension
 	sw	js
 	geofire.min	js
 	html2canvas.min	js
+	qrcode.min	js
 	console	
 	console	js
 	manifest-console	json

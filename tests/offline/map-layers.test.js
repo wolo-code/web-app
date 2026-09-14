@@ -596,37 +596,40 @@ test('Map Guide restores Google search positioning on wide and narrow layouts', 
 	}
 });
 
-test('first Map Guide waits for Google search layout before lifting it', () => {
+test('first Map Guide uses responsive CSS offsets instead of unsettled Google geometry', () => {
 	const guideJs = read('Root/JS/Component/Root/DecodeIconGuide.js');
-	let top = 0;
 	let appendCount = 0;
 	const originalParent = {};
 	const bar = {
 		parentNode: originalParent,
 		nextSibling: null,
 		style: {},
-		getAttribute: () => 'position: absolute; left: 0px; top: 0px;',
-		getBoundingClientRect: () => ({ width: 500, height: 42, left: 12, top })
+		getAttribute: () => 'position: absolute; left: 0px; top: 0px;'
 	};
 	const context = {
 		document: {
 			body: { appendChild(node) { appendCount++; node.parentNode = this; } },
 			getElementById: id => id === 'map_search_cluster' ? bar : null
 		},
-		window: { getComputedStyle: () => ({ marginTop: '90px' }) },
+		window: { getComputedStyle: () => ({ marginLeft: '8px', marginTop: '90px' }) },
 		setTimeout
 	};
 	context.document.body.classList = { contains: name => name === 'decode-icon-guide' };
 	vm.runInNewContext(guideJs, context);
-	assert.equal(context.raiseMapSearchBarForGuide(), false);
-	assert.equal(appendCount, 0);
-	assert.equal(bar.parentNode, originalParent);
-	top = 26;
-	assert.equal(context.raiseMapSearchBarForGuide(), false);
-	assert.equal(appendCount, 0);
-	top = 90;
 	assert.equal(context.raiseMapSearchBarForGuide(), true);
 	assert.equal(appendCount, 1);
+	assert.equal(bar.style.left, '8px');
+	assert.equal(bar.style.top, '90px');
+});
+
+test('Firebase initialization retries a missing Database SDK module', () => {
+	const firebaseJs = read('Root/JS/Firebase.js');
+	const scriptJs = read('Root/JS/Component/Root/Script.js');
+	assert.match(firebaseJs, /function retryFirebaseDatabaseSdk/);
+	assert.match(firebaseJs, /script\[src\*="\/firebase-database\.js"\]/);
+	assert.match(firebaseJs, /typeof firebase\.database != 'function'/);
+	assert.match(firebaseJs, /retry\.onload = function\(\) \{[\s\S]*initLoad\(\)/);
+	assert.match(scriptJs, /if\(!firebaseInit\(\)\)\s+return/);
 });
 
 test('unexpected error dialog uses equal-width actions without an info toggle', () => {
@@ -644,6 +647,9 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.doesNotMatch(exceptionHtml, /mailto:/);
 	assert.doesNotMatch(exceptionHtml, /support@wolo/);
 	assert.match(exceptionHtml, /id='exception_dev_controls'/);
+	assert.match(exceptionHtml, /id='exception_log_frame'/);
+	assert.match(exceptionHtml, /id='exception_log_copy'/);
+	assert.match(exceptionHtml, /includeSVG\('', 'Copy'\)/);
 	assert.doesNotMatch(exceptionHtml, /Unexpected Error/);
 	assert.doesNotMatch(exceptionHtml, /id='exception_message_close'/);
 	assert.doesNotMatch(exceptionHtml, /title='Press and hold/);
@@ -657,6 +663,8 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.match(baseScript, /function setExceptionReloadAttempted/);
 	assert.match(baseScript, /function clearExceptionReloadAttempt/);
 	assert.match(baseScript, /syncExceptionSupportVisibility/);
+	assert.match(baseScript, /function copyExceptionLog/);
+	assert.match(baseScript, /copyButton\.addEventListener\('click', copyExceptionLog\)/);
 	assert.match(baseScript, /setExceptionReloadAttempted\(\);/);
 	assert.match(baseScript, /if\(!pendingExceptionLogs\.length\)\s+clearExceptionReloadAttempt\(\);/);
 	const mailJs = read('Root/JS/Base/Mail.js');
@@ -676,6 +684,7 @@ test('unexpected error dialog uses equal-width actions without an info toggle', 
 	assert.match(dialogCss, /min\(36rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /min\(42rem,\s*calc\(100vw - 24px\)\)/);
 	assert.match(dialogCss, /#exception_message_title/);
+	assert.match(dialogCss, /\.exception_log_copy \{[\s\S]*position:\s*absolute[\s\S]*right:\s*8px[\s\S]*top:\s*8px/);
 });
 
 test('overlay backdrop click closes dialogs except the crash dialog', () => {

@@ -128,7 +128,7 @@ function focusLocateWatchPosition(pos) {
 	}
 	hideLocateWatchLoader();
 	if(typeof focus_ === 'function')
-		focus_(pos, bounds);
+		focus_(pos, bounds, true);
 	locateDidFocus = true;
 }
 

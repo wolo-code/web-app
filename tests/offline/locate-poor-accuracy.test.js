@@ -93,8 +93,10 @@ test('locate auto-proceed from 99+ streak is skipped while long-press override i
 
 	const focusJs = fs.readFileSync(path.join(repoRoot, 'Root/JS/Component/Root/Focus.js'), 'utf8');
 	const finish = focusJs.slice(focusJs.indexOf('function finishSmoothZoomToBounds'), focusJs.indexOf('function smoothZoomOut'));
-	assert.doesNotMatch(finish, /fitBounds/);
-	assert.doesNotMatch(finish, /focus___/);
+	assert.match(locateJs, /focus_\(pos, bounds, true\)/);
+	assert.match(finish, /if\(skipFinalBoundsFit\)/);
+	assert.match(finish, /map\.fitBounds\(bounds, ZOOM_BOUND_PADDING\)/);
+	assert.match(finish, /focus___\(temPos\)/);
 	assert.match(finish, /applyMapChromePan/);
 	assert.match(locateJs, /press_duration > location_button_PRESS_THRESHOLD && addClassIfPresent\(location_dot, 'blinking'\)/);
 });

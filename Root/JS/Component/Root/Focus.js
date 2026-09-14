@@ -6,9 +6,9 @@ function focus__(city, pos, code) {
 	setCode(city, code, pos);
 }
 
-function focus___(pos, bounds) {
+function focus___(pos, bounds, skipFinalBoundsFit) {
 	showMarker(pos);
-	focus_(pos, bounds);
+	focus_(pos, bounds, skipFinalBoundsFit);
 }
 
 const ZOOM_ANIMATION_SPEED = 250;
@@ -105,15 +105,15 @@ function getFocusTargetZoom(bounds) {
 	return newZoom;
 }
 
-function panThenSmoothZoomIn(pos, bounds) {
+function panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit) {
 	map.panTo(pos);
 	var idleListenerPan = map.addListener('idle', function() {
 		idleListenerPan.remove();
-		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds), map.getZoom());
+		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds), map.getZoom(), skipFinalBoundsFit);
 	});
 }
 
-function focus_(pos, bounds) {
+function focus_(pos, bounds, skipFinalBoundsFit) {
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
@@ -128,14 +128,14 @@ function focus_(pos, bounds) {
 			infoWindow.close();
 		smoothZoomOut(map, currentZoom, overviewZoom, function() {
 			revealHeldTryCityInfoWindow();
-			panThenSmoothZoomIn(pos, bounds);
+			panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit);
 		});
 		return;
 	}
 
 	if(holdInfoWindowForTryCityZoomOut)
 		revealHeldTryCityInfoWindow();
-	panThenSmoothZoomIn(pos, bounds);
+	panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit);
 
 }
 
@@ -193,15 +193,33 @@ const ZOOM_ANIMATION_INCREMENT = 1;
 const ZOOM_BOUND_PADDING = 36;
 var zoomChangedListener;
 var nextZoomTimer;
-function finishSmoothZoomToBounds(bounds, map) {
+function finishSmoothZoomToBounds(bounds, map, skipFinalBoundsFit) {
 	setTimeout(function() {
-		if(pendingFocusPos && map) {
-			map.panTo(pendingFocusPos);
-			pendingFocusPos = null;
+		if(skipFinalBoundsFit) {
+			if(pendingFocusPos && map) {
+				map.panTo(pendingFocusPos);
+				pendingFocusPos = null;
+			}
+			if(typeof applyMapChromePan === 'function')
+				applyMapChromePan();
+			endProgrammaticMapFocus();
 		}
-		if(typeof applyMapChromePan === 'function')
-			applyMapChromePan();
-		endProgrammaticMapFocus();
+		else if(pendingFocusPos) {
+			var temPos = Object.assign({}, pendingFocusPos);
+			pendingFocusPos = null;
+			focus___(temPos);
+		}
+		else if(typeof bounds !== 'undefined') {
+			map.fitBounds(bounds, ZOOM_BOUND_PADDING);
+			var idleListenerPanBy = map.addListener('idle', function() {
+				idleListenerPanBy.remove();
+				applyMapChromePan();
+				endProgrammaticMapFocus();
+			});
+		}
+		else {
+			endProgrammaticMapFocus();
+		}
 	}, ZOOM_ANIMATION_SPEED);
 }
 
@@ -227,7 +245,7 @@ function smoothZoomOut(map, current, min, onDone) {
 	}, ZOOM_ANIMATION_SPEED);
 }
 
-function smoothZoomToBounds(bounds, map, max, current) {
+function smoothZoomToBounds(bounds, map, max, current, skipFinalBoundsFit) {
 	if (typeof getActiveMapTypeMaxZoom === 'function') {
 		var typeMax = getActiveMapTypeMaxZoom();
 		if (typeof typeMax === 'number' && max > typeMax)
@@ -236,7 +254,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 	if (current >= max) {
 		if(current > max)
 			map.setZoom(max);
-		finishSmoothZoomToBounds(bounds, map);
+		finishSmoothZoomToBounds(bounds, map, skipFinalBoundsFit);
 		return;
 	}
 	var nextZoom = current + ZOOM_ANIMATION_INCREMENT;
@@ -246,7 +264,7 @@ function smoothZoomToBounds(bounds, map, max, current) {
 		google.maps.event.removeListener(zoomChangedListener);
 		zoomChangedListener = null;
 		incMapInteractionCounter();
-		smoothZoomToBounds(bounds, map, max, nextZoom);
+		smoothZoomToBounds(bounds, map, max, nextZoom, skipFinalBoundsFit);
 	});
 	nextZoomTimer = setTimeout(function() {
 		if(decMapInteractionCounter()) {

@@ -578,6 +578,7 @@ function watchMapCameraCaption() {
 		decodeIconGuideCameraTimer = null;
 		if(!decodeIconGuideVisible || document.body.classList.contains('decode') || document.body.classList.contains('decode-icon-guide-fade'))
 			return;
+		layoutMapCameraCaption();
 		layoutMapSearchCaptions();
 		tries++;
 		if(tries < 8)
@@ -589,6 +590,8 @@ function watchMapCameraCaption() {
 function layoutMapCameraCaption() {
 	var host = document.getElementById('map_camera_label');
 	var camera;
+	var cameraButton;
+	var cameraClone;
 	if(!host)
 		return;
 	if(document.body.classList.contains('decode') || !document.body.classList.contains('decode-icon-guide')) {
@@ -604,6 +607,18 @@ function layoutMapCameraCaption() {
 	if(rect.width < 8 || rect.height < 8) {
 		host.removeAttribute('style');
 		return;
+	}
+	cameraButton = camera.querySelector(':scope > button');
+	cameraClone = host.querySelector('.map_camera_guide_clone');
+	if(cameraButton) {
+		if(cameraClone)
+			cameraClone.parentNode.removeChild(cameraClone);
+		cameraClone = cameraButton.cloneNode(true);
+		cameraClone.classList.add('map_camera_guide_clone');
+		cameraClone.removeAttribute('title');
+		cameraClone.setAttribute('aria-hidden', 'true');
+		cameraClone.setAttribute('tabindex', '-1');
+		host.insertBefore(cameraClone, host.firstChild);
 	}
 	host.style.top = rect.top + 'px';
 	host.style.left = rect.left + 'px';

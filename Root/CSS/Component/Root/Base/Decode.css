@@ -430,6 +430,12 @@ body:not(.decode).decode-icon-guide #decode_button .proceed_button_shape {
 	z-index: 202;
 }
 
+#map_camera_label > .map_camera_guide_clone {
+	inset: 0;
+	pointer-events: none;
+	position: absolute !important;
+}
+
 body:not(.decode).decode-icon-guide #map_camera_label {
 	display: block;
 }

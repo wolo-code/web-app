@@ -251,6 +251,8 @@ function setupControls() {
 	closeActionMenu();
 	if(typeof initDecodeIconGuide == 'function')
 		initDecodeIconGuide();
+	if(typeof initCodeScan == 'function')
+		initCodeScan();
 }
 
 if(typeof initLoad !== 'undefined')

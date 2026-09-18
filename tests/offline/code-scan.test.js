@@ -23,10 +23,14 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
 	assert.match(fragment, /id='code_scan_video'/);
+	assert.match(fragment, /id='code_scan_photo_input'/);
+	assert.match(fragment, /capture='environment'/);
 	assert.match(script, /initCodeScan\(\)/);
 	assert.match(codeScan, /getUserMedia/);
 	assert.match(codeScan, /tesseract\.js@5/);
-	assert.match(codeScan, /beginDecode\(code\)/);
+	assert.match(codeScan, /decode_input_from_form\(\)/);
+	assert.match(codeScan, /decode_input_from_map\(\)/);
+	assert.match(codeScan, /code_scan_photo_input/);
 	assert.doesNotMatch(codeScan, /upload/i);
 	assert.match(css, /\.code_scan_viewport/);
 });

@@ -15,6 +15,10 @@
 		</div>
 		<p id='code_scan_status' class='code_scan_status'>Point your camera at the printed Wolo Code label.</p>
 		<p id='code_scan_candidate' class='code_scan_candidate hide'></p>
+		<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' capture='environment' tabindex='-1' aria-hidden='true'>
+		<button id='code_scan_use_photo' class='border code_scan_use_photo' type='button'>
+			Use photo instead
+		</button>
 		<button id='code_scan_type_instead' class='border code_scan_type_instead' type='button'>
 			Type instead
 		</button>

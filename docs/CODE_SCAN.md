@@ -29,11 +29,13 @@ You can also generate a label from the app (Label / QR dialog) and scan the thre
 
 ## Fallbacks
 
-- **Camera denied or unavailable:** the scan dialog explains the issue; close it and type or paste the code as before.
-- **Unsupported browser:** same fallback — type or paste.
-- **Low-confidence OCR:** keep the label flat, well lit, and centered; or type the code manually.
+- **Camera denied or unavailable:** use **Use photo instead** (still processed on-device) or **Type instead**.
+- **Unsupported browser:** same photo/type fallbacks.
+- **Low-confidence OCR:** keep the label flat, well lit, and centered; try **Use photo instead**; or type the code manually.
 
 ## Technical notes
 
 - OCR engine: [Tesseract.js](https://github.com/naptha/tesseract.js) v5, lazy-loaded from jsDelivr when Scan is opened.
-- Matching: `CodeScanOcrMatch.js` normalizes OCR text and matches tokens against the live 1024-word list (with light fuzzy correction), then calls the existing `beginDecode` flow.
+- Matching: `CodeScanOcrMatch.js` normalizes OCR text and matches tokens against the live 1024-word list (with light fuzzy correction).
+- Decode hooks: success fills `#decode_input` and calls `decode_input_from_form()` from Wolo Code Input View, or fills `#pac-input` and calls `decode_input_from_map()` from Map View. No parallel decode parser is introduced.
+- Outbound label QR (`QR.js`, `qrcode.min.js`) is generate-only and is not used for inbound scanning.

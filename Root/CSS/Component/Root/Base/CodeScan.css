@@ -48,6 +48,7 @@
 	word-break: break-word;
 }
 
+.code_scan_use_photo,
 .code_scan_type_instead {
 	background: #69B7CF;
 	border: none;
@@ -57,11 +58,19 @@
 	display: block;
 	font-family: Abel, 'Roboto Condensed', sans-serif;
 	font-size: 1em;
-	margin: 0 auto;
+	margin: 0 auto 8px;
 	min-height: 34px;
 	padding: 6px 16px;
 }
 
+.code_scan_type_instead {
+	background: transparent;
+	border: 1px solid #69B7CF;
+	color: #69B7CF;
+	margin-bottom: 0;
+}
+
+.code_scan_use_photo:hover,
 .code_scan_type_instead:hover {
 	opacity: 0.92;
 }
@@ -97,7 +106,13 @@ html.dark-mode .code_scan_viewport {
 	background: #000;
 }
 
-html.dark-mode .code_scan_type_instead {
+html.dark-mode .code_scan_use_photo {
 	background: #69B7CF;
 	color: #fff;
+}
+
+html.dark-mode .code_scan_type_instead {
+	background: transparent;
+	border-color: #69B7CF;
+	color: #9fd4e8;
 }

@@ -22,6 +22,10 @@
 		<span class='image'><?php includeSVG('', 'List'); ?></span>
 		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='previous-city' aria-hidden='true'>Previous</span>
 	</button>
+	<button id='map_code_scan_button' class='decode_city_source_button' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label'>
+		<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='scan' aria-hidden='true'>Scan</span>
+	</button>
 	<div id='map_search_bar'>
 		<div id='map_search_field'>
 			<span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
@@ -49,6 +53,10 @@
 				<button id='decode_city_history_toggle' class='decode_city_source_button' type='button' aria-label='Choose previous city' title='Choose previous city' aria-expanded='false'>
 					<span class='image'><?php includeSVG('', 'List'); ?></span>
 					<span class='decode_icon_caption' aria-hidden='true'>Previous</span>
+				</button>
+				<button id='decode_code_scan_button' class='decode_city_source_button' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label'>
+					<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+					<span class='decode_icon_caption' aria-hidden='true'>Scan</span>
 				</button>
 			</div>
 			<div id='decode_input_city'>&nbsp;</div>
@@ -78,6 +86,7 @@
 		require '../../HTML/Fragment/ChooseCity_by_periphery.php';
 		require '../../HTML/Fragment/LocateRight.php';
 		require '../../HTML/Fragment/Invalid_code.php';
+		require '../../HTML/Fragment/Code_scan.php';
 		require '../../HTML/Fragment/Info.php';
 		require '../../HTML/Fragment/Exception.html';
 		require '../../HTML/Fragment/Incompatible_browser.html';

@@ -120,6 +120,235 @@
 		return findWoloCodeInTokens(corrected, includesFn);
 	}
 
+	function splitMatchForReview(match) {
+		var cityCount;
+		var cityWords;
+		var woloWords;
+		if(!match || !match.words || match.words.length < 3)
+			return {city: '', words: ['', '', '']};
+		cityCount = typeof match.cityWordCount == 'number' ? match.cityWordCount : 0;
+		cityWords = match.words.slice(0, cityCount);
+		woloWords = match.words.slice(cityCount);
+		return {
+			city: cityWords.join(' '),
+			words: [woloWords[0] || '', woloWords[1] || '', woloWords[2] || '']
+		};
+	}
+
+	function buildCodeFromReview(city, w1, w2, w3) {
+		var parts = [];
+		var cityTokens;
+		var word;
+		cityTokens = normalizeOcrText(city).split(' ').filter(Boolean);
+		parts = parts.concat(cityTokens);
+		word = normalizeOcrText(w1);
+		if(word)
+			parts.push(word);
+		word = normalizeOcrText(w2);
+		if(word)
+			parts.push(word);
+		word = normalizeOcrText(w3);
+		if(word)
+			parts.push(word);
+		return parts.join(' ');
+	}
+
+	function validateReviewWords(w1, w2, w3, includesFn) {
+		var words = [normalizeOcrText(w1), normalizeOcrText(w2), normalizeOcrText(w3)];
+		var i;
+		for(i = 0; i < words.length; i++) {
+			if(!words[i] || !includesFn(words[i]))
+				return false;
+		}
+		return true;
+	}
+
+	function bboxIoU(a, b) {
+		var x0;
+		var y0;
+		var x1;
+		var y1;
+		var interW;
+		var interH;
+		var inter;
+		var areaA;
+		var areaB;
+		if(!a || !b)
+			return 0;
+		x0 = Math.max(a.x0, b.x0);
+		y0 = Math.max(a.y0, b.y0);
+		x1 = Math.min(a.x1, b.x1);
+		y1 = Math.min(a.y1, b.y1);
+		interW = Math.max(0, x1 - x0);
+		interH = Math.max(0, y1 - y0);
+		inter = interW * interH;
+		areaA = Math.max(0, a.x1 - a.x0) * Math.max(0, a.y1 - a.y0);
+		areaB = Math.max(0, b.x1 - b.x0) * Math.max(0, b.y1 - b.y0);
+		if(areaA <= 0 || areaB <= 0)
+			return 0;
+		return inter / (areaA + areaB - inter);
+	}
+
+	function unionBboxes(bboxes) {
+		var i;
+		var bbox;
+		var union = null;
+		for(i = 0; i < bboxes.length; i++) {
+			bbox = bboxes[i];
+			if(!bbox)
+				continue;
+			if(!union) {
+				union = {
+					x0: bbox.x0,
+					y0: bbox.y0,
+					x1: bbox.x1,
+					y1: bbox.y1
+				};
+				continue;
+			}
+			union.x0 = Math.min(union.x0, bbox.x0);
+			union.y0 = Math.min(union.y0, bbox.y0);
+			union.x1 = Math.max(union.x1, bbox.x1);
+			union.y1 = Math.max(union.y1, bbox.y1);
+		}
+		return union;
+	}
+
+	function getCenteredFixedGuideBBox(width, height, aspect) {
+		var cropWidth;
+		var cropHeight;
+		var sx;
+		var sy;
+		if(!width || !height)
+			return null;
+		if(width / height >= aspect) {
+			cropHeight = height;
+			cropWidth = Math.round(height * aspect);
+		}
+		else {
+			cropWidth = width;
+			cropHeight = Math.round(width / aspect);
+		}
+		sx = Math.max(0, Math.round((width - cropWidth) / 2));
+		sy = Math.max(0, Math.round((height - cropHeight) / 2));
+		return {
+			x0: sx,
+			y0: sy,
+			x1: sx + cropWidth,
+			y1: sy + cropHeight
+		};
+	}
+
+	function isAspectRatioNear(bbox, targetAspect, tolerance) {
+		var width;
+		var height;
+		var ratio;
+		if(!bbox || !targetAspect)
+			return false;
+		width = bbox.x1 - bbox.x0;
+		height = bbox.y1 - bbox.y0;
+		if(width <= 0 || height <= 0)
+			return false;
+		ratio = width / height;
+		return ratio >= targetAspect * (1 - tolerance) && ratio <= targetAspect * (1 + tolerance);
+	}
+
+	function luminanceAt(data, width, x, y) {
+		var i = (y * width + x) * 4;
+		return data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+	}
+
+	function measureRectEdgeContrast(imageData, width, height, rect, sampleStep) {
+		var data = imageData.data;
+		var samples = 0;
+		var total = 0;
+		var x;
+		var y;
+		var inner;
+		var outer;
+		var step = sampleStep || 4;
+		if(!rect || width <= 0 || height <= 0)
+			return 0;
+		for(x = rect.x0; x < rect.x1; x += step) {
+			if(rect.y0 > 0) {
+				inner = luminanceAt(data, width, x, rect.y0);
+				outer = luminanceAt(data, width, x, rect.y0 - 1);
+				total += Math.abs(inner - outer);
+				samples += 1;
+			}
+			if(rect.y1 < height - 1) {
+				inner = luminanceAt(data, width, x, rect.y1 - 1);
+				outer = luminanceAt(data, width, x, rect.y1);
+				total += Math.abs(inner - outer);
+				samples += 1;
+			}
+		}
+		for(y = rect.y0; y < rect.y1; y += step) {
+			if(rect.x0 > 0) {
+				inner = luminanceAt(data, width, rect.x0, y);
+				outer = luminanceAt(data, width, rect.x0 - 1, y);
+				total += Math.abs(inner - outer);
+				samples += 1;
+			}
+			if(rect.x1 < width - 1) {
+				inner = luminanceAt(data, width, rect.x1 - 1, y);
+				outer = luminanceAt(data, width, rect.x1, y);
+				total += Math.abs(inner - outer);
+				samples += 1;
+			}
+		}
+		return samples ? total / samples : 0;
+	}
+
+	function extractMatchBBoxFromOcr(result, match, includesFn, canonicalWords) {
+		var ocrWords = result && result.data && result.data.words;
+		var wanted;
+		var bboxes = [];
+		var i;
+		var word;
+		var token;
+		var corrected;
+		if(!ocrWords || !match || !match.words)
+			return null;
+		wanted = {};
+		for(i = 0; i < match.words.length; i++)
+			wanted[match.words[i]] = true;
+		for(i = 0; i < ocrWords.length; i++) {
+			word = ocrWords[i];
+			if(!word || !word.text || !word.bbox)
+				continue;
+			token = normalizeOcrText(word.text).split(' ').filter(Boolean)[0];
+			if(!token)
+				continue;
+			corrected = fuzzyMatchWord(token, includesFn, canonicalWords) || token;
+			if(wanted[corrected])
+				bboxes.push(word.bbox);
+		}
+		return unionBboxes(bboxes);
+	}
+
+	function isFixedBorderReady(canvas, matchBBox, aspect, tolerance, minContrast) {
+		var guide;
+		var ctx;
+		var imageData;
+		var contrast;
+		if(!canvas || !matchBBox)
+			return false;
+		guide = getCenteredFixedGuideBBox(canvas.width, canvas.height, aspect);
+		if(!guide)
+			return false;
+		if(!isAspectRatioNear(matchBBox, aspect, tolerance))
+			return false;
+		if(bboxIoU(matchBBox, guide) < 0.35)
+			return false;
+		ctx = canvas.getContext('2d');
+		if(!ctx)
+			return false;
+		imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		contrast = measureRectEdgeContrast(imageData, canvas.width, canvas.height, guide);
+		return contrast >= (minContrast || 12);
+	}
+
 	function isCodeScanSupported() {
 		return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 	}
@@ -131,6 +360,16 @@
 		correctTokens: correctTokens,
 		findWoloCodeInTokens: findWoloCodeInTokens,
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
+		splitMatchForReview: splitMatchForReview,
+		buildCodeFromReview: buildCodeFromReview,
+		validateReviewWords: validateReviewWords,
+		bboxIoU: bboxIoU,
+		unionBboxes: unionBboxes,
+		getCenteredFixedGuideBBox: getCenteredFixedGuideBBox,
+		isAspectRatioNear: isAspectRatioNear,
+		measureRectEdgeContrast: measureRectEdgeContrast,
+		extractMatchBBoxFromOcr: extractMatchBBoxFromOcr,
+		isFixedBorderReady: isFixedBorderReady,
 		isCodeScanSupported: isCodeScanSupported
 	};
 

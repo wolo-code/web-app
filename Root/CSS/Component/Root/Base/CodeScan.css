@@ -22,12 +22,122 @@
 	position: relative;
 }
 
+.code_scan_viewport.code_scan_viewport_frozen #code_scan_video {
+	display: none;
+}
+
+.code_scan_viewport.code_scan_viewport_frozen #code_scan_canvas {
+	display: block;
+	height: auto;
+	max-height: 52vh;
+	object-fit: contain;
+	width: 100%;
+}
+
 #code_scan_video {
 	display: block;
 	height: auto;
 	max-height: 52vh;
 	object-fit: cover;
 	width: 100%;
+}
+
+#code_scan_canvas.hide {
+	display: none;
+}
+
+.code_scan_fixed_guide {
+	border: 2px solid rgba(105, 183, 207, 0.9);
+	border-radius: 4px;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+	box-sizing: border-box;
+	height: auto;
+	left: 50%;
+	max-width: 88%;
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 88%;
+	aspect-ratio: 3 / 1;
+}
+
+.code_scan_viewport.code_scan_mode_general .code_scan_fixed_guide {
+	display: none;
+}
+
+.code_scan_viewport.code_scan_wolo_found .code_scan_fixed_guide {
+	border-color: #7fd4a0;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.28);
+}
+
+.code_scan_candidate_highlight {
+	border: 2px solid #7fd4a0;
+	border-radius: 4px;
+	box-shadow: 0 0 0 2px rgba(127, 212, 160, 0.35);
+	pointer-events: none;
+	position: absolute;
+}
+
+.code_scan_live_controls {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin: 0 0 12px;
+}
+
+.code_scan_mode_switch {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+	width: 100%;
+}
+
+.code_scan_mode_button {
+	background: transparent;
+	border: 1px solid #69B7CF;
+	border-radius: 4px;
+	color: #69B7CF;
+	cursor: pointer;
+	flex: 1 1 auto;
+	font-family: Abel, 'Roboto Condensed', sans-serif;
+	font-size: 0.95em;
+	max-width: 160px;
+	min-height: 32px;
+	padding: 4px 10px;
+}
+
+.code_scan_mode_button.code_scan_mode_active {
+	background: #69B7CF;
+	color: #fff;
+}
+
+.code_scan_capture {
+	align-items: center;
+	background: transparent;
+	border: 3px solid #fff;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	height: 64px;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	width: 64px;
+}
+
+.code_scan_capture:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.code_scan_capture_inner {
+	background: #fff;
+	border-radius: 50%;
+	display: block;
+	height: 48px;
+	width: 48px;
 }
 
 .code_scan_status {
@@ -37,17 +147,66 @@
 	text-align: center;
 }
 
-.code_scan_candidate {
-	color: #2a6f86;
-	font-family: Roboto, sans-serif;
-	font-size: 1.1em;
-	font-weight: 500;
+.code_scan_review {
 	margin: 0 0 12px;
-	text-align: center;
-	text-transform: lowercase;
-	word-break: break-word;
 }
 
+.code_scan_review_label {
+	color: #2a6f86;
+	font-size: 0.98em;
+	font-weight: 500;
+	margin: 0 0 10px;
+	text-align: center;
+}
+
+.code_scan_review_field {
+	color: #444;
+	display: block;
+	font-size: 0.9em;
+	margin: 0 0 8px;
+}
+
+.code_scan_review_words {
+	display: grid;
+	gap: 8px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	margin-bottom: 12px;
+}
+
+.code_scan_review_input {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	display: block;
+	font-family: Roboto, sans-serif;
+	font-size: 1em;
+	margin-top: 4px;
+	padding: 8px;
+	text-transform: lowercase;
+	width: 100%;
+}
+
+.code_scan_review_validity {
+	color: #666;
+	font-size: 0.92em;
+	margin: 0 0 10px;
+	text-align: center;
+}
+
+.code_scan_review_validity.code_scan_review_valid {
+	color: #2a6f86;
+}
+
+.code_scan_review_actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: center;
+}
+
+.code_scan_use_code,
+.code_scan_rescan,
+.code_scan_cancel,
 .code_scan_use_photo,
 .code_scan_type_instead {
 	background: #69B7CF;
@@ -63,6 +222,21 @@
 	padding: 6px 16px;
 }
 
+.code_scan_use_code,
+.code_scan_rescan,
+.code_scan_cancel {
+	flex: 1 1 auto;
+	margin: 0;
+	max-width: 140px;
+}
+
+.code_scan_use_code:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.code_scan_rescan,
+.code_scan_cancel,
 .code_scan_type_instead {
 	background: transparent;
 	border: 1px solid #69B7CF;
@@ -71,7 +245,12 @@
 }
 
 .code_scan_use_photo:hover,
-.code_scan_type_instead:hover {
+.code_scan_type_instead:hover,
+.code_scan_use_code:hover:not(:disabled),
+.code_scan_rescan:hover,
+.code_scan_cancel:hover,
+.code_scan_mode_button:hover,
+.code_scan_capture:hover {
 	opacity: 0.92;
 }
 
@@ -98,20 +277,51 @@ html.dark-mode .code_scan_status {
 	color: #b8c5cc;
 }
 
-html.dark-mode .code_scan_candidate {
+html.dark-mode .code_scan_review_label {
 	color: #9fd4e8;
+}
+
+html.dark-mode .code_scan_review_field {
+	color: #c8d4db;
+}
+
+html.dark-mode .code_scan_review_input {
+	background: #1a1f24;
+	border-color: #4a5a66;
+	color: #e8eef2;
 }
 
 html.dark-mode .code_scan_viewport {
 	background: #000;
 }
 
-html.dark-mode .code_scan_use_photo {
+html.dark-mode .code_scan_mode_button {
+	border-color: #69B7CF;
+	color: #9fd4e8;
+}
+
+html.dark-mode .code_scan_mode_button.code_scan_mode_active {
 	background: #69B7CF;
 	color: #fff;
 }
 
-html.dark-mode .code_scan_type_instead {
+html.dark-mode .code_scan_review_validity {
+	color: #b8c5cc;
+}
+
+html.dark-mode .code_scan_review_validity.code_scan_review_valid {
+	color: #9fd4e8;
+}
+
+html.dark-mode .code_scan_use_photo,
+html.dark-mode .code_scan_use_code {
+	background: #69B7CF;
+	color: #fff;
+}
+
+html.dark-mode .code_scan_type_instead,
+html.dark-mode .code_scan_rescan,
+html.dark-mode .code_scan_cancel {
 	background: transparent;
 	border-color: #69B7CF;
 	color: #9fd4e8;

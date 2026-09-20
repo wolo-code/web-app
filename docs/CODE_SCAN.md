@@ -35,7 +35,7 @@ You can also generate a label from the app (Label / QR dialog) and scan the thre
 
 ## Technical notes
 
-- OCR engine: [Tesseract.js](https://github.com/naptha/tesseract.js) v5, lazy-loaded from jsDelivr when Scan is opened.
+- OCR engine: [Tesseract.js](https://github.com/naptha/tesseract.js) v5.1.1, self-hosted under `/tesseract/` (worker, WASM core, and `eng.traineddata.gz`). Lazy-loaded when Scan is opened; assets are precached by the service worker for offline use.
 - Matching: `CodeScanOcrMatch.js` normalizes OCR text and matches tokens against the live 1024-word list (with light fuzzy correction).
 - Decode hooks: success fills `#decode_input` and calls `decode_input_from_form()` from Wolo Code Input View, or fills `#pac-input` and calls `decode_input_from_map()` from Map View. No parallel decode parser is introduced.
 - Outbound label QR (`QR.js`, `qrcode.min.js`) is generate-only and is not used for inbound scanning.

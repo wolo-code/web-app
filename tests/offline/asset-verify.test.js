@@ -25,6 +25,21 @@ test('offline bootstrap word list exists and is non-empty JSON array', () => {
 	assert.ok(data.length > 0);
 });
 
+test('self-hosted OCR assets exist for offline scanning', () => {
+	const tesseractDir = path.join(repoRoot, 'Root/Files/tesseract');
+	const required = [
+		'tesseract.min.js',
+		'worker.min.js',
+		'tesseract-core.wasm.js',
+		'lang/eng.traineddata.gz'
+	];
+	for (const file of required) {
+		const filePath = path.join(tesseractDir, file);
+		assert.ok(fs.existsSync(filePath), 'missing ' + file);
+		assert.ok(fs.statSync(filePath).size > 0, 'empty ' + file);
+	}
+});
+
 test('sw init registers with updateViaCache none', () => {
 	const swInit = read('Root/JS/Component/Root/sw_init.js');
 	assert.match(swInit, /updateViaCache:\s*'none'/);

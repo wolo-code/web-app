@@ -9,6 +9,13 @@ const publicDir = path.join(repoRoot, 'public');
 const rootDir = path.join(repoRoot, 'Root');
 const outputPath = path.join(rootDir, 'precache-manifest.json');
 
+const TESSERACT_ASSETS = [
+	'/tesseract/tesseract.min.js',
+	'/tesseract/worker.min.js',
+	'/tesseract/tesseract-core.wasm.js',
+	'/tesseract/lang/eng.traineddata.gz'
+];
+
 const DEFAULT_ASSETS = [
 	'/',
 	'/index.html',
@@ -24,6 +31,7 @@ const DEFAULT_ASSETS = [
 	'/favicon.ico',
 	'/apple-touch-icon.png',
 	'/offline-data/WordList.json',
+	...TESSERACT_ASSETS,
 	'/launcher-icon-0-75x.png',
 	'/launcher-icon-1x.png',
 	'/launcher-icon-1-5x.png',
@@ -65,7 +73,7 @@ function collectPublicAssets() {
 				continue;
 			}
 			const ext = path.extname(entry.name).toLowerCase();
-			if (!['.js', '.css', '.html', '.json', '.svg', '.png', '.ico', '.woff', '.woff2'].includes(ext)) {
+			if (!['.js', '.css', '.html', '.json', '.svg', '.png', '.ico', '.woff', '.woff2', '.wasm', '.gz'].includes(ext)) {
 				continue;
 			}
 			const relative = prefix + '/' + entry.name;

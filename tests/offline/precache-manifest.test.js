@@ -16,6 +16,10 @@ test('precache manifest includes core offline shell assets', () => {
 	assert.ok(manifest.assets.includes('/root.js'));
 	assert.ok(manifest.assets.includes('/offline-data/WordList.json'));
 	assert.ok(manifest.assets.includes('/precache-manifest.json'));
+	assert.ok(manifest.assets.includes('/tesseract/tesseract.min.js'));
+	assert.ok(manifest.assets.includes('/tesseract/worker.min.js'));
+	assert.ok(manifest.assets.includes('/tesseract/tesseract-core.wasm.js'));
+	assert.ok(manifest.assets.includes('/tesseract/lang/eng.traineddata.gz'));
 });
 
 test('precache manifest generator discovers hashed bundles from public index', () => {

@@ -14,7 +14,7 @@ var codeScanState = {
 var CODE_SCAN_FRAME_INTERVAL_MS = 1600;
 var CODE_SCAN_STABLE_MATCHES = 2;
 var CODE_SCAN_MIN_CONFIDENCE = 55;
-var CODE_SCAN_TESSERACT_CDN = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist';
+var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 
 function initCodeScan() {
 	bindControl('decode_code_scan_button', 'click', openCodeScan);
@@ -170,7 +170,7 @@ function loadCodeScanTesseractScript() {
 		return codeScanState.tesseractPromise;
 	codeScanState.tesseractPromise = new Promise(function(resolve, reject) {
 		var script = document.createElement('script');
-		script.src = CODE_SCAN_TESSERACT_CDN + '/tesseract.min.js';
+		script.src = CODE_SCAN_TESSERACT_BASE + '/tesseract.min.js';
 		script.async = true;
 		script.onload = function() {
 			if(window.Tesseract)
@@ -192,9 +192,9 @@ function prepareCodeScanWorker() {
 	setCodeScanStatus('Loading on-device scanner...');
 	return loadCodeScanTesseractScript().then(function(Tesseract) {
 		return Tesseract.createWorker('eng', 1, {
-			workerPath: CODE_SCAN_TESSERACT_CDN + '/worker.min.js',
-			langPath: CODE_SCAN_TESSERACT_CDN + '/lang',
-			corePath: CODE_SCAN_TESSERACT_CDN + '/tesseract-core.wasm.js',
+			workerPath: CODE_SCAN_TESSERACT_BASE + '/worker.min.js',
+			langPath: CODE_SCAN_TESSERACT_BASE + '/lang',
+			corePath: CODE_SCAN_TESSERACT_BASE + '/tesseract-core.wasm.js',
 			logger: function() {}
 		});
 	}).then(function(worker) {

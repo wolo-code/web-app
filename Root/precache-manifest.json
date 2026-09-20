@@ -1,6 +1,6 @@
 {
   "version": "wolo-offline-v1",
-  "generatedAt": "2026-09-20T06:22:46.255Z",
+  "generatedAt": "2026-09-20T06:28:54.018Z",
   "assets": [
     "/",
     "/apple-touch-icon.png",
@@ -23,7 +23,7 @@
     "/root.js",
     "/sw.js",
     "/tesseract/lang/eng.traineddata.gz",
-    "/tesseract/tesseract-core.wasm.js",
+    "/tesseract/tesseract-core.wasm.min.js",
     "/tesseract/tesseract.min.js",
     "/tesseract/worker.min.js"
   ]

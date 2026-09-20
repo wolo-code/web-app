@@ -30,7 +30,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(codeScan, /CODE_SCAN_TESSERACT_BASE\s*=\s*'\/tesseract'/);
 	assert.match(codeScan, /workerPath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/worker\.min\.js'/);
 	assert.match(codeScan, /langPath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/lang'/);
-	assert.match(codeScan, /corePath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/tesseract-core\.wasm\.js'/);
+	assert.match(codeScan, /corePath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/tesseract-core\.wasm\.min\.js'/);
 	assert.doesNotMatch(codeScan, /jsdelivr|unpkg|cdn\./i);
 	assert.match(codeScan, /decode_input_from_form\(\)/);
 	assert.match(codeScan, /decode_input_from_map\(\)/);

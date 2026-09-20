@@ -8,11 +8,11 @@ Path	Name	Extension
 	social	png
 	manifest	json
 	offline-data/WordList	json
-	tesseract/tesseract.min	js
-	tesseract/worker.min	js
-	tesseract/tesseract-core.wasm	js
-	tesseract/lang/eng.traineddata	gz
-	tesseract/VERSION	txt
+tesseract/	tesseract.min	js
+tesseract/	worker.min	js
+tesseract/	tesseract-core.wasm.min	js
+tesseract/lang/	eng.traineddata	gz
+tesseract/	VERSION	txt
 	precache-manifest	json
 	root	
 	root	js

@@ -81,3 +81,18 @@ test('validateReviewWords requires three dictionary words', () => {
 	assert.equal(ocrMatch.validateReviewWords('cat', 'apple', 'tomato', vocab.includes), true);
 	assert.equal(ocrMatch.validateReviewWords('cat', 'apple', 'xyzzy', vocab.includes), false);
 });
+
+test('bboxIoU measures overlap between candidate boxes', () => {
+	const a = {x0: 0, y0: 0, x1: 100, y1: 50};
+	const b = {x0: 50, y0: 0, x1: 150, y1: 50};
+	const identical = {x0: 10, y0: 10, x1: 90, y1: 40};
+	assert.ok(ocrMatch.bboxIoU(identical, identical) > 0.99);
+	assert.ok(ocrMatch.bboxIoU(a, b) > 0.3);
+	assert.equal(ocrMatch.bboxIoU(a, {x0: 200, y0: 200, x1: 300, y1: 250}), 0);
+});
+
+test('isAspectRatioNear accepts 3:1 within tolerance', () => {
+	const bbox = {x0: 0, y0: 0, x1: 300, y1: 100};
+	assert.equal(ocrMatch.isAspectRatioNear(bbox, 3, 0.2), true);
+	assert.equal(ocrMatch.isAspectRatioNear({x0: 0, y0: 0, x1: 100, y1: 100}, 3, 0.2), false);
+});

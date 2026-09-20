@@ -66,6 +66,19 @@
 	display: none;
 }
 
+.code_scan_viewport.code_scan_wolo_found .code_scan_fixed_guide {
+	border-color: #7fd4a0;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.28);
+}
+
+.code_scan_candidate_highlight {
+	border: 2px solid #7fd4a0;
+	border-radius: 4px;
+	box-shadow: 0 0 0 2px rgba(127, 212, 160, 0.35);
+	pointer-events: none;
+	position: absolute;
+}
+
 .code_scan_live_controls {
 	align-items: center;
 	display: flex;
@@ -173,14 +186,27 @@
 	width: 100%;
 }
 
+.code_scan_review_validity {
+	color: #666;
+	font-size: 0.92em;
+	margin: 0 0 10px;
+	text-align: center;
+}
+
+.code_scan_review_validity.code_scan_review_valid {
+	color: #2a6f86;
+}
+
 .code_scan_review_actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 	justify-content: center;
 }
 
-.code_scan_confirm,
-.code_scan_retake,
+.code_scan_use_code,
+.code_scan_rescan,
+.code_scan_cancel,
 .code_scan_use_photo,
 .code_scan_type_instead {
 	background: #69B7CF;
@@ -196,14 +222,21 @@
 	padding: 6px 16px;
 }
 
-.code_scan_confirm,
-.code_scan_retake {
+.code_scan_use_code,
+.code_scan_rescan,
+.code_scan_cancel {
 	flex: 1 1 auto;
 	margin: 0;
-	max-width: 160px;
+	max-width: 140px;
 }
 
-.code_scan_retake,
+.code_scan_use_code:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.code_scan_rescan,
+.code_scan_cancel,
 .code_scan_type_instead {
 	background: transparent;
 	border: 1px solid #69B7CF;
@@ -213,8 +246,9 @@
 
 .code_scan_use_photo:hover,
 .code_scan_type_instead:hover,
-.code_scan_confirm:hover,
-.code_scan_retake:hover,
+.code_scan_use_code:hover:not(:disabled),
+.code_scan_rescan:hover,
+.code_scan_cancel:hover,
 .code_scan_mode_button:hover,
 .code_scan_capture:hover {
 	opacity: 0.92;
@@ -271,14 +305,23 @@ html.dark-mode .code_scan_mode_button.code_scan_mode_active {
 	color: #fff;
 }
 
+html.dark-mode .code_scan_review_validity {
+	color: #b8c5cc;
+}
+
+html.dark-mode .code_scan_review_validity.code_scan_review_valid {
+	color: #9fd4e8;
+}
+
 html.dark-mode .code_scan_use_photo,
-html.dark-mode .code_scan_confirm {
+html.dark-mode .code_scan_use_code {
 	background: #69B7CF;
 	color: #fff;
 }
 
 html.dark-mode .code_scan_type_instead,
-html.dark-mode .code_scan_retake {
+html.dark-mode .code_scan_rescan,
+html.dark-mode .code_scan_cancel {
 	background: transparent;
 	border-color: #69B7CF;
 	color: #9fd4e8;

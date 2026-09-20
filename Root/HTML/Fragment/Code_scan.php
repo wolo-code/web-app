@@ -13,6 +13,7 @@
 			<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
 			<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
 			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'></div>
+			<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
 		</div>
 		<div id='code_scan_live_controls' class='code_scan_live_controls'>
 			<div class='code_scan_mode_switch' role='group' aria-label='Detection mode'>
@@ -32,8 +33,9 @@
 			<p class='code_scan_review_label'>Review and edit before decoding</p>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				City
-				<input id='code_scan_review_city' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
+				<input id='code_scan_review_city' class='code_scan_review_input' type='text' list='code_scan_city_choices' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
 			</label>
+			<datalist id='code_scan_city_choices'></datalist>
 			<div class='code_scan_review_words' role='group' aria-label='Wolo words'>
 				<label class='code_scan_review_field' for='code_scan_review_w1'>
 					Word 1
@@ -48,12 +50,16 @@
 					<input id='code_scan_review_w3' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' required>
 				</label>
 			</div>
+			<p id='code_scan_review_validity' class='code_scan_review_validity'>Enter three valid Wolo words.</p>
 			<div class='code_scan_review_actions'>
-				<button id='code_scan_confirm' class='code_scan_confirm' type='button'>
-					Confirm
+				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
+					Use Code
 				</button>
-				<button id='code_scan_retake' class='border code_scan_retake' type='button'>
-					Retake
+				<button id='code_scan_rescan' class='border code_scan_rescan' type='button'>
+					Rescan
+				</button>
+				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
+					Cancel
 				</button>
 			</div>
 		</div>

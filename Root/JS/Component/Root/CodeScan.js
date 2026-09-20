@@ -3,40 +3,58 @@ var codeScanState = {
 	source: 'decode',
 	phase: 'live',
 	detectionMode: 'fixed',
+	hasCaptured: false,
 	stream: null,
 	worker: null,
 	scanTimer: null,
 	processing: false,
 	lastMatchCode: '',
 	stableMatchCount: 0,
+	lastMatchBBox: null,
 	tesseractPromise: null,
 	cameraAvailable: false
 };
 
 var CODE_SCAN_FRAME_INTERVAL_MS = 1600;
-var CODE_SCAN_STABLE_MATCHES = 2;
+var CODE_SCAN_STABLE_MATCHES = 3;
+var CODE_SCAN_BBOX_IOU_MIN = 0.55;
 var CODE_SCAN_MIN_CONFIDENCE = 55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_FIXED_ASPECT = 3;
+var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.2;
+var CODE_SCAN_FIXED_MIN_EDGE_CONTRAST = 12;
 
 function initCodeScan() {
 	bindControl('decode_code_scan_button', 'click', openCodeScan);
 	bindControl('map_code_scan_button', 'click', openCodeScan);
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', closeCodeScan);
+	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
 	bindControl('code_scan_capture', 'click', captureCodeScanManually);
-	bindControl('code_scan_confirm', 'click', confirmCodeScanReview);
-	bindControl('code_scan_retake', 'click', retakeCodeScan);
+	bindControl('code_scan_use_code', 'click', useCodeScanReview);
+	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_mode_fixed', 'click', function() {
 		setCodeScanDetectionMode('fixed');
 	});
 	bindControl('code_scan_mode_general', 'click', function() {
 		setCodeScanDetectionMode('general');
 	});
+	bindCodeScanReviewInputListeners();
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput)
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
+}
+
+function bindCodeScanReviewInputListeners() {
+	var ids = ['code_scan_review_city', 'code_scan_review_w1', 'code_scan_review_w2', 'code_scan_review_w3'];
+	var i;
+	var node;
+	for(i = 0; i < ids.length; i++) {
+		node = document.getElementById(ids[i]);
+		if(node)
+			node.addEventListener('input', updateCodeScanReviewValidity);
+	}
 }
 
 function openCodeScan(event) {
@@ -47,6 +65,7 @@ function openCodeScan(event) {
 		return;
 	}
 	codeScanState.source = event && event.currentTarget && event.currentTarget.id === 'map_code_scan_button' ? 'map' : 'decode';
+	codeScanState.hasCaptured = false;
 	resetCodeScanUi();
 	setCodeScanPhotoFallbackVisible(true);
 	showOverlay(document.getElementById('code_scan_message'));
@@ -85,6 +104,7 @@ function stopCodeScan() {
 	codeScanState.processing = false;
 	codeScanState.cameraAvailable = false;
 	codeScanState.phase = 'live';
+	codeScanState.hasCaptured = false;
 	resetCodeScanMatchState();
 	clearCodeScanTimer();
 	stopCodeScanCamera();
@@ -102,11 +122,14 @@ function resetCodeScanUi() {
 	setCodeScanLiveControlsVisible(true);
 	setCodeScanReviewVisible(false);
 	setCodeScanCaptureEnabled(true);
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
 }
 
 function resetCodeScanMatchState() {
 	codeScanState.lastMatchCode = '';
 	codeScanState.stableMatchCount = 0;
+	codeScanState.lastMatchBBox = null;
 }
 
 function clearCodeScanTimer() {
@@ -129,8 +152,12 @@ function setCodeScanDetectionMode(mode) {
 	var viewport = document.querySelector('.code_scan_viewport');
 	var fixedButton = document.getElementById('code_scan_mode_fixed');
 	var generalButton = document.getElementById('code_scan_mode_general');
+	if(codeScanState.phase !== 'live' || codeScanState.hasCaptured)
+		return;
 	codeScanState.detectionMode = mode === 'general' ? 'general' : 'fixed';
 	resetCodeScanMatchState();
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
 	if(viewport)
 		viewport.classList.toggle('code_scan_mode_general', codeScanState.detectionMode === 'general');
 	if(fixedButton)
@@ -145,8 +172,8 @@ function setCodeScanDetectionMode(mode) {
 
 function scheduleCodeScanFrame() {
 	clearCodeScanTimer();
-	if(!codeScanState.active || !isCodeScanVisible()) {
-		if(codeScanState.active)
+	if(!codeScanState.active || !isCodeScanVisible() || codeScanState.hasCaptured) {
+		if(codeScanState.active && !codeScanState.hasCaptured)
 			stopCodeScan();
 		return;
 	}
@@ -195,7 +222,7 @@ function startCodeScanCamera() {
 			? 'Align the label inside the frame, then capture.'
 			: 'Point your camera at the printed Wolo Code label.');
 		prepareCodeScanWorker().then(function() {
-			if(codeScanState.active && codeScanState.phase === 'live')
+			if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 				scheduleCodeScanFrame();
 		}).catch(handleCodeScanWorkerError);
 	}).catch(handleCodeScanCameraError);
@@ -288,8 +315,8 @@ function handleCodeScanWorkerError() {
 }
 
 function runCodeScanFrame() {
-	if(!codeScanState.active || codeScanState.processing || codeScanState.phase !== 'live') {
-		if(codeScanState.active && codeScanState.phase === 'live')
+	if(!codeScanState.active || codeScanState.processing || codeScanState.phase !== 'live' || codeScanState.hasCaptured) {
+		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 		return;
 	}
@@ -305,13 +332,13 @@ function runCodeScanFrame() {
 		cropCodeScanCanvasToFixedRatio(canvas);
 	codeScanState.worker.recognize(canvas).then(function(result) {
 		codeScanState.processing = false;
-		if(!codeScanState.active || codeScanState.phase !== 'live')
+		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
 			return;
-		handleCodeScanLiveOcrResult(result);
+		handleCodeScanLiveOcrResult(result, canvas);
 		scheduleCodeScanFrame();
 	}).catch(function() {
 		codeScanState.processing = false;
-		if(codeScanState.active && codeScanState.phase === 'live')
+		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 	});
 }
@@ -365,35 +392,73 @@ function extractMatchFromOcrResult(result) {
 	return codeScanOcrMatch.matchOcrTextToWoloCode(text, wordList.includes.bind(wordList), wordList.curList);
 }
 
-function handleCodeScanLiveOcrResult(result) {
+function extractGuidanceFromOcrResult(result, canvas) {
 	var match = extractMatchFromOcrResult(result);
-	if(!match) {
+	var bbox;
+	if(!match)
+		return null;
+	bbox = codeScanOcrMatch.extractMatchBBoxFromOcr(result, match, wordList.includes.bind(wordList), wordList.curList);
+	if(!bbox && canvas)
+		bbox = codeScanOcrMatch.getCenteredFixedGuideBBox(canvas.width, canvas.height, CODE_SCAN_FIXED_ASPECT);
+	return {
+		match: match,
+		bbox: bbox
+	};
+}
+
+function handleCodeScanLiveOcrResult(result, canvas) {
+	var guidance = extractGuidanceFromOcrResult(result, canvas);
+	var match;
+	var bbox;
+	var iou;
+	var borderReady;
+	if(!guidance) {
 		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
 			? 'Align the label inside the frame, then capture.'
 			: 'Looking for a Wolo Code label...');
 		resetCodeScanMatchState();
+		clearCodeScanCandidateHighlight();
+		setCodeScanWoloFoundCue(false);
 		return;
 	}
-	if(match.code === codeScanState.lastMatchCode)
+	match = guidance.match;
+	bbox = guidance.bbox;
+	setCodeScanCandidateHighlight(bbox, canvas);
+	setCodeScanWoloFoundCue(true);
+	setCodeScanStatus('Wolo Code found');
+	if(match.code === codeScanState.lastMatchCode && codeScanState.lastMatchBBox && bbox)
+		iou = codeScanOcrMatch.bboxIoU(codeScanState.lastMatchBBox, bbox);
+	else
+		iou = 0;
+	if(match.code === codeScanState.lastMatchCode && (!bbox || !codeScanState.lastMatchBBox || iou >= CODE_SCAN_BBOX_IOU_MIN))
 		codeScanState.stableMatchCount += 1;
 	else {
 		codeScanState.lastMatchCode = match.code;
 		codeScanState.stableMatchCount = 1;
+		codeScanState.lastMatchBBox = bbox;
 	}
-	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES) {
-		setCodeScanStatus('Label detected. Capturing...');
+	borderReady = codeScanState.detectionMode !== 'fixed' || codeScanOcrMatch.isFixedBorderReady(
+		canvas,
+		bbox,
+		CODE_SCAN_FIXED_ASPECT,
+		CODE_SCAN_FIXED_ASPECT_TOLERANCE,
+		CODE_SCAN_FIXED_MIN_EDGE_CONTRAST
+	);
+	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && borderReady) {
+		setCodeScanStatus('Wolo Code found. Capturing...');
 		beginCodeScanCapture();
 		return;
 	}
-	setCodeScanStatus('Hold steady...');
+	if(codeScanState.stableMatchCount >= 2)
+		setCodeScanStatus('Hold steady...');
 }
 
 function captureCodeScanManually(event) {
-	if(event && event.preventDefault)
-		event.preventDefault();
 	var video;
 	var canvas;
-	if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.processing)
+	if(event && event.preventDefault)
+		event.preventDefault();
+	if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.processing || codeScanState.hasCaptured)
 		return;
 	video = getCodeScanVideo();
 	canvas = getCodeScanCanvas();
@@ -410,11 +475,14 @@ function captureCodeScanManually(event) {
 
 function beginCodeScanCapture() {
 	clearCodeScanTimer();
+	codeScanState.hasCaptured = true;
 	codeScanState.processing = true;
 	setCodeScanCaptureEnabled(false);
 	setCodeScanPhase('processing');
 	setCodeScanLiveControlsVisible(false);
 	setCodeScanPhotoFallbackVisible(false);
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
 	stopCodeScanCamera();
 	setCodeScanFrozenPreview(true);
 	setCodeScanStatus('Reading label on your device...');
@@ -449,10 +517,12 @@ function showCodeScanReview(match) {
 	setCodeScanPhotoFallbackVisible(false);
 	setCodeScanFrozenPreview(true);
 	populateCodeScanReviewFields(review.city, review.words[0], review.words[1], review.words[2]);
+	populateCodeScanCityChoices(review.city);
+	updateCodeScanReviewValidity();
 	if(match)
-		setCodeScanStatus('Check the city and three words, then confirm.');
+		setCodeScanStatus('Check the city and three words, then tap Use Code.');
 	else
-		setCodeScanStatus('Enter the city and three words, then confirm.');
+		setCodeScanStatus('Enter the city and three words, then tap Use Code.');
 }
 
 function populateCodeScanReviewFields(city, w1, w2, w3) {
@@ -470,11 +540,72 @@ function populateCodeScanReviewFields(city, w1, w2, w3) {
 		w3Input.value = w3 || '';
 }
 
-function clearCodeScanReviewFields() {
-	populateCodeScanReviewFields('', '', '', '');
+function populateCodeScanCityChoices(recognizedCity) {
+	var datalist = document.getElementById('code_scan_city_choices');
+	var choices = [];
+	var seen = {};
+	var i;
+	var city;
+	var name;
+	function addCity(cityName) {
+		var key;
+		if(!cityName)
+			return;
+		key = String(cityName).toLowerCase();
+		if(seen[key])
+			return;
+		seen[key] = true;
+		choices.push(cityName);
+	}
+	if(!datalist)
+		return;
+	addCity(recognizedCity);
+	if(typeof decode_city_history !== 'undefined' && decode_city_history) {
+		for(i = 0; i < decode_city_history.length && i < 5; i++) {
+			city = decode_city_history[i];
+			name = typeof getDecodeCityDisplayName == 'function' ? getDecodeCityDisplayName(city) : city.name;
+			addCity(name);
+		}
+	}
+	if(typeof geoIp_city_name !== 'undefined' && geoIp_city_name)
+		addCity(geoIp_city_name);
+	if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
+		addCity(selected_decode_city.name);
+	datalist.innerHTML = '';
+	for(i = 0; i < choices.length; i++) {
+		var option = document.createElement('option');
+		option.value = choices[i];
+		datalist.appendChild(option);
+	}
 }
 
-function confirmCodeScanReview(event) {
+function clearCodeScanReviewFields() {
+	populateCodeScanReviewFields('', '', '', '');
+	populateCodeScanCityChoices('');
+	updateCodeScanReviewValidity();
+}
+
+function updateCodeScanReviewValidity() {
+	var cityInput = document.getElementById('code_scan_review_city');
+	var w1Input = document.getElementById('code_scan_review_w1');
+	var w2Input = document.getElementById('code_scan_review_w2');
+	var w3Input = document.getElementById('code_scan_review_w3');
+	var useCodeButton = document.getElementById('code_scan_use_code');
+	var validityNode = document.getElementById('code_scan_review_validity');
+	var valid = false;
+	if(w1Input && w2Input && w3Input)
+		valid = codeScanOcrMatch.validateReviewWords(w1Input.value, w2Input.value, w3Input.value, wordList.includes.bind(wordList));
+	if(useCodeButton)
+		useCodeButton.disabled = !valid;
+	if(validityNode) {
+		validityNode.textContent = valid ? 'Ready to decode.' : 'Enter three valid Wolo words.';
+		validityNode.classList.toggle('code_scan_review_valid', valid);
+	}
+	if(cityInput && !cityInput.value && typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
+		cityInput.placeholder = selected_decode_city.name;
+}
+
+function useCodeScanReview(event) {
 	var cityInput;
 	var w1Input;
 	var w2Input;
@@ -491,7 +622,7 @@ function confirmCodeScanReview(event) {
 	if(!w1Input || !w2Input || !w3Input)
 		return;
 	if(!codeScanOcrMatch.validateReviewWords(w1Input.value, w2Input.value, w3Input.value, wordList.includes.bind(wordList))) {
-		setCodeScanStatus('Enter three valid Wolo words from the list.');
+		updateCodeScanReviewValidity();
 		showNotification('Enter three valid Wolo words from the list.');
 		return;
 	}
@@ -504,16 +635,19 @@ function confirmCodeScanReview(event) {
 	applyScannedWoloCode(code);
 }
 
-function retakeCodeScan(event) {
+function rescanCodeScan(event) {
 	if(event && event.preventDefault)
 		event.preventDefault();
 	if(!codeScanState.active)
 		return;
+	codeScanState.hasCaptured = false;
 	clearCodeScanReviewFields();
 	setCodeScanReviewVisible(false);
 	setCodeScanFrozenPreview(false);
 	setCodeScanPhase('live');
 	resetCodeScanMatchState();
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
 	setCodeScanPhotoFallbackVisible(true);
 	if(codeScanOcrMatch.isCodeScanSupported()) {
 		setCodeScanViewportVisible(true);
@@ -560,14 +694,18 @@ function handleCodeScanPhotoInput(event) {
 		return;
 	if(!codeScanState.active) {
 		codeScanState.active = true;
+		codeScanState.hasCaptured = false;
 		resetCodeScanUi();
 		setCodeScanDetectionMode(codeScanState.detectionMode);
 	}
 	clearCodeScanTimer();
+	codeScanState.hasCaptured = true;
 	codeScanState.processing = true;
 	setCodeScanPhase('processing');
 	setCodeScanLiveControlsVisible(false);
 	setCodeScanPhotoFallbackVisible(false);
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
 	stopCodeScanCamera();
 	setCodeScanStatus('Reading photo on your device...');
 	prepareCodeScanWorker().then(function() {
@@ -580,6 +718,7 @@ function handleCodeScanPhotoInput(event) {
 		showCodeScanReview(extractMatchFromOcrResult(result));
 	}).catch(function() {
 		codeScanState.processing = false;
+		codeScanState.hasCaptured = false;
 		if(codeScanState.active) {
 			setCodeScanFrozenPreview(false);
 			setCodeScanPhase('live');
@@ -629,6 +768,45 @@ function recognizeCodeScanPhoto(file) {
 		reader.onerror = reject;
 		reader.readAsDataURL(file);
 	});
+}
+
+function setCodeScanCandidateHighlight(bbox, canvas) {
+	var highlight = document.getElementById('code_scan_candidate_highlight');
+	var viewport = document.querySelector('.code_scan_viewport');
+	var video = getCodeScanVideo();
+	var width;
+	var height;
+	var left;
+	var top;
+	var boxWidth;
+	var boxHeight;
+	if(!highlight || !viewport || !bbox || !canvas)
+		return;
+	width = canvas.width;
+	height = canvas.height;
+	if(!width || !height)
+		return;
+	left = (bbox.x0 / width) * 100;
+	top = (bbox.y0 / height) * 100;
+	boxWidth = ((bbox.x1 - bbox.x0) / width) * 100;
+	boxHeight = ((bbox.y1 - bbox.y0) / height) * 100;
+	highlight.style.left = left + '%';
+	highlight.style.top = top + '%';
+	highlight.style.width = boxWidth + '%';
+	highlight.style.height = boxHeight + '%';
+	highlight.classList.remove('hide');
+}
+
+function clearCodeScanCandidateHighlight() {
+	var highlight = document.getElementById('code_scan_candidate_highlight');
+	if(highlight)
+		highlight.classList.add('hide');
+}
+
+function setCodeScanWoloFoundCue(active) {
+	var viewport = document.querySelector('.code_scan_viewport');
+	if(viewport)
+		viewport.classList.toggle('code_scan_wolo_found', !!active);
 }
 
 function setCodeScanViewportVisible(visible) {

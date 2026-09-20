@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		if(typeof initLoad != 'undefined')
 			initLoad();
 		if( typeof CSS == 'undefined' || !CSS.supports("backdrop-filter: blur()") ) {
-			document.getElementById('logo').classList.add('plain_background');
-			document.getElementById('footer-content').classList.add('plain_background');
+			addClassIfPresent(document.getElementById('logo'), 'plain_background');
+			addClassIfPresent(document.getElementById('footer-content'), 'plain_background');
 		}
 		initExceptionMessageControls();
 		flushExceptionPrompt();
@@ -241,8 +241,8 @@ function showExceptionMessage(log) {
 	if(typeof showOverlay == 'function')
 		showOverlay(message);
 	else {
-		document.getElementById('overlay').classList.remove('hide');
-		message.classList.remove('hide');
+		removeClassIfPresent(document.getElementById('overlay'), 'hide');
+		removeClassIfPresent(message, 'hide');
 	}
 }
 
@@ -255,8 +255,8 @@ function hideExceptionMessage() {
 	if(typeof hideOverlay == 'function')
 		hideOverlay(message);
 	else {
-		document.getElementById('overlay').classList.add('hide');
-		message.classList.add('hide');
+		addClassIfPresent(document.getElementById('overlay'), 'hide');
+		addClassIfPresent(message, 'hide');
 	}
 }
 

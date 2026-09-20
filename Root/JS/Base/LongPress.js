@@ -46,6 +46,8 @@ var start = function(e) {
 };
 
 function addLongpressListener(node, fnShort, fnLong) {
+	if(!node || !node.addEventListener)
+		return;
 	node.addEventListener('mousedown', start);
 	node.addEventListener('touchstart', start, { passive: true });
 	node.addEventListener('click', click);

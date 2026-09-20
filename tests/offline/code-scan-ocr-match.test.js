@@ -59,3 +59,25 @@ test('matchOcrTextToWoloCode rejects text without three valid words', () => {
 	const vocab = buildIncludes();
 	assert.equal(ocrMatch.matchOcrTextToWoloCode('bengaluru cat apple', vocab.includes, vocab.canonical), null);
 });
+
+test('splitMatchForReview separates city and three words', () => {
+	const review = ocrMatch.splitMatchForReview({
+		words: ['bengaluru', 'cat', 'apple', 'tomato'],
+		cityWordCount: 1
+	});
+	assert.equal(review.city, 'bengaluru');
+	assert.deepEqual(review.words, ['cat', 'apple', 'tomato']);
+});
+
+test('buildCodeFromReview joins city and words for decode', () => {
+	assert.equal(
+		ocrMatch.buildCodeFromReview('Bengaluru', 'cat', 'apple', 'tomato'),
+		'bengaluru cat apple tomato'
+	);
+});
+
+test('validateReviewWords requires three dictionary words', () => {
+	const vocab = buildIncludes();
+	assert.equal(ocrMatch.validateReviewWords('cat', 'apple', 'tomato', vocab.includes), true);
+	assert.equal(ocrMatch.validateReviewWords('cat', 'apple', 'xyzzy', vocab.includes), false);
+});

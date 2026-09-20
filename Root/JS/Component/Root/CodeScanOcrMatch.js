@@ -120,6 +120,49 @@
 		return findWoloCodeInTokens(corrected, includesFn);
 	}
 
+	function splitMatchForReview(match) {
+		var cityCount;
+		var cityWords;
+		var woloWords;
+		if(!match || !match.words || match.words.length < 3)
+			return {city: '', words: ['', '', '']};
+		cityCount = typeof match.cityWordCount == 'number' ? match.cityWordCount : 0;
+		cityWords = match.words.slice(0, cityCount);
+		woloWords = match.words.slice(cityCount);
+		return {
+			city: cityWords.join(' '),
+			words: [woloWords[0] || '', woloWords[1] || '', woloWords[2] || '']
+		};
+	}
+
+	function buildCodeFromReview(city, w1, w2, w3) {
+		var parts = [];
+		var cityTokens;
+		var word;
+		cityTokens = normalizeOcrText(city).split(' ').filter(Boolean);
+		parts = parts.concat(cityTokens);
+		word = normalizeOcrText(w1);
+		if(word)
+			parts.push(word);
+		word = normalizeOcrText(w2);
+		if(word)
+			parts.push(word);
+		word = normalizeOcrText(w3);
+		if(word)
+			parts.push(word);
+		return parts.join(' ');
+	}
+
+	function validateReviewWords(w1, w2, w3, includesFn) {
+		var words = [normalizeOcrText(w1), normalizeOcrText(w2), normalizeOcrText(w3)];
+		var i;
+		for(i = 0; i < words.length; i++) {
+			if(!words[i] || !includesFn(words[i]))
+				return false;
+		}
+		return true;
+	}
+
 	function isCodeScanSupported() {
 		return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 	}
@@ -131,6 +174,9 @@
 		correctTokens: correctTokens,
 		findWoloCodeInTokens: findWoloCodeInTokens,
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
+		splitMatchForReview: splitMatchForReview,
+		buildCodeFromReview: buildCodeFromReview,
+		validateReviewWords: validateReviewWords,
 		isCodeScanSupported: isCodeScanSupported
 	};
 

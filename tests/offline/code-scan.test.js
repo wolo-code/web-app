@@ -23,6 +23,15 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
 	assert.match(fragment, /id='code_scan_video'/);
+	assert.match(fragment, /id='code_scan_capture'/);
+	assert.match(fragment, /id='code_scan_review_city'/);
+	assert.match(fragment, /id='code_scan_review_w1'/);
+	assert.match(fragment, /id='code_scan_review_w2'/);
+	assert.match(fragment, /id='code_scan_review_w3'/);
+	assert.match(fragment, /id='code_scan_confirm'/);
+	assert.match(fragment, /id='code_scan_retake'/);
+	assert.match(fragment, /id='code_scan_mode_fixed'/);
+	assert.match(fragment, /id='code_scan_mode_general'/);
 	assert.match(fragment, /id='code_scan_photo_input'/);
 	assert.match(fragment, /capture='environment'/);
 	assert.match(script, /initCodeScan\(\)/);
@@ -32,16 +41,27 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(codeScan, /langPath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/lang'/);
 	assert.match(codeScan, /corePath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/tesseract-core\.wasm\.min\.js'/);
 	assert.doesNotMatch(codeScan, /jsdelivr|unpkg|cdn\./i);
+	assert.match(codeScan, /confirmCodeScanReview/);
+	assert.match(codeScan, /retakeCodeScan/);
+	assert.match(codeScan, /captureCodeScanManually/);
+	assert.match(codeScan, /showCodeScanReview/);
 	assert.match(codeScan, /decode_input_from_form\(\)/);
 	assert.match(codeScan, /decode_input_from_map\(\)/);
 	assert.match(codeScan, /code_scan_photo_input/);
 	assert.doesNotMatch(codeScan, /upload/i);
+	assert.doesNotMatch(codeScan, /setCodeScanCandidate/);
+	assert.doesNotMatch(fragment, /code_scan_candidate/);
 	assert.match(css, /\.code_scan_viewport/);
+	assert.match(css, /\.code_scan_capture/);
+	assert.match(css, /\.code_scan_review/);
 });
 
 test('OCR matcher module is self-contained and testable', () => {
 	const matcher = read('Root/JS/Component/Root/CodeScanOcrMatch.js');
 	assert.match(matcher, /matchOcrTextToWoloCode/);
+	assert.match(matcher, /splitMatchForReview/);
+	assert.match(matcher, /buildCodeFromReview/);
+	assert.match(matcher, /validateReviewWords/);
 	assert.match(matcher, /module\.exports/);
 	assert.match(matcher, /isCodeScanSupported/);
 });

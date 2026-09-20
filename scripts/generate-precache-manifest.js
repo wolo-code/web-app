@@ -12,7 +12,7 @@ const outputPath = path.join(rootDir, 'precache-manifest.json');
 const TESSERACT_ASSETS = [
 	'/tesseract/tesseract.min.js',
 	'/tesseract/worker.min.js',
-	'/tesseract/tesseract-core.wasm.js',
+	'/tesseract/tesseract-core.wasm.min.js',
 	'/tesseract/lang/eng.traineddata.gz'
 ];
 

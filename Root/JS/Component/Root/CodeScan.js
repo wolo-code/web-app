@@ -194,7 +194,7 @@ function prepareCodeScanWorker() {
 		return Tesseract.createWorker('eng', 1, {
 			workerPath: CODE_SCAN_TESSERACT_BASE + '/worker.min.js',
 			langPath: CODE_SCAN_TESSERACT_BASE + '/lang',
-			corePath: CODE_SCAN_TESSERACT_BASE + '/tesseract-core.wasm.js',
+			corePath: CODE_SCAN_TESSERACT_BASE + '/tesseract-core.wasm.min.js',
 			logger: function() {}
 		});
 	}).then(function(worker) {

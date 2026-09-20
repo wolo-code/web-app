@@ -30,7 +30,7 @@ test('self-hosted OCR assets exist for offline scanning', () => {
 	const required = [
 		'tesseract.min.js',
 		'worker.min.js',
-		'tesseract-core.wasm.js',
+		'tesseract-core.wasm.min.js',
 		'lang/eng.traineddata.gz'
 	];
 	for (const file of required) {

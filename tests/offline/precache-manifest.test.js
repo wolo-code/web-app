@@ -18,7 +18,7 @@ test('precache manifest includes core offline shell assets', () => {
 	assert.ok(manifest.assets.includes('/precache-manifest.json'));
 	assert.ok(manifest.assets.includes('/tesseract/tesseract.min.js'));
 	assert.ok(manifest.assets.includes('/tesseract/worker.min.js'));
-	assert.ok(manifest.assets.includes('/tesseract/tesseract-core.wasm.js'));
+	assert.ok(manifest.assets.includes('/tesseract/tesseract-core.wasm.min.js'));
 	assert.ok(manifest.assets.includes('/tesseract/lang/eng.traineddata.gz'));
 });
 

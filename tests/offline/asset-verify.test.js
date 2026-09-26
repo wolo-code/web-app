@@ -43,6 +43,8 @@ test('self-hosted OCR assets exist for offline scanning', () => {
 test('sw init registers with updateViaCache none', () => {
 	const swInit = read('Root/JS/Component/Root/sw_init.js');
 	assert.match(swInit, /updateViaCache:\s*'none'/);
+	assert.match(swInit, /requestServiceWorkerUpdate/);
+	assert.doesNotMatch(swInit, /return registration\.update\(\);/);
 });
 
 test('offline modules load before Database.js via Base directory', () => {

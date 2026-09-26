@@ -192,7 +192,31 @@ function deferExceptionPrompt(callback) {
 		setTimeout(callback, 0);
 }
 
+function isIgnorableServiceWorkerError(error) {
+	var name = error && error.name ? String(error.name) : '';
+	var message = '';
+	if(typeof error == 'string')
+		message = error;
+	else if(error && error.message)
+		message = String(error.message);
+
+	if(
+		message.indexOf('Failed to update a ServiceWorker') != -1
+		|| message.indexOf('Failed to register a ServiceWorker') != -1
+		|| message.indexOf('Service Worker system has shutdown') != -1
+	)
+		return true;
+
+	return name == 'AbortError' && (
+		message.indexOf('ServiceWorker') != -1
+		|| message.indexOf('Service Worker') != -1
+	);
+}
+
 function showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error) {
+	if(isIgnorableServiceWorkerError(error) || isIgnorableServiceWorkerError(errorMsg))
+		return;
+
 	var exception = normalizeException(errorMsg, url, lineNumber, columnNumber, error);
 	pendingExceptionLogs.push(exception);
 	reportExceptionPrompt(error || errorMsg || exception.msg, exception);
@@ -286,5 +310,10 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber, columnNumber
 
 window.addEventListener('unhandledrejection', function myRejectionHandler(event) {
 	var reason = event.reason || 'Unhandled promise rejection';
+	if(isIgnorableServiceWorkerError(reason) || isIgnorableServiceWorkerError(reason && reason.message)) {
+		if(event && typeof event.preventDefault == 'function')
+			event.preventDefault();
+		return;
+	}
 	showErrorPrompt(reason.message || reason, '', '', '', reason);
 });

@@ -1,3 +1,24 @@
+function isIdleServiceWorkerRegistration(registration) {
+	return !!(registration && !registration.installing);
+}
+
+function ignoreServiceWorkerRegistrationError(err) {
+	if(typeof isIgnorableServiceWorkerError == 'function' && isIgnorableServiceWorkerError(err))
+		return true;
+	if(typeof console !== 'undefined' && console.error)
+		console.error('Service worker registration failed', err);
+	return false;
+}
+
+function requestServiceWorkerUpdate(registration) {
+	if(!isIdleServiceWorkerRegistration(registration) || typeof registration.update != 'function')
+		return Promise.resolve();
+	return Promise.resolve(registration.update()).then(function() {}, function(err) {
+		if(!ignoreServiceWorkerRegistrationError(err))
+			throw err;
+	});
+}
+
 if ('serviceWorker' in navigator) {
 	// A worker taking control for the first time does not require a reload: the
 	// current page already came from the network. Only reload pages that began
@@ -28,11 +49,11 @@ if ('serviceWorker' in navigator) {
 					}
 				});
 			});
-			return registration.update();
-		}, function(err) {
-			if (typeof console !== 'undefined' && console.error) {
-				console.error('Service worker registration failed', err);
-			}
+			// register() already started an update check. A second update()
+			// during that install is aborted by Chrome (script "Unknown").
+			return requestServiceWorkerUpdate(registration);
+		}).then(function() {}, function(err) {
+			ignoreServiceWorkerRegistrationError(err);
 		});
 
 		navigator.serviceWorker.addEventListener('controllerchange', function() {

@@ -11,7 +11,9 @@ Sentry.init({
 		'Unexpected token =',
 		/Unexpected token ['<]/,
 		/this\.i\.at is not a function/,
-		/t\.entries\.at is not a function/
+		/t\.entries\.at is not a function/,
+		/Failed to (?:update|register) a ServiceWorker/,
+		/Service Worker system has shutdown/
 	],
 	denyUrls: [
 		/beacon\.min\.js/,

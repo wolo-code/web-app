@@ -23,6 +23,11 @@ function initLoad () {
 	}
 };
 
+function showSignedOutAccountChrome() {
+	addClassIfPresent(document.getElementById('account_default_image'), 'inactive');
+	removeClassIfPresent(document.getElementById('account_default_image'), 'hide');
+}
+
 function initApp() {
 	firebase.auth().getRedirectResult().then(function(result) {
 		if (result.credential) {
@@ -31,8 +36,7 @@ function initApp() {
 		else if (firebase.auth().currentUser) {
 			signedIn();
 		} else {
-			document.getElementById('account_default_image').classList.add('inactive');
-			document.getElementById('account_default_image').classList.remove('hide');
+			showSignedOutAccountChrome();
 		}
 	}).catch(function(error) {
 		if(isFirebaseIndexedDbClosingError(error)) {
@@ -40,8 +44,7 @@ function initApp() {
 			return;
 		}
 		if(isFirebaseAuthNetworkError(error)) {
-			document.getElementById('account_default_image').classList.add('inactive');
-			document.getElementById('account_default_image').classList.remove('hide');
+			showSignedOutAccountChrome();
 			return;
 		}
 		Sentry.captureException(error);
@@ -49,23 +52,35 @@ function initApp() {
 }
 
 function signedIn() {
-	document.getElementById('account_default_image').classList.remove('inactive');
-	document.getElementById('account_dialog_display_name').innerText = firebase.auth().currentUser.displayName;
-	document.getElementById('account_dialog_email').innerText = firebase.auth().currentUser.email;
-	if(typeof firebase.auth().currentUser.photoURL != 'undefined' && firebase.auth().currentUser.photoURL != null && firebase.auth().currentUser.photoURL.length) {
-		document.getElementById('account_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
-		document.getElementById('account_user_image').classList.remove('hide');
-		document.getElementById('account_default_image').classList.add('hide');
-		document.getElementById('account_dialog_user_image').setAttribute('src', firebase.auth().currentUser.photoURL);
-		document.getElementById('account_dialog_user_image').classList.remove('hide');
-		document.getElementById('account_dialog_default_image').classList.add('hide');
+	var defaultImage = document.getElementById('account_default_image');
+	var userImage = document.getElementById('account_user_image');
+	var dialogUserImage = document.getElementById('account_dialog_user_image');
+	var dialogDefaultImage = document.getElementById('account_dialog_default_image');
+	var displayName = document.getElementById('account_dialog_display_name');
+	var email = document.getElementById('account_dialog_email');
+	var user = firebase.auth().currentUser;
+	removeClassIfPresent(defaultImage, 'inactive');
+	if(displayName)
+		displayName.innerText = user.displayName;
+	if(email)
+		email.innerText = user.email;
+	if(typeof user.photoURL != 'undefined' && user.photoURL != null && user.photoURL.length) {
+		if(userImage)
+			userImage.setAttribute('src', user.photoURL);
+		removeClassIfPresent(userImage, 'hide');
+		addClassIfPresent(defaultImage, 'hide');
+		if(dialogUserImage)
+			dialogUserImage.setAttribute('src', user.photoURL);
+		removeClassIfPresent(dialogUserImage, 'hide');
+		addClassIfPresent(dialogDefaultImage, 'hide');
 	}
 	else {
-		document.getElementById('account_default_image').classList.remove('inactive');
-		document.getElementById('account_default_image').classList.remove('hide');
-		document.getElementById('account_dialog_user_image').classList.add('hide');
-		document.getElementById('account_dialog_user_image').setAttribute('src', 'data:,');
-		document.getElementById('account_dialog_default_image').classList.remove('hide');
+		removeClassIfPresent(defaultImage, 'inactive');
+		removeClassIfPresent(defaultImage, 'hide');
+		addClassIfPresent(dialogUserImage, 'hide');
+		if(dialogUserImage)
+			dialogUserImage.setAttribute('src', 'data:,');
+		removeClassIfPresent(dialogDefaultImage, 'hide');
 	}
 	loadSaveList();
 }

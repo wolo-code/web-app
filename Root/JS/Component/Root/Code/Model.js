@@ -3,13 +3,14 @@
 // var code_postition;
 
 function setCode(city, wcode, latLng) {
+	var mapEl = document.getElementById('map');
 	if(typeof code_city != 'undefined' && code_city.gp_id != null && city.gp_id != code_city.gp_id) {
-		document.getElementById('map').classList.remove('city_tally_true');
-		document.getElementById('map').classList.add('city_tally_false');
+		removeClassIfPresent(mapEl, 'city_tally_true');
+		addClassIfPresent(mapEl, 'city_tally_false');
 	}
 	else {
-		document.getElementById('map').classList.remove('city_tally_false');
-		document.getElementById('map').classList.add('city_tally_true');
+		removeClassIfPresent(mapEl, 'city_tally_false');
+		addClassIfPresent(mapEl, 'city_tally_true');
 	}
 	code_wcode = wcode;
 	code_postition = latLng;

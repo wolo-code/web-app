@@ -46,13 +46,14 @@ function encode(position, locating_encode) {
 }
 
 function setCurrentCity_status(status) {
+	var mapEl = document.getElementById('map');
 	if(status) {
-		document.getElementById('map').classList.remove('different_city');
-		document.getElementById('map').classList.add('current_city');
+		removeClassIfPresent(mapEl, 'different_city');
+		addClassIfPresent(mapEl, 'current_city');
 	}
 	else {
-		document.getElementById('map').classList.remove('current_city');
-		document.getElementById('map').classList.add('different_city');
+		removeClassIfPresent(mapEl, 'current_city');
+		addClassIfPresent(mapEl, 'different_city');
 	}
 }
 

@@ -66,19 +66,19 @@ function versionCheck() {
 }
 
 function activateOverlayInfo_full() {
-	info_intro.classList.add('hide');
-	info_links.classList.add('hide');
-	info_message_close.classList.remove('hide');
-	info_full.classList.remove('hide');
-	info_agency.classList.add('hide');
+	addClassIfPresent(document.getElementById('info_intro'), 'hide');
+	addClassIfPresent(document.getElementById('info_links'), 'hide');
+	removeClassIfPresent(document.getElementById('info_message_close'), 'hide');
+	removeClassIfPresent(document.getElementById('info_full'), 'hide');
+	addClassIfPresent(document.getElementById('info_agency'), 'hide');
 }
 
 function activateOverlayInfo_links() {
-	info_intro.classList.add('hide');
-	info_full.classList.add('hide');
-	info_links.classList.remove('hide');
-	info_message_close.classList.remove('hide');
-	info_agency.classList.remove('hide');
+	addClassIfPresent(document.getElementById('info_intro'), 'hide');
+	addClassIfPresent(document.getElementById('info_full'), 'hide');
+	removeClassIfPresent(document.getElementById('info_links'), 'hide');
+	removeClassIfPresent(document.getElementById('info_message_close'), 'hide');
+	removeClassIfPresent(document.getElementById('info_agency'), 'hide');
 }
 
 function urlDecode() {

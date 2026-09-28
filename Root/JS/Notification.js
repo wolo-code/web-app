@@ -10,13 +10,20 @@ function layoutBottomNotification() {
 	notif.style.bottom = (80 + stackH + gap) + 'px';
 }
 
+function getNotificationBottom() {
+	return document.getElementById('notification_bottom');
+}
+
 function showNotification(message, duration) {
+	var notification = getNotificationBottom();
+	if(!notification || !notification.classList)
+		return;
 	if(typeof duration == 'undefined')
 		duration = NOTIFICATION_DURATION_DEFAULT;
 
 	clearNotificationTimer();
-	notification_bottom.innerHTML = message;
-	notification_bottom.classList.remove('hide', 'fade-out');
+	notification.innerHTML = message;
+	notification.classList.remove('hide', 'fade-out');
 	layoutBottomNotification();
 	if(typeof layoutDecodeIconGuide == 'function')
 		layoutDecodeIconGuide();
@@ -30,15 +37,19 @@ function hideNotication() {
 }
 
 function fadeOutNotification() {
-	if(!notification_bottom || notification_bottom.classList.contains('hide')) {
+	var notification = getNotificationBottom();
+	if(!notification || !notification.classList || notification.classList.contains('hide')) {
 		return;
 	}
 	clearNotificationTimer();
-	notification_bottom.classList.add('fade-out');
+	notification.classList.add('fade-out');
 	notification_timer = setTimeout(function() {
-		notification_bottom.innerText = '';
-		notification_bottom.classList.add('hide');
-		notification_bottom.classList.remove('fade-out');
+		var bottom = getNotificationBottom();
+		if(bottom) {
+			bottom.innerText = '';
+			addClassIfPresent(bottom, 'hide');
+			removeClassIfPresent(bottom, 'fade-out');
+		}
 		notification_timer = null;
 		if(typeof layoutBottomNotification == 'function')
 			layoutBottomNotification();

@@ -40,43 +40,52 @@ function closeQR() {
 }
 
 function previewQR_activate() {
+	var addressNode = document.getElementById('qr_address');
 	mode_preview = true;
 	hideEmptyElsePreview(document.getElementById('qr_title_main'));
 	hideEmptyElsePreview(document.getElementById('qr_title_segment'));
-	if(qr_address_active_first || document.getElementById('qr_address').innerHTML.trim().length == 0)
-		document.getElementById('qr_address').classList.add('hide');
+	if(qr_address_active_first || !addressNode || addressNode.innerHTML.trim().length == 0)
+		addClassIfPresent(addressNode, 'hide');
 	else {
-		document.getElementById('qr_address').classList.add('preview');
-		document.getElementById('qr_address').setAttribute('contenteditable', false);
+		addClassIfPresent(addressNode, 'preview');
+		addressNode.setAttribute('contenteditable', false);
 	}
-	document.getElementById('qr_preview').classList.add('button_active');
+	addClassIfPresent(document.getElementById('qr_preview'), 'button_active');
 }
 
 function previewQR_deactivate() {
+	var addressNode = document.getElementById('qr_address');
 	mode_preview = false;
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_main'));
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_segment'));
-	document.getElementById('qr_address').setAttribute('contenteditable', true);
-	document.getElementById('qr_address').classList.remove('preview');
-	document.getElementById('qr_address').classList.remove('hide');
-	document.getElementById('qr_preview').classList.remove('button_active');
+	if(addressNode)
+		addressNode.setAttribute('contenteditable', true);
+	removeClassIfPresent(addressNode, 'preview');
+	removeClassIfPresent(addressNode, 'hide');
+	removeClassIfPresent(document.getElementById('qr_preview'), 'button_active');
 }
 
 function qr_address_active() {
+	var addressNode = document.getElementById('qr_address');
 	if (qr_address_active_first) {
 		qr_address_active_first = false;
-		document.getElementById('qr_address').innerHTML = address;
+		if(addressNode)
+			addressNode.innerHTML = address;
 	}
 }
 
 function hideEmptyElsePreview(node) {
-	if(node.value.trim() == '')
-		node.classList.add('hide')
+	if(!node || !node.classList)
+		return;
+	if(typeof node.value == 'string' && node.value.trim() == '')
+		node.classList.add('hide');
 	else
-		node.classList.add('preview')
+		node.classList.add('preview');
 }
 
 function unHideEmptyAndRemovePreview(node) {
+	if(!node || !node.classList)
+		return;
 	node.classList.remove('hide');
 	node.classList.remove('preview');
 }
@@ -89,29 +98,36 @@ function toggleQRpreview() {
 }
 
 function setQRChromeHidden(hidden) {
-	var method = hidden ? 'add' : 'remove';
-	document.getElementById('qr_close').classList[method]('hide');
-	document.getElementById('qr_save').classList[method]('hide');
+	if(hidden) {
+		addClassIfPresent(document.getElementById('qr_close'), 'hide');
+		addClassIfPresent(document.getElementById('qr_save'), 'hide');
+	}
+	else {
+		removeClassIfPresent(document.getElementById('qr_close'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_save'), 'hide');
+	}
 }
 
 function beforeQRprint() {
+	var overlay = document.getElementById('overlay');
 	document.body.classList.add('print');
 	if(!mode_preview) {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
-	document.getElementById('overlay').classList.remove('overlay');
-	document.getElementById('overlay').classList.add('section-to-print');
+	removeClassIfPresent(overlay, 'overlay');
+	addClassIfPresent(overlay, 'section-to-print');
 	setQRChromeHidden(true);
-	document.getElementById('overlay').classList.add('raster');
+	addClassIfPresent(overlay, 'raster');
 }
 
 function afterQRprint() {
+	var overlay = document.getElementById('overlay');
 	document.body.classList.remove('print');
-	document.getElementById('overlay').classList.add('overlay');
-	document.getElementById('overlay').classList.remove('section-to-print');
+	addClassIfPresent(overlay, 'overlay');
+	removeClassIfPresent(overlay, 'section-to-print');
 	setQRChromeHidden(false);
-	document.getElementById('overlay').classList.remove('raster');
+	removeClassIfPresent(overlay, 'raster');
 	if(mode_preview_activated)
 		toggleQRpreview();
 }
@@ -125,25 +141,29 @@ function printQR() {
 }
 
 function downloadQR() {
+	var overlay = document.getElementById('overlay');
+	var qrBody = document.getElementById('qr_body');
 	if(!mode_preview) {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
-	document.getElementById('qr_close').classList.add('hide');
-	document.getElementById('qr_save').classList.add('hide');
-	document.getElementById('qr_controls').classList.add('hide');
-	document.getElementById('overlay').classList.add('raster');
-	document.getElementById('qr_body').setAttribute( 'style',
-	 "height: "+(document.getElementById('qr_body').offsetHeight-6)+"px"+"; "+
-	 "width: "+document.getElementById('qr_body').offsetWidth+"px" );
+	addClassIfPresent(document.getElementById('qr_close'), 'hide');
+	addClassIfPresent(document.getElementById('qr_save'), 'hide');
+	addClassIfPresent(document.getElementById('qr_controls'), 'hide');
+	addClassIfPresent(overlay, 'raster');
+	if(qrBody)
+		qrBody.setAttribute( 'style',
+		 "height: "+(qrBody.offsetHeight-6)+"px"+"; "+
+		 "width: "+qrBody.offsetWidth+"px" );
 	html2canvas( document.querySelector('#qr_body'), {scale:1} ).then( canvas => {
 		if(mode_preview_activated)
 			toggleQRpreview();
-		document.getElementById('overlay').classList.remove('raster');
-		document.getElementById('qr_body').removeAttribute('style');
-		document.getElementById('qr_close').classList.remove('hide');
-		document.getElementById('qr_save').classList.remove('hide');
-		document.getElementById('qr_controls').classList.remove('hide');
+		removeClassIfPresent(overlay, 'raster');
+		if(qrBody)
+			qrBody.removeAttribute('style');
+		removeClassIfPresent(document.getElementById('qr_close'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_save'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_controls'), 'hide');
 		var qrImage = canvas.toDataURL("image/png");
 		downloadURI(qrImage, "Wolo Code - " + getCodeFull_text() + ".png");
 	} );
@@ -155,23 +175,23 @@ function downloadQR_minimal() {
 		toggleQRpreview();
 		mode_preview_activated = true;
 	}
-	document.getElementById('qr_close').classList.add('hide');
-	document.getElementById('qr_save').classList.add('hide');
-	document.getElementById('qr_controls').classList.add('hide');
-	document.getElementById('overlay').classList.add('raster');
-	document.getElementById('overlay').classList.add('qr_minimal');
-	document.getElementById('qr_label').classList.add('hide');
-	document.getElementById('qr_webapp_url').classList.add('hide');
+	addClassIfPresent(document.getElementById('qr_close'), 'hide');
+	addClassIfPresent(document.getElementById('qr_save'), 'hide');
+	addClassIfPresent(document.getElementById('qr_controls'), 'hide');
+	addClassIfPresent(document.getElementById('overlay'), 'raster');
+	addClassIfPresent(document.getElementById('overlay'), 'qr_minimal');
+	addClassIfPresent(document.getElementById('qr_label'), 'hide');
+	addClassIfPresent(document.getElementById('qr_webapp_url'), 'hide');
 	html2canvas( document.querySelector('#qr_body'), {scale:1} ).then( canvas => {
 		if(mode_preview_activated)
 			toggleQRpreview();
-		document.getElementById('overlay').classList.remove('raster');
-		document.getElementById('overlay').classList.remove('qr_minimal');
-		document.getElementById('qr_label').classList.remove('hide');
-		document.getElementById('qr_webapp_url').classList.remove('hide');
-		document.getElementById('qr_close').classList.remove('hide');
-		document.getElementById('qr_save').classList.remove('hide');
-		document.getElementById('qr_controls').classList.remove('hide');
+		removeClassIfPresent(document.getElementById('overlay'), 'raster');
+		removeClassIfPresent(document.getElementById('overlay'), 'qr_minimal');
+		removeClassIfPresent(document.getElementById('qr_label'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_webapp_url'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_close'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_save'), 'hide');
+		removeClassIfPresent(document.getElementById('qr_controls'), 'hide');
 
 		window.jsPDF = window.jspdf.jsPDF;
 		const doc = new jsPDF({orientation: "l", unit: "mm", format: [50, 75]});

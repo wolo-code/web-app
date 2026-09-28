@@ -419,6 +419,16 @@ function removeClassIfPresent(element, className) {
 	return true;
 }
 
+function toggleClassIfPresent(element, className, force) {
+	if(typeof element == 'undefined' || !element || !element.classList)
+		return false;
+	if(typeof force == 'undefined')
+		element.classList.toggle(className);
+	else
+		element.classList.toggle(className, force);
+	return true;
+}
+
 function watch_location_notice() {
 	var wait_duration;
 	if(firstFocus == true) {

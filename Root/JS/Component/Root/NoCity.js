@@ -13,18 +13,18 @@ function noCity_add() {
 }
 
 function noCity_showLoader() {
-	no_city_message_prompt.classList.add('hide');
-	no_city_message_wait.classList.remove('hide');
+	addClassIfPresent(document.getElementById('no_city_message_prompt'), 'hide');
+	removeClassIfPresent(document.getElementById('no_city_message_wait'), 'hide');
 }
 
 function noCity_hideLoader() {
-	no_city_message_prompt.classList.remove('hide');
-	no_city_message_wait.classList.add('hide');
+	removeClassIfPresent(document.getElementById('no_city_message_prompt'), 'hide');
+	addClassIfPresent(document.getElementById('no_city_message_wait'), 'hide');
 }
 
 function noCity_cancel() {
 	hideNoCityMessage();
-	notification_top.classList.remove('hide');
+	removeClassIfPresent(document.getElementById('notification_top'), 'hide');
 }
 
 function noCityWait_continue() {
@@ -36,5 +36,5 @@ function noCityWait_stop() {
 	pendingPosition = null;
 	pendingCity = false;
 	hideNoCityMessage();
-	notification_top.classList.remove('hide');
+	removeClassIfPresent(document.getElementById('notification_top'), 'hide');
 }

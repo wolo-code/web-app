@@ -103,8 +103,8 @@ function decode_(city, code) {
 	}
 	var position = decode__(cityBegin, data);
 	setCodeCoord(city, position, code);
-	notification_top.classList.add('hide');
-	wait_loader.classList.add('hide');
+	addClassIfPresent(document.getElementById('notification_top'), 'hide');
+	addClassIfPresent(document.getElementById('wait_loader'), 'hide');
 }
 
 function encode__(city_begin, position) {

@@ -1,8 +1,9 @@
 function showLocateRightMessage(hide_dnd) {
+	var dnd = document.getElementById('locate_right_message_dnd');
 	if(hide_dnd == true)
-		locate_right_message_dnd.classList.add('hide');
+		addClassIfPresent(dnd, 'hide');
 	else
-		locate_right_message_dnd.classList.remove('hide');
+		removeClassIfPresent(dnd, 'hide');
 	showOverlay(document.getElementById('locate_right_message'));
 }
 
@@ -31,7 +32,8 @@ function locateRight_deny() {
 }
 
 function locateRight_DND_check() {
-	if(locate_right_message_dnd_input.checked) {
+	var dndInput = document.getElementById('locate_right_message_dnd_input');
+	if(dndInput && dndInput.checked) {
 		setLocationAccessDND(true);
 	}
 	else {

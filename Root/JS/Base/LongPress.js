@@ -6,7 +6,8 @@ var cancel = function(e) {
 		listPressTimer[this.pressTimerIndex] = this.presstimer = null;
 	}
 
-	this.classList.remove('longpress');
+	if(this.classList)
+		this.classList.remove('longpress');
 };
 
 var click = function(e) {
@@ -15,7 +16,8 @@ var click = function(e) {
 		listPressTimer[this.pressTimerIndex] = this.presstimer = null;
 	}
 
-	this.classList.remove('longpress');
+	if(this.classList)
+		this.classList.remove('longpress');
 
 	if (this.longpress) {
 		return false;
@@ -32,7 +34,8 @@ var start = function(e) {
 
 	this.longpress = false;
 
-	this.classList.add('longpress');
+	if(this.classList)
+		this.classList.add('longpress');
 
 	var parent = this;
 	if (this.presstimer === null) {

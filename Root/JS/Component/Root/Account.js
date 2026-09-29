@@ -39,8 +39,10 @@ function syncAccountDialogSaveForm() {
 	else
 		document.getElementById('save_title_segment').value = '';
 	if(current_address) {
-		document.getElementById('save_address').innerText = current_address;
-		document.getElementById('save_address').classList.remove('initial');
+		var saveAddressField = document.getElementById('save_address');
+		if(saveAddressField)
+			saveAddressField.innerText = current_address;
+		removeClassIfPresent(saveAddressField, 'initial');
 		account_dialog_address_active_first = false;
 	}
 	else {
@@ -318,8 +320,9 @@ function onAccountDialogAddressActive() {
 	if (account_dialog_address_active_first) {
 		account_dialog_address_active_first = false;
 		var field = document.getElementById('save_address');
-		field.classList.remove('initial');
-		field.innerText = address || '';
+		removeClassIfPresent(field, 'initial');
+		if(field)
+			field.innerText = address || '';
 	}
 }
 
@@ -345,13 +348,15 @@ function loadSaveList() {
 		uid = user.uid;
 		var container = document.getElementById('account_dialog_save_list');
 		firebase.database().ref('/UserData/'+uid).on('value', function(snapshot) {
-			document.getElementById('account_dialog_save_list').innerHTML = '';
-			document.getElementById('account_dialog_save_list_end').classList.add('hide');
+			var list = document.getElementById('account_dialog_save_list');
+			if(list)
+				list.innerHTML = '';
+			addClassIfPresent(document.getElementById('account_dialog_save_list_end'), 'hide');
 			closeSaveEntryMenus();
 			saveList = snapshot.val();
 			if(saveList && Object.keys(saveList).length) {
-				document.getElementById('account_dialog_save_list_loader').classList.add('hide');
-				document.getElementById('account_dialog_save_list_placeholder').classList.add('hide');
+				addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
+				addClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
 				for(let key in saveList) {
 					let row = document.createElement('div');
 					let row_header = document.createElement('div');
@@ -432,8 +437,8 @@ function loadSaveList() {
 				queueSaveListEndIndicatorUpdate();
 			}
 			else {
-				document.getElementById('account_dialog_save_list_loader').classList.add('hide');
-				document.getElementById('account_dialog_save_list_placeholder').classList.remove('hide');
+				addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
+				removeClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
 				queueSaveListEndIndicatorUpdate();
 			}
 		})
@@ -567,8 +572,9 @@ function editSaveEntry(e) {
 	document.getElementById('save_title_segment').value = entry.segment || '';
 	var field = document.getElementById('save_address');
 	if(entry.address) {
-		field.innerText = entry.address;
-		field.classList.remove('initial');
+		if(field)
+			field.innerText = entry.address;
+		removeClassIfPresent(field, 'initial');
 		account_dialog_address_active_first = false;
 	}
 	else {
@@ -611,6 +617,8 @@ function onPressSaveEntry(e) {
 }
 
 function toggleSaveEntry(e) {
+	if(!e || !e.classList)
+		return;
 	if(e.classList.contains('active')) {
 		e.classList.remove('active');
 		lastActiveSaveEntry = null;

@@ -1,7 +1,11 @@
 //var loaderCount;
 
+function getWaitLoader() {
+	return document.getElementById('wait_loader');
+}
+
 function pushLoader() {
-	document.getElementById('wait_loader').classList.remove('hide');
+	removeClassIfPresent(getWaitLoader(), 'hide');
 	loaderCount++;
 }
 
@@ -9,7 +13,7 @@ function popLoader() {
 	if(loaderCount)
 		loaderCount--;
 	if(!loaderCount)
-		document.getElementById('wait_loader').classList.add('hide');
+		addClassIfPresent(getWaitLoader(), 'hide');
 }
 
 function finishInitialLoader() {
@@ -22,5 +26,5 @@ function finishInitialLoader() {
 function clearLoader() {
 	initialLoaderPending = false;
 	loaderCount = 0;
-	document.getElementById('wait_loader').classList.add('hide');
+	addClassIfPresent(getWaitLoader(), 'hide');
 }

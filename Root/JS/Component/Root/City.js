@@ -916,7 +916,9 @@ function areaNotCovered(position) {
 	showNotification("Area not covered");
 	showAddress();
 	infoWindow_setContent("<div>Area not covered</div>");
-	if(typeof wait_loader != 'undefined' && wait_loader)
+	if(typeof addClassIfPresent == 'function')
+		addClassIfPresent(document.getElementById('wait_loader'), 'hide');
+	else if(typeof wait_loader != 'undefined' && wait_loader)
 		wait_loader.classList.add('hide');
 }
 
@@ -948,7 +950,7 @@ function tryDefaultCity() {
 	if(typeof requestTryCityZoomOut === 'function')
 		requestTryCityZoomOut();
 	decode(DEFAULT_WCODE);
-	notification_top.classList.add('hide');
+	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	if(typeof infoWindow != 'undefined')
 		infoWindow.close();
 }

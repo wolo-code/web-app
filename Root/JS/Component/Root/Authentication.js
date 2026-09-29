@@ -12,21 +12,26 @@ function onLogout() {
 	pushLoader();
 	firebase.auth().signOut()
 	.then(function() {
+		var userImage = document.getElementById('account_user_image');
+		var dialogUserImage = document.getElementById('account_dialog_user_image');
+		var saveList = document.getElementById('account_dialog_save_list');
 		popLoader();
 		hideOverlay(document.getElementById('firebaseui-auth-container'));
 		hideOverlay(document.getElementById('account_dialog_container'));
-		document.getElementById('account_user_image').classList.add('hide');
-		document.getElementById('account_user_image').setAttribute('src', null);
-		document.getElementById('account_default_image').classList.remove('hide');
-		document.getElementById('account_default_image').classList.add('inactive');
-		document.getElementById('account_default_image').classList.remove('hide');
-		document.getElementById('account_dialog_user_image').classList.add('hide');
-		document.getElementById('account_dialog_user_image').setAttribute('src', 'data:,');
-		document.getElementById('account_dialog_default_image').classList.remove('hide');
-		document.getElementById('account_dialog_save_list_loader').classList.remove('hide');
-		document.getElementById('account_dialog_save_list_placeholder').classList.add('hide');
-		document.getElementById('account_dialog_save_list_end').classList.add('hide');
-		document.getElementById('account_dialog_save_list').innerHTML = '';
+		addClassIfPresent(userImage, 'hide');
+		if(userImage)
+			userImage.setAttribute('src', null);
+		if(typeof showSignedOutAccountChrome == 'function')
+			showSignedOutAccountChrome();
+		addClassIfPresent(dialogUserImage, 'hide');
+		if(dialogUserImage)
+			dialogUserImage.setAttribute('src', 'data:,');
+		removeClassIfPresent(document.getElementById('account_dialog_default_image'), 'hide');
+		removeClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
+		addClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
+		addClassIfPresent(document.getElementById('account_dialog_save_list_end'), 'hide');
+		if(saveList)
+			saveList.innerHTML = '';
 	})
 	.catch(function(error) {
 		console.error('logout error');

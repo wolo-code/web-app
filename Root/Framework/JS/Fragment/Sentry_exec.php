@@ -13,7 +13,11 @@ Sentry.init({
 		/this\.i\.at is not a function/,
 		/t\.entries\.at is not a function/,
 		/Failed to (?:update|register) a ServiceWorker/,
-		/Service Worker system has shutdown/
+		/Service Worker system has shutdown/,
+		'installations/request-failed',
+		/installations\//i,
+		/firebaseui/i,
+		/firebase ui/i
 	],
 	denyUrls: [
 		/beacon\.min\.js/,

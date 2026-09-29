@@ -724,3 +724,49 @@ test('overlay backdrop click closes dialogs except the crash dialog', () => {
 	assert.match(overlayJs, /function showOverlay[\s\S]*hideDecodeIconGuide/);
 	assert.doesNotMatch(overlayJs, /function showOverlay[\s\S]*syncDecodeIconGuide/);
 });
+
+test('Firebase installation and analytics errors are suppressed and do not trigger crash prompt', () => {
+	const firebaseJs = read('Root/JS/Firebase.js');
+	const baseScript = read('Root/JS/Base/Script.js');
+	const sentryExec = read('Root/Framework/JS/Fragment/Sentry_exec.php');
+	assert.match(firebaseJs, /function isFirebaseInstallationError/);
+	assert.match(firebaseJs, /isFirebaseInstallationError\(event\.reason\)/);
+	assert.match(firebaseJs, /isFirebaseInstallationError\(event\.error \|\| event\.message\)/);
+	assert.match(baseScript, /message\.indexOf\('installations\/'\)/);
+	assert.match(sentryExec, /'installations\/request-failed'/);
+});
+
+test('FirebaseUI missing or deferred does not crash authInit or trigger crash prompt', () => {
+	const authJs = read('Root/JS/Component/Root/Firebase_auth.js');
+	const firebaseJs = read('Root/JS/Firebase.js');
+	const authComponentJs = read('Root/JS/Component/Root/Authentication.js');
+	const baseScript = read('Root/JS/Base/Script.js');
+	const sentryExec = read('Root/Framework/JS/Fragment/Sentry_exec.php');
+	const indexPhp = read('Root/HTML/Component/Root/Index.php');
+
+	assert.match(authJs, /typeof firebaseui !== 'undefined'/);
+	assert.match(authJs, /isFirebaseUiAvailable/);
+	assert.match(authJs, /isFirebaseAuthAvailable/);
+	assert.match(firebaseJs, /isFirebaseUiMissingError/);
+	assert.match(authComponentJs, /retryFirebaseUiSdk/);
+	assert.match(baseScript, /firebaseui/);
+	assert.match(sentryExec, /firebaseui/);
+	assert.match(indexPhp, /firebase-ui-auth\.js['"]\s+onload=/);
+
+	// Test authInit in an environment without firebaseui defined
+	const context = {
+		console: { warn: () => {} },
+		firebase: {
+			auth: () => ({}),
+		}
+	};
+	context.firebase.auth.GoogleAuthProvider = { PROVIDER_ID: 'google.com' };
+	context.firebase.auth.EmailAuthProvider = { PROVIDER_ID: 'password' };
+	vm.runInNewContext(authJs, context);
+	assert.equal(typeof context.authInit, 'function');
+	// Must return false and NOT throw ReferenceError: Can't find variable: firebaseui
+	assert.equal(context.authInit(), false);
+	assert.equal(context.ui, undefined);
+	assert.ok(context.uiConfig);
+});
+

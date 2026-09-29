@@ -304,6 +304,10 @@ function showExceptionLog() {
 }
 
 window.onerror = function myErrorHandler(errorMsg, url, lineNumber, columnNumber, error) {
+	var message = (typeof errorMsg == 'string' ? errorMsg : '') || (error && error.message ? error.message : '');
+	if(message.indexOf('installations/') != -1 || message.indexOf('Installations:') != -1
+		|| message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1)
+		return true;
 	showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error);
 	return false;
 }
@@ -315,5 +319,10 @@ window.addEventListener('unhandledrejection', function myRejectionHandler(event)
 			event.preventDefault();
 		return;
 	}
+	var message = reason && reason.message ? reason.message : (typeof reason == 'string' ? reason : '');
+	if((reason && reason.code && typeof reason.code == 'string' && reason.code.indexOf('installations/') != -1)
+		|| message.indexOf('installations/') != -1 || message.indexOf('Installations:') != -1
+		|| message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1)
+		return;
 	showErrorPrompt(reason.message || reason, '', '', '', reason);
 });

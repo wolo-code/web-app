@@ -327,6 +327,13 @@ test('map infowindow omits DIGIPIN; address panel labels DIGIPIN and plus code',
 	assert.match(addressHtml, /Plus code/);
 });
 
+test('map infowindow wolo tile hides scrollbars except on tiny screens', () => {
+	const infoWindowCss = read('Root/CSS/Base/Info_window.css');
+	assert.match(infoWindowCss, /\.gm-style-iw-d\s*\{[^}]*overflow:\s*hidden\s*!important/);
+	assert.match(infoWindowCss, /@media[^{]*max-width:\s*320px[^{]*max-height:\s*360px/);
+	assert.match(infoWindowCss, /@media[^{]*\{[\s\S]*\.gm-style-iw-d\s*\{[^}]*overflow:\s*auto\s*!important/);
+});
+
 test('unrecognized-code dialog and decode input tip are wired', () => {
 	const index = read('root/HTML/Component/Root/Index.php');
 	const fragment = read('Root/HTML/Fragment/Invalid_code.php');

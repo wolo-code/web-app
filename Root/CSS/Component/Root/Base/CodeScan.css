@@ -350,29 +350,24 @@
 }
 
 .code_scan_review_input {
-	border: 1px solid #ccc;
-	border-radius: 6px;
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #8e8e8e;
+	border-radius: 0;
 	box-sizing: border-box;
 	display: block;
 	font-family: Roboto, sans-serif;
 	font-size: 0.95em;
 	margin-top: 2px;
-	padding: 6px 8px;
+	padding: 6px 4px;
 	text-align: center;
 	text-transform: lowercase;
 	width: 100%;
 }
 
-.code_scan_review_validity {
-	color: #666;
-	font-size: 0.84em;
-	margin: 0 0 8px;
-	text-align: center;
-}
-
-.code_scan_review_validity.code_scan_review_valid {
-	color: #2a6f86;
-	font-weight: 500;
+.code_scan_review_input:focus {
+	border-bottom-color: #69B7CF;
+	outline: none;
 }
 
 .code_scan_review_actions {
@@ -382,8 +377,7 @@
 }
 
 .code_scan_use_code,
-.code_scan_rescan,
-.code_scan_cancel {
+.code_scan_rescan {
 	background: #69B7CF;
 	border: none;
 	border-radius: 20px;
@@ -404,8 +398,7 @@
 	opacity: 0.55;
 }
 
-.code_scan_rescan,
-.code_scan_cancel {
+.code_scan_rescan {
 	background: transparent;
 	border: 1px solid #69B7CF;
 	color: #69B7CF;
@@ -436,7 +429,6 @@
 .code_scan_type_instead:hover,
 .code_scan_use_code:hover:not(:disabled),
 .code_scan_rescan:hover,
-.code_scan_cancel:hover,
 .code_scan_icon_button:hover {
 	opacity: 0.92;
 }
@@ -459,9 +451,13 @@ html.dark-mode .code_scan_review_field {
 }
 
 html.dark-mode .code_scan_review_input {
-	background: #1a1f24;
-	border-color: #4a5a66;
+	background: transparent;
+	border-bottom-color: #7a8a96;
 	color: #e8eef2;
+}
+
+html.dark-mode .code_scan_review_input:focus {
+	border-bottom-color: #69B7CF;
 }
 
 html.dark-mode .code_scan_viewport {
@@ -491,8 +487,7 @@ html.dark-mode .code_scan_use_code {
 	color: #fff;
 }
 
-html.dark-mode .code_scan_rescan,
-html.dark-mode .code_scan_cancel {
+html.dark-mode .code_scan_rescan {
 	background: transparent;
 	border-color: #69B7CF;
 	color: #9fd4e8;
@@ -550,6 +545,10 @@ html.dark-mode .code_scan_apply_crop {
 	.code_scan_body {
 		max-height: calc(100dvh - 50px);
 		max-height: calc(100vh - 50px);
+	}
+
+	.code_scan_review_actions {
+		flex-direction: row-reverse;
 	}
 
 }

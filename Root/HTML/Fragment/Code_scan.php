@@ -6,9 +6,6 @@
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div class='message_dialog_body code_scan_body'>
-		<p class='code_scan_privacy'>
-			Processed on your device. No images are uploaded.
-		</p>
 		<div class='code_scan_viewport'>
 			<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
 			<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
@@ -40,9 +37,8 @@
 				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>
 			</button>
 		</div>
-		<p id='code_scan_status' class='code_scan_status'>Point your camera at the printed Wolo Code label.</p>
+		<p id='code_scan_status' class='code_scan_status'>Processed on your device. No images are uploaded.</p>
 		<div id='code_scan_review' class='code_scan_review hide'>
-			<p class='code_scan_review_label'>Review and edit before decoding</p>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				City
 				<input id='code_scan_review_city' class='code_scan_review_input' type='text' list='code_scan_city_choices' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
@@ -62,16 +58,12 @@
 					<input id='code_scan_review_w3' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' required>
 				</label>
 			</div>
-			<p id='code_scan_review_validity' class='code_scan_review_validity'>Enter three valid Wolo words.</p>
 			<div class='code_scan_review_actions'>
 				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
 					Use Code
 				</button>
 				<button id='code_scan_rescan' class='border code_scan_rescan' type='button'>
 					Rescan
-				</button>
-				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
-					Cancel
 				</button>
 			</div>
 		</div>

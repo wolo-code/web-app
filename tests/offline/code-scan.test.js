@@ -30,10 +30,12 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(fragment, /id='code_scan_review_w1'/);
 	assert.match(fragment, /id='code_scan_review_w2'/);
 	assert.match(fragment, /id='code_scan_review_w3'/);
-	assert.match(fragment, /id='code_scan_review_validity'/);
+	assert.match(fragment, /id='code_scan_status'[^>]*>Processed on your device/);
+	assert.doesNotMatch(fragment, /Review and edit before decoding/);
+	assert.doesNotMatch(fragment, /Enter three valid Wolo words/);
 	assert.match(fragment, /id='code_scan_use_code'/);
 	assert.match(fragment, /id='code_scan_rescan'/);
-	assert.match(fragment, /id='code_scan_cancel'/);
+	assert.doesNotMatch(fragment, /id='code_scan_cancel'/);
 	assert.doesNotMatch(fragment, /id='code_scan_mode_fixed'/);
 	assert.doesNotMatch(fragment, /id='code_scan_mode_general'/);
 	assert.match(fragment, /includeSVG\('', 'Gallery'\)/);
@@ -90,6 +92,8 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(css, /\.code_scan_zoom_group/);
 	assert.match(css, /\.code_scan_zoom_button/);
 	assert.match(css, /\.code_scan_apply_crop/);
+	assert.match(css, /\.code_scan_review_input[\s\S]*border-bottom:\s*1px/);
+	assert.match(css, /@media\s*\(max-width:\s*662px\)[\s\S]*\.code_scan_review_actions[\s\S]*flex-direction:\s*row-reverse/);
 });
 
 test('OCR matcher module is self-contained and testable', () => {

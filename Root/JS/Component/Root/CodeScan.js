@@ -50,13 +50,20 @@ var CODE_SCAN_MIN_CONFIDENCE = 55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_FIXED_ASPECT = 3;
 var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
-var CODE_SCAN_FIXED_MIN_EDGE_CONTRAST = 12;
+var codeScanInitialStatus = '';
+
+function getCodeScanInitialStatus() {
+	if(!codeScanInitialStatus) {
+		var node = document.getElementById('code_scan_status');
+		codeScanInitialStatus = node && node.textContent ? node.textContent : '';
+	}
+	return codeScanInitialStatus;
+}
 
 function initCodeScan() {
 	bindControl('decode_code_scan_button', 'click', openCodeScan);
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', closeCodeScan);
-	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
 	bindControl('code_scan_capture', 'click', captureCodeScanManually);
 	bindControl('code_scan_use_code', 'click', useCodeScanReview);
@@ -154,6 +161,7 @@ function resetCodeScanUi() {
 	setCodeScanCaptureEnabled(true);
 	clearCodeScanCandidateHighlight();
 	setCodeScanWoloFoundCue(false);
+	setCodeScanStatus(getCodeScanInitialStatus());
 	codeScanState.originalSourceCanvas = null;
 	codeScanState.sourceCanvas = null;
 	resetCodeScanZoom();
@@ -199,9 +207,7 @@ function setCodeScanDetectionMode(mode) {
 	if(generalButton)
 		generalButton.classList.toggle('code_scan_mode_active', codeScanState.detectionMode === 'general');
 	if(codeScanState.phase === 'live' && codeScanState.cameraAvailable)
-		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
-			? 'Align the label inside the frame, then capture.'
-			: 'Point your camera at the printed Wolo Code label.');
+		setCodeScanStatus(getCodeScanInitialStatus());
 }
 
 function scheduleCodeScanFrame() {
@@ -252,9 +258,7 @@ function startCodeScanCamera() {
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanFrozenPreview(false);
-		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
-			? 'Align the label inside the frame, then capture.'
-			: 'Point your camera at the printed Wolo Code label.');
+		setCodeScanStatus(getCodeScanInitialStatus());
 		prepareCodeScanWorker().then(function() {
 			if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 				scheduleCodeScanFrame();
@@ -489,9 +493,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 	var borderReady;
 	var ratioNear;
 	if(!guidance || !guidance.bbox) {
-		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
-			? 'Align the label inside the frame, then capture.'
-			: 'Looking for a Wolo Code label...');
+		setCodeScanStatus(getCodeScanInitialStatus());
 		resetCodeScanMatchState();
 		clearCodeScanCandidateHighlight();
 		setCodeScanWoloFoundCue(false);
@@ -638,10 +640,7 @@ function showCodeScanReview(match) {
 	populateCodeScanReviewFields(review.city, review.words[0], review.words[1], review.words[2]);
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
-	if(match)
-		setCodeScanStatus('Check the city and three words, then tap Use Code.');
-	else
-		setCodeScanStatus('Enter the city and three words, then tap Use Code.');
+	setCodeScanStatus('');
 }
 
 function populateCodeScanReviewFields(city, w1, w2, w3) {
@@ -717,7 +716,7 @@ function updateCodeScanReviewValidity() {
 	if(useCodeButton)
 		useCodeButton.disabled = !valid;
 	if(validityNode) {
-		validityNode.textContent = valid ? 'Ready to decode.' : 'Enter three valid Wolo words.';
+		validityNode.textContent = '';
 		validityNode.classList.toggle('code_scan_review_valid', valid);
 	}
 	if(cityInput && !cityInput.value && typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
@@ -777,13 +776,11 @@ function rescanCodeScan(event) {
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanCaptureEnabled(true);
-		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
-			? 'Align the label inside the frame, then capture.'
-			: 'Point your camera at the printed Wolo Code label.');
+		setCodeScanStatus(getCodeScanInitialStatus());
 		startCodeScanCamera();
 		return;
 	}
-	setCodeScanLiveControlsVisible(false);
+	setCodeScanCaptureVisible(false);
 	setCodeScanStatus('Live camera is not supported here. Use a photo of the label or type the code instead.');
 }
 

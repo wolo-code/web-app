@@ -167,6 +167,7 @@ function resetCodeScanUi() {
 	codeScanState.sourceCanvas = null;
 	resetCodeScanZoom();
 	resetCodeScanLiveZoom();
+	resetCodeScanGuide();
 }
 
 function resetCodeScanMatchState() {
@@ -515,9 +516,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 	else {
 		clearCodeScanCandidateHighlight();
 		setCodeScanWoloFoundCue(false);
-		setCodeScanStatus(codeScanState.detectionMode === 'fixed'
-			? 'Align the 3 words inside the dashed frame...'
-			: 'Looking for a Wolo Code label...');
+		setCodeScanStatus(getCodeScanInitialStatus());
 	}
 	if(match.code === codeScanState.lastMatchCode && codeScanState.lastMatchBBox && bbox)
 		iou = codeScanOcrMatch.bboxIoU(codeScanState.lastMatchBBox, bbox);
@@ -547,6 +546,9 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 			saveCodeScanSourceFromCanvas(autoCanvas, true);
 			resetCodeScanZoom();
 		}
+		if(bbox && autoCanvas) {
+			positionCodeScanGuideToDetectedRegion(bbox, autoCanvas);
+		}
 		beginCodeScanCapture();
 		return;
 	}
@@ -572,6 +574,9 @@ function captureCodeScanManually(event) {
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
+	if(codeScanState.lastMatchBBox) {
+		positionCodeScanGuideToDetectedRegion(codeScanState.lastMatchBBox, canvas);
+	}
 	beginCodeScanCapture();
 }
 
@@ -617,12 +622,19 @@ function processCodeScanCapture() {
 			showCodeScanReview(null);
 		return;
 	}
-	ocrCanvas = codeScanState.detectionMode === 'fixed' ? getCodeScanFixedRatioSlice(canvas) : canvas;
+	ocrCanvas = canvas;
 	codeScanState.worker.recognize(ocrCanvas).then(function(result) {
 		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
-		showCodeScanReview(extractMatchFromOcrResult(result));
+		var guidance = extractGuidanceFromOcrResult(result, canvas);
+		if(guidance && guidance.bbox) {
+			positionCodeScanGuideToDetectedRegion(guidance.bbox, canvas);
+			showCodeScanReview(guidance.match);
+		}
+		else {
+			showCodeScanReview(extractMatchFromOcrResult(result));
+		}
 	}).catch(function() {
 		codeScanState.processing = false;
 		if(codeScanState.active)
@@ -768,6 +780,7 @@ function rescanCodeScan(event) {
 	setCodeScanCropControlsVisible(false);
 	resetCodeScanZoom();
 	resetCodeScanLiveZoom();
+	resetCodeScanGuide();
 	setCodeScanPhase('live');
 	resetCodeScanMatchState();
 	clearCodeScanCandidateHighlight();
@@ -838,7 +851,15 @@ function handleCodeScanPhotoInput(event) {
 			return;
 		setCodeScanFrozenPreview(true);
 		setCodeScanCropControlsVisible(true);
-		showCodeScanReview(extractMatchFromOcrResult(result));
+		var photoCanvas = getCodeScanCanvas();
+		var guidance = extractGuidanceFromOcrResult(result, photoCanvas);
+		if(guidance && guidance.bbox) {
+			positionCodeScanGuideToDetectedRegion(guidance.bbox, photoCanvas);
+			showCodeScanReview(guidance.match);
+		}
+		else {
+			showCodeScanReview(extractMatchFromOcrResult(result));
+		}
 	}).catch(function() {
 		codeScanState.processing = false;
 		codeScanState.hasCaptured = false;
@@ -881,7 +902,7 @@ function recognizeCodeScanPhoto(file) {
 				canvas.getContext('2d').drawImage(image, 0, 0, targetWidth, targetHeight);
 				saveCodeScanSourceFromCanvas(canvas, true);
 				resetCodeScanZoom();
-				ocrCanvas = codeScanState.detectionMode === 'fixed' ? getCodeScanFixedRatioSlice(canvas) : canvas;
+				ocrCanvas = canvas;
 				if(!codeScanState.worker) {
 					reject(new Error('Scanner not ready'));
 					return;
@@ -927,6 +948,69 @@ function clearCodeScanCandidateHighlight() {
 	var highlight = document.getElementById('code_scan_candidate_highlight');
 	if(highlight)
 		highlight.classList.add('hide');
+}
+
+function positionCodeScanGuideToDetectedRegion(bbox, canvas) {
+	var guide = document.getElementById('code_scan_fixed_guide');
+	var viewport = document.querySelector('.code_scan_viewport');
+	var canvasEl = getCodeScanCanvas();
+	var vpRect;
+	var imgRect;
+	var normX0;
+	var normY0;
+	var normX1;
+	var normY1;
+	var boxCenterX;
+	var boxCenterY;
+	var boxWidth;
+	var boxHeight;
+	var guideWidth;
+	var guideHeight;
+	var guideLeft;
+	var guideTop;
+	if(!guide || !viewport || !bbox || !canvas)
+		return;
+	canvasEl = canvasEl || canvas;
+	vpRect = viewport.getBoundingClientRect();
+	imgRect = getCodeScanRenderedImageRect(canvasEl);
+	if(!vpRect.width || !vpRect.height || !imgRect.width || !imgRect.height)
+		return;
+	normX0 = bbox.x0 / canvas.width;
+	normY0 = bbox.y0 / canvas.height;
+	normX1 = bbox.x1 / canvas.width;
+	normY1 = bbox.y1 / canvas.height;
+	boxCenterX = (imgRect.left - vpRect.left) + ((normX0 + normX1) / 2) * imgRect.width;
+	boxCenterY = (imgRect.top - vpRect.top) + ((normY0 + normY1) / 2) * imgRect.height;
+	boxWidth = (normX1 - normX0) * imgRect.width;
+	boxHeight = (normY1 - normY0) * imgRect.height;
+
+	guideWidth = Math.min(vpRect.width * 0.94, Math.max(boxWidth * 1.35, boxHeight * 3.6, vpRect.width * 0.5));
+	guideHeight = guideWidth / CODE_SCAN_FIXED_ASPECT;
+	if(guideHeight > vpRect.height * 0.92) {
+		guideHeight = vpRect.height * 0.92;
+		guideWidth = guideHeight * CODE_SCAN_FIXED_ASPECT;
+	}
+	guideLeft = Math.max(guideWidth / 2, Math.min(vpRect.width - guideWidth / 2, boxCenterX));
+	guideTop = Math.max(guideHeight / 2, Math.min(vpRect.height - guideHeight / 2, boxCenterY));
+
+	guide.style.left = Math.round(guideLeft) + 'px';
+	guide.style.top = Math.round(guideTop) + 'px';
+	guide.style.width = Math.round(guideWidth) + 'px';
+	guide.style.height = Math.round(guideHeight) + 'px';
+	guide.style.transform = 'translate(-50%, -50%)';
+	guide.style.aspectRatio = 'unset';
+}
+
+function resetCodeScanGuide() {
+	var guide = document.getElementById('code_scan_fixed_guide');
+	if(guide) {
+		guide.style.left = '';
+		guide.style.top = '';
+		guide.style.width = '';
+		guide.style.height = '';
+		guide.style.transform = '';
+		guide.style.aspectRatio = '';
+	}
 }
 
 function setCodeScanWoloFoundCue(active) {
@@ -1242,6 +1326,7 @@ function applyCodeScanCrop() {
 	canvas.getContext('2d').drawImage(croppedCanvas, 0, 0);
 	codeScanState.sourceCanvas = croppedCanvas;
 	setCodeScanZoom(1.0, 0, 0);
+	resetCodeScanGuide();
 
 	codeScanState.worker.recognize(croppedCanvas).then(function(result) {
 		if(cropButton)

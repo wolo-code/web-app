@@ -18,7 +18,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	const codeScan = read('Root/JS/Component/Root/CodeScan.js');
 	const css = read('Root/CSS/Component/Root/Base/CodeScan.css');
 	assert.match(index, /id='decode_code_scan_button'/);
-	assert.match(index, /id='map_code_scan_button'/);
+	assert.doesNotMatch(index, /id='map_code_scan_button'/);
 	assert.match(index, /includeSVG\('', 'Camera'\)/);
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
@@ -34,8 +34,10 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(fragment, /id='code_scan_use_code'/);
 	assert.match(fragment, /id='code_scan_rescan'/);
 	assert.match(fragment, /id='code_scan_cancel'/);
-	assert.match(fragment, /id='code_scan_mode_fixed'/);
-	assert.match(fragment, /id='code_scan_mode_general'/);
+	assert.doesNotMatch(fragment, /id='code_scan_mode_fixed'/);
+	assert.doesNotMatch(fragment, /id='code_scan_mode_general'/);
+	assert.match(fragment, /includeSVG\('', 'Gallery'\)/);
+	assert.match(fragment, /includeSVG\('', 'Keyboard'\)/);
 	assert.match(fragment, /id='code_scan_photo_input'/);
 	assert.match(fragment, /capture='environment'/);
 	assert.match(script, /initCodeScan\(\)/);
@@ -58,6 +60,22 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(codeScan, /decode_input_from_form\(\)/);
 	assert.match(codeScan, /decode_input_from_map\(\)/);
 	assert.match(codeScan, /code_scan_photo_input/);
+	assert.match(fragment, /id='code_scan_crop_controls'/);
+	assert.match(fragment, /id='code_scan_zoom_out'/);
+	assert.match(fragment, /id='code_scan_zoom_level'/);
+	assert.match(fragment, /id='code_scan_zoom_in'/);
+	assert.match(fragment, /id='code_scan_zoom_reset'/);
+	assert.match(fragment, /id='code_scan_apply_crop'/);
+	assert.match(codeScan, /sourceCanvas/);
+	assert.match(codeScan, /originalSourceCanvas/);
+	assert.match(codeScan, /resetCodeScanZoom/);
+	assert.match(codeScan, /applyCodeScanCrop/);
+	assert.match(codeScan, /initCodeScanZoomAndPan/);
+	assert.match(codeScan, /getCodeScanRenderedImageRect/);
+	assert.match(codeScan, /setCodeScanCropControlsVisible/);
+	assert.match(codeScan, /zoomInCodeScan/);
+	assert.match(codeScan, /zoomOutCodeScan/);
+	assert.match(codeScan, /getCodeScanVideoSourceRect/);
 	assert.doesNotMatch(codeScan, /upload/i);
 	assert.doesNotMatch(codeScan, /confirmCodeScanReview/);
 	assert.doesNotMatch(codeScan, /retakeCodeScan/);
@@ -65,8 +83,13 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.doesNotMatch(fragment, /code_scan_retake/);
 	assert.match(css, /\.code_scan_viewport/);
 	assert.match(css, /\.code_scan_capture/);
+	assert.match(css, /\.code_scan_icon_button/);
 	assert.match(css, /\.code_scan_review/);
 	assert.match(css, /\.code_scan_candidate_highlight/);
+	assert.match(css, /\.code_scan_crop_controls/);
+	assert.match(css, /\.code_scan_zoom_group/);
+	assert.match(css, /\.code_scan_zoom_button/);
+	assert.match(css, /\.code_scan_apply_crop/);
 });
 
 test('OCR matcher module is self-contained and testable', () => {
@@ -77,6 +100,7 @@ test('OCR matcher module is self-contained and testable', () => {
 	assert.match(matcher, /validateReviewWords/);
 	assert.match(matcher, /bboxIoU/);
 	assert.match(matcher, /isFixedBorderReady/);
+	assert.match(matcher, /getVideoViewfinderCropRect/);
 	assert.match(matcher, /module\.exports/);
 	assert.match(matcher, /isCodeScanSupported/);
 });

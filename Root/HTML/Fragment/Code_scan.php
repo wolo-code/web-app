@@ -12,20 +12,32 @@
 		<div class='code_scan_viewport'>
 			<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
 			<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
-			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'></div>
-			<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
+			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'>
+				<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
+			</div>
+			<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
+		</div>
+		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide' role='toolbar' aria-label='Crop and zoom controls'>
+			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
+				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
+				<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
+				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
+				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom'>Reset</button>
+			</div>
+			<button id='code_scan_apply_crop' class='code_scan_apply_crop' type='button'>
+				Crop &amp; Scan
+			</button>
 		</div>
 		<div id='code_scan_live_controls' class='code_scan_live_controls'>
-			<div class='code_scan_mode_switch' role='group' aria-label='Detection mode'>
-				<button id='code_scan_mode_fixed' class='code_scan_mode_button code_scan_mode_active' type='button'>
-					Fixed 3:1
-				</button>
-				<button id='code_scan_mode_general' class='code_scan_mode_button' type='button'>
-					General
-				</button>
-			</div>
-			<button id='code_scan_capture' class='code_scan_capture' type='button' aria-label='Capture label'>
+			<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' capture='environment' tabindex='-1' aria-hidden='true'>
+			<button id='code_scan_use_photo' class='border code_scan_icon_button code_scan_use_photo' type='button' aria-label='Choose photo from gallery' title='Choose photo from gallery'>
+				<span class='image'><?php includeSVG('', 'Gallery'); ?></span>
+			</button>
+			<button id='code_scan_capture' class='code_scan_capture' type='button' aria-label='Capture label' title='Capture label'>
 				<span class='code_scan_capture_inner'></span>
+			</button>
+			<button id='code_scan_type_instead' class='border code_scan_icon_button code_scan_type_instead' type='button' aria-label='Type code instead' title='Type code instead'>
+				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>
 			</button>
 		</div>
 		<p id='code_scan_status' class='code_scan_status'>Point your camera at the printed Wolo Code label.</p>
@@ -63,12 +75,5 @@
 				</button>
 			</div>
 		</div>
-		<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' capture='environment' tabindex='-1' aria-hidden='true'>
-		<button id='code_scan_use_photo' class='border code_scan_use_photo' type='button'>
-			Use photo instead
-		</button>
-		<button id='code_scan_type_instead' class='border code_scan_type_instead' type='button'>
-			Type instead
-		</button>
 	</div>
 </div>

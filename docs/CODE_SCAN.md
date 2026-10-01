@@ -4,40 +4,47 @@ The web app can read printed Wolo Code labels (city + three words) from the devi
 
 ## Where to find it
 
-- **Decode view:** tap **Scan** in the city-source row (next to IP city / GPS city / Previous).
-- **Map view:** tap **Scan** next to the search bar (beside Previous).
+- **Decode view:** tap **Scan** centered in the empty rectangular area below the input box.
+
+See [Wolo Code Format & Layout](WOLO_CODE_FORMAT_AND_LAYOUT.md) for printed label specifications, typography, and aspect ratio detection rules.
 
 ## Sequence checklist (iOS parity)
 
-1. **Entry** — open the full-screen overlay scanner from the code-input or map camera/scan control (`#decode_code_scan_button`, `#map_code_scan_button`).
-2. **Live** — rear-camera preview with throttled on-device OCR for **guidance only** (candidate highlight + “Wolo Code found” cue). Segmented modes: **Fixed 3:1** (default) vs **General**. Changing mode clears stability and stays on live preview.
+1. **Entry** — open the full-screen overlay scanner from the code-input camera/scan control (`#decode_code_scan_button`).
+2. **Live** — rear-camera preview with throttled on-device OCR for **guidance only** (candidate highlight + “Wolo Code found” cue) with a fixed ~3:1 border framing guide. Control bar flanks the manual shutter with **Gallery** (`#code_scan_use_photo`) and **Typing** (`#code_scan_type_instead`) icon buttons.
 3. **Capture once** via:
-   - Always-visible **manual shutter** (`#code_scan_capture`, white circle), or
-   - **Auto-capture** after **3 consecutive stable frames** with the same candidate text and bounding-box IoU ≥ 0.55. **Fixed** also requires a continuous ~3:1 label border (20% aspect tolerance) with edge contrast in the guide region (best-effort on web). **General** can auto-capture on stable text without a border requirement.
+   - Always-visible **manual shutter** (`#code_scan_capture`), or
+   - **Auto-capture** after **3 consecutive stable frames** with the same candidate text, bounding-box IoU ≥ 0.55, and ~3:1 label border (20% aspect tolerance) with edge contrast in the guide region.
 4. **Latch** — after one capture (`hasCaptured`), live OCR stops and never streams continuous video OCR into `#decode_input` / `#pac-input`.
-5. **Review** — frozen still of the capture; editable `city word word word`; city chooser datalist (recognized city, recent decode history, IP/GPS city when available); live decode validity (`#code_scan_review_validity`). Extra printed names/addresses are stripped; city + three Wolo words are matched against the 1024-word list with fuzzy correction (`CodeScanOcrMatch.js`).
-6. **Use Code** (`#code_scan_use_code`, enabled only when preview is valid) → fill `#decode_input` or `#pac-input` and call `decode_input_from_form()` / `decode_input_from_map()`, then dismiss. **Rescan** (`#code_scan_rescan`) clears review text, restarts live preview, and **keeps the current mode**. **Cancel** (`#code_scan_close`, `#code_scan_cancel`, **Type instead**) dismisses without applying.
+5. **Review & Crop/Zoom** — frozen still of the capture; crop & zoom toolbar (`-`, zoom %, `+`, `Reset`, `Crop & Scan`); interactive pan (mouse drag / 1-finger touch) and zoom (mouse wheel / 2-finger pinch) under the 3:1 dashed guide; editable `city word word word`; city chooser datalist (recognized city, recent decode history, IP/GPS city when available); live decode validity (`#code_scan_review_validity`). Extra printed names/addresses are stripped; city + three Wolo words are matched against the 1024-word list with fuzzy correction (`CodeScanOcrMatch.js`).
+6. **Use Code** (`#code_scan_use_code`, enabled only when preview is valid) → fill `#decode_input` or `#pac-input` and call `decode_input_from_form()` / `decode_input_from_map()`, then dismiss. **Rescan** (`#code_scan_rescan`) clears review text and restarts live preview. **Cancel** (`#code_scan_close`, `#code_scan_cancel`, **Typing** icon) dismisses without applying.
 
-**Use photo instead** follows the same capture → review → **Use Code** path (no auto-decode-only shortcut).
+**Gallery photo picker** (`#code_scan_use_photo`) follows the same capture → review (with crop & zoom) → **Use Code** path (no auto-decode-only shortcut).
 
 ## Hard rules
 
 - Explicit shutter control is always shown on live preview.
 - Live OCR may track/highlight candidates only; the final path is **capture → editable review → explicit Use Code**.
-- Photo fallback lands in **Review**, not auto-decode-only.
+- Photo fallback lands in **Review** (with crop & zoom toolbar), not auto-decode-only.
+- Interactive crop frames strictly target the 3-word single line at ~3:1 aspect ratio.
 
 ## How to verify manually
 
 1. Open [wolo.codes](https://wolo.codes) on a phone (Android Chrome is the primary target; iOS Safari is best-effort).
-2. Tap **Scan** from decode view or map view and allow camera access.
+2. Tap **Scan** from decode view and allow camera access.
 3. Confirm the shutter button is visible on live preview.
 4. Point at a printed label; status should show guidance (“Wolo Code found”, “Hold steady…”) without filling the main decode field.
-5. Tap shutter (or hold steady for auto-capture in General mode).
-6. On review, edit city + three words; confirm **Use Code** stays disabled until three valid words are entered.
-7. Tap **Use Code** → map decodes. Tap **Rescan** → live preview returns with the same Fixed/General mode.
-8. Tap **Cancel** or close → overlay dismisses with no decode applied.
-9. **Use photo instead** → review screen → **Use Code** (same as camera path).
-10. Confirm no image uploads during scanning.
+5. Tap shutter (or hold steady for auto-capture).
+6. In review preview, test crop & zoom:
+   - Tap `+` or use pinch-to-zoom / wheel to zoom in to 150-200%.
+   - Drag to frame the 3 words inside the dashed guide.
+   - Tap **Crop & Scan** → confirms cropped recognition updates the 3 words.
+   - Tap **Reset** → restores 100% zoom and uncropped original.
+7. On review, edit city + three words; confirm **Use Code** stays disabled until three valid words are entered.
+8. Tap **Use Code** → map decodes. Tap **Rescan** → live preview returns with the same Fixed/General mode.
+9. Tap **Cancel** or close → overlay dismisses with no decode applied.
+10. **Use photo instead** → test crop and zoom on chosen photo → review screen → **Use Code** (same as camera path).
+11. Confirm no image uploads during scanning.
 
 ### Without a physical label
 
@@ -50,9 +57,9 @@ You can also generate a label from the app (Label / QR dialog) and scan the thre
 
 ## Fallbacks
 
-- **Camera denied or unavailable:** **Use photo instead** (review step) or **Type instead**.
-- **Unsupported browser:** same photo/type fallbacks.
-- **Low-confidence OCR:** try **General** mode, better lighting, or **Use photo instead**; edit fields manually on review.
+- **Camera denied or unavailable:** **Gallery** photo picker (`#code_scan_use_photo`) or **Typing** (`#code_scan_type_instead`) icon button.
+- **Unsupported browser:** same gallery/typing fallbacks.
+- **Low-confidence OCR:** try better lighting, framing within the guide, or **Gallery** photo picker; edit fields manually on review.
 
 ## Technical notes
 

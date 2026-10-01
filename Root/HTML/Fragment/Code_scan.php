@@ -15,14 +15,17 @@
 			<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
 		</div>
 		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide' role='toolbar' aria-label='Crop and zoom controls'>
+			<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan' type='button' aria-label='Rescan' title='Rescan'>
+				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
+			</button>
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
 				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
 				<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
 				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
 				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom'>Reset</button>
 			</div>
-			<button id='code_scan_apply_crop' class='code_scan_apply_crop' type='button'>
-				Crop &amp; Scan
+			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Crop and scan' title='Crop and scan'>
+				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			</button>
 		</div>
 		<div id='code_scan_live_controls' class='code_scan_live_controls'>
@@ -37,7 +40,7 @@
 				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>
 			</button>
 		</div>
-		<p id='code_scan_status' class='code_scan_status'>Processed on your device. No images are uploaded.</p>
+		<p id='code_scan_status' class='code_scan_status'>Processed on your device – No images are uploaded</p>
 		<div id='code_scan_review' class='code_scan_review hide'>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				City
@@ -62,8 +65,8 @@
 				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
 					Use Code
 				</button>
-				<button id='code_scan_rescan' class='border code_scan_rescan' type='button'>
-					Rescan
+				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
+					Cancel
 				</button>
 			</div>
 		</div>

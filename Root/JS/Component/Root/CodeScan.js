@@ -67,6 +67,7 @@ function initCodeScan() {
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
 	bindControl('code_scan_capture', 'click', captureCodeScanManually);
 	bindControl('code_scan_use_code', 'click', useCodeScanReview);
+	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_zoom_out', 'click', zoomOutCodeScan);
 	bindControl('code_scan_zoom_in', 'click', zoomInCodeScan);

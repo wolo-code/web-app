@@ -107,6 +107,7 @@ test('OCR matcher module is self-contained and testable', () => {
 	assert.match(matcher, /buildCodeFromReview/);
 	assert.match(matcher, /validateReviewWords/);
 	assert.match(matcher, /bboxIoU/);
+	assert.match(matcher, /extractMatchRegionDetails/);
 	assert.match(matcher, /isFixedBorderReady/);
 	assert.match(matcher, /getVideoViewfinderCropRect/);
 	assert.match(matcher, /module\.exports/);

@@ -10,16 +10,19 @@ See [Wolo Code Format & Layout](WOLO_CODE_FORMAT_AND_LAYOUT.md) for printed labe
 
 ## Sequence checklist (iOS parity)
 
-1. **Entry** — open the full-screen overlay scanner from the code-input camera/scan control (`#decode_code_scan_button`).
+1. **Entry** — open the full-screen overlay scanner from the code-input camera/scan control (`#decode_code_scan_button`). On narrow screens (`max-width: 662px`), the dialog takes full viewport height and width (`100dvh`), with top header pinned to the top, bottom controls pinned to the bottom, and an enlarged viewfinder filling the vertical space between.
 2. **Live** — rear-camera preview with throttled on-device OCR for **guidance only** and clean viewfinder (no mask or dotted rectangle during live preview). Control bar flanks the manual shutter with **Gallery** (`#code_scan_use_photo`) and **Typing** (`#code_scan_type_instead`) icon buttons.
-3. **Capture once** via:
+3. **Capture** via:
    - Always-visible **manual shutter** (`#code_scan_capture`), or
    - **Auto-capture** after **3 consecutive stable frames** with the same candidate text, bounding-box IoU ≥ 0.55, and ~3:1 label border (20% aspect tolerance) with edge contrast in the guide region.
-4. **Latch** — after one capture (`hasCaptured`), live OCR stops and never streams continuous video OCR into `#decode_input` / `#pac-input`.
-5. **Review & Crop/Zoom** — frozen still of the capture; mask and 3:1 dashed rectangle appear, framing any detected region; crop & zoom toolbar on the same line with **Rescan** (`#code_scan_rescan`, `<`), zoom group (`-`, zoom %, `+`, `Reset`), and **Proceed** (`#code_scan_apply_crop`, `>`) with 20px spacing; interactive pan (mouse drag / 1-finger touch) and zoom (mouse wheel / 2-finger pinch) under the 3:1 dashed guide; underlined editable `city word word word` inputs in primary accent; city chooser datalist (recognized city, recent decode history, IP/GPS city when available). Extra printed names/addresses are stripped; city + three Wolo words are matched against the 1024-word list with fuzzy correction (`CodeScanOcrMatch.js`).
-6. **Use Code** (`#code_scan_use_code`, on the right on narrow devices and on the left on full-width displays; enabled only when valid) → fill `#decode_input` or `#pac-input` and call `decode_input_from_form()` / `decode_input_from_map()`, then dismiss. **Cancel** (`#code_scan_cancel`, on the left on narrow devices and on the right on full-width displays) dismisses without applying. Dismiss can also be done via the dialog close button (`#code_scan_close`) or Typing icon (`#code_scan_type_instead`).
+4. **Automatic Processing & Review (2-Stage Workflow)**:
+   - Immediately after the picture is taken, region finding, perspective fixing (angle leveling), straightening, and auto-cropping to the 3:1 label region execute automatically.
+   - Text recognition runs automatically on the straightened/cropped region, directly populating review fields (`city`, `w1`, `w2`, `w3`) and activating **Use Code**.
+   - User can zoom in/out, pan, or tap **Reset** to adjust the crop region if required, and tap **Proceed** (`#code_scan_apply_crop`, `>`) to re-crop/re-recognize.
+   - Underlined editable inputs styled in primary accent allow direct edits.
+5. **Use Code** (`#code_scan_use_code`, on the right on narrow devices and on the left on full-width displays; enabled only when valid) → fill `#decode_input` or `#pac-input` and call `decode_input_from_form()` / `decode_input_from_map()`, then dismiss. **Cancel** (`#code_scan_cancel`, on the left on narrow devices and on the right on full-width displays) dismisses without applying. Dismiss can also be done via the dialog close button (`#code_scan_close`) or Typing icon (`#code_scan_type_instead`).
 
-**Gallery photo picker** (`#code_scan_use_photo`) follows the same capture → review (with crop & zoom) → **Use Code** path (no auto-decode-only shortcut).
+**Gallery photo picker** (`#code_scan_use_photo`) follows the same automatic 2-step capture → auto-straighten/crop/review path with crop adjustment controls.
 
 ## Hard rules
 

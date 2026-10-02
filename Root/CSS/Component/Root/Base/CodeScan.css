@@ -571,18 +571,85 @@ html.dark-mode .code_scan_apply_crop {
 
 @media (max-width: 662px) {
 
+	#overlay:has(.code_scan_dialog) {
+		padding: 0 !important;
+	}
+
+	#overlay > .code_scan_dialog,
 	.code_scan_dialog {
 		border: none;
+		border-radius: 0;
 		box-shadow: none;
-		max-height: 100dvh;
-		max-height: 100vh;
-		max-width: 100vw;
-		width: 100vw;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		height: 100dvh !important;
+		height: 100vh !important;
+		inset: 0;
+		margin: 0 !important;
+		max-height: 100dvh !important;
+		max-height: 100vh !important;
+		max-width: 100vw !important;
+		position: fixed;
+		width: 100vw !important;
+		z-index: 1000;
+	}
+
+	.code_scan_dialog .message_dialog_label {
+		flex: 0 0 auto;
+		font-size: 1.25em;
+		margin: 10px 0 2px;
+		padding: 0 16px;
+	}
+
+	.code_scan_dialog .message_dialog_close {
+		right: 14px;
+		top: 10px;
 	}
 
 	.code_scan_body {
-		max-height: calc(100dvh - 50px);
-		max-height: calc(100vh - 50px);
+		box-sizing: border-box;
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		height: calc(100dvh - 44px);
+		height: calc(100vh - 44px);
+		justify-content: space-between;
+		max-height: none;
+		overflow-x: hidden;
+		overflow-y: auto;
+		padding: 4px 14px 14px;
+		width: 100%;
+	}
+
+	.code_scan_viewport {
+		border-radius: 8px;
+		flex: 1 1 auto;
+		height: auto;
+		margin: 4px 0 8px;
+		max-height: none;
+		min-height: 200px;
+		width: 100%;
+	}
+
+	.code_scan_crop_controls {
+		flex: 0 0 auto;
+		margin: 4px 0 8px;
+	}
+
+	.code_scan_live_controls {
+		flex: 0 0 auto;
+		margin: 6px 0 8px;
+	}
+
+	.code_scan_status {
+		flex: 0 0 auto;
+		margin: 0 0 6px;
+	}
+
+	.code_scan_review {
+		flex: 0 0 auto;
+		margin: 0 0 4px;
 	}
 
 	.code_scan_review_actions {
@@ -590,3 +657,4 @@ html.dark-mode .code_scan_apply_crop {
 	}
 
 }
+

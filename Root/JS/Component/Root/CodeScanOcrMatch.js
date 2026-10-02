@@ -300,6 +300,97 @@
 		return samples ? total / samples : 0;
 	}
 
+	function extractMatchRegionDetails(result, match, includesFn, canonicalWords) {
+		var ocrWords = result && result.data && result.data.words;
+		var wanted;
+		var bboxes = [];
+		var matchedWordObjects = [];
+		var i;
+		var word;
+		var token;
+		var corrected;
+		var startIndex;
+		var union;
+		var angle = 0;
+		var first;
+		var last;
+		var dx;
+		var dy;
+		var cx;
+		var cy;
+
+		if(!ocrWords || !match || !match.words)
+			return null;
+
+		wanted = {};
+		startIndex = typeof match.cityWordCount === 'number' ? match.cityWordCount : 0;
+		for(i = startIndex; i < match.words.length; i++)
+			wanted[match.words[i]] = true;
+
+		for(i = 0; i < ocrWords.length; i++) {
+			word = ocrWords[i];
+			if(!word || !word.text || !word.bbox)
+				continue;
+			token = normalizeOcrText(word.text).split(' ').filter(Boolean)[0];
+			if(!token)
+				continue;
+			corrected = fuzzyMatchWord(token, includesFn, canonicalWords) || token;
+			if(wanted[corrected]) {
+				bboxes.push(word.bbox);
+				cx = (word.bbox.x0 + word.bbox.x1) / 2;
+				cy = (word.bbox.y0 + word.bbox.y1) / 2;
+				matchedWordObjects.push({
+					word: corrected,
+					bbox: word.bbox,
+					baseline: word.baseline,
+					cx: cx,
+					cy: cy
+				});
+			}
+		}
+
+		if(!bboxes.length)
+			return null;
+
+		union = unionBboxes(bboxes);
+		if(!union)
+			return null;
+
+		if(matchedWordObjects.length >= 2) {
+			matchedWordObjects.sort(function(a, b) {
+				return a.cx - b.cx;
+			});
+			first = matchedWordObjects[0];
+			last = matchedWordObjects[matchedWordObjects.length - 1];
+			dx = last.cx - first.cx;
+			dy = last.cy - first.cy;
+			if(Math.abs(dx) > 10) {
+				angle = Math.atan2(dy, dx);
+			}
+		}
+		else if(matchedWordObjects.length === 1 && matchedWordObjects[0].baseline && matchedWordObjects[0].baseline.has_baseline) {
+			dx = matchedWordObjects[0].baseline.x1 - matchedWordObjects[0].baseline.x0;
+			dy = matchedWordObjects[0].baseline.y1 - matchedWordObjects[0].baseline.y0;
+			if(Math.abs(dx) > 5) {
+				angle = Math.atan2(dy, dx);
+			}
+		}
+
+		if(Math.abs(angle) < 0.004) {
+			angle = 0;
+		}
+
+		return {
+			bbox: union,
+			angle: angle,
+			center: {
+				x: (union.x0 + union.x1) / 2,
+				y: (union.y0 + union.y1) / 2
+			},
+			matchedWords: matchedWordObjects
+		};
+	}
+
 	function extractMatchBBoxFromOcr(result, match, includesFn, canonicalWords) {
 		var ocrWords = result && result.data && result.data.words;
 		var wanted;
@@ -308,10 +399,12 @@
 		var word;
 		var token;
 		var corrected;
+		var startIndex;
 		if(!ocrWords || !match || !match.words)
 			return null;
 		wanted = {};
-		for(i = 0; i < match.words.length; i++)
+		startIndex = typeof match.cityWordCount === 'number' ? match.cityWordCount : 0;
+		for(i = startIndex; i < match.words.length; i++)
 			wanted[match.words[i]] = true;
 		for(i = 0; i < ocrWords.length; i++) {
 			word = ocrWords[i];
@@ -349,6 +442,40 @@
 		return contrast >= (minContrast || 12);
 	}
 
+	function getVideoViewfinderCropRect(videoWidth, videoHeight, viewportWidth, viewportHeight, liveZoom) {
+		var cw = typeof videoWidth === 'number' ? videoWidth : 0;
+		var ch = typeof videoHeight === 'number' ? videoHeight : 0;
+		var vw = typeof viewportWidth === 'number' ? viewportWidth : 0;
+		var vh = typeof viewportHeight === 'number' ? viewportHeight : 0;
+		var zoom = typeof liveZoom === 'number' && liveZoom > 0 ? liveZoom : 1;
+		var s0;
+		var s;
+		var sw;
+		var sh;
+		var sx;
+		var sy;
+
+		if(!vw || !vh || !cw || !ch) {
+			return { sx: 0, sy: 0, sw: cw, sh: ch };
+		}
+
+		s0 = Math.max(vw / cw, vh / ch);
+		s = s0 * zoom;
+
+		sw = Math.min(cw, vw / s);
+		sh = Math.min(ch, vh / s);
+
+		sx = Math.max(0, (cw - sw) / 2);
+		sy = Math.max(0, (ch - sh) / 2);
+
+		return {
+			sx: Math.round(sx),
+			sy: Math.round(sy),
+			sw: Math.round(sw),
+			sh: Math.round(sh)
+		};
+	}
+
 	function isCodeScanSupported() {
 		return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 	}
@@ -369,7 +496,9 @@
 		isAspectRatioNear: isAspectRatioNear,
 		measureRectEdgeContrast: measureRectEdgeContrast,
 		extractMatchBBoxFromOcr: extractMatchBBoxFromOcr,
+		extractMatchRegionDetails: extractMatchRegionDetails,
 		isFixedBorderReady: isFixedBorderReady,
+		getVideoViewfinderCropRect: getVideoViewfinderCropRect,
 		isCodeScanSupported: isCodeScanSupported
 	};
 

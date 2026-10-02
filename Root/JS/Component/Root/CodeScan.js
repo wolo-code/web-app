@@ -756,6 +756,7 @@ function showCodeScanReview(match) {
 	setCodeScanPhotoFallbackVisible(false);
 	setCodeScanFrozenPreview(true);
 	setCodeScanCropControlsVisible(true);
+	setCodeScanEditingCrop(false);
 	populateCodeScanReviewFields(review.city, review.words[0], review.words[1], review.words[2]);
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
@@ -1182,6 +1183,13 @@ function clampCodeScanPan() {
 	codeScanState.panY = Math.max(-maxPanY, Math.min(maxPanY, codeScanState.panY));
 }
 
+function setCodeScanEditingCrop(isEditing) {
+	var viewport = document.querySelector('.code_scan_viewport');
+	if (viewport) {
+		viewport.classList.toggle('code_scan_is_editing_crop', !!isEditing);
+	}
+}
+
 function setCodeScanZoom(zoom, panX, panY) {
 	var canvas = getCodeScanCanvas();
 	var zoomLevelNode = document.getElementById('code_scan_zoom_level');
@@ -1196,16 +1204,22 @@ function setCodeScanZoom(zoom, panX, panY) {
 		canvas.style.transform = 'translate(' + codeScanState.panX + 'px, ' + codeScanState.panY + 'px) scale(' + codeScanState.zoom + ')';
 	if(zoomLevelNode)
 		zoomLevelNode.textContent = Math.round(codeScanState.zoom * 100) + '%';
+	
+	if (codeScanState.phase !== 'live' && (codeScanState.zoom !== 1 || codeScanState.panX !== 0 || codeScanState.panY !== 0 || (codeScanState.originalSourceCanvas && codeScanState.sourceCanvas === codeScanState.originalSourceCanvas))) {
+		setCodeScanEditingCrop(true);
+	}
 }
 
 function resetCodeScanZoom() {
 	var canvas = getCodeScanCanvas();
+	var didRestoreOriginal = false;
 	if(codeScanState.zoom === 1 && codeScanState.originalSourceCanvas && codeScanState.sourceCanvas !== codeScanState.originalSourceCanvas && canvas) {
 		canvas.width = codeScanState.originalSourceCanvas.width;
 		canvas.height = codeScanState.originalSourceCanvas.height;
 		canvas.getContext('2d').drawImage(codeScanState.originalSourceCanvas, 0, 0);
 		codeScanState.sourceCanvas = codeScanState.originalSourceCanvas;
 		resetCodeScanGuide();
+		didRestoreOriginal = true;
 	}
 	else if(codeScanState.sourceCanvas && canvas) {
 		canvas.width = codeScanState.sourceCanvas.width;
@@ -1213,6 +1227,9 @@ function resetCodeScanZoom() {
 		canvas.getContext('2d').drawImage(codeScanState.sourceCanvas, 0, 0);
 	}
 	setCodeScanZoom(1.0, 0, 0);
+	if (didRestoreOriginal) {
+		setCodeScanEditingCrop(true);
+	}
 }
 
 function zoomInCodeScan() {
@@ -1317,6 +1334,8 @@ function getTouchDistance(t1, t2) {
 }
 
 function handleCodeScanTouchStart(event) {
+	if(event.stopPropagation)
+		event.stopPropagation();
 	var isLive = codeScanState.phase === 'live' && codeScanState.cameraAvailable && !codeScanState.hasCaptured;
 	if(!isLive && codeScanState.phase !== 'review' && !codeScanState.hasCaptured)
 		return;
@@ -1335,6 +1354,8 @@ function handleCodeScanTouchStart(event) {
 }
 
 function handleCodeScanTouchMove(event) {
+	if(event.stopPropagation)
+		event.stopPropagation();
 	var isLive = codeScanState.phase === 'live' && codeScanState.cameraAvailable && !codeScanState.hasCaptured;
 	if(!isLive && codeScanState.phase !== 'review' && !codeScanState.hasCaptured)
 		return;
@@ -1359,6 +1380,8 @@ function handleCodeScanTouchMove(event) {
 }
 
 function handleCodeScanTouchEnd(event) {
+	if(event.stopPropagation)
+		event.stopPropagation();
 	if(event.touches.length === 0) {
 		codeScanState.isDragging = false;
 		codeScanState.touchStartDist = 0;
@@ -1375,6 +1398,11 @@ function handleCodeScanTouchEnd(event) {
 
 function initCodeScanZoomAndPan() {
 	var viewport = document.querySelector('.code_scan_viewport');
+	var dialog = document.querySelector('.code_scan_dialog');
+	if(dialog) {
+		dialog.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: false});
+		dialog.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: false});
+	}
 	if(!viewport)
 		return;
 	viewport.addEventListener('mousedown', handleCodeScanMouseDown);

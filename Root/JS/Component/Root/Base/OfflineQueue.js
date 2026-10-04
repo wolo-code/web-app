@@ -64,7 +64,7 @@ function flushOfflineSaveQueue() {
 	if (offlineQueueFlushing) {
 		return Promise.resolve();
 	}
-	if (!firebase || !firebase.auth || !firebase.auth().currentUser) {
+	if (!firebase || typeof firebase.database != 'function' || !firebase.auth || !firebase.auth().currentUser) {
 		return Promise.resolve();
 	}
 	offlineQueueFlushing = true;

@@ -418,7 +418,11 @@ function getCity_by_perifery_list_fs(latLng, session_id) {
 	nearCity = null;
 	var nearCityList_coord = {};
 	var nearCityList_detail = {};
-	geoFireInit();
+	if(!geoFireInit()) {
+		if(pending_encode_latLng != null)
+			encode_continue(null, pending_encode_latLng);
+		return;
+	}
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
 		radius: CITY_RANGE_RADIUS
@@ -493,7 +497,10 @@ function getCityFromIdThenEncode(city_id, city_center, latLng) {
 function getCityFromPositionThenDecode(latLng, wcode) {
 	var nearCity = null;
 
-	geoFireInit();
+	if(!geoFireInit()) {
+		decode_continue(null, wcode);
+		return;
+	}
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
 		radius: CITY_RANGE_RADIUS
@@ -803,6 +810,23 @@ function getCityCenterFromId(city, callback, options) {
 }
 
 function getCitiesFromNameId(name_id, callback) {
+	if(!database || typeof database.ref != 'function') {
+		if(typeof findCachedCitiesByNameId != 'function') {
+			callback(null);
+			return;
+		}
+		findCachedCitiesByNameId(name_id).then(function(matches) {
+			var list = {};
+			(matches || []).forEach(function(city) {
+				if(city && city.id)
+					list[city.id] = city;
+			});
+			callback(Object.keys(list).length ? list : null);
+		}).catch(function() {
+			callback(null);
+		});
+		return;
+	}
 	var ref = database.ref('CityDetail');
 	pushLoader();
 	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value', function(snapshot) {
@@ -932,6 +956,13 @@ function submitCity() {
 }
 
 function execSubmitCity() {
+	if(!database || typeof database.ref != 'function') {
+		if(typeof showNetworkRequiredMessage == 'function')
+			showNetworkRequiredMessage('Requesting a city');
+		else if(typeof showNotification == 'function')
+			showNotification('Requesting a city needs an internet connection');
+		return;
+	}
 	var newPostKey = database.ref().child('CityRequest').push().key;
 	var updates = {};
 	var data = {

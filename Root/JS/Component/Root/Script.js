@@ -29,6 +29,10 @@ function showSignedOutAccountChrome() {
 }
 
 function initApp() {
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function') {
+		showSignedOutAccountChrome();
+		return;
+	}
 	firebase.auth().getRedirectResult().then(function(result) {
 		if (result.credential) {
 			signedIn();

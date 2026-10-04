@@ -9,6 +9,11 @@ function onLogin() {
 }
 
 function onLogout() {
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function') {
+		if(typeof showSignedOutAccountChrome == 'function')
+			showSignedOutAccountChrome();
+		return;
+	}
 	pushLoader();
 	firebase.auth().signOut()
 	.then(function() {

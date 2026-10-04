@@ -21,7 +21,6 @@ var NETWORK_ONLY_HOSTS = [
 	'googleapis.com/securetoken',
 	'googleapis.com/firestore',
 	'googleapis.com/firebase',
-	'gstatic.com/firebasejs',
 	'cloudfunctions.net'
 ];
 
@@ -87,6 +86,10 @@ self.addEventListener('fetch', function(event) {
 
 	if (isMapTileRequest(url)) {
 		event.respondWith(cacheFirstTile(request));
+		return;
+	}
+
+	if (isFirebaseSdkRequest(url)) {
 		return;
 	}
 
@@ -296,8 +299,15 @@ function isMapTileRequest(url) {
 		|| /\.(png|jpg|jpeg|webp)$/.test(url.pathname);
 }
 
+function isFirebaseSdkRequest(url) {
+	return url.href.indexOf('gstatic.com/firebasejs') !== -1;
+}
+
 function isNetworkOnlyRequest(url) {
 	var href = url.href;
+	if (isFirebaseSdkRequest(url)) {
+		return false;
+	}
 	for (var i = 0; i < NETWORK_ONLY_HOSTS.length; i++) {
 		if (href.indexOf(NETWORK_ONLY_HOSTS[i]) !== -1) {
 			return true;

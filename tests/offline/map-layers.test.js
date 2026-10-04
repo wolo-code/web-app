@@ -624,9 +624,12 @@ test('Firebase initialization retries a missing Database SDK module', () => {
 	const firebaseJs = read('Root/JS/Firebase.js');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	assert.match(firebaseJs, /function retryFirebaseDatabaseSdk/);
-	assert.match(firebaseJs, /script\[src\*="\/firebase-database\.js"\]/);
+	assert.match(firebaseJs, /function hasFirebaseDatabase/);
+	assert.match(firebaseJs, /function markFirebaseClientUnavailable/);
+	assert.match(firebaseJs, /findFirebaseSdkScript\('firebase-database\.js'\)/);
 	assert.match(firebaseJs, /typeof firebase\.database != 'function'/);
-	assert.match(firebaseJs, /retry\.onload = function\(\) \{[\s\S]*initLoad\(\)/);
+	assert.match(firebaseJs, /finishFirebaseSdkRetry/);
+	assert.doesNotMatch(firebaseJs, /Firebase Database SDK failed to load/);
 	assert.match(scriptJs, /if\(!firebaseInit\(\)\)\s+return/);
 });
 

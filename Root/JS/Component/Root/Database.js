@@ -1,5 +1,7 @@
 function dbInit() {
 	initOfflineWordList();
+	if(!database || typeof database.ref != 'function')
+		return;
 	database.ref('WordList').on('value', function(snapshot) {
 		var list = snapshot.val();
 		if (!list) {

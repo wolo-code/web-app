@@ -238,6 +238,10 @@ function buildSaveAddressPayload(title, segment, address, city, code) {
 }
 
 function saveAddress(title, segment, savedAddress, callback) {
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function') {
+		showNotification('Please login first to save address');
+		return;
+	}
 	var user = firebase.auth().currentUser;
 	if(!user) {
 		showNotification('Please login first to save address');
@@ -285,6 +289,10 @@ function saveAddress(title, segment, savedAddress, callback) {
 }
 
 function updateSavedAddress(key, title, segment, savedAddress, callback) {
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function') {
+		showNotification('Could not save address');
+		return;
+	}
 	var user = firebase.auth().currentUser;
 	if(!user) {
 		showNotification('Please login first to save address');
@@ -343,6 +351,8 @@ function queueSaveListEndIndicatorUpdate() {
 function loadSaveList() {
 	saveList = [];
 	lastActiveSaveEntry = null;
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function')
+		return;
 	var user = firebase.auth().currentUser;
 	if(user != null) {
 		uid = user.uid;
@@ -589,6 +599,8 @@ function editSaveEntry(e) {
 function deleteSaveEntry(e) {
 	if(e && e.stopPropagation)
 		e.stopPropagation();
+	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function')
+		return;
 	var user = firebase.auth().currentUser;
 	var row = getSaveEntryMenuRow(e);
 	closeSaveEntryMenus();

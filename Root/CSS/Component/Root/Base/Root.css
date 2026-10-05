@@ -122,7 +122,7 @@ html body .decode_city_source_button.activating svg {
 
 #map_input_suggestion_result {
 	position: absolute;
-	top: 10px;
+	top: calc(10px + var(--app-safe-top));
 	left: 54px;
 }
 
@@ -194,6 +194,8 @@ html body .decode_city_source_button.activating svg {
 	box-sizing: border-box;
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	border-radius: 25px;
 	display: block;
 	height: 39px;
@@ -275,6 +277,8 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 #location_button svg {
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	border-radius: 25px;
 	display: block;
 	height: 39px;
@@ -284,6 +288,8 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 
 #map_type_button svg {
 	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	border-radius: 25px;
 	box-shadow: rgb(0 0 0 / 30%) 0px 1px 4px -1px;
 	box-sizing: border-box;

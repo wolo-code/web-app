@@ -1,6 +1,6 @@
 {
   "version": "wolo-offline-v1",
-  "generatedAt": "2026-09-20T06:28:54.018Z",
+  "generatedAt": "2026-10-05T04:17:47.039Z",
   "assets": [
     "/",
     "/apple-touch-icon.png",
@@ -20,6 +20,7 @@
     "/offline-data/WordList.json",
     "/precache-manifest.json",
     "/qrcode.min.js",
+    "/root-deadbeef.min.js",
     "/root.js",
     "/sw.js",
     "/tesseract/lang/eng.traineddata.gz",

@@ -5,6 +5,15 @@ function onAccount() {
 		onLogin();
 }
 
+function showSavedDialog() {
+	loadSaveList();
+	showOverlay(document.getElementById('saved_dialog_container'));
+	setAccountDialogSavesOpen(true);
+	syncAccountDialogSaveForm();
+	var inner = document.querySelector('#account_dialog_save_list_container > .account_dialog_fold_inner');
+	if(inner) inner.scrollTop = 0;
+}
+
 var editingSaveKey = null;
 var menuSaveEntry = null;
 
@@ -22,6 +31,7 @@ function showAccountDialog() {
 
 function hideAccountDialog() {
 	hideOverlay(document.getElementById('account_dialog_container'));
+	hideOverlay(document.getElementById('saved_dialog_container'));
 	closeSaveEntryMenus();
 	setAccountDialogAddOpen(false);
 	setAccountDialogSavesOpen(false);
@@ -75,7 +85,7 @@ function toggleAccountDialogAdd() {
 function setAccountDialogSavesOpen(open) {
 	var list = document.getElementById('account_dialog_save_list_container');
 	var toggle = document.getElementById('account_dialog_saves_toggle');
-	var dialog = document.getElementById('account_dialog');
+	var dialog = document.getElementById('saved_dialog');
 	var prefs = document.getElementById('account_dialog_prefs');
 	if(!list || !toggle)
 		return;
@@ -193,12 +203,6 @@ function onAccountDialogSave() {
 		return;
 	}
 
-	var user = firebase.auth().currentUser;
-	if(user == null) {
-		showNotification('Please login first to save address');
-		return;
-	}
-	uid = user.uid;
 	var segmentField = document.getElementById('save_title_segment');
 	var segment = segmentField ? segmentField.value : '';
 	var saveAddr = getAccountDialogSaveAddressText();
@@ -238,16 +242,7 @@ function buildSaveAddressPayload(title, segment, address, city, code) {
 }
 
 function saveAddress(title, segment, savedAddress, callback) {
-	if(typeof firebase != 'object' || typeof firebase.auth != 'function') {
-		showNotification('Please login first to save address');
-		return;
-	}
-	var user = firebase.auth().currentUser;
-	if(!user) {
-		showNotification('Please login first to save address');
-		return;
-	}
-	uid = user.uid;
+	var user = getBookmarkUser();
 	var city = typeof getCodeCity == 'function' ? getCodeCity() : null;
 	var code = normalizeSavedWcode(typeof getCodeWCode == 'function' ? getCodeWCode() : null);
 	var basePayload = buildSaveAddressPayload(title, segment, savedAddress, city, code);
@@ -256,7 +251,7 @@ function saveAddress(title, segment, savedAddress, callback) {
 		return;
 	}
 	var payload = {
-		uid: uid,
+		uid: user ? user.uid : null,
 		city_id: basePayload.city_id,
 		gp_id: city.gp_id || null,
 		city_name: typeof getProperCityAccent == 'function' ? getProperCityAccent(city) : (city.name || ''),
@@ -265,6 +260,17 @@ function saveAddress(title, segment, savedAddress, callback) {
 		segment: basePayload.segment,
 		address: basePayload.address
 	};
+	if(!user) {
+		var local = readLocalBookmarks();
+		local['local_' + Date.now() + '_' + Math.random().toString(36).slice(2)] = payload;
+		if(writeLocalBookmarks(local)) {
+			loadSaveList();
+			if(typeof callback === 'function') callback();
+			showNotification('Bookmark saved on this device');
+		}
+		return;
+	}
+	uid = user.uid;
 	if (isOfflineMode()) {
 		enqueueOfflineSave(payload).then(function() {
 			if(typeof callback != 'undefined')
@@ -289,15 +295,20 @@ function saveAddress(title, segment, savedAddress, callback) {
 }
 
 function updateSavedAddress(key, title, segment, savedAddress, callback) {
-	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function') {
-		showNotification('Could not save address');
+	var user = getBookmarkUser();
+	if(isLocalBookmark(key)) {
+		var local = readLocalBookmarks();
+		if(!local[key]) return;
+		local[key].title = title;
+		local[key].segment = segment;
+		local[key].address = savedAddress;
+		if(writeLocalBookmarks(local)) {
+			loadSaveList();
+			if(typeof callback === 'function') callback();
+		}
 		return;
 	}
-	var user = firebase.auth().currentUser;
-	if(!user) {
-		showNotification('Please login first to save address');
-		return;
-	}
+	if(!user) return;
 	if(!key) {
 		showNotification('Could not save address');
 		return;
@@ -348,110 +359,160 @@ function queueSaveListEndIndicatorUpdate() {
 	setTimeout(updateSaveListEndIndicator, 0);
 }
 
+var LOCAL_BOOKMARKS_KEY = 'wolo.local-bookmarks.v1';
+var bookmarkCloudRef = null;
+var bookmarkCloudListener = null;
+var cloudBookmarks = {};
+
+function getBookmarkUser() {
+ return typeof firebase !== 'undefined' && firebase && typeof firebase.auth === 'function' ? firebase.auth().currentUser : null;
+}
+function isLocalBookmark(key) { return typeof key === 'string' && key.indexOf('local_') === 0; }
+function readLocalBookmarks() {
+ try {
+  var entries = JSON.parse(localStorage.getItem(LOCAL_BOOKMARKS_KEY) || '{}');
+  if(!entries || typeof entries !== 'object' || Array.isArray(entries)) return {};
+  var valid = {};
+  Object.keys(entries).forEach(function(key) {
+   if(isLocalBookmark(key) && entries[key] && typeof entries[key] === 'object' && normalizeSavedWcode(entries[key].code).length)
+    valid[key] = entries[key];
+  });
+  return valid;
+ } catch(error) { return {}; }
+}
+function writeLocalBookmarks(entries) {
+ try { localStorage.setItem(LOCAL_BOOKMARKS_KEY, JSON.stringify(entries)); return true; }
+ catch(error) { showNotification('Could not save bookmarks on this device'); return false; }
+}
+function renderAllBookmarks() {
+ renderSaveList(Object.assign({}, cloudBookmarks, readLocalBookmarks()));
+ var note = document.getElementById('bookmark_storage_note');
+ if(note) note.innerText = getBookmarkUser()
+  ? 'Bookmarks marked “On this device” are not saved to the cloud.'
+  : 'Saved only in this browser, not to the cloud. Clearing browser data removes these bookmarks.';
+}
 function loadSaveList() {
-	saveList = [];
+ if(bookmarkCloudRef && bookmarkCloudListener) bookmarkCloudRef.off('value', bookmarkCloudListener);
+ bookmarkCloudRef = null;
+ bookmarkCloudListener = null;
+ cloudBookmarks = {};
+ renderAllBookmarks();
+ var user = getBookmarkUser();
+ if(!user) return;
+ var owner = user.uid;
+ bookmarkCloudRef = firebase.database().ref('/UserData/' + owner);
+ bookmarkCloudListener = function(snapshot) {
+  var current = getBookmarkUser();
+  if(!current || current.uid !== owner) return;
+  cloudBookmarks = snapshot.val() || {};
+  renderAllBookmarks();
+ };
+ bookmarkCloudRef.on('value', bookmarkCloudListener, function() {
+  showNotification('Cloud bookmarks could not be loaded');
+ });
+}
+function renderSaveList(entries) {
+ var container = document.getElementById('account_dialog_save_list');
+ if(!container) return;
+	var list = document.getElementById('account_dialog_save_list');
+	if(list)
+		list.innerHTML = '';
+	addClassIfPresent(document.getElementById('account_dialog_save_list_end'), 'hide');
+	closeSaveEntryMenus();
+	saveList = entries;
 	lastActiveSaveEntry = null;
-	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function')
-		return;
-	var user = firebase.auth().currentUser;
-	if(user != null) {
-		uid = user.uid;
-		var container = document.getElementById('account_dialog_save_list');
-		firebase.database().ref('/UserData/'+uid).on('value', function(snapshot) {
-			var list = document.getElementById('account_dialog_save_list');
-			if(list)
-				list.innerHTML = '';
-			addClassIfPresent(document.getElementById('account_dialog_save_list_end'), 'hide');
-			closeSaveEntryMenus();
-			saveList = snapshot.val();
-			if(saveList && Object.keys(saveList).length) {
-				addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
-				addClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
-				for(let key in saveList) {
-					let row = document.createElement('div');
-					let row_header = document.createElement('div');
-					let row_title = document.createElement('div');
-					let row_segment = document.createElement('div');
-					let row_controls_container = document.createElement('div');
-					let row_controls = document.createElement('div');
-					let row_address = document.createElement('div');
-					let row_code = document.createElement('div');
-					let row_process = document.createElement('span');
-					let row_process_img = document.createElement('img');
-					let savedCode = normalizeSavedWcode(saveList[key].code);
-					row_header.setAttribute('class', 'row-header');
-					row_title.setAttribute('class', 'row-title');
-					row_title.innerText = saveList[key].title;
-					row_header.appendChild(row_title);
-					if((saveList[key].segment || '').trim()) {
-						row_segment.setAttribute('class', 'row-segment');
-						row_segment.innerText = saveList[key].segment;
-						row_header.appendChild(row_segment);
-					}
-					var moreTemplate = document.getElementById('account_dialog_more_icon_template');
-					let row_menu_toggle = document.createElement('button');
-					row_menu_toggle.setAttribute('class', 'row-menu-toggle control');
-					row_menu_toggle.setAttribute('type', 'button');
-					row_menu_toggle.setAttribute('title', 'More');
-					row_menu_toggle.setAttribute('aria-label', 'More');
-					row_menu_toggle.setAttribute('aria-haspopup', 'menu');
-					row_menu_toggle.setAttribute('aria-expanded', 'false');
-					if(moreTemplate)
-						row_menu_toggle.innerHTML = moreTemplate.innerHTML;
-					row_menu_toggle.addEventListener('click', onSaveEntryMenuToggle);
-					row_header.appendChild(row_menu_toggle);
-					row.addEventListener('click', onPressSaveEntry);
-					row.data_key = key;
-					row.data_code = savedCode;
-					row_address.setAttribute('class', 'row-address');
-					row_address.innerText = saveList[key].address;
-					row_code.setAttribute('class', 'row-code');
-					setSavedRowCodeText(row_code, savedCityDisplayName(null, saveList[key]), savedCode);
-					row_controls.setAttribute('class', 'row-controls');
-					row_process.setAttribute('class', 'row-process');
-					row_process.setAttribute('title', 'Go');
-					row_process.setAttribute('aria-label', 'Go');
-					row_process_img.src = svg_front;
-					row_process_img.alt = '';
-					addLongpressListener(row_process, processSaveEntry_internal, processSaveEntry_external);
-					row_process.appendChild(row_process_img);
-					row_controls.appendChild(row_process);
-					row_controls_container.setAttribute('class', 'row-controls-container');
-					row_controls_container.appendChild(row_controls);
-					let row_details = document.createElement('div');
-					let row_details_inner = document.createElement('div');
-					row_details.setAttribute('class', 'row-details');
-					row_details_inner.setAttribute('class', 'row-details-inner');
-					row_details_inner.appendChild(row_code);
-					row_details_inner.appendChild(row_address);
-					row_details_inner.appendChild(row_controls_container);
-					row_details.appendChild(row_details_inner);
-					container.appendChild(row);
-					row.appendChild(row_header);
-					row.appendChild(row_details);
-					row.data_process_continue_flag = false;
-					var savedCityId = saveList[key].city_id;
-					if(!isUsableCityId(savedCityId) && saveList[key].gp_id)
-						savedCityId = saveList[key].gp_id;
-					if(isUsableCityId(savedCityId)) {
-						getCityFromId(savedCityId, function(city) {
-							row.data_city = city;
-							setSavedRowCodeText(row_code, savedCityDisplayName(city, saveList[key]), savedCode);
-							if(row.data_process_continue_flag)
-								processSaveEntry_continue(row);
-						}, { notify: false });
-					} else {
-						row.data_city = null;
-					}
-				}
-				queueSaveListEndIndicatorUpdate();
+	if(saveList && Object.keys(saveList).length) {
+		addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
+		addClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
+		for(let key in saveList) {
+			let row = document.createElement('div');
+			let row_header = document.createElement('div');
+			let row_title = document.createElement('div');
+			let row_segment = document.createElement('div');
+			let row_controls_container = document.createElement('div');
+			let row_controls = document.createElement('div');
+			let row_address = document.createElement('div');
+			let row_code = document.createElement('div');
+			let row_process = document.createElement('span');
+			let row_process_img = document.createElement('img');
+			let savedCode = normalizeSavedWcode(saveList[key].code);
+			row_header.setAttribute('class', 'row-header');
+			row_title.setAttribute('class', 'row-title');
+			row_title.innerText = saveList[key].title;
+			if(isLocalBookmark(key)) {
+				var badge = document.createElement('span');
+				badge.className = 'bookmark-local-label';
+				badge.innerText = 'On this device';
+				row_title.appendChild(badge);
 			}
-			else {
-				addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
-				removeClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
-				queueSaveListEndIndicatorUpdate();
+			row_header.appendChild(row_title);
+			if((saveList[key].segment || '').trim()) {
+				row_segment.setAttribute('class', 'row-segment');
+				row_segment.innerText = saveList[key].segment;
+				row_header.appendChild(row_segment);
 			}
-		})
+			var moreTemplate = document.getElementById('account_dialog_more_icon_template');
+			let row_menu_toggle = document.createElement('button');
+			row_menu_toggle.setAttribute('class', 'row-menu-toggle control');
+			row_menu_toggle.setAttribute('type', 'button');
+			row_menu_toggle.setAttribute('title', 'More');
+			row_menu_toggle.setAttribute('aria-label', 'More');
+			row_menu_toggle.setAttribute('aria-haspopup', 'menu');
+			row_menu_toggle.setAttribute('aria-expanded', 'false');
+			if(moreTemplate)
+				row_menu_toggle.innerHTML = moreTemplate.innerHTML;
+			row_menu_toggle.addEventListener('click', onSaveEntryMenuToggle);
+			row_header.appendChild(row_menu_toggle);
+			row.addEventListener('click', onPressSaveEntry);
+			row.data_key = key;
+			row.data_code = savedCode;
+			row_address.setAttribute('class', 'row-address');
+			row_address.innerText = saveList[key].address;
+			row_code.setAttribute('class', 'row-code');
+			setSavedRowCodeText(row_code, savedCityDisplayName(null, saveList[key]), savedCode);
+			row_controls.setAttribute('class', 'row-controls');
+			row_process.setAttribute('class', 'row-process');
+			row_process.setAttribute('title', 'Go');
+			row_process.setAttribute('aria-label', 'Go');
+			row_process_img.src = svg_front;
+			row_process_img.alt = '';
+			addLongpressListener(row_process, processSaveEntry_internal, processSaveEntry_external);
+			row_process.appendChild(row_process_img);
+			row_controls.appendChild(row_process);
+			row_controls_container.setAttribute('class', 'row-controls-container');
+			row_controls_container.appendChild(row_controls);
+			let row_details = document.createElement('div');
+			let row_details_inner = document.createElement('div');
+			row_details.setAttribute('class', 'row-details');
+			row_details_inner.setAttribute('class', 'row-details-inner');
+			row_details_inner.appendChild(row_code);
+			row_details_inner.appendChild(row_address);
+			row_details_inner.appendChild(row_controls_container);
+			row_details.appendChild(row_details_inner);
+			container.appendChild(row);
+			row.appendChild(row_header);
+			row.appendChild(row_details);
+			row.data_process_continue_flag = false;
+			var savedCityId = saveList[key].city_id;
+			if(!isUsableCityId(savedCityId) && saveList[key].gp_id)
+				savedCityId = saveList[key].gp_id;
+			if(isUsableCityId(savedCityId)) {
+				getCityFromId(savedCityId, function(city) {
+					row.data_city = city;
+					setSavedRowCodeText(row_code, savedCityDisplayName(city, saveList[key]), savedCode);
+					if(row.data_process_continue_flag)
+						processSaveEntry_continue(row);
+				}, { notify: false });
+			} else {
+				row.data_city = null;
+			}
+		}
+		queueSaveListEndIndicatorUpdate();
+	}
+	else {
+		addClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
+		removeClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
+		queueSaveListEndIndicatorUpdate();
 	}
 }
 
@@ -533,7 +594,7 @@ function closeSaveEntryMenus() {
 
 function positionSaveEntryMenu(toggle) {
 	var menu = document.getElementById('account_dialog_row_menu');
-	var dialog = document.getElementById('account_dialog');
+	var dialog = document.getElementById('saved_dialog');
 	if(!menu || !dialog || !toggle)
 		return;
 	menu.classList.remove('hide');
@@ -599,11 +660,19 @@ function editSaveEntry(e) {
 function deleteSaveEntry(e) {
 	if(e && e.stopPropagation)
 		e.stopPropagation();
-	if(typeof firebase != 'object' || typeof firebase.auth != 'function' || typeof firebase.database != 'function')
-		return;
-	var user = firebase.auth().currentUser;
+	var user = getBookmarkUser();
 	var row = getSaveEntryMenuRow(e);
 	closeSaveEntryMenus();
+	if(row && isLocalBookmark(row.data_key)) {
+		var local = readLocalBookmarks();
+		delete local[row.data_key];
+		if(writeLocalBookmarks(local)) {
+			if(editingSaveKey === row.data_key) onAccountDialogCancel();
+			loadSaveList();
+			showNotification('Bookmark deleted');
+		}
+		return;
+	}
 	if(user != null && row && row.data_key) {
 		uid = user.uid;
 		if(editingSaveKey === row.data_key) {
@@ -650,3 +719,7 @@ function clearSaveEntry() {
 }
 
 window.addEventListener('resize', queueSaveListEndIndicatorUpdate);
+
+window.addEventListener('storage', function(event) {
+ if(event.key === LOCAL_BOOKMARKS_KEY) renderAllBookmarks();
+});

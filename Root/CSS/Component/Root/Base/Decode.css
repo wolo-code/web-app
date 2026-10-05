@@ -43,6 +43,7 @@ body.decode-icon-guide #account,
 body.decode-icon-guide #action_menu,
 body.decode-icon-guide #location_button,
 body.decode-icon-guide #decode_map_view_button,
+body.decode-icon-guide #decode_code_scan_button,
 body.decode-icon-guide #map_type_button,
 body.decode-icon-guide #map_search_cluster,
 body.decode-icon-guide #map_search_bar,
@@ -680,6 +681,8 @@ body.map-source-single #action_menu_map {
 
 #decode_map_view_button svg {
 	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	border-radius: 25px;
 	box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 	box-sizing: border-box;
@@ -687,6 +690,63 @@ body.map-source-single #action_menu_map {
 	height: 39px;
 	padding: 5px;
 	width: 39px;
+}
+
+#decode_scan_area {
+	position: absolute;
+	top: calc(50% + 83px);
+	bottom: 40px;
+	left: 0;
+	right: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.decode #decode_scan_area {
+	display: flex;
+}
+
+#decode_code_scan_button {
+	-webkit-tap-highlight-color: transparent;
+	align-items: center;
+	background: transparent;
+	border: none;
+	border-radius: 12px;
+	box-sizing: border-box;
+	cursor: pointer;
+	display: inline-flex;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	pointer-events: auto;
+	position: relative;
+	transform: scale(1);
+	transform-origin: center;
+	transition: color 160ms ease, transform 180ms ease, opacity 160ms ease;
+}
+
+#decode_code_scan_button:hover:not(:disabled),
+#decode_code_scan_button:focus-visible {
+	transform: scale(1.08);
+}
+
+#decode_code_scan_button svg {
+	background-color: rgb(255 255 255 / 65%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+	border: 1px solid rgba(105, 183, 207, 0.28);
+	border-radius: 12px;
+	box-shadow: rgb(0 0 0 / 12%) 0px 2px 8px -1px;
+	box-sizing: border-box;
+	color: #69B7CF;
+	display: block;
+	height: 50px;
+	padding: 8px;
+	transition: opacity 160ms ease, border-color 160ms ease;
+	width: 50px;
 }
 
 @media (max-width: 316px) {
@@ -698,3 +758,38 @@ body.map-source-single #action_menu_map {
 		width: calc(100vw - 24px) !important;
 	}
 }
+
+/* Decode destinations: Info + Map on the left, Camera + Saved on the right. */
+body.decode #decode_map_view_button { left: 62px; right: auto; }
+#saved_button { display: none; }
+body.decode #saved_button {
+ display: block; position: absolute; right: 11px; bottom: 31px;
+ background: transparent; border: 0; padding: 8px; margin: -8px;
+ width: 39px; height: 39px; box-sizing: content-box; z-index: 2; cursor: pointer;
+}
+body.decode #saved_button svg {
+ width: 39px; height: 39px; border-radius: 25px;
+ background-color: rgb(255 255 255 / 50%); backdrop-filter: blur(4px);
+ box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
+}
+body.decode-icon-guide #saved_button { z-index: 202; }
+#saved_button .decode_icon_caption { bottom: calc(100% + 10px); }
+
+
+
+body.decode #saved_button svg { box-sizing: border-box; padding: 5px; }
+
+.decode #decode_scan_area {
+ top: auto; bottom: 31px; left: auto; right: 62px;
+ width: 39px; height: 39px;
+}
+.decode #decode_code_scan_button {
+ box-sizing: content-box; width: 39px; height: 39px;
+ padding: 8px; margin: -8px;
+}
+.decode #decode_code_scan_button svg {
+ width: 39px; height: 39px; padding: 5px; border: 0; border-radius: 25px;
+ background-color: rgb(255 255 255 / 50%);
+ box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
+}
+.decode #decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }

@@ -452,7 +452,7 @@ html.dark-mode .overlay {
 }
 
 html.dark-mode .message_dialog,
-html.dark-mode #account_dialog,
+html.dark-mode .saved-compatible-dialog,
 html.dark-mode #authentication_header,
 html.dark-mode #info_message,
 html.dark-mode #no_city_message {
@@ -556,20 +556,20 @@ html.dark-mode #save_address {
 	color: #aaa;
 }
 
-html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner {
+html.dark-mode #saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner {
 	scrollbar-color: #4a4a68 #222244;
 }
 
-html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar,
-html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-track {
+html.dark-mode #saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar,
+html.dark-mode #saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-track {
 	background: #222244;
 }
 
-html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb {
+html.dark-mode #saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb {
 	background: #4a4a68;
 }
 
-html.dark-mode #account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb:hover {
+html.dark-mode #saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb:hover {
 	background: #6a6a8a;
 }
 
@@ -717,7 +717,7 @@ html.dark-mode .link-gray:hover {
 html.dark-mode,
 html.dark-mode body,
 html.dark-mode .message_dialog,
-html.dark-mode #account_dialog,
+html.dark-mode .saved-compatible-dialog,
 html.dark-mode #info_message,
 html.dark-mode #no_city_message {
 	transition: background-color 0.3s, color 0.3s, border-color 0.3s;

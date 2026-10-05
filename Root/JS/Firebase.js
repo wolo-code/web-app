@@ -94,6 +94,30 @@ function isFirebaseIndexedDbClosingError(error) {
 	return message.indexOf('database connection is closing') != -1 && (!error.name || error.name == 'InvalidStateError');
 }
 
+function isFirebaseInstallationError(error) {
+	var message = '';
+	if(error) {
+		if(error.code && typeof error.code == 'string' && error.code.indexOf('installations/') != -1)
+			return true;
+		if(error.message)
+			message = error.message;
+		else if(typeof error == 'string')
+			message = error;
+	}
+	return message.indexOf('installations/') != -1 || message.indexOf('Installations:') != -1;
+}
+
+function isFirebaseUiMissingError(error) {
+	var message = '';
+	if(error) {
+		if(error.message)
+			message = error.message;
+		else if(typeof error == 'string')
+			message = error;
+	}
+	return message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1;
+}
+
 function recoverFirebaseIndexedDbConnection(error) {
 	if(typeof Sentry != 'undefined')
 		Sentry.captureException(error);
@@ -107,6 +131,16 @@ function recoverFirebaseIndexedDbConnection(error) {
 
 function firebaseResumeRecoveryInit() {
 	window.addEventListener('error', function(event) {
+		if(isFirebaseUiMissingError(event.error || event.message)) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			return;
+		}
+		if(isFirebaseInstallationError(event.error || event.message)) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			return;
+		}
 		if(isFirebaseIndexedDbClosingError(event.error || event.message)) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -114,6 +148,16 @@ function firebaseResumeRecoveryInit() {
 		}
 	}, true);
 	window.addEventListener('unhandledrejection', function(event) {
+		if(isFirebaseUiMissingError(event.reason)) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			return;
+		}
+		if(isFirebaseInstallationError(event.reason)) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			return;
+		}
 		if(isFirebaseIndexedDbClosingError(event.reason)) {
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -134,12 +178,23 @@ function firebaseInit() {
 		pushLoader();
 		firebase.initializeApp(FIREBASE_CONFIG);
 		popLoader();
-		if(typeof authInit != 'undefined')
-			authInit();
-		if(typeof firebase.analytics != 'undefined')
-			analytics = firebase.analytics();
-		if(typeof firebase.performance != 'undefined')
-			perf = firebase.performance();
+		if(typeof authInit != 'undefined') {
+			try {
+				authInit();
+			} catch(authError) {
+				console.warn('Firebase Auth UI initialization deferred or failed:', authError);
+			}
+		}
+		if(typeof firebase.analytics != 'undefined') {
+			try {
+				analytics = firebase.analytics();
+			} catch(analyticsError) {}
+		}
+		if(typeof firebase.performance != 'undefined') {
+			try {
+				perf = firebase.performance();
+			} catch(perfError) {}
+		}
 		database = firebase.database();
 		refCityCenter = database.ref('CityCenter');
 		return true;

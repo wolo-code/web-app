@@ -5,9 +5,14 @@ const fs = require('fs');
 const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..');
-const publicDir = path.join(repoRoot, 'public');
+const args = process.argv.slice(2);
+function option(name, fallback) {
+ const index = args.indexOf(name);
+ return index >= 0 && args[index + 1] ? path.resolve(args[index + 1]) : fallback;
+}
+const publicDir = option('--public-dir', path.join(repoRoot, 'public'));
 const rootDir = path.join(repoRoot, 'Root');
-const outputPath = path.join(rootDir, 'precache-manifest.json');
+const outputPath = option('--output', path.join(rootDir, 'precache-manifest.json'));
 
 const TESSERACT_ASSETS = [
 	'/tesseract/tesseract.min.js',
@@ -31,6 +36,8 @@ const DEFAULT_ASSETS = [
 	'/favicon.ico',
 	'/apple-touch-icon.png',
 	'/offline-data/WordList.json',
+ '/sounds/camera-shutter-release.mp3',
+ '/sounds/camera-shutter-release.wav',
 	...TESSERACT_ASSETS,
 	'/launcher-icon-0-75x.png',
 	'/launcher-icon-1x.png',
@@ -73,7 +80,7 @@ function collectPublicAssets() {
 				continue;
 			}
 			const ext = path.extname(entry.name).toLowerCase();
-			if (!['.js', '.css', '.html', '.json', '.svg', '.png', '.ico', '.woff', '.woff2', '.wasm', '.gz'].includes(ext)) {
+			if (!['.js', '.css', '.html', '.json', '.svg', '.png', '.ico', '.woff', '.woff2', '.wasm', '.gz', '.mp3', '.wav'].includes(ext)) {
 				continue;
 			}
 			const relative = prefix + '/' + entry.name;
@@ -105,7 +112,7 @@ function main() {
 	assets.push(...collectPublicAssets());
 
 	const manifest = {
-		version: process.env.WOLO_SW_CACHE_VERSION || 'wolo-offline-v1',
+		version: process.env.WOLO_SW_CACHE_VERSION || 'wolo-offline-v3',
 		generatedAt: new Date().toISOString(),
 		assets: uniqueSorted(assets)
 	};

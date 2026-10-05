@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 'use strict';
 
-var CACHE_VERSION = 'wolo-offline-v2';
+var CACHE_VERSION = 'wolo-offline-v3';
 var STATIC_CACHE = CACHE_VERSION + ':static';
 var SHELL_CACHE = CACHE_VERSION + ':shell';
 var TILE_CACHE = CACHE_VERSION + ':tiles';

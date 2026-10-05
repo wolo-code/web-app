@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 const test = require('node:test');
 const { spawnSync } = require('node:child_process');
 
@@ -23,22 +24,22 @@ test('precache manifest includes core offline shell assets', () => {
 });
 
 test('precache manifest generator discovers hashed bundles from public index', () => {
-	const publicDir = path.join(repoRoot, 'public');
+	const publicDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wolo-precache-'));
+ const temporaryManifest = path.join(publicDir, 'manifest-output.json');
 	fs.mkdirSync(publicDir, { recursive: true });
 	const indexPath = path.join(publicDir, 'index.html');
 	const bundleName = 'root-deadbeef.min.js';
 	fs.writeFileSync(indexPath, `<!doctype html><script src="/${bundleName}"></script>`);
 	fs.writeFileSync(path.join(publicDir, bundleName), 'console.log("bundle");');
 
-	const result = spawnSync(process.execPath, ['scripts/generate-precache-manifest.js'], {
+	const result = spawnSync(process.execPath, ['scripts/generate-precache-manifest.js', '--public-dir', publicDir, '--output', temporaryManifest], {
 		cwd: repoRoot,
 		encoding: 'utf8'
 	});
 	assert.equal(result.status, 0, result.stderr || result.stdout);
 
-	const generated = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+	const generated = JSON.parse(fs.readFileSync(temporaryManifest, 'utf8'));
 	assert.ok(generated.assets.includes('/' + bundleName));
 
-	fs.rmSync(indexPath, { force: true });
-	fs.rmSync(path.join(publicDir, bundleName), { force: true });
+	fs.rmSync(publicDir, { recursive: true, force: true });
 });

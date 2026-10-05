@@ -260,3 +260,6 @@ Scanner continuity: Capture, adjustment and recognition share a stable viewfinde
 
 
 Scanner spacing: Back and forward buttons are centered in the remaining space on each side of the zoom controls, within the viewfinder width. The scanner title has a small gap before the viewfinder. The no-match adjustment instruction is omitted.
+
+
+Offline release manifest: Native publishing generates the precache list from each final merged environment bundle, including its current hashed script and scanner audio. The service-worker cache uses v3. Manifest tests write isolated temporary fixtures and do not change real publish outputs.

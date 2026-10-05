@@ -190,6 +190,8 @@ function isCodeScanVisible() {
 
 function setCodeScanPhase(phase) {
 	codeScanState.phase = phase || 'live';
+	var cropButton = document.getElementById('code_scan_apply_crop');
+	if(cropButton) cropButton.disabled = codeScanState.phase === 'processing';
 }
 
 function setCodeScanDetectionMode(mode) {
@@ -631,9 +633,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 			saveCodeScanSourceFromCanvas(autoCanvas, true);
 			resetCodeScanZoom();
 		}
-		if(bbox && autoCanvas) {
-			positionCodeScanGuideToDetectedRegion(bbox, autoCanvas);
-		}
+		resetCodeScanGuide();
 		beginCodeScanCapture();
 		return;
 	}
@@ -659,9 +659,7 @@ function captureCodeScanManually(event) {
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
-	if(codeScanState.lastMatchBBox) {
-		positionCodeScanGuideToDetectedRegion(codeScanState.lastMatchBBox, canvas);
-	}
+	resetCodeScanGuide();
 	beginCodeScanCapture();
 }
 
@@ -714,33 +712,8 @@ function processCodeScanCapture() {
 		if(!codeScanState.active)
 			return;
 		var match = extractMatchFromOcrResult(result);
-		var regionDetails = codeScanOcrMatch.extractMatchRegionDetails(result, match, wordList.includes.bind(wordList), wordList.curList);
-		var autoCropped;
-		if(regionDetails && regionDetails.bbox && rawCanvas) {
-			autoCropped = straightenAndCropCanvasToRegion(rawCanvas, regionDetails);
-			if(autoCropped) {
-				canvas.width = autoCropped.width;
-				canvas.height = autoCropped.height;
-				canvas.getContext('2d').drawImage(autoCropped, 0, 0);
-				codeScanState.sourceCanvas = autoCropped;
-				resetCodeScanGuide();
-			}
-			showCodeScanReview(match);
-		}
-		else {
-			var fallbackSlice = getCodeScanFixedRatioSlice(rawCanvas || canvas);
-			if(fallbackSlice && fallbackSlice !== canvas) {
-				canvas.width = fallbackSlice.width;
-				canvas.height = fallbackSlice.height;
-				canvas.getContext('2d').drawImage(fallbackSlice, 0, 0);
-				codeScanState.sourceCanvas = fallbackSlice;
-				resetCodeScanGuide();
-			}
-			showCodeScanReview(match);
-			if(!match) {
-				setCodeScanStatus('Could not read code automatically. Adjust framing or zoom, then tap >');
-			}
-		}
+		showCodeScanReview(match);
+		if(!match) setCodeScanStatus('Adjust the image or zoom, then scan the framed area.');
 	}).catch(function() {
 		codeScanState.processing = false;
 		if(codeScanState.active)
@@ -756,11 +729,12 @@ function showCodeScanReview(match) {
 	setCodeScanPhotoFallbackVisible(false);
 	setCodeScanFrozenPreview(true);
 	setCodeScanCropControlsVisible(true);
-	setCodeScanEditingCrop(false);
+	setCodeScanEditingCrop(true);
+	resetCodeScanGuide();
 	populateCodeScanReviewFields(review.city, review.words[0], review.words[1], review.words[2]);
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
-	setCodeScanStatus('');
+	setCodeScanStatus('Check the words below. Drag or zoom to adjust the framed area.');
 }
 
 function populateCodeScanReviewFields(city, w1, w2, w3) {
@@ -961,33 +935,8 @@ function handleCodeScanPhotoInput(event) {
 		var photoCanvas = getCodeScanCanvas();
 		var rawCanvas = codeScanState.originalSourceCanvas || photoCanvas;
 		var match = extractMatchFromOcrResult(result);
-		var regionDetails = codeScanOcrMatch.extractMatchRegionDetails(result, match, wordList.includes.bind(wordList), wordList.curList);
-		var autoCropped;
-		if(regionDetails && regionDetails.bbox && rawCanvas) {
-			autoCropped = straightenAndCropCanvasToRegion(rawCanvas, regionDetails);
-			if(autoCropped) {
-				photoCanvas.width = autoCropped.width;
-				photoCanvas.height = autoCropped.height;
-				photoCanvas.getContext('2d').drawImage(autoCropped, 0, 0);
-				codeScanState.sourceCanvas = autoCropped;
-				resetCodeScanGuide();
-			}
-			showCodeScanReview(match);
-		}
-		else {
-			var fallbackSlice = getCodeScanFixedRatioSlice(rawCanvas || photoCanvas);
-			if(fallbackSlice && fallbackSlice !== photoCanvas) {
-				photoCanvas.width = fallbackSlice.width;
-				photoCanvas.height = fallbackSlice.height;
-				photoCanvas.getContext('2d').drawImage(fallbackSlice, 0, 0);
-				codeScanState.sourceCanvas = fallbackSlice;
-				resetCodeScanGuide();
-			}
-			showCodeScanReview(match);
-			if(!match) {
-				setCodeScanStatus('Could not read code automatically. Adjust framing or zoom, then tap >');
-			}
-		}
+		showCodeScanReview(match);
+		if(!match) setCodeScanStatus('Adjust the image or zoom, then scan the framed area.');
 	}).catch(function() {
 		codeScanState.processing = false;
 		codeScanState.hasCaptured = false;
@@ -1030,6 +979,8 @@ function recognizeCodeScanPhoto(file) {
 				canvas.getContext('2d').drawImage(image, 0, 0, targetWidth, targetHeight);
 				saveCodeScanSourceFromCanvas(canvas, true);
 				resetCodeScanZoom();
+				setCodeScanFrozenPreview(true);
+				setCodeScanCropControlsVisible(true);
 				ocrCanvas = canvas;
 				if(!codeScanState.worker) {
 					reject(new Error('Scanner not ready'));
@@ -1113,10 +1064,10 @@ function positionCodeScanGuideToDetectedRegion(bbox, canvas) {
 	boxHeight = (normY1 - normY0) * imgRect.height;
 
 	guideWidth = Math.min(vpRect.width * 0.94, Math.max(boxWidth * 1.35, boxHeight * 3.6, vpRect.width * 0.5));
-	guideHeight = guideWidth / CODE_SCAN_FIXED_ASPECT;
+	guideHeight = guideWidth / ((1 + Math.sqrt(5)) / 2);
 	if(guideHeight > vpRect.height * 0.92) {
 		guideHeight = vpRect.height * 0.92;
-		guideWidth = guideHeight * CODE_SCAN_FIXED_ASPECT;
+		guideWidth = guideHeight * ((1 + Math.sqrt(5)) / 2);
 	}
 	guideLeft = Math.max(guideWidth / 2, Math.min(vpRect.width - guideWidth / 2, boxCenterX));
 	guideTop = Math.max(guideHeight / 2, Math.min(vpRect.height - guideHeight / 2, boxCenterY));
@@ -1453,7 +1404,7 @@ function applyCodeScanCrop() {
 	var cropSh;
 	var croppedCanvas;
 	var croppedCtx;
-	if(!canvas || !guide || !source || !codeScanState.worker)
+	if(!canvas || !guide || !source || !codeScanState.worker || codeScanState.phase === 'processing')
 		return;
 	guideRect = guide.getBoundingClientRect();
 	imgRect = getCodeScanRenderedImageRect(canvas);
@@ -1467,27 +1418,21 @@ function applyCodeScanCrop() {
 	sourceHeight = source.height;
 	cropSx = Math.max(0, Math.round(normX * sourceWidth));
 	cropSy = Math.max(0, Math.round(normY * sourceHeight));
-	cropSw = Math.min(sourceWidth - cropSx, Math.round(normW * sourceWidth));
-	cropSh = Math.min(sourceHeight - cropSy, Math.round(normH * sourceHeight));
+	cropSw = Math.min(sourceWidth, Math.round((normX + normW) * sourceWidth)) - cropSx;
+	cropSh = Math.min(sourceHeight, Math.round((normY + normH) * sourceHeight)) - cropSy;
 	if(cropSw <= 20 || cropSh <= 10) {
 		showNotification('Framed area is too small. Zoom out or adjust framing.');
 		return;
 	}
 	if(cropButton)
 		cropButton.disabled = true;
-	setCodeScanStatus('Reading cropped selection...');
+	setCodeScanPhase('processing');
+	setCodeScanStatus('Reading framed area on your device...');
 	croppedCanvas = document.createElement('canvas');
 	croppedCanvas.width = cropSw;
 	croppedCanvas.height = cropSh;
 	croppedCtx = croppedCanvas.getContext('2d');
 	croppedCtx.drawImage(source, cropSx, cropSy, cropSw, cropSh, 0, 0, cropSw, cropSh);
-
-	canvas.width = cropSw;
-	canvas.height = cropSh;
-	canvas.getContext('2d').drawImage(croppedCanvas, 0, 0);
-	codeScanState.sourceCanvas = croppedCanvas;
-	setCodeScanZoom(1.0, 0, 0);
-	resetCodeScanGuide();
 
 	codeScanState.worker.recognize(croppedCanvas).then(function(result) {
 		if(cropButton)
@@ -1500,6 +1445,7 @@ function applyCodeScanCrop() {
 			setCodeScanStatus('Wolo Code recognized from crop! Check details below.');
 		}
 		else {
+			setCodeScanPhase('review');
 			setCodeScanStatus('Could not read Wolo Code from this crop. Adjust framing or zoom.');
 		}
 	}).catch(function() {
@@ -1507,6 +1453,7 @@ function applyCodeScanCrop() {
 			cropButton.disabled = false;
 		if(!codeScanState.active)
 			return;
+		setCodeScanPhase('review');
 		setCodeScanStatus('Recognition failed for this crop. Try adjusting the frame.');
 	});
 }

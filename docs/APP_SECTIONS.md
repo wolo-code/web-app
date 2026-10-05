@@ -253,3 +253,6 @@ Decode navigation: Saved opens a dedicated modal using the account dialog design
 
 
 Scanner continuity: Capture, adjustment and recognition share a stable viewfinder and control area. The dotted guide uses a golden-ratio width/height and fills up to 94% of the available viewfinder. Captured and gallery images remain fully visible at fit zoom; OCR crop scanning leaves the original preview intact, so users can reframe repeatedly. Review fields fade in with reduced-motion support; letterboxed image crops intersect the frame with actual image bounds.
+
+
+Scanner spacing: Back and forward buttons are centered in the remaining space on each side of the zoom controls, within the viewfinder width. The scanner title has a small gap before the viewfinder. The no-match adjustment instruction is omitted.

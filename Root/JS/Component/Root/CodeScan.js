@@ -713,7 +713,7 @@ function processCodeScanCapture() {
 			return;
 		var match = extractMatchFromOcrResult(result);
 		showCodeScanReview(match);
-		if(!match) setCodeScanStatus('Adjust the image or zoom, then scan the framed area.');
+		if(!match) setCodeScanStatus('');
 	}).catch(function() {
 		codeScanState.processing = false;
 		if(codeScanState.active)
@@ -936,7 +936,7 @@ function handleCodeScanPhotoInput(event) {
 		var rawCanvas = codeScanState.originalSourceCanvas || photoCanvas;
 		var match = extractMatchFromOcrResult(result);
 		showCodeScanReview(match);
-		if(!match) setCodeScanStatus('Adjust the image or zoom, then scan the framed area.');
+		if(!match) setCodeScanStatus('');
 	}).catch(function() {
 		codeScanState.processing = false;
 		codeScanState.hasCaptured = false;

@@ -680,7 +680,8 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_live_controls, .code_scan_crop_controls {
  min-height: 64px; margin: 0; flex: 0 0 auto; gap: 12px;
 }
-.code_scan_crop_controls { justify-content: space-between; }
+.code_scan_crop_controls { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 0; }
+.code_scan_crop_controls > button { justify-self: center; }
 .code_scan_crop_button { width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; }
 .code_scan_status { min-height: 36px; margin: 0; flex: 0 0 auto; }
 .code_scan_review { animation: code-scan-review-in 180ms ease-out; }
@@ -694,3 +695,8 @@ html.dark-mode .code_scan_apply_crop {
  .code_scan_review { animation: none; }
  #code_scan_canvas, #code_scan_video { transition: none; }
 }
+
+.code_scan_dialog .message_dialog_label { margin-bottom: 10px; }
+.code_scan_crop_controls .code_scan_zoom_group { justify-self: center; }
+
+.code_scan_status:empty { display: none; }

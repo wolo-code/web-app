@@ -445,6 +445,7 @@ test('chrome controls include native tooltips', () => {
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
 	assert.match(index, /id='map_search_cluster'/);
 	assert.match(index, /id='map_city_history_toggle'/);
+	assert.match(index, /id='map_city_history_toggle'[\s\S]*?<\/button>\s*<div id='map_search_bar'>/);
 	assert.match(index, /id='map_search_bar'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);

@@ -1,7 +1,7 @@
 @media (max-width: 662px) {
 
 	#map_input_suggestion_result {
-		top: 74px !important;
+		top: calc(74px + var(--app-safe-top)) !important;
 	}
 
 	.map_attribution {
@@ -64,7 +64,7 @@
 @media (max-width: 390px) {
 	
 	#map_input_suggestion_result {
-		top: 100px !important;
+		top: calc(100px + var(--app-safe-top)) !important;
 	}
 	
 }
@@ -76,7 +76,7 @@
 	}
 
 	#map_search_cluster {
-		margin-top: 116px;
+		margin-top: calc(116px + var(--app-safe-top));
 	}
 
 }

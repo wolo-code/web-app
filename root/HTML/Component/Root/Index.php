@@ -22,10 +22,6 @@
 		<span class='image'><?php includeSVG('', 'List'); ?></span>
 		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='previous-city' aria-hidden='true'>Previous</span>
 	</button>
-	<button id='map_code_scan_button' class='decode_city_source_button' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label'>
-		<span class='image'><?php includeSVG('', 'Camera'); ?></span>
-		<span class='decode_icon_caption decode_chrome_caption' data-guide-id='scan' aria-hidden='true'>Scan</span>
-	</button>
 	<div id='map_search_bar'>
 		<div id='map_search_field'>
 			<span id='search_icon' class='image'><?php includeSVG('', 'Search'); ?></span>
@@ -54,10 +50,6 @@
 					<span class='image'><?php includeSVG('', 'List'); ?></span>
 					<span class='decode_icon_caption' aria-hidden='true'>Previous</span>
 				</button>
-				<button id='decode_code_scan_button' class='decode_city_source_button' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label'>
-					<span class='image'><?php includeSVG('', 'Camera'); ?></span>
-					<span class='decode_icon_caption' aria-hidden='true'>Scan</span>
-				</button>
 			</div>
 			<div id='decode_input_city'>&nbsp;</div>
 		</div>
@@ -68,6 +60,12 @@
 			<span class='decode_icon_caption' aria-hidden='true'>Go</span>
 		</div>
 		<input id='decode_input_case' type='text' tabindex='-1' aria-hidden='true' autocomplete='off' required pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?'>
+	</div>
+	<div id='decode_scan_area'>
+		<button id='decode_code_scan_button' class='control' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label' tabindex='5'>
+			<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+			<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Scan</span>
+		</button>
 	</div>
 	<span id='decode_input_shadow'></span>
 </div>
@@ -210,6 +208,6 @@
 </div>
 <?php require '../../HTML/Fragment/Firebase_includes.php'; ?>
 <script src='https://www.gstatic.com/firebasejs/<?php echo $config['firebase_version'] ?>/firebase-auth.js'></script>
-<script src='https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.js'></script>
+<script src='https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.js' onload='typeof authInit == "function" && authInit()'></script>
 <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/<?php echo $config['firebase_ui_version'] ?>/firebase-ui-auth.css" />
 <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/<?php echo $config['jspdf_version'] ?>/jspdf.umd.min.js"></script>

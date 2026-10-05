@@ -2,7 +2,7 @@
 		.satellite #account, .map #account {
 				right: unset !important;
 				left: 10px !important;
-				top: 84px !important;
+				top: calc(84px + var(--app-safe-top)) !important;
 		}
 }
 
@@ -18,7 +18,7 @@
 	
 		#map_search_cluster {
 			box-sizing: border-box;
-			margin: 90px 8px 0;
+			margin: calc(90px + var(--app-safe-top)) 8px 0;
 			width: calc(100vw - 16px);
 		}
 
@@ -73,7 +73,7 @@
 		}
 		
 		#notification_top {
-			top: 168px !important;
+			top: calc(168px + var(--app-safe-top)) !important;
 		}
 
 		#footer-content-container {
@@ -84,7 +84,7 @@
 		#account {
 			right: 10px !important;
 			left: unset !important;
-			top: 10px !important;
+			top: calc(10px + var(--app-safe-top)) !important;
 		}
 		
 }
@@ -105,7 +105,7 @@
 
 	#account {
 		left: 4px !important;
-		top: 84px !important;
+		top: calc(84px + var(--app-safe-top)) !important;
 	}
 }
 

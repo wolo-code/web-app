@@ -1,7 +1,7 @@
 #account {
 	position: absolute;
 	right: 200px;
-	top: 18px;
+	top: calc(18px + var(--app-safe-top));
 	padding: 8px;
 	margin: 0px;
 }

@@ -32,6 +32,7 @@
 	})();
 	</script>
 	<meta name='mobile-web-app-capable' content='yes' >
+	<meta name='apple-mobile-web-app-capable' content='yes' >
 	<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' >
 	<?php require '../HTML/Fragment/OG_Meta.php' ?>
 	<?php require '../HTML/Fragment/FB_Meta.php' ?>

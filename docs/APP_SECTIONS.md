@@ -248,6 +248,10 @@ Related naming:
 - Table positions describe the default desktop layout unless a row explicitly calls out mobile behavior.
 - Use `Responsive Placement Notes` when documenting controls whose positions change between desktop and mobile layouts.
 
+Installed iOS layout: the logo, Account control, map search row, suggestions, top notifications, and offline indicators include the device's top safe-area inset so they remain below the status bar and Dynamic Island. Browser layouts with a zero inset retain their existing spacing.
+
+Installed app canvas: standalone/fullscreen mode uses `height: 100vh` on html/body and anchors absolute controls to that full-height page, painting the map/input background through both screen edges. Do not override this with `100dvh`, `100svh`, or `-webkit-fill-available`: WebKit bug #254868 documents installed `viewport-fit=cover` heights excluding safe areas and recommends `vh` (https://bugs.webkit.org/show_bug.cgi?id=254868). iOS installation declares Apple web-app capability and keeps the translucent status bar plus `viewport-fit=cover`.
+
 
 Decode navigation: Saved opens a dedicated modal using the account dialog design, with saved addresses expanded and existing add/edit/delete actions. Account retains profile and preferences. Info and Map sit at bottom left; Camera sits beside Bookmarks at bottom right. The bookmark modal has no empty-list placeholder text. Profile retains its original position. Bookmarks opens without sign-in; signed-out saves persist in this browser with a notice that they are not saved to the cloud. Local bookmarks remain visible after sign-in, are labeled “On this device”, and support editing, deleting and reopening. Signed-in new saves retain cloud storage. Clearing browser data removes local bookmarks.
 

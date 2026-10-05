@@ -1184,6 +1184,7 @@ function syncMapChromeTooltips() {
 	setControlTooltip(document.getElementById('decode_city_ip'), 'Use IP city');
 	setControlTooltip(document.getElementById('decode_city_geolocation'), 'Use geolocation city');
 	setControlTooltip(document.getElementById('decode_city_history_toggle'), 'Choose previous city');
+	setControlTooltip(document.getElementById('decode_code_scan_button'), 'Scan Wolo Code label');
 }
 
 function syncMapSourceControls() {

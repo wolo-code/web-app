@@ -1,4 +1,5 @@
 :root {
+	--app-safe-top: env(safe-area-inset-top, 0px);
 	--app-background-wcode: #efefef;
 	--app-background-map: #60d0e5;
 	--app-background-satellite: #1b2f62;
@@ -18,6 +19,18 @@ html, body {
 
 body {
 	background: var(--app-background-current);
+}
+
+/* WebKit #254868: installed cover viewports need vh to include the safe areas.
+   Do not override this with dvh/svh or -webkit-fill-available. */
+@media screen and (display-mode: standalone), screen and (display-mode: fullscreen) {
+	html, body {
+		height: 100vh;
+	}
+
+	body {
+		position: relative;
+	}
 }
 
 body.decode {
@@ -152,7 +165,7 @@ body.satellite #map {
 #logo {
 	position: absolute;
 	right: 10px;
-	top: 10px;
+	top: calc(10px + var(--app-safe-top));
 	width: auto;
 }
 
@@ -193,7 +206,7 @@ body > #pac-input,
 	align-items: center;
 	display: flex;
 	gap: 0;
-	margin: 26px 0 0 12px;
+	margin: calc(26px + var(--app-safe-top)) 0 0 12px;
 	overflow: visible;
 	position: relative;
 	z-index: 1;
@@ -300,7 +313,7 @@ body > #pac-input,
 }
 
 #notification_top {
-	top: 118px;
+	top: calc(118px + var(--app-safe-top));
 	width: 182px;
 	cursor: pointer
 }
@@ -348,7 +361,7 @@ body > #pac-input,
 
 .offline_status_banner {
 	position: fixed;
-	top: 0;
+	top: var(--app-safe-top);
 	left: 0;
 	right: 0;
 	z-index: 10000;
@@ -361,7 +374,7 @@ body > #pac-input,
 
 .offline_queue_badge {
 	position: fixed;
-	top: 12px;
+	top: calc(12px + var(--app-safe-top));
 	right: 12px;
 	z-index: 10001;
 	min-width: 20px;
@@ -450,4 +463,3 @@ a.mail-link {
 	height: 100%;
 	width: 100%;
 }
-

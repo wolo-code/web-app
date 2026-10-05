@@ -247,3 +247,6 @@ Related naming:
 - `Wolo Code Input View` replaces the older `Decode View` wording in product-facing docs. Use `decode` only when referring to implementation state or functions.
 - Table positions describe the default desktop layout unless a row explicitly calls out mobile behavior.
 - Use `Responsive Placement Notes` when documenting controls whose positions change between desktop and mobile layouts.
+
+
+Decode navigation: Saved opens a dedicated modal using the account dialog design, with saved addresses expanded and existing add/edit/delete actions. Account retains profile and preferences. Info and Map sit at bottom left; Saved and Account sit at bottom right. Signed-out Saved access opens sign-in.

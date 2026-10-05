@@ -165,6 +165,8 @@ function setupControls() {
 	bindControl('authentication_header_close', 'click', hideAuthenticationDialog);
 	bindControl('account_dialog_close', 'click', hideAccountDialog);
 	bindControl('account', 'click', onAccount);
+	bindControl('saved_button', 'click', showSavedDialog);
+	bindControl('saved_dialog_close', 'click', hideAccountDialog);
 	bindControl('account_dialog_logout_button', 'click', onLogout);
 	bindControl('save_address', 'focus', onAccountDialogAddressActive);
 	bindControl('account_dialog_cancel_button', 'click', onAccountDialogCancel);

@@ -1,5 +1,5 @@
 <div id='account_dialog_container' class="center hide">
-	<div id='account_dialog' class='message_dialog'>
+	<div id='account_dialog' class='message_dialog saved-compatible-dialog'>
 		<h2 id='account_dialog_label' class='message_dialog_label'>
 			Account
 		</h2>
@@ -31,12 +31,22 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+</div>
+<div id='saved_dialog_container' class='center hide'>
+	<div id='saved_dialog' class='message_dialog saved-compatible-dialog saves-open'>
+		<h2 class='message_dialog_label'>Saved</h2>
+		<button id='saved_dialog_close' type='button' class='message_dialog_close control' aria-label='Close saved'>
+			<span class='image'><?php includeSVG('', 'Close'); ?></span>
+		</button>
+		<div class='message_dialog_body'>
 			<div id='account_dialog_saved_heading'>
 				<div id='account_dialog_saves_hit'>
 					<h3 class='dialog-sub-label'>
 						Saved
 					</h3>
-					<button id='account_dialog_saves_toggle' class='account_dialog_heading_action control' type='button' title='Saved addresses' aria-label='Saved addresses' aria-expanded='false'>
+					<button id='account_dialog_saves_toggle' class='account_dialog_heading_action control' type='button' title='Saved addresses' aria-label='Saved addresses' aria-expanded='true'>
 						<span class='image'><?php includeSVG('', 'Caret'); ?></span>
 					</button>
 				</div>
@@ -61,7 +71,7 @@
 					</div>
 				</div>
 			</div>
-			<div id='account_dialog_save_list_container' aria-hidden='true'>
+			<div id='account_dialog_save_list_container' aria-hidden='false'>
 				<div class='account_dialog_fold_inner'>
 					<div id='account_dialog_save_list_loader' class='account_dialog_save_list_indicator'>loading...</div>
 					<div id='account_dialog_save_list_placeholder' class="account_dialog_save_list_indicator hide">-empty-</div>

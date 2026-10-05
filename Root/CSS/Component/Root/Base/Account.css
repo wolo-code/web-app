@@ -10,7 +10,7 @@
 	fill: #AAAAAA;
 }
 
-#account_dialog {
+.saved-compatible-dialog {
 	box-sizing: border-box;
 	width: min(320px, calc(100vw - 32px));
 	max-width: min(320px, calc(100vw - 32px));
@@ -98,7 +98,7 @@
 	transition: grid-template-rows 0.28s ease;
 }
 
-#account_dialog > .message_dialog_body {
+.saved-compatible-dialog > .message_dialog_body {
 	display: flex;
 	flex: 1 1 auto;
 	flex-direction: column;
@@ -136,16 +136,16 @@
 	overflow: hidden;
 }
 
-#account_dialog.saves-open #account_dialog_prefs {
+#saved_dialog.saves-open #account_dialog_prefs {
 	grid-template-rows: 0fr;
 	pointer-events: none;
 }
 
-#account_dialog.saves-open #account_dialog_save_list_container {
+#saved_dialog.saves-open #account_dialog_save_list_container {
 	grid-template-rows: 1fr;
 }
 
-#account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner {
+#saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner {
 	overflow-x: hidden;
 	overflow-y: auto;
 	overscroll-behavior: contain;
@@ -154,20 +154,20 @@
 	scrollbar-width: thin;
 }
 
-#account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar {
+#saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar {
 	width: 8px;
 }
 
-#account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-track {
+#saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-track {
 	background: #ffffff;
 }
 
-#account_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb {
+#saved_dialog.saves-open #account_dialog_save_list_container > .account_dialog_fold_inner::-webkit-scrollbar-thumb {
 	background: #c2c2c2;
 	border-radius: 4px;
 }
 
-#account_dialog.saves-open #account_dialog_saved_heading {
+#saved_dialog.saves-open #account_dialog_saved_heading {
 	margin-top: 8px;
 }
 
@@ -601,3 +601,10 @@
 		transition: none;
 	}
 }
+
+#saved_dialog #account_dialog_saved_heading { margin-top: 0; }
+#saved_dialog #account_dialog_saves_hit { pointer-events: none; }
+#saved_dialog #account_dialog_saves_toggle { display: none; }
+#saved_dialog_close { background: transparent; border: 0; }
+
+#saved_dialog #account_dialog_saves_hit { display: none; }

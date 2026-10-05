@@ -5,6 +5,18 @@ function onAccount() {
 		onLogin();
 }
 
+function showSavedDialog() {
+	if(!firebase.auth().currentUser) {
+		onLogin();
+		return;
+	}
+	showOverlay(document.getElementById('saved_dialog_container'));
+	setAccountDialogSavesOpen(true);
+	syncAccountDialogSaveForm();
+	var inner = document.querySelector('#account_dialog_save_list_container > .account_dialog_fold_inner');
+	if(inner) inner.scrollTop = 0;
+}
+
 var editingSaveKey = null;
 var menuSaveEntry = null;
 
@@ -22,6 +34,7 @@ function showAccountDialog() {
 
 function hideAccountDialog() {
 	hideOverlay(document.getElementById('account_dialog_container'));
+	hideOverlay(document.getElementById('saved_dialog_container'));
 	closeSaveEntryMenus();
 	setAccountDialogAddOpen(false);
 	setAccountDialogSavesOpen(false);
@@ -75,7 +88,7 @@ function toggleAccountDialogAdd() {
 function setAccountDialogSavesOpen(open) {
 	var list = document.getElementById('account_dialog_save_list_container');
 	var toggle = document.getElementById('account_dialog_saves_toggle');
-	var dialog = document.getElementById('account_dialog');
+	var dialog = document.getElementById('saved_dialog');
 	var prefs = document.getElementById('account_dialog_prefs');
 	if(!list || !toggle)
 		return;
@@ -523,7 +536,7 @@ function closeSaveEntryMenus() {
 
 function positionSaveEntryMenu(toggle) {
 	var menu = document.getElementById('account_dialog_row_menu');
-	var dialog = document.getElementById('account_dialog');
+	var dialog = document.getElementById('saved_dialog');
 	if(!menu || !dialog || !toggle)
 		return;
 	menu.classList.remove('hide');

@@ -131,3 +131,6 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 - Map-type switchers use `data-map-next` so the visible icon matches the next layer in `getMapLayerCycle()`, including Google Satellite view.
 - `toggleDecodeView()` is the newer view toggle used by the map-view Wolo Code input button and the Action Menu Wolo Code input control.
 - Toggle icons are rendered as paired inline SVG resources, stacked in one fixed-size slot, and switched by `body.decode` and `body.satellite` state classes.
+
+
+Decode navigation: Saved opens a dedicated modal using the account dialog design, with saved addresses expanded and existing add/edit/delete actions. Account retains profile and preferences. Info and Map sit at bottom left; Saved and Account sit at bottom right. Signed-out Saved access opens sign-in.

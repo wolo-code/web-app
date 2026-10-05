@@ -759,7 +759,7 @@ body.map-source-single #action_menu_map {
 	}
 }
 
-/* Decode destinations: Info + Map on the left, Saved on the right. */
+/* Decode destinations: Info + Map on the left, Camera + Saved on the right. */
 body.decode #decode_map_view_button { left: 62px; right: auto; }
 #saved_button { display: none; }
 body.decode #saved_button {
@@ -778,3 +778,18 @@ body.decode-icon-guide #saved_button { z-index: 202; }
 
 
 body.decode #saved_button svg { box-sizing: border-box; padding: 5px; }
+
+.decode #decode_scan_area {
+ top: auto; bottom: 31px; left: auto; right: 62px;
+ width: 39px; height: 39px;
+}
+.decode #decode_code_scan_button {
+ box-sizing: content-box; width: 39px; height: 39px;
+ padding: 8px; margin: -8px;
+}
+.decode #decode_code_scan_button svg {
+ width: 39px; height: 39px; padding: 5px; border: 0; border-radius: 25px;
+ background-color: rgb(255 255 255 / 50%);
+ box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
+}
+.decode #decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }

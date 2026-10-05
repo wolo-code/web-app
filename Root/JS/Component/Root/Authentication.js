@@ -91,8 +91,7 @@ function onLogout() {
 		removeClassIfPresent(document.getElementById('account_dialog_save_list_loader'), 'hide');
 		addClassIfPresent(document.getElementById('account_dialog_save_list_placeholder'), 'hide');
 		addClassIfPresent(document.getElementById('account_dialog_save_list_end'), 'hide');
-		if(saveList)
-			saveList.innerHTML = '';
+		loadSaveList();
 	})
 	.catch(function(error) {
 		console.error('logout error');

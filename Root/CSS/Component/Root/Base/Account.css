@@ -608,3 +608,6 @@
 #saved_dialog_close { background: transparent; border: 0; }
 
 #saved_dialog #account_dialog_saves_hit { display: none; }
+
+#bookmark_storage_note { color: #888; font-size: 14px; margin: 8px 0; text-align: left; flex: 0 0 auto; }
+.bookmark-local-label { display: block; font-size: 12px; opacity: .85; }

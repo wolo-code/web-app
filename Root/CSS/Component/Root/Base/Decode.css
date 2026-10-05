@@ -759,28 +759,22 @@ body.map-source-single #action_menu_map {
 	}
 }
 
-/* Decode destinations: Info + Map on the left, Saved + Account on the right. */
+/* Decode destinations: Info + Map on the left, Saved on the right. */
 body.decode #decode_map_view_button { left: 62px; right: auto; }
 #saved_button { display: none; }
 body.decode #saved_button {
- display: block; position: absolute; right: 62px; bottom: 31px;
+ display: block; position: absolute; right: 11px; bottom: 31px;
  background: transparent; border: 0; padding: 8px; margin: -8px;
  width: 39px; height: 39px; box-sizing: content-box; z-index: 2; cursor: pointer;
 }
-body.decode #saved_button svg, body.decode #account .image > svg,
-body.decode #account_default_image svg {
+body.decode #saved_button svg {
  width: 39px; height: 39px; border-radius: 25px;
  background-color: rgb(255 255 255 / 50%); backdrop-filter: blur(4px);
  box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
-body.decode #account {
- top: auto !important; left: auto !important; right: 11px !important;
- bottom: 31px; padding: 8px; margin: -8px; width: 39px; height: 39px;
-}
-body.decode #account > span > img { width: 39px; height: 39px; }
 body.decode-icon-guide #saved_button { z-index: 202; }
 #saved_button .decode_icon_caption { bottom: calc(100% + 10px); }
 
-body.decode.decode-icon-guide #account .decode_chrome_caption { bottom: calc(100% + 6px); top: auto; left: 50%; transform: translateX(-50%); }
+
 
 body.decode #saved_button svg { box-sizing: border-box; padding: 5px; }

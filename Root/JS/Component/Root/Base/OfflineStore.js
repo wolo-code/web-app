@@ -301,6 +301,8 @@ function initOfflineWordList() {
 }
 
 function isOfflineMode() {
+	if(typeof firebaseClientUnavailable != 'undefined' && firebaseClientUnavailable)
+		return true;
 	return typeof navigator !== 'undefined' && navigator.onLine === false;
 }
 

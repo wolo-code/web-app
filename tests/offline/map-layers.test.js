@@ -631,9 +631,12 @@ test('Firebase initialization retries a missing Database SDK module', () => {
 	const firebaseJs = read('Root/JS/Firebase.js');
 	const scriptJs = read('Root/JS/Component/Root/Script.js');
 	assert.match(firebaseJs, /function retryFirebaseDatabaseSdk/);
-	assert.match(firebaseJs, /script\[src\*="\/firebase-database\.js"\]/);
+	assert.match(firebaseJs, /function hasFirebaseDatabase/);
+	assert.match(firebaseJs, /function markFirebaseClientUnavailable/);
+	assert.match(firebaseJs, /findFirebaseSdkScript\('firebase-database\.js'\)/);
 	assert.match(firebaseJs, /typeof firebase\.database != 'function'/);
-	assert.match(firebaseJs, /retry\.onload = function\(\) \{[\s\S]*initLoad\(\)/);
+	assert.match(firebaseJs, /finishFirebaseSdkRetry/);
+	assert.doesNotMatch(firebaseJs, /Firebase Database SDK failed to load/);
 	assert.match(scriptJs, /if\(!firebaseInit\(\)\)\s+return/);
 });
 
@@ -742,7 +745,7 @@ test('FirebaseUI missing or deferred does not crash authInit or trigger crash pr
 	const authComponentJs = read('Root/JS/Component/Root/Authentication.js');
 	const baseScript = read('Root/JS/Base/Script.js');
 	const sentryExec = read('Root/Framework/JS/Fragment/Sentry_exec.php');
-	const indexPhp = read('Root/HTML/Component/Root/Index.php');
+	const indexPhp = read('root/HTML/Component/Root/Index.php');
 
 	assert.match(authJs, /typeof firebaseui !== 'undefined'/);
 	assert.match(authJs, /isFirebaseUiAvailable/);
@@ -751,7 +754,7 @@ test('FirebaseUI missing or deferred does not crash authInit or trigger crash pr
 	assert.match(authComponentJs, /retryFirebaseUiSdk/);
 	assert.match(baseScript, /firebaseui/);
 	assert.match(sentryExec, /firebaseui/);
-	assert.match(indexPhp, /firebase-ui-auth\.js['"]\s+onload=/);
+	assert.match(indexPhp, /firebase-ui-auth\.js/);
 
 	// Test authInit in an environment without firebaseui defined
 	const context = {

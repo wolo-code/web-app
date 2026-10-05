@@ -23,7 +23,7 @@ flowchart TD
 - Navigation requests: network-first with cached shell fallback (`/` or `/index.html`).
 - Same-origin static assets: network-first with cache fallback, so online refreshes pick up CSS/JS/SVG changes instead of serving a stale cache-first copy.
 - Map tile hosts (Google, OSM, Esri/Apple Maps view, Bing/Microsoft): cache-first with background refresh and a 500-entry cap.
-- Firebase/auth/API calls: network-only (except queued offline saves handled in app code).
+- Firebase Realtime Database, Auth, and Functions calls: network-only (except queued offline saves handled in app code). Versioned Firebase JS SDK files on `gstatic.com/firebasejs` are left to the browser HTTP cache so a repeat visit can boot when the CDN is unreachable.
 
 Regenerate the manifest after publish/bake:
 

@@ -271,3 +271,5 @@ Scanner review: A List icon button to the left of the editable city opens recogn
 Scanner field controls: The city chooser icon sits inside the left edge of the city input. Zoom percentage and the small reset icon above it share one reset button. The icon appears only away from 100% zoom; its space stays reserved to prevent layout shifts.
 
 Scanner compact controls: City input is centered at 75% width, with an anchored city-choice popup that dismisses on selection, outside click, or Escape. Zoom percentage floats above the pill and is visible only away from 100%, alongside the conditional reset icon; the combined reset target remains stable. Wolo Code Input View orders city-source controls as Previous city, IP globe, then GPS.
+
+Scanner zoom reset: The reset glyph is centered in a fixed-width middle slot between minus and plus, with no individual background circle, including hover and pressed states. The shared zoom pill retains its background.

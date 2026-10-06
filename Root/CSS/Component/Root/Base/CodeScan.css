@@ -704,8 +704,12 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_status:empty { display: none; }
 
 .code_scan_zoom_button.code_scan_zoom_reset {
- position: relative; height: 28px; padding: 0 6px;
+ position: relative; width: 28px; height: 28px; padding: 0;
+ flex: 0 0 28px; align-items: center; justify-content: center;
+ background: transparent; border: none; border-radius: 0; box-shadow: none;
 }
+.code_scan_zoom_button.code_scan_zoom_reset:hover,
+.code_scan_zoom_button.code_scan_zoom_reset:active { background: transparent; }
 .code_scan_zoom_reset .code_scan_zoom_level {
  position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
  visibility: hidden;

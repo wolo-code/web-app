@@ -46,7 +46,7 @@
 		<div id='code_scan_review' class='code_scan_review hide'>
 			<div class='code_scan_review_city_row'>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
-				City
+				<span class='code_scan_city_label'>City</span>
 				<input id='code_scan_review_city' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
 			</label>
 				<button id='code_scan_city_select' class='code_scan_icon_button' type='button' aria-label='Choose city' title='Choose city' aria-expanded='false' aria-controls='code_scan_city_choices'><span class='image'><?php includeSVG('', 'List'); ?></span></button>

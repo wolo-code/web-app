@@ -269,3 +269,5 @@ Scanner controls: Status and privacy messages appear above the controls. Capture
 Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Use Code/Cancel are spread across the row. Zoom Reset uses an accessible reset-arrow icon.
 
 Scanner field controls: The city chooser icon sits inside the left edge of the city input. Zoom percentage and the small reset icon above it share one reset button. The icon appears only away from 100% zoom; its space stays reserved to prevent layout shifts.
+
+Scanner compact controls: City input is centered at 75% width, with an anchored city-choice popup that dismisses on selection, outside click, or Escape. Zoom percentage floats above the pill and is visible only away from 100%, alongside the conditional reset icon; the combined reset target remains stable. Wolo Code Input View orders city-source controls as Previous city, IP globe, then GPS.

@@ -73,6 +73,19 @@ function initCodeScan() {
 	bindControl('code_scan_zoom_in', 'click', zoomInCodeScan);
 	bindControl('code_scan_zoom_reset', 'click', resetCodeScanZoom);
 	bindControl('code_scan_city_select', 'click', toggleCodeScanCityChoices);
+	document.addEventListener('click', function(event) {
+		var row = document.querySelector('.code_scan_review_city_row');
+		if(row && !row.contains(event.target)) hideCodeScanCityChoices();
+	});
+	document.addEventListener('keydown', function(event) {
+		var choices = document.getElementById('code_scan_city_choices');
+		if(event.key === 'Escape' && choices && !choices.classList.contains('hide')) {
+			event.preventDefault();
+			event.stopPropagation();
+			hideCodeScanCityChoices();
+			document.getElementById('code_scan_city_select').focus();
+		}
+	}, true);
 	bindControl('code_scan_apply_crop', 'click', applyCodeScanCrop);
 	bindCodeScanReviewInputListeners();
 	initCodeScanZoomAndPan();
@@ -816,6 +829,13 @@ function toggleCodeScanCityChoices() {
 	choices.classList.toggle('hide', !expanded);
 	toggle.setAttribute('aria-expanded', String(expanded));
 	if(expanded && choices.firstElementChild) choices.firstElementChild.focus();
+}
+
+function hideCodeScanCityChoices() {
+	var choices = document.getElementById('code_scan_city_choices');
+	var toggle = document.getElementById('code_scan_city_select');
+	if(choices) choices.classList.add('hide');
+	if(toggle) toggle.setAttribute('aria-expanded', 'false');
 }
 
 function clearCodeScanReviewFields() {

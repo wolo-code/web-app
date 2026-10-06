@@ -50,7 +50,6 @@
 				<input id='code_scan_review_city' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
 			</label>
 				<button id='code_scan_city_select' class='code_scan_icon_button' type='button' aria-label='Choose city' title='Choose city' aria-expanded='false' aria-controls='code_scan_city_choices'><span class='image'><?php includeSVG('', 'List'); ?></span></button>
-				<div id='code_scan_city_choices' class='code_scan_city_choices hide' role='group' aria-label='Choose city'></div>
 			</div>
 			<div class='code_scan_review_words' role='group' aria-label='Wolo words'>
 				<label class='code_scan_review_field' for='code_scan_review_w1'>
@@ -76,4 +75,5 @@
 			</div>
 		</div>
 	</div>
+	<dialog id='code_scan_city_choices' class='code_scan_city_choices hide' aria-label='Choose city'></dialog>
 </div>

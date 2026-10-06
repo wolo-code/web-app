@@ -159,3 +159,5 @@ Scanner compact controls: City input is centered at 75% width, with an anchored 
 Scanner zoom reset: The reset glyph is centered in a fixed-width middle slot between minus and plus, with no individual background circle, including hover and pressed states. The shared zoom pill retains its background.
 
 Scanner City label sits just outside the input's left edge with an 8px gap, preserving the city field and embedded chooser positions.
+
+Scanner city choices open in a centered modal popup when the city icon is clicked, above the scanner with a dimmed backdrop. Selection updates the review city and dismisses the popup; Escape or backdrop click also dismisses it.

@@ -731,12 +731,14 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 .code_scan_review_actions { justify-content: space-around; gap: 24px; margin-top: 14px; }
 .code_scan_review_actions > button { flex: 0 1 130px; }
 .code_scan_city_choices {
- position: absolute; top: 100%; left: 0; right: 0; z-index: 5;
- display: flex; flex-direction: column; gap: 4px; padding: 8px;
- max-height: 180px; overflow-y: auto; background: #fff;
+ position: fixed; inset: 0; margin: auto; box-sizing: border-box;
+ display: flex; flex-direction: column; gap: 8px; padding: 16px;
+ width: min(320px, calc(100vw - 40px));
+ max-height: min(360px, calc(100dvh - 80px)); overflow-y: auto; background: #fff;
  border: 1px solid rgb(105 183 207 / 40%); border-radius: 10px;
  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
 }
+.code_scan_city_choices::backdrop { background: rgb(0 0 0 / 35%); }
 html.dark-mode .code_scan_city_choices { background: #222244; }
 .code_scan_city_choices.hide { display: none; }
 .code_scan_city_choices > button {

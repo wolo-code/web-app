@@ -75,7 +75,8 @@ function initCodeScan() {
 	bindControl('code_scan_city_select', 'click', toggleCodeScanCityChoices);
 	document.addEventListener('click', function(event) {
 		var row = document.querySelector('.code_scan_review_city_row');
-		if(row && !row.contains(event.target)) hideCodeScanCityChoices();
+		var choices = document.getElementById('code_scan_city_choices');
+		if(row && !row.contains(event.target) && (!choices || event.target === choices || !choices.contains(event.target))) hideCodeScanCityChoices();
 	});
 	document.addEventListener('keydown', function(event) {
 		var choices = document.getElementById('code_scan_city_choices');
@@ -798,7 +799,7 @@ function populateCodeScanCityChoices(recognizedCity) {
 	if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
 		addCity(selected_decode_city.name);
 	datalist.innerHTML = '';
-	datalist.classList.add('hide');
+	hideCodeScanCityChoices();
 	var toggle = document.getElementById('code_scan_city_select');
 	if(toggle) {
 		toggle.setAttribute('aria-expanded', 'false');
@@ -810,7 +811,7 @@ function populateCodeScanCityChoices(recognizedCity) {
 		option.textContent = choices[i];
 		option.addEventListener('click', function(event) {
 			document.getElementById('code_scan_review_city').value = event.currentTarget.textContent;
-			datalist.classList.add('hide');
+			hideCodeScanCityChoices();
 			if(toggle) {
 				toggle.setAttribute('aria-expanded', 'false');
 				toggle.focus();
@@ -827,6 +828,8 @@ function toggleCodeScanCityChoices() {
 	if(!choices || !toggle) return;
 	var expanded = choices.classList.contains('hide');
 	choices.classList.toggle('hide', !expanded);
+	if(expanded && typeof choices.showModal === 'function') choices.showModal();
+	if(!expanded && typeof choices.close === 'function') choices.close();
 	toggle.setAttribute('aria-expanded', String(expanded));
 	if(expanded && choices.firstElementChild) choices.firstElementChild.focus();
 }
@@ -834,7 +837,10 @@ function toggleCodeScanCityChoices() {
 function hideCodeScanCityChoices() {
 	var choices = document.getElementById('code_scan_city_choices');
 	var toggle = document.getElementById('code_scan_city_select');
-	if(choices) choices.classList.add('hide');
+	if(choices) {
+		if(typeof choices.close === 'function') choices.close();
+		choices.classList.add('hide');
+	}
 	if(toggle) toggle.setAttribute('aria-expanded', 'false');
 }
 

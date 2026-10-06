@@ -37,6 +37,8 @@ test('scanner city picker deduplicates choices and updates only the review city'
   };
  }
  const choices = element(), toggle = element(), input = element();
+ choices.showModal = () => { choices.open = true; };
+ choices.close = () => { choices.open = false; };
  const nodes = { code_scan_city_choices: choices, code_scan_city_select: toggle, code_scan_review_city: input };
  const context = { Audio: function() { this.load = () => {}; },
   document: { getElementById: id => nodes[id], createElement: element },
@@ -49,10 +51,12 @@ test('scanner city picker deduplicates choices and updates only the review city'
  context.populateCodeScanCityChoices('Delhi');
  assert.deepEqual(choices.children.map(x => x.textContent), ['Delhi', 'Mumbai']);
  context.toggleCodeScanCityChoices();
+ assert.equal(choices.open, true);
  assert.equal(toggle.attributes['aria-expanded'], 'true');
  assert.equal(choices.children[0].focused, true);
  choices.children[1].click({ currentTarget: choices.children[1] });
  assert.equal(input.value, 'Mumbai');
+ assert.equal(choices.open, false);
  assert.equal(context.selected_decode_city.name, 'Delhi');
  assert.equal(toggle.attributes['aria-expanded'], 'false');
  assert.equal(choices.classList.contains('hide'), true);

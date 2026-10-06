@@ -678,10 +678,12 @@ html.dark-mode .code_scan_apply_crop {
  box-shadow: 0 0 0 9999px rgba(0, 0, 0, .18);
 }
 .code_scan_live_controls, .code_scan_crop_controls {
- min-height: 64px; margin: 0; flex: 0 0 auto; gap: 12px;
+ min-height: 64px; margin: 0; flex: 1 0 64px; gap: 0;
+ display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+ align-content: center;
 }
-.code_scan_crop_controls { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 0; }
-.code_scan_crop_controls > button { justify-self: center; }
+.code_scan_live_controls > button, .code_scan_crop_controls > button { justify-self: center; }
+.code_scan_live_controls.hide, .code_scan_crop_controls.hide { display: none; }
 .code_scan_crop_button { width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; }
 .code_scan_status { min-height: 36px; margin: 0; flex: 0 0 auto; }
 .code_scan_review { animation: code-scan-review-in 180ms ease-out; }

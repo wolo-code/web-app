@@ -14,6 +14,7 @@
 			</div>
 			<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
 		</div>
+		<p id='code_scan_status' class='code_scan_status'>Processed on your device – No images are uploaded</p>
 		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide' role='toolbar' aria-label='Crop and zoom controls'>
 			<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan' type='button' aria-label='Rescan' title='Rescan'>
 				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
@@ -40,7 +41,6 @@
 				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>
 			</button>
 		</div>
-		<p id='code_scan_status' class='code_scan_status'>Processed on your device – No images are uploaded</p>
 		<div id='code_scan_review' class='code_scan_review hide'>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				City

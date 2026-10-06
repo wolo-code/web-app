@@ -21,9 +21,11 @@
 			</button>
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
 				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
-				<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
+				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom' title='Reset zoom'>
+					<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 8a8 8 0 1 1-1 8M5 3v5h5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>
+					<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
+				</button>
 				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
-				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom' title='Reset zoom'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 8a8 8 0 1 1-1 8M5 3v5h5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg></button>
 			</div>
 			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Crop and scan' title='Crop and scan'>
 				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
@@ -43,11 +45,11 @@
 		</div>
 		<div id='code_scan_review' class='code_scan_review hide'>
 			<div class='code_scan_review_city_row'>
-				<button id='code_scan_city_select' class='code_scan_icon_button' type='button' aria-label='Choose city' title='Choose city' aria-expanded='false' aria-controls='code_scan_city_choices'><span class='image'><?php includeSVG('', 'List'); ?></span></button>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				City
 				<input id='code_scan_review_city' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='words' spellcheck='false' placeholder='Optional'>
 			</label>
+				<button id='code_scan_city_select' class='code_scan_icon_button' type='button' aria-label='Choose city' title='Choose city' aria-expanded='false' aria-controls='code_scan_city_choices'><span class='image'><?php includeSVG('', 'List'); ?></span></button>
 			</div>
 			<div id='code_scan_city_choices' class='code_scan_city_choices hide' role='group' aria-label='Choose city'></div>
 			<div class='code_scan_review_words' role='group' aria-label='Wolo words'>

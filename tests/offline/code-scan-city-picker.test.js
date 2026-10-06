@@ -3,6 +3,25 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
+test('zoom reset indicator follows zoom changes and clears on reset', () => {
+ const level = {}, reset = { classList: { toggle(name, visible) { this.visible = visible; } } };
+ const context = { Audio: function() { this.load = () => {}; }, document: {
+  getElementById: id => ({ code_scan_zoom_level: level, code_scan_zoom_reset: reset })[id]
+ } };
+ vm.createContext(context);
+ vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
+ context.getCodeScanCanvas = () => null;
+ context.clampCodeScanPan = () => {};
+ context.setCodeScanZoom(1);
+ assert.equal(reset.classList.visible, false);
+ context.setCodeScanZoom(1.5);
+ assert.equal(level.textContent, '150%');
+ assert.equal(reset.classList.visible, true);
+ context.resetCodeScanZoom();
+ assert.equal(level.textContent, '100%');
+ assert.equal(reset.classList.visible, false);
+});
+
 test('scanner city picker deduplicates choices and updates only the review city', () => {
  function element() {
   const classes = new Set(['hide']);

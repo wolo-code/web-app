@@ -1182,6 +1182,9 @@ function setCodeScanZoom(zoom, panX, panY) {
 		canvas.style.transform = 'translate(' + codeScanState.panX + 'px, ' + codeScanState.panY + 'px) scale(' + codeScanState.zoom + ')';
 	if(zoomLevelNode)
 		zoomLevelNode.textContent = Math.round(codeScanState.zoom * 100) + '%';
+	var resetButton = document.getElementById('code_scan_zoom_reset');
+	if(resetButton)
+		resetButton.classList.toggle('code_scan_zoom_changed', codeScanState.zoom !== 1);
 	
 	if (codeScanState.phase !== 'live' && (codeScanState.zoom !== 1 || codeScanState.panX !== 0 || codeScanState.panY !== 0 || (codeScanState.originalSourceCanvas && codeScanState.sourceCanvas === codeScanState.originalSourceCanvas))) {
 		setCodeScanEditingCrop(true);

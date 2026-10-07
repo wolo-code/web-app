@@ -823,13 +823,13 @@ body:not(.decode) #saved_button {
  line-height: 0;
 }
 @media (min-width: 663px) {
- body:not(.decode) #map_search_cluster { margin-left: 63px; }
- body:not(.decode) #map_input_suggestion_result { left: 105px; }
+ body:not(.decode) #map_search_cluster { margin-left: 48px; }
+ body:not(.decode) #map_input_suggestion_result { left: 90px; }
  body:not(.decode) #saved_button {
-  width: 52px; height: 42px; padding: 0; margin: 0;
+  width: 42px; height: 42px; padding: 0; margin: 0;
  }
  body:not(.decode) #saved_button svg {
-  width: 52px; height: 42px; padding: 6px 11px;
+  width: 42px; height: 42px; padding: 6px;
   border-radius: 5px 0 0 5px;
  }
  body:not(.decode) #pac-input {

@@ -27,7 +27,8 @@
 	margin-bottom: 1.1em;
 }
 
-#logo_info {
+#logo_info,
+#logo_qr {
 	align-items: end;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -37,7 +38,8 @@
 	padding-left: 40px;
 }
 
-#logo_info > a {
+#logo_info > a,
+#logo_qr > a {
 	border-radius: 6px;
 	border-width: thin;
 	border-color: #f0f7fa;
@@ -45,26 +47,31 @@
 	padding: 3px;
 }
 
-#logo_wolo_info {
+#logo_wolo_info,
+#logo_wolo_qr {
 	justify-self: end;
 }
 
-#logo_codes_info {
+#logo_codes_info,
+#logo_codes_qr {
 	justify-self: start;
 	margin-bottom: 6px;
 }
 
-#logo_wolo_info > .image > svg {
+#logo_wolo_info > .image > svg,
+#logo_wolo_qr > .image > svg {
 	height: 50px;
 }
 
-#logo_codes_info > .image {
+#logo_codes_info > .image,
+#logo_codes_qr > .image {
 	display: block;
 	overflow: hidden;
 	width: 62px;
 }
 
-#logo_codes_info > .image > svg {
+#logo_codes_info > .image > svg,
+#logo_codes_qr > .image > svg {
 	display: block;
 	padding-top: 4px;
 	height: 22px;

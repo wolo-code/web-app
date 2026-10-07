@@ -471,7 +471,8 @@ html.dark-mode #info_message {
 	border-color: transparent;
 }
 
-html.dark-mode #logo_info > a {
+html.dark-mode #logo_info > a,
+html.dark-mode #logo_qr > a {
 	border-color: transparent;
 }
 

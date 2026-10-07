@@ -22,19 +22,6 @@
 }
 
 
-#logo_qr > a {
-	display: inline-block;
-	border-radius: 6px;
-	border-width: thin;
-	border-color: #f0f7fa;
-	border-style: solid;
-	padding: 3px;
-}
-
-#logo_codes_qr > .image > svg {
-	padding-top: 4px;
-}
-
 #qr_title_container {
 	margin-top: 6px;
 }
@@ -217,7 +204,7 @@
 	word-break: break-word;
 }
 
-#logo_qr { display: flex; align-items: center; justify-content: center; gap: 4px; cursor: default; user-select: none; caret-color: transparent; }
+#logo_qr { cursor: default; user-select: none; caret-color: transparent; }
 #qr_wcode_text { flex: 0 0 auto; margin-block: auto; }
 #qr_save .qr_bookmark_filled { display: none; }
 #qr_save.bookmarked .qr_bookmark_filled { display: block; }

@@ -73,7 +73,8 @@ self.addEventListener('message', function(event) {
 
 self.addEventListener('fetch', function(event) {
 	var request = event.request;
-	if (request.method !== 'GET') {
+	// Range requests need the server's partial-response semantics.
+	if (request.method !== 'GET' || request.headers.has('range')) {
 		return;
 	}
 
@@ -139,7 +140,7 @@ function precacheAssets(assets) {
 function cacheAsset(cache, asset) {
 	var url = new URL(asset, self.location.origin).toString();
 	return fetch(url, { credentials: 'same-origin' }).then(function(response) {
-		if (response && response.ok) {
+		if (response && response.ok && response.status !== 206) {
 			return cache.put(url, response);
 		}
 	}).catch(function() {});
@@ -148,11 +149,11 @@ function cacheAsset(cache, asset) {
 function networkFirstShell(request) {
 	return fetch(request)
 		.then(function(response) {
-			if (response && response.ok) {
+			if (response && response.ok && response.status !== 206) {
 				var copy = response.clone();
 				caches.open(SHELL_CACHE).then(function(cache) {
-					cache.put(request, copy);
-				});
+					return cache.put(request, copy);
+				}).catch(function() {});
 			}
 			return response;
 		})
@@ -201,11 +202,11 @@ function tryShellPaths(cache, index) {
 
 function networkFirstStatic(request) {
 	return fetch(request).then(function(response) {
-		if (response && response.ok) {
+		if (response && response.ok && response.status !== 206) {
 			var copy = response.clone();
 			caches.open(STATIC_CACHE).then(function(cache) {
-				cache.put(request, copy);
-			});
+				return cache.put(request, copy);
+			}).catch(function() {});
 		}
 		return response;
 	}).catch(function() {
@@ -217,9 +218,10 @@ function cacheFirstTile(request) {
 	return caches.open(TILE_CACHE).then(function(cache) {
 		return cache.match(request).then(function(cached) {
 			var networkPromise = fetch(request).then(function(response) {
-				if (response && response.ok) {
-					cache.put(request, response.clone());
-					trimTileCache(cache);
+				if (response && response.ok && response.status !== 206) {
+					cache.put(request, response.clone()).then(function() {
+						return trimTileCache(cache);
+					}).catch(function() {});
 				}
 				return response;
 			}).catch(function() {
@@ -244,7 +246,7 @@ function eventWait(promise) {
 }
 
 function trimTileCache(cache) {
-	cache.keys().then(function(keys) {
+	return cache.keys().then(function(keys) {
 		if (keys.length <= MAX_TILE_ENTRIES) {
 			return;
 		}

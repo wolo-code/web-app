@@ -1,5 +1,7 @@
 # App Features
 
+Bottom notifications remain visible above modal dialogs and their dimmed overlay, including feedback from modal actions.
+
 Use this file as a feature-level map of the Wolo Code root app. Pair it with `APP_SECTIONS.md` for screen/state naming.
 
 ## Reliability And Offline

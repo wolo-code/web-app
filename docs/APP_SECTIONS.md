@@ -1,5 +1,7 @@
 # App Section Names
 
+The Bottom Notification Bar (`#notification_bottom`) sits above the Overlay Layer so modal action feedback remains visible.
+
 Use these names consistently in code comments, tickets, copy docs, and design notes.
 
 Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so opening QR Label View can proceed.

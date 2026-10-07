@@ -345,7 +345,8 @@ body > #pac-input,
 	opacity: 1;
 	transition: opacity 400ms ease, bottom 200ms ease;
 	width: 350px;
-	z-index: 301;
+	/* Feedback from modal actions must stay above the overlay (10000). */
+	z-index: 10002;
 }
 
 #notification_bottom.fade-out {

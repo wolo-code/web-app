@@ -178,3 +178,5 @@ Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at
 Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Use Code stays disabled until all three words are complete and valid. Recognized or suggested cities display a rounded outlined tag, which clears when edited to an unknown city.
 
 The scan camera disc is styled on its image wrapper, with an unclipped SVG inside, so its lower corners retain the same rounding as its upper corners.
+
+Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 240ms icon growth transition on mouse hover and keyboard focus. Only the artwork scales; hit areas and guide captions stay fixed. Touch avoids sticky hover growth, and reduced-motion preferences disable the transition.

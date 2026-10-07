@@ -721,15 +721,9 @@ body.map-source-single #action_menu_map {
 	padding: 0;
 	pointer-events: auto;
 	position: relative;
-	transform: scale(1);
-	transform-origin: center;
-	transition: color 160ms ease, transform 180ms ease, opacity 160ms ease;
+	transition: color 160ms ease, opacity 160ms ease;
 }
 
-#decode_code_scan_button:hover:not(:disabled),
-#decode_code_scan_button:focus-visible {
-	transform: scale(1.08);
-}
 
 #decode_code_scan_button > .image {
 	background-color: rgb(255 255 255 / 65%);
@@ -795,4 +789,34 @@ body.decode #saved_button svg { box-sizing: border-box; padding: 5px; }
 /* Keep the camera artwork outside the disc's rounded clipping geometry. */
 #decode_code_scan_button > .image > svg {
  display: block; width: 100%; height: 100%; overflow: visible;
+}
+
+/* Animate the artwork while keeping hover targets and guide captions stationary. */
+:is(#decode_code_scan_button, #saved_button, #account, #location_button,
+    #decode_map_view_button, #map_type_button, #action_menu_info,
+    #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button) > .image {
+ display: inline-block;
+ transform: translateZ(0) scale(1);
+ transform-origin: center;
+ will-change: transform;
+ transition: transform 240ms cubic-bezier(.2, .7, .3, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+ :is(#decode_code_scan_button, #saved_button, #account, #location_button,
+     #decode_map_view_button, #map_type_button, #action_menu_info,
+     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button):hover:not(:disabled) > .image {
+  transform: translateZ(0) scale(1.08);
+ }
+}
+:is(#decode_code_scan_button, #saved_button, #account, #location_button,
+    #decode_map_view_button, #map_type_button, #action_menu_info,
+    #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button):focus-visible:not(:disabled) > .image {
+ transform: translateZ(0) scale(1.08);
+}
+@media (prefers-reduced-motion: reduce) {
+ :is(#decode_code_scan_button, #saved_button, #account, #location_button,
+     #decode_map_view_button, #map_type_button, #action_menu_info,
+     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button) > .image {
+  transition: none;
+ }
 }

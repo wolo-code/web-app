@@ -296,3 +296,5 @@ Scanner review validation: All three words must match the Wolo word list, ignori
 The scan camera disc is styled on its image wrapper, with an unclipped SVG inside, so its lower corners retain the same rounding as its upper corners.
 
 Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 240ms icon growth transition on mouse hover and keyboard focus. Only the artwork scales; hit areas and guide captions stay fixed. Touch avoids sticky hover growth, and reduced-motion preferences disable the transition.
+
+The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.

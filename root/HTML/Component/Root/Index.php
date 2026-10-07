@@ -108,7 +108,7 @@
 	</div>
 </div>
 <button id='saved_button' class='control' type='button' aria-label='Saved addresses' title='Saved addresses'>
-	<span class='image'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'><path fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.55l5-2.86 5 2.86V5z'/></svg></span>
+	<span class='image'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'><path transform='translate(0.6 0.6) scale(0.95)' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.55l5-2.86 5 2.86V5z'/></svg></span>
 	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Saved</span>
 </button>
 <div id='account' class="control" title='Account' aria-label='Account'>

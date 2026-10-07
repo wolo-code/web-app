@@ -781,7 +781,7 @@ body.decode-icon-guide #saved_button { z-index: 202; }
 }
 #decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }
 
-/* Map chrome: one aligned bottom band, with Bookmarks beside Account. */
+/* Map chrome: one aligned bottom band, with Bookmarks beside Search. */
 body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button) {
  bottom: calc(31px + env(safe-area-inset-bottom, 0px));
  box-sizing: content-box;
@@ -807,8 +807,13 @@ body:not(.decode) #decode_scan_area {
 body:not(.decode) #saved_button {
  top: calc(26px + var(--app-safe-top));
  bottom: auto;
- right: 259px;
+ left: 11px;
+ right: auto;
  line-height: 0;
+}
+@media (min-width: 663px) {
+ body:not(.decode) #map_search_cluster { margin-left: 63px; }
+ body:not(.decode) #map_input_suggestion_result { left: 105px; }
 }
 body:not(.decode) #saved_button .decode_chrome_caption {
  top: calc(100% + 6px);
@@ -830,13 +835,7 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
 @media (max-width: 662px) {
  body:not(.decode) #saved_button {
   top: calc(18px + var(--app-safe-top));
-  right: 69px;
- }
-}
-@media (max-width: 316px) {
- body:not(.decode) #saved_button {
-  top: calc(92px + var(--app-safe-top));
-  left: 63px;
+  left: 11px;
   right: auto;
  }
 }

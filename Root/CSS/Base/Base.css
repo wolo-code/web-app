@@ -406,6 +406,8 @@ body > #pac-input,
 }
 
 #footer-content-container {
+	/* Static footer text must not show a caret when browser caret browsing is enabled. */
+	caret-color: transparent;
 	position: absolute;
 	left: 0;
 	right: 0;

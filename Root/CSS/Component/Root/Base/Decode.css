@@ -43,6 +43,7 @@ body.decode-icon-guide #account,
 body.decode-icon-guide .action_menu_item,
 body.decode-icon-guide #location_button,
 body.decode-icon-guide #decode_map_view_button,
+body.decode-icon-guide #decode_scan_area,
 body.decode-icon-guide #decode_code_scan_button,
 body.decode-icon-guide #map_type_button,
 body.decode-icon-guide #map_search_cluster,
@@ -760,7 +761,7 @@ body.decode #decode_map_view_button { left: 62px; right: auto; }
  box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 body.decode-icon-guide #saved_button { z-index: 202; }
-#saved_button .decode_icon_caption { bottom: calc(100% + 10px); }
+#saved_button .decode_icon_caption { bottom: calc(100% + 10px); top: auto; }
 
 
 
@@ -779,7 +780,7 @@ body.decode-icon-guide #saved_button { z-index: 202; }
  background-color: rgb(255 255 255 / 50%);
  box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
-#decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }
+#decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); top: auto; }
 
 /* Map chrome: one aligned bottom band, with Bookmarks beside Search. */
 body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button) {
@@ -833,8 +834,8 @@ body:not(.decode) #saved_button {
  }
 }
 body:not(.decode) #saved_button .decode_chrome_caption {
- top: calc(100% + 6px);
- bottom: auto;
+ top: auto;
+ bottom: calc(100% + 6px);
 }
 body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button) > .image {
  display: block;
@@ -850,6 +851,9 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
  bottom: calc(61px + env(safe-area-inset-bottom, 0px)) !important;
 }
 @media (max-width: 662px) {
+ body:not(.decode).decode-icon-guide #saved_button {
+  top: calc(32px + var(--app-safe-top));
+ }
  body:not(.decode) #saved_button {
   top: calc(18px + var(--app-safe-top));
   left: 11px;

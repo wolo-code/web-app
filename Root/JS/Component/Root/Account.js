@@ -155,9 +155,13 @@ function savedCityDisplayName(city, entry) {
 }
 
 function setSavedRowCodeText(row_code, cityName, words) {
-	var code = (words || []).join(' ');
-	var city = cityName || '';
-	row_code.innerText = '\\ ' + city + (city ? '\n' : '') + code + ' /';
+	var cityLine = document.createElement('div');
+	cityLine.className = 'row-code-city';
+	cityLine.textContent = '\\ ' + (cityName || '');
+	var codeLine = document.createElement('div');
+	codeLine.className = 'row-code-words';
+	codeLine.textContent = (words || []).join(' ') + ' /';
+	row_code.replaceChildren(cityLine, codeLine);
 }
 
 function getSaveEntryRow(node) {

@@ -407,7 +407,7 @@
 }
 
 .row-title, .row-segment {
-	text-align: center;
+	text-align: left;
 	padding-right: 10px;
 }
 
@@ -454,9 +454,18 @@
 .row-code {
 	overflow-wrap: anywhere;
 	padding: 8px 10px 4px;
-	text-align: center;
+	text-align: left;
 	white-space: pre-line;
 	word-break: break-word;
+}
+
+.row-code-city {
+	text-align: left;
+	margin-bottom: 4px;
+}
+
+.row-code-words {
+	text-align: center;
 }
 
 .row-address {

@@ -7,12 +7,26 @@
 	font-family: Abel;
 	margin: 0 auto;
 	border: transparent solid 20px;
+	border-radius: 25px;
 	overflow: visible;
 	padding: 2px 20px 28px;
 	text-align: left;
 	background-color: #FFFFFF;
 	color: #999999;
 	max-width: 400px;
+}
+
+#info_message_close {
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+	top: -3px;
+	right: 9px;
+	z-index: 1;
 }
 
 #wolo_about {

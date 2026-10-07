@@ -1,7 +1,7 @@
 <div id='info_message' class='hide'>
-	<div id='info_message_close' class="message_dialog_close control hide">
+	<button id='info_message_close' type='button' class="message_dialog_close control hide" aria-label='Close information'>
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
-	</div>
+	</button>
 	<div id='logo_info'>
 		<a id=logo_wolo_info href='//wcodes.org' tabindex='1'>
 			<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>

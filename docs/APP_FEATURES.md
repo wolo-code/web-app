@@ -212,3 +212,5 @@ The Map View scanner and search artwork use the primary accent (#69B7CF).
 The profile artwork (default icon and signed-in avatar) is 42px with a padded tap target. Narrow Map View centers the bookmark and profile horizontally in the spaces beside the logo and vertically in the header. The logo fits between the reserved control spaces.
 
 QR Label View adds 5px of horizontal padding on each side, increasing the label modal width by 10px.
+
+Info and footer Details share a modal with 25px rounded corners. Its close action is a keyboard-accessible button with a 44px hit area above the modal content, supporting mouse and touch dismissal.

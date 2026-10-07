@@ -165,7 +165,7 @@ body.satellite #map {
 
 #logo {
 	position: absolute;
-	right: max(0px, calc(10px - var(--app-logo-offset-x)));
+	right: 10px;
 	top: calc(10px + var(--app-safe-top));
 	width: auto;
 }

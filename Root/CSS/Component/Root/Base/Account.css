@@ -1,9 +1,15 @@
 #account {
 	position: absolute;
-	right: 200px;
+	right: 194px;
 	top: calc(18px + var(--app-safe-top));
 	padding: 8px;
 	margin: 0px;
+}
+
+#account > .image svg,
+#account > .image > img {
+	width: 32px;
+	height: 32px;
 }
 
 #account_default_image.inactive > svg > path:first-child {
@@ -583,8 +589,9 @@
 
 #account > span.image {
 	box-shadow: rgb(0 0 0 / 46%) 0px 0px 3px;
-	height: 42px;
-	display: inline-block;
+	width: 32px;
+	height: 32px;
+	display: block;
 	border-radius: 50%;
 	background: rgb(255 255 255 / 50%);
 }

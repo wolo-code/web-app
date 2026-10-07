@@ -69,7 +69,7 @@ body.decode-icon-guide #map_search_bar .decode_icon_caption {
 body.decode-icon-guide #account {
 	overflow: visible;
 	position: absolute;
-	width: 39px;
+	width: 32px;
 }
 
 #decode_icon_guide_scrim {
@@ -463,7 +463,7 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 }
 
 .decode #account {
-	left: 12px;
+	left: 6px;
 	overflow: visible;
 	right: auto;
 }
@@ -751,7 +751,7 @@ body.map-source-single #action_menu_map {
 /* Decode destinations: Info + Map on the left, Camera + Saved on the right. */
 body.decode #decode_map_view_button { left: 62px; right: auto; }
 #saved_button {
- display: block; position: absolute; right: 11px; bottom: 31px;
+ display: block; position: absolute; right: 6px; bottom: 31px;
  background: transparent; border: 0; padding: 8px; margin: -8px;
  width: 39px; height: 39px; box-sizing: content-box; z-index: 2; cursor: pointer;
 }
@@ -817,7 +817,7 @@ html:not(.dark-mode) #search_icon path:first-child { fill: #777; }
 body:not(.decode) #saved_button {
  top: calc(26px + var(--app-safe-top));
  bottom: auto;
- left: 11px;
+ left: 6px;
  right: auto;
  line-height: 0;
 }
@@ -855,7 +855,7 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
 @media (max-width: 662px) {
  body:not(.decode) #saved_button {
   top: calc(18px + var(--app-safe-top));
-  left: 11px;
+  left: 6px;
   right: auto;
  }
 }

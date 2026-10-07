@@ -206,3 +206,5 @@ Map View places Scan inside the right end of the search field, before Go, with t
 Guide captions: the decode scanner and its parent stay above the guide overlay. Scan and Saved captions appear above their decode buttons; the map Saved caption appears below its bookmark button. Previous stays enabled during the guide even when city history is empty; its normal availability returns after dismissal. Static copyright footer text hides the browser caret without affecting input cursors.
 
 In light mode, the Map View scanner icon uses the same higher-contrast gray (#777) as the search icon. The color applies to its artwork only.
+
+The profile artwork (default icon and signed-in avatar) is 32px with a padded tap target. Profile and bookmark controls sit closer to their respective edges; narrow Map View places the bookmark at the left and profile at the right to reduce header overlap.

@@ -6,7 +6,12 @@
 
 	.decode #account {
 		left: unset;
-		right: 10px;
+		right: 4px;
+	}
+
+	body:not(.decode) #account {
+		left: auto;
+		right: 4px;
 	}
 
 	.decode.decode-icon-guide #account .decode_chrome_caption,

@@ -1,7 +1,7 @@
 @media (max-width: 734px) and (min-width: 662px) {
 		.satellite #account, .map #account {
 				right: unset !important;
-				left: 10px !important;
+				left: 4px !important;
 				top: calc(84px + var(--app-safe-top)) !important;
 		}
 }

@@ -396,6 +396,9 @@
 }
 
 .row-header {
+	caret-color: transparent;
+	user-select: none;
+	-webkit-user-select: none;
 	box-sizing: border-box;
 	min-height: 70px;
 	background: #69B7CF !important;
@@ -404,6 +407,10 @@
 }
 
 .row-header, .row-title, .row-segment, .row-address, .row-code {
+	box-sizing: border-box;
+	width: fit-content;
+	max-width: 100%;
+	margin-inline: auto;
 	pointer-events: none;
 }
 

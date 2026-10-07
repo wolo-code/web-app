@@ -173,3 +173,5 @@ City-list icon placement: The scanner review icon sits 4 px higher. In Map View,
 The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.
 
 Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at normal zoom. Changed zoom displays the reset glyph in the same slot, retaining the existing reset target, percentage position, and behavior.
+
+Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Unknown words show a red underline and an accessible field-specific message; Use Code stays disabled until all three are valid. Recognized or suggested cities display a rounded outlined tag, which clears when edited to an unknown city.

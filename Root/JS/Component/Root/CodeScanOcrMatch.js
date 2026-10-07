@@ -154,7 +154,7 @@
 	}
 
 	function validateReviewWords(w1, w2, w3, includesFn) {
-		var words = [normalizeOcrText(w1), normalizeOcrText(w2), normalizeOcrText(w3)];
+		var words = [w1, w2, w3].map(function(word) { return String(word || '').trim().toLowerCase(); });
 		var i;
 		for(i = 0; i < words.length; i++) {
 			if(!words[i] || !includesFn(words[i]))

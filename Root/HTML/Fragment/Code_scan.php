@@ -55,17 +55,18 @@
 			<div class='code_scan_review_words' role='group' aria-label='Wolo words'>
 				<label class='code_scan_review_field' for='code_scan_review_w1'>
 					Word 1
-					<input id='code_scan_review_w1' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' required>
+					<input id='code_scan_review_w1' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' aria-describedby='code_scan_review_validity' required>
 				</label>
 				<label class='code_scan_review_field' for='code_scan_review_w2'>
 					Word 2
-					<input id='code_scan_review_w2' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' required>
+					<input id='code_scan_review_w2' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' aria-describedby='code_scan_review_validity' required>
 				</label>
 				<label class='code_scan_review_field' for='code_scan_review_w3'>
 					Word 3
-					<input id='code_scan_review_w3' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' required>
+					<input id='code_scan_review_w3' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' aria-describedby='code_scan_review_validity' required>
 				</label>
 			</div>
+			<p id='code_scan_review_validity' class='code_scan_review_validity' role='status' aria-live='polite'></p>
 			<div class='code_scan_review_actions'>
 				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
 					Use Code

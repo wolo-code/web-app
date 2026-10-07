@@ -51,6 +51,7 @@ var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_FIXED_ASPECT = 3;
 var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
 var codeScanInitialStatus = '';
+var codeScanCityChoices = [];
 
 function getCodeScanInitialStatus() {
 	if(!codeScanInitialStatus) {
@@ -798,6 +799,7 @@ function populateCodeScanCityChoices(recognizedCity) {
 		addCity(geoIp_city_name);
 	if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
 		addCity(selected_decode_city.name);
+	codeScanCityChoices = choices;
 	datalist.innerHTML = '';
 	hideCodeScanCityChoices();
 	var toggle = document.getElementById('code_scan_city_select');
@@ -857,14 +859,31 @@ function updateCodeScanReviewValidity() {
 	var w3Input = document.getElementById('code_scan_review_w3');
 	var useCodeButton = document.getElementById('code_scan_use_code');
 	var validityNode = document.getElementById('code_scan_review_validity');
-	var valid = false;
-	if(w1Input && w2Input && w3Input)
-		valid = codeScanOcrMatch.validateReviewWords(w1Input.value, w2Input.value, w3Input.value, wordList.includes.bind(wordList));
+	var inputs = [w1Input, w2Input, w3Input];
+	var invalidWords = [];
+	var valid = true;
+	inputs.forEach(function(input, index) {
+		if(!input) { valid = false; return; }
+		var value = input.value.trim().toLowerCase();
+		var listed = !!(value && typeof wordList !== 'undefined' && wordList && wordList.includes(value));
+		var invalid = !!value && !listed;
+		valid = valid && listed;
+		input.classList.toggle('code_scan_word_invalid', invalid);
+		input.setAttribute('aria-invalid', String(invalid));
+		input.setCustomValidity(invalid ? 'This word is not in the Wolo word list.' : '');
+		if(invalid) invalidWords.push('Word ' + (index + 1));
+	});
 	if(useCodeButton)
 		useCodeButton.disabled = !valid;
 	if(validityNode) {
-		validityNode.textContent = '';
+		validityNode.textContent = invalidWords.length ? invalidWords.join(', ') + ': not in the Wolo word list.' : '';
 		validityNode.classList.toggle('code_scan_review_valid', valid);
+	}
+	if(cityInput) {
+		var city = cityInput.value.trim().toLowerCase();
+		cityInput.classList.toggle('code_scan_city_tag', !!city && codeScanCityChoices.some(function(choice) {
+			return String(choice).trim().toLowerCase() === city;
+		}));
 	}
 	if(cityInput && !cityInput.value && typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
 		cityInput.placeholder = selected_decode_city.name;

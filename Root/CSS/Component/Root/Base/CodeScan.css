@@ -793,3 +793,15 @@ html.dark-mode #decode_city_history_message { background: #222244; }
  padding: 0; max-height: min(300px, calc(100dvh - 160px)); overflow-y: auto;
 }
 #decode_city_history_delete { padding: 0 16px; }
+
+.code_scan_review_input.code_scan_word_invalid,
+html.dark-mode .code_scan_review_input.code_scan_word_invalid {
+ color: #d94c4c; border-bottom: 2px solid #d94c4c;
+}
+.code_scan_review_validity,
+html.dark-mode .code_scan_review_validity { color: #d94c4c; font-size: 0.82em; text-align: center; }
+.code_scan_review_validity:empty { display: none; }
+.code_scan_review_input.code_scan_city_tag,
+html.dark-mode .code_scan_review_input.code_scan_city_tag {
+ border: 1px solid #69B7CF; border-radius: 16px; background: rgb(105 183 207 / 8%);
+}

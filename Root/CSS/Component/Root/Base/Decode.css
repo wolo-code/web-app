@@ -781,6 +781,66 @@ body.decode-icon-guide #saved_button { z-index: 202; }
 }
 #decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }
 
+/* Map chrome: one aligned bottom band, with Bookmarks beside Account. */
+body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button) {
+ bottom: calc(31px + env(safe-area-inset-bottom, 0px));
+ box-sizing: content-box;
+ height: 39px;
+ width: 39px;
+ padding: 8px;
+ margin: -8px;
+ background: transparent;
+ border: 0;
+ line-height: 0;
+}
+body:not(.decode) #location_button {
+ left: 50%;
+ right: auto;
+ transform: translateX(-50%);
+}
+body:not(.decode) #map_type_button { right: 11px; }
+body:not(.decode) #decode_scan_area {
+ bottom: calc(31px + env(safe-area-inset-bottom, 0px));
+ right: 62px;
+ z-index: 2;
+}
+body:not(.decode) #saved_button {
+ top: calc(26px + var(--app-safe-top));
+ bottom: auto;
+ right: 259px;
+ line-height: 0;
+}
+body:not(.decode) #saved_button .decode_chrome_caption {
+ top: calc(100% + 6px);
+ bottom: auto;
+}
+body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button) > .image {
+ display: block;
+}
+body:not(.decode) :is(#location_button, #map_type_button) svg {
+ box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
+}
+html.dark-mode body :is(.action_menu_item, #map_type_button, #decode_map_view_button, #saved_button, #decode_code_scan_button) {
+ background: transparent;
+}
+body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
+ right: 113px !important;
+ bottom: calc(61px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (max-width: 662px) {
+ body:not(.decode) #saved_button {
+  top: calc(18px + var(--app-safe-top));
+  right: 69px;
+ }
+}
+@media (max-width: 316px) {
+ body:not(.decode) #saved_button {
+  top: calc(92px + var(--app-safe-top));
+  left: 63px;
+  right: auto;
+ }
+}
+
 /* Keep the camera artwork outside the disc's rounded clipping geometry. */
 #decode_code_scan_button > .image > svg {
  display: block; width: 100%; height: 100%; overflow: visible;

@@ -62,13 +62,14 @@
 		</div>
 		<input id='decode_input_case' type='text' tabindex='-1' aria-hidden='true' autocomplete='off' required pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?'>
 	</div>
-	<div id='decode_scan_area'>
-		<button id='decode_code_scan_button' class='control' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label' tabindex='5'>
-			<span class='image'><?php includeSVG('', 'Camera'); ?></span>
-			<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Scan</span>
-		</button>
-	</div>
+
 	<span id='decode_input_shadow'></span>
+</div>
+<div id='decode_scan_area'>
+	<button id='decode_code_scan_button' class='control' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label' tabindex='5'>
+		<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+		<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Scan</span>
+	</button>
 </div>
 <button id='decode_map_view_button' class='control' type='button' aria-label='Terrain map view' title='Terrain map view' tabindex='6'>
 	<span class='image'><?php includeSVG('', 'Map-terrain'); ?></span>

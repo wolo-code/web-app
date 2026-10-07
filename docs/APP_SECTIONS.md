@@ -317,4 +317,4 @@ QR Label View layout: the code rectangle has an explicit 172px height at its 278
 
 QR Label View brand placement shares the Info modal logo styles: bottom-aligned two-column grid, 50px Wolo mark, and the cropped 62px-wide Codes mark with a 6px bottom offset. Both hide logo outlines in dark mode.
 
-Map navigation uses independent buttons matching Wolo Code Input View: Info and Wolo Code at bottom left, Camera and Bookmarks at bottom right, with Switch map beside Camera. The former action menu wrapper and layout are removed.
+Map View uses independent circular controls aligned along the bottom: Info and Wolo Code at left, Locate in the center, and Scan and Switch map at right, with the map D-pad beside Scan. Bookmarks sits beside the profile icon at the top and follows its responsive placement. Buttons retain transparent outer hit areas in dark mode. Scan is outside the hidden input overlay so it remains available on Map View. Wolo Code Input View keeps Camera and Bookmarks at bottom right.

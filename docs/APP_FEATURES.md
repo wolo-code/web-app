@@ -197,8 +197,8 @@ Label and city chooser sizing: the bordered Wolo Code region in QR Label View us
 
 QR Label View: city and code are vertically centered as one group within the golden-ratio rectangle. The save bookmark fills for a saved city/code and shows an asterisk when its address differs from every matching bookmark; editing and bookmark updates refresh the status. The brand lockup has no text caret or extra tab stop. Preview, Download and Print use circular backgrounds.
 
-QR Label View layout: the code rectangle has an explicit 172px height at its 278px width so the code group centers consistently in the modal and raster export. The three circular footer actions have 32px gaps.
+QR Label View layout: the code rectangle has an explicit 172px height at its 278px width so the code group centers consistently in the modal and raster export. The three circular footer actions have 44px gaps. The label-scoped code container uses a column flex layout so the city/code group remains vertically centered.
 
-QR Label View brand placement shares the Info modal logo styles: bottom-aligned two-column grid, 50px Wolo mark, and the cropped 62px-wide Codes mark with a 6px bottom offset. Both hide logo outlines in dark mode.
+QR Label View brand placement shares the Info modal logo styles: bottom-aligned two-column grid, 50px Wolo mark, and the cropped 62px-wide Codes mark with a 6px bottom offset. Both hide logo outlines in dark mode. The label logo group is shifted 8px to the right.
 
 Map View uses independent circular controls aligned along the bottom: Info and Wolo Code at left, Locate in the center, and Scan and Switch map at right, with the map D-pad beside Scan. Bookmarks sits to the left of the search cluster on wide screens, with space reserved before the previous-city and search controls. On narrow screens it sits in the top-left corner above the search bar. Buttons retain transparent outer hit areas in dark mode. Scan is outside the hidden input overlay so it remains available on Map View. Wolo Code Input View keeps Camera and Bookmarks at bottom right.

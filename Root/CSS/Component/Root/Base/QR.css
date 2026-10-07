@@ -93,7 +93,7 @@
 	text-decoration: none;
 }
 
-#qr_wcode_container {
+#qr_container #qr_wcode_container {
 	width: 278px;
 	max-width: 100%;
 	height: 172px;
@@ -204,12 +204,12 @@
 	word-break: break-word;
 }
 
-#logo_qr { cursor: default; user-select: none; caret-color: transparent; }
+#logo_qr { cursor: default; user-select: none; caret-color: transparent; transform: translateX(8px); }
 #qr_wcode_text { flex: 0 0 auto; margin-block: auto; }
 #qr_save .qr_bookmark_filled { display: none; }
 #qr_save.bookmarked .qr_bookmark_filled { display: block; }
 #qr_save.bookmarked .qr_bookmark_outline { display: none; }
 #qr_bookmark_changed { color: #69b7cf; font-size: 20px; line-height: 1; align-self: flex-start; }
-#qr_controls { display: flex; justify-content: center; gap: 32px; float: none; left: auto; }
+#qr_controls { display: flex; justify-content: center; gap: 44px; float: none; left: auto; }
 #qr_controls > button { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 44px; height: 44px; min-width: 44px; padding: 10px; margin: 2px 0 10px; left: auto; border-radius: 50%; }
 #qr_controls > button .image { display: flex; align-items: center; justify-content: center; }

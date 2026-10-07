@@ -165,3 +165,5 @@ Scanner city choices open in a centered modal popup when the city icon is clicke
 Service-worker partial responses: Range requests pass directly to the network. HTTP 206 responses are never cached, and background cache-write failures do not interrupt successful network responses.
 
 Scanner city chooser: The city-list icon has no persistent circle in either theme. Pressing it shows a circle that fades over 450 ms after release.
+
+Scanner city choices appear as a vertical list of full-width, left-aligned rows with subtle separators in both themes. Selecting a row fills the review city and closes the chooser.

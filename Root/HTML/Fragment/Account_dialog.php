@@ -82,23 +82,12 @@
 			</div>
 		</div>
 		<div id='account_dialog_row_menu' class='row-menu-list hide' role='menu' aria-hidden='true'>
-			<button type='button' id='account_dialog_row_edit' class='row-edit' role='menuitem'>Edit</button>
-			<button type='button' id='account_dialog_row_delete' class='row-delete' role='menuitem'>Delete</button>
+			<button type='button' id='account_dialog_row_edit' class='row-edit' role='menuitem'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='m15 4 5 5M4 20l4-1L20 7a2 2 0 0 0-3-3L5 16z'/></svg><span>Edit</span></button>
+			<button type='button' id='account_dialog_row_sync' class='bookmark-sync hide' role='menuitem'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M7 18H6a4 4 0 0 1-1-8 7 7 0 0 1 13-1 4.5 4.5 0 0 1 0 9h-1M12 21V11m-4 4 4-4 4 4'/></svg><span id='account_dialog_row_sync_label'>Sync to cloud</span></button>
+			<button type='button' id='account_dialog_row_delete' class='row-delete' role='menuitem'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7'/></svg><span>Delete</span></button>
 		</div>
 		<div id='account_dialog_more_icon_template' class='hide' aria-hidden='true'>
-			<span class='image'><?php includeSVG('', 'More'); ?></span>
-		</div>
-	</div>
-</div>
-<div id='bookmark_info_dialog_container' class='center hide'>
-	<div id='bookmark_info_dialog' class='message_dialog saved-compatible-dialog' role='dialog' aria-modal='true' aria-labelledby='bookmark_info_title' aria-describedby='bookmark_info_message'>
-		<h2 id='bookmark_info_title' class='message_dialog_label'>Bookmark storage</h2>
-		<button id='bookmark_info_close' type='button' class='message_dialog_close control' aria-label='Close bookmark information'>
-			<span class='image'><?php includeSVG('', 'Close'); ?></span>
-		</button>
-		<div class='message_dialog_body'>
-			<p id='bookmark_info_message'>This bookmark is saved only in this browser, not to the cloud. Clearing browser data removes it.</p>
-			<button id='bookmark_info_sync' type='button' class='bookmark-sync control'>Sync to cloud</button>
+			<span class='image'><svg viewBox='0 0 18 18' aria-hidden='true'><circle cx='9' cy='2' r='2'/><circle cx='9' cy='9' r='2'/><circle cx='9' cy='16' r='2'/></svg></span>
 		</div>
 	</div>
 </div>

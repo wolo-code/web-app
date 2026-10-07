@@ -30,8 +30,6 @@ function showAccountDialog() {
 }
 
 function hideAccountDialog() {
-	hideOverlay(document.getElementById('bookmark_info_dialog_container'));
-	bookmarkInfoKey = null;
 	hideOverlay(document.getElementById('account_dialog_container'));
 	hideOverlay(document.getElementById('saved_dialog_container'));
 	closeSaveEntryMenus();
@@ -342,7 +340,6 @@ var bookmarkCloudRef = null;
 var bookmarkCloudListener = null;
 var cloudBookmarks = {};
 var syncingLocalBookmarks = {};
-var bookmarkInfoKey = null;
 
 function getBookmarkUser() {
  return typeof firebase !== 'undefined' && firebase && typeof firebase.auth === 'function' ? firebase.auth().currentUser : null;
@@ -395,58 +392,32 @@ function addLocalBookmarkInfo(row, header, key) {
 	info.type = 'button';
 	info.className = 'bookmark-info-toggle control';
 	info.setAttribute('aria-label', 'Bookmark storage information');
-	info.setAttribute('aria-haspopup', 'dialog');
-	info.setAttribute('aria-controls', 'bookmark_info_dialog');
 	info.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10v7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="1" fill="currentColor"/></svg>';
 	info.addEventListener('click', function(event) {
 		event.stopPropagation();
-		showBookmarkInfoDialog(key);
+		showNotification('This bookmark is saved only in this browser. Use Sync to cloud in the three-dot menu to save it to your account. Clearing browser data removes the local copy.', NOTIFICATION_DURATION_LONG);
 	});
 	header.appendChild(info);
 }
 
-function showBookmarkInfoDialog(key) {
-	bookmarkInfoKey = key;
-	var sync = document.getElementById('bookmark_info_sync');
-	sync.textContent = syncingLocalBookmarks[key] ? 'Syncing…' : 'Sync to cloud';
-	sync.disabled = !!syncingLocalBookmarks[key];
-	sync.setAttribute('aria-disabled', !getBookmarkUser() || sync.disabled ? 'true' : 'false');
-	sync.title = getBookmarkUser() ? '' : 'Sign in to sync this bookmark';
-	showOverlay(document.getElementById('bookmark_info_dialog_container'));
-	document.getElementById('bookmark_info_close').focus();
+function updateBookmarkSyncMenu(row) {
+	var button = document.getElementById('account_dialog_row_sync');
+	var key = row && row.data_key;
+	button.classList.toggle('hide', !isLocalBookmark(key));
+	button.disabled = !!syncingLocalBookmarks[key];
+	button.setAttribute('aria-disabled', !getBookmarkUser() || button.disabled ? 'true' : 'false');
+	button.title = getBookmarkUser() ? '' : 'Sign in to sync this bookmark';
+	document.getElementById('account_dialog_row_sync_label').textContent = button.disabled ? 'Syncing…' : 'Sync to cloud';
 }
 
-function closeBookmarkInfoDialog() {
-	var key = bookmarkInfoKey;
-	bookmarkInfoKey = null;
-	showOverlay(document.getElementById('saved_dialog_container'));
-	var info = document.getElementById('bookmark_info_toggle_' + key);
-	if(info) info.focus();
-	else document.getElementById('saved_dialog_close').focus();
+function syncSaveEntry(event) {
+	if(event && event.stopPropagation) event.stopPropagation();
+	var row = getSaveEntryMenuRow(event);
+	closeSaveEntryMenus();
+	if(row && isLocalBookmark(row.data_key)) return syncLocalBookmark(row.data_key);
 }
 
-function onBookmarkInfoKeydown(event) {
-	if(event.key === 'Escape') {
-		event.preventDefault();
-		event.stopPropagation();
-		closeBookmarkInfoDialog();
-	}
-	else if(event.key === 'Tab') {
-		var close = document.getElementById('bookmark_info_close');
-		var sync = document.getElementById('bookmark_info_sync');
-		if(sync.disabled || (event.shiftKey && event.target === close) || (!event.shiftKey && event.target === sync)) {
-			event.preventDefault();
-			(event.shiftKey && !sync.disabled ? sync : close).focus();
-		}
-	}
-}
-
-function onBookmarkInfoSync() {
-	if(bookmarkInfoKey)
-		return syncLocalBookmark(bookmarkInfoKey, document.getElementById('bookmark_info_sync'));
-}
-
-function syncLocalBookmark(key, button) {
+function syncLocalBookmark(key) {
 	var user = getBookmarkUser();
 	if(!user) {
 		showNotification('Sign in to sync this bookmark to the cloud');
@@ -473,9 +444,7 @@ function syncLocalBookmark(key, button) {
 		time: firebase.database.ServerValue.TIMESTAMP
 	};
 	syncingLocalBookmarks[key] = true;
-	button.disabled = true;
-	button.setAttribute('aria-disabled', 'true');
-	button.textContent = 'Syncing…';
+	if(menuSaveEntry) updateBookmarkSyncMenu(menuSaveEntry);
 	// A stable cloud key makes retries safe if saving local storage fails.
 	return new Promise(function(resolve, reject) {
 		firebase.database().ref('/UserData/' + user.uid + '/' + cloudKey).set(payload, function(error) {
@@ -498,11 +467,7 @@ function syncLocalBookmark(key, button) {
 		return false;
 	}).then(function(result) {
 		delete syncingLocalBookmarks[key];
-		button.disabled = false;
-		button.setAttribute('aria-disabled', getBookmarkUser() ? 'false' : 'true');
-		button.textContent = 'Sync to cloud';
 		renderAllBookmarks();
-		if(bookmarkInfoKey === key && !readLocalBookmarks()[key]) closeBookmarkInfoDialog();
 		return result;
 	});
 }
@@ -708,6 +673,7 @@ function onSaveEntryMenuToggle(e) {
 	if(wasOpen || !row)
 		return;
 	menuSaveEntry = row;
+	updateBookmarkSyncMenu(row);
 	toggle.setAttribute('aria-expanded', 'true');
 	var menu = document.getElementById('account_dialog_row_menu');
 	if(menu)

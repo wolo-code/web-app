@@ -167,15 +167,13 @@ function setupControls() {
 	bindControl('account', 'click', onAccount);
 	bindControl('saved_button', 'click', showSavedDialog);
 	bindControl('saved_dialog_close', 'click', hideAccountDialog);
-	bindControl('bookmark_info_close', 'click', closeBookmarkInfoDialog);
-	bindControl('bookmark_info_sync', 'click', onBookmarkInfoSync);
-	bindControl('bookmark_info_dialog_container', 'keydown', onBookmarkInfoKeydown);
 	bindControl('account_dialog_logout_button', 'click', onLogout);
 	bindControl('account_dialog_cancel_button', 'click', onAccountDialogCancel);
 	bindControl('account_dialog_save_button', 'click', onAccountDialogSave);
 	bindControl('account_dialog_add_toggle', 'click', toggleAccountDialogAdd);
 	bindControl('account_dialog_saves_hit', 'click', toggleAccountDialogSaves);
 	bindControl('account_dialog_row_edit', 'click', editSaveEntry);
+	bindControl('account_dialog_row_sync', 'click', syncSaveEntry);
 	bindControl('account_dialog_row_delete', 'click', deleteSaveEntry);
 	bindControl('account_dialog_row_menu', 'click', function(event) {
 		if(event && event.stopPropagation)

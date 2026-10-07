@@ -41,7 +41,6 @@
 			<span class='image'><?php includeSVG('', 'Close'); ?></span>
 		</button>
 		<div class='message_dialog_body'>
-			<p id='bookmark_storage_note' role='note'></p>
 			<div id='account_dialog_saved_heading'>
 				<div id='account_dialog_saves_hit'>
 					<h3 class='dialog-sub-label'>

@@ -339,6 +339,7 @@ var LOCAL_BOOKMARKS_KEY = 'wolo.local-bookmarks.v1';
 var bookmarkCloudRef = null;
 var bookmarkCloudListener = null;
 var cloudBookmarks = {};
+var syncingLocalBookmarks = {};
 
 function getBookmarkUser() {
  return typeof firebase !== 'undefined' && firebase && typeof firebase.auth === 'function' ? firebase.auth().currentUser : null;
@@ -363,10 +364,7 @@ function writeLocalBookmarks(entries) {
 function renderAllBookmarks() {
  if(typeof updateQRBookmarkStatus === 'function') updateQRBookmarkStatus();
  renderSaveList(Object.assign({}, cloudBookmarks, readLocalBookmarks()));
- var note = document.getElementById('bookmark_storage_note');
- if(note) note.innerText = getBookmarkUser()
-  ? 'Bookmarks marked “On this device” are not saved to the cloud.'
-  : 'Saved only in this browser, not to the cloud. Clearing browser data removes these bookmarks.';
+
 }
 function loadSaveList() {
  if(bookmarkCloudRef && bookmarkCloudListener) bookmarkCloudRef.off('value', bookmarkCloudListener);
@@ -388,6 +386,104 @@ function loadSaveList() {
   showNotification('Cloud bookmarks could not be loaded');
  });
 }
+function addLocalBookmarkInfo(row, header, key) {
+	var info = document.createElement('button');
+	info.type = 'button';
+	info.className = 'bookmark-info-toggle control';
+	info.setAttribute('aria-label', 'Bookmark storage information');
+	info.setAttribute('aria-expanded', 'false');
+	info.setAttribute('aria-controls', 'bookmark_info_' + key);
+	info.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10v7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="1" fill="currentColor"/></svg>';
+	var panel = document.createElement('div');
+	panel.id = 'bookmark_info_' + key;
+	panel.className = 'bookmark-info-panel hide';
+	panel.addEventListener('click', function(event) { event.stopPropagation(); });
+	var message = document.createElement('p');
+	message.textContent = 'This bookmark is saved only in this browser, not to the cloud. Clearing browser data removes it.';
+	var sync = document.createElement('button');
+	sync.type = 'button';
+	sync.className = 'bookmark-sync control';
+	sync.textContent = syncingLocalBookmarks[key] ? 'Syncing…' : 'Sync to cloud';
+	sync.disabled = !!syncingLocalBookmarks[key];
+	sync.setAttribute('aria-disabled', !getBookmarkUser() || sync.disabled ? 'true' : 'false');
+	if(!getBookmarkUser()) sync.title = 'Sign in to sync this bookmark';
+	sync.addEventListener('click', function(event) {
+		event.stopPropagation();
+		syncLocalBookmark(key, sync);
+	});
+	info.addEventListener('click', function(event) {
+		event.stopPropagation();
+		var open = panel.classList.contains('hide');
+		panel.classList.toggle('hide', !open);
+		info.setAttribute('aria-expanded', open ? 'true' : 'false');
+		queueSaveListEndIndicatorUpdate();
+	});
+	panel.appendChild(message);
+	panel.appendChild(sync);
+	header.appendChild(info);
+	row.appendChild(panel);
+}
+
+function syncLocalBookmark(key, button) {
+	var user = getBookmarkUser();
+	if(!user) {
+		showNotification('Sign in to sync this bookmark to the cloud');
+		onLogin();
+		return Promise.resolve(false);
+	}
+	if(syncingLocalBookmarks[key]) return Promise.resolve(false);
+	var entry = readLocalBookmarks()[key];
+	if(!entry) return Promise.resolve(false);
+	if(isOfflineMode()) {
+		showNotification('Connect to the internet to sync this bookmark');
+		return Promise.resolve(false);
+	}
+	var original = JSON.stringify(entry);
+	var cloudKey = 'synced_' + key;
+	var payload = {
+		city_id: entry.city_id,
+		gp_id: entry.gp_id || null,
+		city_name: entry.city_name || null,
+		code: normalizeSavedWcode(entry.code),
+		title: entry.title || '',
+		segment: entry.segment || '',
+		address: entry.address || '',
+		time: firebase.database.ServerValue.TIMESTAMP
+	};
+	syncingLocalBookmarks[key] = true;
+	button.disabled = true;
+	button.setAttribute('aria-disabled', 'true');
+	button.textContent = 'Syncing…';
+	// A stable cloud key makes retries safe if saving local storage fails.
+	return new Promise(function(resolve, reject) {
+		firebase.database().ref('/UserData/' + user.uid + '/' + cloudKey).set(payload, function(error) {
+			if(error) reject(error);
+			else resolve();
+		});
+	}).then(function() {
+		var current = getBookmarkUser();
+		if(current && current.uid === user.uid) cloudBookmarks[cloudKey] = payload;
+		var local = readLocalBookmarks();
+		if(local[key] && JSON.stringify(local[key]) === original) {
+			delete local[key];
+			if(!writeLocalBookmarks(local)) return false;
+			if(editingSaveKey === key && current && current.uid === user.uid) editingSaveKey = cloudKey;
+		}
+		showNotification('Bookmark saved to the cloud');
+		return true;
+	}).catch(function() {
+		showNotification('Could not sync bookmark. It is still saved in this browser.');
+		return false;
+	}).then(function(result) {
+		delete syncingLocalBookmarks[key];
+		button.disabled = false;
+		button.setAttribute('aria-disabled', getBookmarkUser() ? 'false' : 'true');
+		button.textContent = 'Sync to cloud';
+		renderAllBookmarks();
+		return result;
+	});
+}
+
 function renderSaveList(entries) {
  var container = document.getElementById('account_dialog_save_list');
  if(!container) return;
@@ -414,12 +510,6 @@ function renderSaveList(entries) {
 			row_header.setAttribute('class', 'row-header');
 			row_title.setAttribute('class', 'row-title');
 			row_title.innerText = saveList[key].title;
-			if(isLocalBookmark(key)) {
-				var badge = document.createElement('span');
-				badge.className = 'bookmark-local-label';
-				badge.innerText = 'On this device';
-				row_title.appendChild(badge);
-			}
 			row_header.appendChild(row_title);
 			if((saveList[key].segment || '').trim()) {
 				row_segment.setAttribute('class', 'row-segment');
@@ -463,6 +553,7 @@ function renderSaveList(entries) {
 			row_details.appendChild(row_details_inner);
 			container.appendChild(row);
 			row.appendChild(row_header);
+			if(isLocalBookmark(key)) addLocalBookmarkInfo(row, row_header, key);
 			row.appendChild(row_details);
 			row.data_process_continue_flag = false;
 			var savedCityId = saveList[key].city_id;
@@ -650,7 +741,7 @@ function deleteSaveEntry(e) {
 }
 
 function onPressSaveEntry(e) {
-	if(e && e.target && (e.target.closest('.row-process') || e.target.closest('.row-menu-toggle') || e.target.closest('#account_dialog_row_menu')))
+	if(e && e.target && (e.target.closest('.bookmark-info-toggle') || e.target.closest('.bookmark-info-panel') || e.target.closest('.row-process') || e.target.closest('.row-menu-toggle') || e.target.closest('#account_dialog_row_menu')))
 		return;
 	var row = e.currentTarget || getSaveEntryRow(e.target);
 	if(!row)

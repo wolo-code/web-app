@@ -605,5 +605,57 @@
 
 #saved_dialog #account_dialog_saves_hit { display: none; }
 
-#bookmark_storage_note { color: #888; font-size: 14px; margin: 8px 0; text-align: left; flex: 0 0 auto; }
-.bookmark-local-label { display: block; font-size: 12px; opacity: .85; }
+.row-header .bookmark-info-toggle {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	bottom: 6px;
+	color: white;
+	cursor: pointer;
+	height: 30px;
+	margin: 0;
+	padding: 6px;
+	pointer-events: auto;
+	position: absolute;
+	right: 40px;
+	width: 30px;
+}
+
+.bookmark-info-toggle svg {
+	display: block;
+	height: 18px;
+	width: 18px;
+}
+
+.bookmark-info-panel {
+	padding: 10px;
+	text-align: left;
+}
+
+.bookmark-info-panel p {
+	font-family: 'Roboto', sans-serif;
+	font-size: 13px;
+	line-height: 1.4;
+	margin: 0 0 8px;
+}
+
+.bookmark-info-panel .bookmark-sync {
+	background: transparent;
+	border: 1px solid currentColor;
+	border-radius: 4px;
+	box-shadow: none;
+	color: #69b7cf;
+	cursor: pointer;
+	font: inherit;
+	margin: 0;
+	padding: 6px 10px;
+	position: static;
+}
+
+.bookmark-sync[aria-disabled='true'] {
+	opacity: .45;
+}
+
+.bookmark-sync:disabled {
+	cursor: wait;
+}

@@ -232,7 +232,7 @@
 #qr_address:empty::before, #qr_address_line_2:empty::before { content: attr(data-placeholder); color: #999; font-size: small; pointer-events: none; }
 #qr_address_line_2[hidden], #qr_address_preview[hidden] { display: none; }
 #qr_address_preview { white-space: pre-wrap; overflow-wrap: anywhere; text-align: center; }
-#qr_address_split_toggle { position: absolute; right: 0; top: 0; width: 32px; height: 32px; padding: 6px; border: 0; background: transparent; color: #6a6a6a; }
+#qr_address_split_toggle { position: absolute; right: 0; bottom: 0; width: 32px; height: 32px; padding: 6px; border: 0; background: transparent; color: #6a6a6a; }
 #qr_address_split_toggle svg { display: block; width: 20px; height: 20px; }
 #qr_address_split_toggle .address-toggle-caret { fill: #69B7CF; }
 #qr_address_split_toggle { opacity: 0; pointer-events: none; }

@@ -62,7 +62,7 @@
 				<div id='save_address_container'>
 					<div class='save-address-first-row'>
 						<textarea id='save_address' rows='1' placeholder='Address (optional)' aria-label='Address (optional)' autocomplete='address-line1'></textarea>
-						<button id='save_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='save_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><g class='address-split-symbol'><path d='M4 4h16M3 20h7m4 0h7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 9h10l-5 6z'/></g><g class='address-merge-symbol'><path d='M3 4h7m4 0h7M4 20h16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 9h10l-5 6z'/></g></svg></button>
+						<button id='save_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='save_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><g class='address-split-symbol'><path d='M4 4h16M3 20h7m4 0h7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 9h10l-5 6z'/></g><g class='address-merge-symbol'><path d='M4 4h16M3 20h7m4 0h7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 15h10l-5-6z'/></g></svg></button>
 					</div>
 					<input id='save_address_line_2' type='text' placeholder='Address line 2 – e.g. Flat 4B, second floor' aria-label='Address line 2 (optional)' autocomplete='address-line2' hidden disabled>
 				</div>

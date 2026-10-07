@@ -708,7 +708,7 @@
 #save_address { padding-right: 36px; resize: none; min-height: 32px; }
 #save_address_line_2[hidden] { display: none; }
 #save_address_split_toggle {
-	position: absolute; right: 0; top: 0; width: 32px; height: 32px;
+	position: absolute; right: 0; bottom: 0; width: 32px; height: 32px;
 	padding: 6px; border: 0; background: transparent; color: #6a6a6a;
 }
 #save_address_split_toggle svg { display: block; width: 20px; height: 20px; }

@@ -82,9 +82,9 @@
 		}
 		
 		#account {
-			right: 10px !important;
+			right: calc((var(--app-header-side-width) - 58px) / 2) !important;
 			left: unset !important;
-			top: calc(10px + var(--app-safe-top)) !important;
+			top: calc(14px + var(--app-safe-top)) !important;
 		}
 		
 }
@@ -103,10 +103,6 @@
 		margin-top: 116px;
 	}
 
-	#account {
-		left: 4px !important;
-		top: calc(84px + var(--app-safe-top)) !important;
-	}
 }
 
 @media (max-width: 480px) {

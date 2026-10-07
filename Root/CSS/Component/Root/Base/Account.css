@@ -8,8 +8,8 @@
 
 #account > .image svg,
 #account > .image > img {
-	width: 32px;
-	height: 32px;
+	width: 42px;
+	height: 42px;
 }
 
 #account_default_image.inactive > svg > path:first-child {
@@ -589,8 +589,8 @@
 
 #account > span.image {
 	box-shadow: rgb(0 0 0 / 46%) 0px 0px 3px;
-	width: 32px;
-	height: 32px;
+	width: 42px;
+	height: 42px;
 	display: block;
 	border-radius: 50%;
 	background: rgb(255 255 255 / 50%);

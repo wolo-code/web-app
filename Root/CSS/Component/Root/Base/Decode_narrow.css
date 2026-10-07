@@ -1,5 +1,36 @@
 @media (max-width: 662px) {
 
+	body {
+		--app-header-side-width: max(58px, calc((100vw - 321px) / 2));
+	}
+
+	#logo {
+		width: min(321px, calc(100vw - 116px)) !important;
+	}
+
+	#logo_surface {
+		box-sizing: border-box;
+		width: 100%;
+		height: 66px;
+		align-items: center;
+		flex-direction: row;
+	}
+
+	#logo a {
+		flex: 1;
+		min-width: 0;
+	}
+
+	#logo :is(#logo_wolo, #logo_codes) > .image > svg {
+		width: 100%;
+		height: auto;
+	}
+
+	body:not(.decode) #saved_button {
+		left: calc((var(--app-header-side-width) - 39px) / 2);
+		top: calc(23.5px + var(--app-safe-top));
+	}
+
 	.external #logo {
 		z-index: 101;
 	}

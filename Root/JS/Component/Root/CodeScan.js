@@ -68,6 +68,7 @@ function getCodeScanInitialStatus() {
 
 function initCodeScan() {
 	bindControl('decode_code_scan_button', 'click', openCodeScan);
+	bindControl('map_code_scan_button', 'click', openCodeScan);
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', closeCodeScan);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);

@@ -800,10 +800,17 @@ body:not(.decode) #location_button {
 }
 body:not(.decode) #map_type_button { right: 11px; }
 body:not(.decode) #decode_scan_area {
- bottom: calc(31px + env(safe-area-inset-bottom, 0px));
- right: 62px;
- z-index: 2;
+ display: none;
 }
+#map_code_scan_button {
+ position: absolute; top: 0; right: 0; z-index: 2;
+ width: 42px; height: 42px; padding: 5px; margin: 0;
+ border: 0; background: transparent; cursor: pointer;
+}
+#map_code_scan_button > .image,
+#map_code_scan_button svg { display: block; width: 100%; height: 100%; overflow: visible; }
+#map_code_scan_button .decode_chrome_caption { top: calc(100% + 6px); bottom: auto; }
+#map_search_field #pac-input { padding-right: 42px; }
 body:not(.decode) #saved_button {
  top: calc(26px + var(--app-safe-top));
  bottom: auto;
@@ -814,6 +821,16 @@ body:not(.decode) #saved_button {
 @media (min-width: 663px) {
  body:not(.decode) #map_search_cluster { margin-left: 63px; }
  body:not(.decode) #map_input_suggestion_result { left: 105px; }
+ body:not(.decode) #saved_button {
+  width: 52px; height: 42px; padding: 0; margin: 0;
+ }
+ body:not(.decode) #saved_button svg {
+  width: 52px; height: 42px; padding: 6px 11px;
+  border-radius: 5px 0 0 5px;
+ }
+ body:not(.decode) #pac-input {
+  border-top-left-radius: 0; border-bottom-left-radius: 0;
+ }
 }
 body:not(.decode) #saved_button .decode_chrome_caption {
  top: calc(100% + 6px);
@@ -846,7 +863,7 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
 }
 
 /* Animate the artwork while keeping hover targets and guide captions stationary. */
-:is(#decode_code_scan_button, #saved_button, #account, #location_button,
+:is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
     #decode_map_view_button, #map_type_button, #action_menu_info,
     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button) > .image {
  display: inline-block;
@@ -856,19 +873,19 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
  transition: transform 240ms cubic-bezier(.2, .7, .3, 1);
 }
 @media (hover: hover) and (pointer: fine) {
- :is(#decode_code_scan_button, #saved_button, #account, #location_button,
+ :is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
      #decode_map_view_button, #map_type_button, #action_menu_info,
      #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button):hover:not(:disabled) > .image {
   transform: translateZ(0) scale(1.08);
  }
 }
-:is(#decode_code_scan_button, #saved_button, #account, #location_button,
+:is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
     #decode_map_view_button, #map_type_button, #action_menu_info,
     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button):focus-visible:not(:disabled) > .image {
  transform: translateZ(0) scale(1.08);
 }
 @media (prefers-reduced-motion: reduce) {
- :is(#decode_code_scan_button, #saved_button, #account, #location_button,
+ :is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
      #decode_map_view_button, #map_type_button, #action_menu_info,
      #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button) > .image {
   transition: none;

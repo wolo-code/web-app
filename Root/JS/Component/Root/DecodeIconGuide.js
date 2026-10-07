@@ -724,6 +724,8 @@ function hideDecodeIconGuide(fromFade) {
 	decodeIconGuideReady = false;
 	decodeIconGuideReplayHint = false;
 	document.body.classList.remove('decode-icon-guide', 'decode-icon-guide-fade');
+	if(typeof syncDecodeCityHistoryControl == 'function')
+		syncDecodeCityHistoryControl();
 	resetDecodeIconGuideOffset();
 	unwatchMapCameraCaption();
 	restoreMapSearchBarFromGuide();
@@ -790,6 +792,8 @@ function startDecodeIconGuide(force) {
 	decodeIconGuideVisible = true;
 	decodeIconGuideShownOnDecode = isDecodeIconGuideView();
 	document.body.classList.add('decode-icon-guide');
+	if(typeof syncDecodeCityHistoryControl == 'function')
+		syncDecodeCityHistoryControl();
 	document.body.classList.remove('decode-icon-guide-fade');
 	blurInputsForIconGuide();
 	layoutDecodeIconGuide();

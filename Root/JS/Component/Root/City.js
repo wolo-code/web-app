@@ -195,7 +195,7 @@ function getDecodeCityHistoryToggles() {
 function syncDecodeCityHistoryControl() {
 	decode_city_history = getDecodeCityHistory();
 
-	var disabled = decode_city_history.length == 0;
+	var disabled = decode_city_history.length == 0 && !document.body.classList.contains('decode-icon-guide');
 	var toggles = getDecodeCityHistoryToggles();
 	for(var i = 0; i < toggles.length; i++)
 		toggles[i].disabled = disabled;

@@ -25,7 +25,7 @@
 			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment – e.g. Main gate">
 		</div>
 		<div id='qr_wcode'>
-			<div id='qr_wcode_container' class='center'>
+			<div id='qr_wcode_container'>
 				<div id='qr_wcode_text'>
 				<div id='qr_wcode_left'>
 					<span class='slash'>\</span>
@@ -45,7 +45,7 @@
 			<div>www.wolo.codes</div>
 		</div>
 	</div>
-	<div id='qr_controls' class="center message_dialog_control section-to-not-print">
+	<div id='qr_controls' class="message_dialog_control section-to-not-print">
 		<button id='qr_preview' class='border' type='button'><span class='image'><?php includeSVG('', 'Preview'); ?></span></button>
 		<button id='qr_download' class='border' type='button'><span class='image'><?php includeSVG('', 'Download'); ?></span></button>
 		<button id='qr_print' class='border' type='button'><span class='image'><?php includeSVG('', 'Print'); ?></span></button>

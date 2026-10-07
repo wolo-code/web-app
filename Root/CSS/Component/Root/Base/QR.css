@@ -101,6 +101,8 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	margin-inline: auto;
+	text-align: center;
 	color: #69b7cf;
 	padding-left: 12px;
 	padding-top: 8px;
@@ -210,6 +212,6 @@
 #qr_save.bookmarked .qr_bookmark_filled { display: block; }
 #qr_save.bookmarked .qr_bookmark_outline { display: none; }
 #qr_bookmark_changed { color: #69b7cf; font-size: 20px; line-height: 1; align-self: flex-start; }
-#qr_controls { display: flex; justify-content: center; gap: 44px; float: none; left: auto; }
+#qr_controls { display: flex; justify-content: center; gap: 44px; float: none; left: auto; margin-inline: auto; text-align: center; }
 #qr_controls > button { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 44px; height: 44px; min-width: 44px; padding: 10px; margin: 2px 0 10px; left: auto; border-radius: 50%; }
 #qr_controls > button .image { display: flex; align-items: center; justify-content: center; }

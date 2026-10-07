@@ -8,15 +8,17 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  for (const id of ['city', 'w1', 'w2', 'w3']) {
   const classes = new Set();
   nodes['code_scan_review_' + id] = { value: '', attributes: {},
-   classList: { toggle: (key, on) => on ? classes.add(key) : classes.delete(key), contains: key => classes.has(key) },
+   classList: { toggle: (key, on) => on ? classes.add(key) : classes.delete(key), contains: key => classes.has(key), add: key => classes.add(key), remove: key => classes.delete(key) },
    setAttribute(key, value) { this.attributes[key] = value; },
    setCustomValidity(value) { this.error = value; }
   };
  }
  nodes.code_scan_use_code = {};
- nodes.code_scan_review_validity = { classList: { toggle() {} } };
- const context = { Audio: function() { this.load = () => {}; }, document: { getElementById: id => nodes[id] },
-  wordList: { includes: word => ['apple', 'banana', 'cherry'].includes(word) } };
+ nodes.code_scan_review_validity = { classList: { add() {}, remove() {} } };
+ let popupTimer;
+ const timers = { setTimeout(fn) { popupTimer = fn; return 1; }, clearTimeout() {} };
+ const context = { ...timers, Audio: function() { this.load = () => {}; }, document: { getElementById: id => nodes[id] },
+  wordList: { wordList: [['apple'], ['banana', 'bananas'], ['cherry']], includes: word => ['apple', 'banana', 'bananas', 'cherry'].includes(word) } };
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.codeScanCityChoices = ['Delhi'];
@@ -27,7 +29,19 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  context.updateCodeScanReviewValidity();
  assert.equal(nodes.code_scan_use_code.disabled, true);
  assert.equal(nodes.code_scan_review_w2.attributes['aria-invalid'], 'true');
- assert.match(nodes.code_scan_review_validity.textContent, /Word 2/);
+ assert.match(nodes.code_scan_review_validity.textContent, /unknown/);
+ popupTimer();
+ assert.equal(nodes.code_scan_review_validity.textContent, '');
+ nodes.code_scan_review_w2.value = 'ban';
+ context.updateCodeScanReviewValidity();
+ assert.equal(nodes.code_scan_review_w2.attributes['aria-invalid'], 'false');
+ assert.equal(nodes.code_scan_review_w2.classList.contains('code_scan_word_pending'), true);
+ assert.equal(nodes.code_scan_use_code.disabled, true);
+ assert.equal(nodes.code_scan_review_validity.textContent, '');
+ nodes.code_scan_review_w2.value = 'zz';
+ context.updateCodeScanReviewValidity();
+ assert.equal(nodes.code_scan_review_w2.classList.contains('code_scan_word_invalid'), true);
+ assert.match(nodes.code_scan_review_validity.textContent, /zz/);
  assert.equal(nodes.code_scan_review_city.classList.contains('code_scan_city_tag'), true);
  nodes.code_scan_review_w2.value = 'banana';
  nodes.code_scan_review_city.value = 'Unknown city';

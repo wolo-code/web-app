@@ -52,6 +52,7 @@ var CODE_SCAN_FIXED_ASPECT = 3;
 var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
 var codeScanInitialStatus = '';
 var codeScanCityChoices = [];
+var codeScanWordPopupTimer = null;
 
 function getCodeScanInitialStatus() {
 	if(!codeScanInitialStatus) {
@@ -861,23 +862,42 @@ function updateCodeScanReviewValidity() {
 	var validityNode = document.getElementById('code_scan_review_validity');
 	var inputs = [w1Input, w2Input, w3Input];
 	var invalidWords = [];
+	var newlyInvalidWords = [];
 	var valid = true;
 	inputs.forEach(function(input, index) {
 		if(!input) { valid = false; return; }
 		var value = input.value.trim().toLowerCase();
 		var listed = !!(value && typeof wordList !== 'undefined' && wordList && wordList.includes(value));
-		var invalid = !!value && !listed;
+		var possible = !value || listed || (typeof wordList !== 'undefined' && wordList &&
+			(wordList.wordList || [wordList.curList || []]).some(function(group) {
+				return group.some(function(word) { return String(word).toLowerCase().indexOf(value) === 0; });
+			}));
+		var invalid = !!value && !possible;
+		if(invalid && !input.classList.contains('code_scan_word_invalid')) newlyInvalidWords.push(input.value.trim());
+		input.classList.toggle('code_scan_word_pending', !listed && !invalid);
 		valid = valid && listed;
 		input.classList.toggle('code_scan_word_invalid', invalid);
 		input.setAttribute('aria-invalid', String(invalid));
 		input.setCustomValidity(invalid ? 'This word is not in the Wolo word list.' : '');
-		if(invalid) invalidWords.push('Word ' + (index + 1));
+		if(invalid) invalidWords.push(input.value.trim());
 	});
 	if(useCodeButton)
 		useCodeButton.disabled = !valid;
 	if(validityNode) {
-		validityNode.textContent = invalidWords.length ? invalidWords.join(', ') + ': not in the Wolo word list.' : '';
-		validityNode.classList.toggle('code_scan_review_valid', valid);
+		if(!invalidWords.length) {
+			clearTimeout(codeScanWordPopupTimer);
+			validityNode.classList.remove('code_scan_word_popup_visible');
+			validityNode.textContent = '';
+		}
+		if(newlyInvalidWords.length) {
+			clearTimeout(codeScanWordPopupTimer);
+			validityNode.textContent = newlyInvalidWords.map(function(word) { return '“' + word + '”'; }).join(', ') + ': not in the Wolo word list.';
+			validityNode.classList.add('code_scan_word_popup_visible');
+			codeScanWordPopupTimer = setTimeout(function() {
+				validityNode.classList.remove('code_scan_word_popup_visible');
+				validityNode.textContent = '';
+			}, 3000);
+		}
 	}
 	if(cityInput) {
 		var city = cityInput.value.trim().toLowerCase();

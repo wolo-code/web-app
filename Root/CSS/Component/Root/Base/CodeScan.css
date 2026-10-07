@@ -805,3 +805,24 @@ html.dark-mode .code_scan_review_validity { color: #d94c4c; font-size: 0.82em; t
 html.dark-mode .code_scan_review_input.code_scan_city_tag {
  border: 1px solid #69B7CF; border-radius: 16px; background: rgb(105 183 207 / 8%);
 }
+
+.code_scan_review { position: relative; }
+.code_scan_review_input.code_scan_word_pending,
+html.dark-mode .code_scan_review_input.code_scan_word_pending {
+ color: #999; border-bottom-color: #999;
+}
+.code_scan_word_invalid { animation: code-scan-word-shake 300ms ease-in-out; }
+@keyframes code-scan-word-shake {
+ 0%, 100% { transform: translateX(0); }
+ 25%, 75% { transform: translateX(-4px); }
+ 50% { transform: translateX(4px); }
+}
+.code_scan_review_validity,
+html.dark-mode .code_scan_review_validity {
+ display: none; position: absolute; left: 50%; bottom: 54px; transform: translateX(-50%);
+ width: max-content; max-width: calc(100% - 24px); box-sizing: border-box;
+ margin: 0; padding: 10px 14px; border-radius: 12px; background: #333; color: #fff;
+ box-shadow: 0 4px 16px rgb(0 0 0 / 20%); z-index: 2; pointer-events: none;
+}
+.code_scan_review_validity.code_scan_word_popup_visible { display: block; }
+@media (prefers-reduced-motion: reduce) { .code_scan_word_invalid { animation: none; } }

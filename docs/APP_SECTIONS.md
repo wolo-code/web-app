@@ -290,4 +290,5 @@ The previous-city popup shares the scanner city-list styling: white/light or dee
 
 Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at normal zoom. Changed zoom displays the reset glyph in the same slot, retaining the existing reset target, percentage position, and behavior.
 
-Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Unknown words show a red underline and an accessible field-specific message; Use Code stays disabled until all three are valid. Recognized or suggested cities display a rounded outlined tag, which clears when edited to an unknown city.
+
+Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Use Code stays disabled until all three words are complete and valid. Recognized or suggested cities display a rounded outlined tag, which clears when edited to an unknown city.

@@ -23,6 +23,7 @@ function showQR() {
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
 	showOverlay(document.getElementById('qr_container'));
+	updateQRBookmarkStatus();
 	
 	window.addEventListener('beforeprint', beforeQRprint);
 	window.addEventListener('afterprint', afterQRprint);
@@ -72,6 +73,7 @@ function qr_address_active() {
 		if(addressNode)
 			addressNode.innerHTML = address;
 	}
+	updateQRBookmarkStatus();
 }
 
 function hideEmptyElsePreview(node) {
@@ -271,4 +273,33 @@ function onQRDialogSave() {
 	if(!qr_address_active_first)
 		current_address = document.getElementById('qr_address').innerText;
 	saveAddress(current_title, current_segment, saveAddr);
+}
+
+function getQRBookmarkState(entries, city, words, labelAddress) {
+ var normalizeAddress = function(value) { return String(value || '').replace(/\s+/g, ' ').trim(); };
+ var code = normalizeSavedWcode(words).join(' ').toLowerCase();
+ var matches = Object.keys(entries || {}).map(function(key) { return entries[key]; }).filter(function(entry) {
+  if(!entry || !city || !code) return false;
+  var sameCity = city.id != null && entry.city_id != null && String(city.id) === String(entry.city_id);
+  if(!sameCity && city.gp_id && entry.gp_id) sameCity = city.gp_id === entry.gp_id;
+  return sameCity && normalizeSavedWcode(entry.code).join(' ').toLowerCase() === code;
+ });
+ return { saved: matches.length > 0, changed: matches.length > 0 && !matches.some(function(entry) {
+  return normalizeAddress(entry.address) === normalizeAddress(labelAddress);
+ }) };
+}
+
+function updateQRBookmarkStatus() {
+ var button = document.getElementById('qr_save');
+ var field = document.getElementById('qr_address');
+ var marker = document.getElementById('qr_bookmark_changed');
+ if(!button || !field || !marker) return;
+ var labelAddress = qr_address_active_first || isSaveAddressPlaceholder(field.innerText) ? address : field.innerText;
+ var entries = Object.assign({}, cloudBookmarks, readLocalBookmarks());
+ var state = getQRBookmarkState(entries, getCodeCity(), getCodeWCode(), labelAddress);
+ button.classList.toggle('bookmarked', state.saved);
+ marker.classList.toggle('hide', !state.changed);
+ var description = state.changed ? 'Saved bookmark: address differs' : (state.saved ? 'Saved in address book' : 'Save to address book');
+ button.title = description;
+ button.setAttribute('aria-label', description);
 }

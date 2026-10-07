@@ -385,6 +385,7 @@ function writeLocalBookmarks(entries) {
  catch(error) { showNotification('Could not save bookmarks on this device'); return false; }
 }
 function renderAllBookmarks() {
+ if(typeof updateQRBookmarkStatus === 'function') updateQRBookmarkStatus();
  renderSaveList(Object.assign({}, cloudBookmarks, readLocalBookmarks()));
  var note = document.getElementById('bookmark_storage_note');
  if(note) note.innerText = getBookmarkUser()

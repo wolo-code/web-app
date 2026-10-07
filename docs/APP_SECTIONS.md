@@ -310,3 +310,5 @@ Scanner gallery: selected photos preserve their original pixel dimensions for pr
 Scanner spatial recognition: the three Wolo words define a code rectangle and an inferred golden-ratio container. Only OCR words above that code within the container become city text. Live and gallery review show separate blue container, gold city and green code rectangles; review overlays follow zoom, pan and viewport resizing.
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
+
+QR Label View: city and code are vertically centered as one group within the golden-ratio rectangle. The save bookmark fills for a saved city/code and shows an asterisk when its address differs from every matching bookmark; editing and bookmark updates refresh the status. The brand lockup has no text caret or extra tab stop. Preview, Download and Print use circular backgrounds.

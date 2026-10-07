@@ -4,14 +4,14 @@
 		Label
 	</h2>
 	<div id='qr_save' class="message_dialog_close message_dialog_leading_action control section-to-not-print" title='Save to address book' aria-label='Save to address book'>
-		<span class='image'><?php includeSVG('', 'Save'); ?></span>
+		<span class='image'><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' aria-hidden='true'><path class='qr_bookmark_outline' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.55l5-2.86 5 2.86V5z'/><path class='qr_bookmark_filled' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z'/></svg></span><span id='qr_bookmark_changed' class='hide' aria-hidden='true'>*</span>
 	</div>
 	<div id='qr_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='qr_body'>
 		<div id='qr_label' class='center'>
-			<div id='logo_qr' tabindex='1'>
+			<div id='logo_qr'>
 				<a id=logo_wolo_qr href='//wolo.codes'>
 					<span class='image'><?php includeSVG('', 'logo_wolo'); ?></span>
 				</a>
@@ -26,6 +26,7 @@
 		</div>
 		<div id='qr_wcode'>
 			<div id='qr_wcode_container' class='center'>
+				<div id='qr_wcode_text'>
 				<div id='qr_wcode_left'>
 					<span class='slash'>\</span>
 					<span class='infowindow_code' id='qr_wcode_city'></span>
@@ -35,6 +36,7 @@
 					<span class='slash'>/</span>
 				</div>
 			</div>
+		</div>
 		</div>
 		<div id='qr_address_container' class='center'>
 			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address</div>

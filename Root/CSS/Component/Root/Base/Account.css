@@ -401,16 +401,13 @@
 	-webkit-user-select: none;
 	box-sizing: border-box;
 	min-height: 70px;
+	width: 100%;
 	background: #69B7CF !important;
 	color: white !important;
 	position: relative;
 }
 
 .row-header, .row-title, .row-segment, .row-address, .row-code {
-	box-sizing: border-box;
-	width: fit-content;
-	max-width: 100%;
-	margin-inline: auto;
 	pointer-events: none;
 }
 

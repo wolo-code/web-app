@@ -92,7 +92,7 @@ function hideOverlay(e) {
 	if(isInfoIntroActive() && (!e || e.id === 'info_message'))
 		return;
 	visible_div = getVisibleOverlayDialog();
-	if(visible_div == e && overlay && overlay.classList && visible_div.classList) {
+	if(visible_div && visible_div == e && overlay && overlay.classList && visible_div.classList) {
 		overlay.classList.add('hide');
 		visible_div.classList.add('hide');
 	}

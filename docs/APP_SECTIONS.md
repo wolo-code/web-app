@@ -2,6 +2,8 @@
 
 Use these names consistently in code comments, tickets, copy docs, and design notes.
 
+Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so opening QR Label View can proceed.
+
 ## View Names
 
 | View | Use this name | Current implementation signal | Purpose |

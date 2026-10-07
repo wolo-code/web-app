@@ -54,6 +54,8 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 
 ## Sharing, QR, And Export
 
+Opening a QR label safely skips closing a missing copy-code dialog, including when no overlay is visible.
+
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
 | Share Wolo Code | `shareWCode()`, `handleShareWCode()` | Uses native share when available and falls back to copy messaging. |

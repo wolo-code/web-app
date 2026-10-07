@@ -170,31 +170,27 @@
 		</div>
 	</div>
 </div>
-<div id='action_menu' class='control' tabindex='7'>
-	<div id='action_menu_items'>
-		<button id='action_menu_info' class='action_menu_item' type='button' tabindex='-1' aria-label='Info' title='Info'>
-			<span class='image'><?php includeSVG('', 'Info'); ?></span>
-			<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Info</span>
-		</button>
-		<button id='action_menu_decode' class='action_menu_item' type='button' tabindex='-1' aria-label='Wolo Code input' title='Wolo Code input'>
-			<span class='image view_toggle_icon'>
-				<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
-				<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
-			</span>
-			<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Wolo Code</span>
-		</button>
-		<button id='action_menu_map' class='action_menu_item' type='button' tabindex='-1' aria-label='Map view' title='Map view'>
-			<span class='image map_type_icon'>
-				<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
-				<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
-				<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
-				<span class='map_type_icon_apple'><?php includeSVG('', 'Map-apple'); ?></span>
-				<span class='map_type_icon_esri'><?php includeSVG('', 'Map-esri'); ?></span>
-				<span class='map_type_icon_microsoft'><?php includeSVG('', 'Map-microsoft'); ?></span>
-			</span>
-		</button>
-	</div>
-</div>
+<button id='action_menu_info' class='control action_menu_item' type='button' tabindex='-1' aria-label='Info' title='Info'>
+	<span class='image'><?php includeSVG('', 'Info'); ?></span>
+	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Info</span>
+</button>
+<button id='action_menu_decode' class='control action_menu_item' type='button' tabindex='-1' aria-label='Wolo Code input' title='Wolo Code input'>
+	<span class='image view_toggle_icon'>
+		<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
+	</span>
+	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Wolo Code</span>
+</button>
+<button id='action_menu_map' class='control action_menu_item' type='button' tabindex='-1' aria-label='Map view' title='Map view'>
+	<span class='image map_type_icon'>
+		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
+		<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
+		<span class='map_type_icon_apple'><?php includeSVG('', 'Map-apple'); ?></span>
+		<span class='map_type_icon_esri'><?php includeSVG('', 'Map-esri'); ?></span>
+		<span class='map_type_icon_microsoft'><?php includeSVG('', 'Map-microsoft'); ?></span>
+	</span>
+</button>
 <div id='notification_top' class="notification_bar hide">Try: Bengaluru, India</div>
 <div id='offline_queue_badge' class='offline_queue_badge hide' aria-live='polite'></div>
 <div id='map_bottom_stack'>

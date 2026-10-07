@@ -316,3 +316,5 @@ QR Label View: city and code are vertically centered as one group within the gol
 QR Label View layout: the code rectangle has an explicit 172px height at its 278px width so the code group centers consistently in the modal and raster export. The three circular footer actions have 32px gaps.
 
 QR Label View brand placement shares the Info modal logo styles: bottom-aligned two-column grid, 50px Wolo mark, and the cropped 62px-wide Codes mark with a 6px bottom offset. Both hide logo outlines in dark mode.
+
+Map navigation uses independent buttons matching Wolo Code Input View: Info and Wolo Code at bottom left, Camera and Bookmarks at bottom right, with Switch map beside Camera. The former action menu wrapper and layout are removed.

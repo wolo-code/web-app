@@ -122,7 +122,7 @@ function openCodeScan(event) {
 		showNotification('Word list is still loading. Try again in a moment.');
 		return;
 	}
-	codeScanState.source = event && event.currentTarget && event.currentTarget.id === 'map_code_scan_button' ? 'map' : 'decode';
+	codeScanState.source = document.body.classList.contains('decode') ? 'decode' : 'map';
 	codeScanState.hasCaptured = false;
 	resetCodeScanUi();
 	setCodeScanPhotoFallbackVisible(true);

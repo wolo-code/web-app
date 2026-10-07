@@ -118,7 +118,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | QR label surface | QR Label Surface | `#qr_label` | Main body of QR Label View | Contains the composed label preview. |
 | QR brand area | QR Label Brand | `#logo_qr`, `#logo_wolo_qr`, `#logo_codes_qr` | Top of QR Label Surface | Identifies the label as Wolo Code. |
 | QR title inputs | QR Label Title Fields | `#qr_title_main`, `#qr_title_segment` | Below QR brand area | Lets the user edit title and segment text, with `Title – e.g. Home` and `Segment – e.g. Main gate` hints. |
-| QR code text | QR Label Wolo Code | `#qr_wcode`, `#qr_wcode_city`, `#qr_wcode_code` | Middle of QR Label Surface | Shows the encoded city and Wolo Code. |
+| QR code text | QR Label Wolo Code | `#qr_wcode`, `#qr_wcode_city`, `#qr_wcode_code` | Middle of QR Label Surface | Shows the encoded city above the three-word code; when space permits, the horizontal midline of the words aligns with the horizontal midline of the bordered region. |
 | QR address field | QR Label Address | `#qr_address` | Below QR code text | Lets the user edit the displayed address. |
 | QR app URL | QR Label App URL | `#qr_webapp_url` | Bottom of QR Label Surface | Shows the app URL for the label. |
 | QR controls | QR Label Controls | `#qr_controls` | Bottom of QR Label View | Hosts preview, download, and print actions. |

@@ -207,7 +207,15 @@
 }
 
 #logo_qr { cursor: default; user-select: none; caret-color: transparent; transform: translateX(8px); }
-#qr_wcode_text { flex: 0 0 auto; margin-block: auto; }
+#qr_wcode_text {
+	flex: 1 0 auto;
+	display: grid;
+	grid-template-rows: minmax(min-content, 1fr) auto 1fr;
+}
+
+#qr_wcode_text > #qr_wcode_left {
+	align-self: end;
+}
 #qr_save .qr_bookmark_filled { display: none; }
 #qr_save.bookmarked .qr_bookmark_filled { display: block; }
 #qr_save.bookmarked .qr_bookmark_outline { display: none; }

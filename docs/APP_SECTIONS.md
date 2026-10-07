@@ -312,3 +312,5 @@ Scanner spatial recognition: the three Wolo words define a code rectangle and an
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 
 QR Label View: city and code are vertically centered as one group within the golden-ratio rectangle. The save bookmark fills for a saved city/code and shows an asterisk when its address differs from every matching bookmark; editing and bookmark updates refresh the status. The brand lockup has no text caret or extra tab stop. Preview, Download and Print use circular backgrounds.
+
+QR Label View layout: the code rectangle has an explicit 172px height at its 278px width so the code group centers consistently in the modal and raster export. The three circular footer actions have 32px gaps.

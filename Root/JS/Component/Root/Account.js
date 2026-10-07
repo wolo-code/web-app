@@ -602,7 +602,7 @@ function renderSaveList(entries) {
 			row.data_key = key;
 			row.data_code = savedCode;
 			row_address.setAttribute('class', 'row-address');
-			row_address.innerText = formatSavedAddress(saveList[key]);
+			row_address.innerText = formatSavedAddress(saveList[key], '\n\n');
 			row_code.setAttribute('class', 'row-code');
 			setSavedRowCodeText(row_code, savedCityDisplayName(null, saveList[key]), savedCode);
 			row_process.setAttribute('class', 'row-process control');

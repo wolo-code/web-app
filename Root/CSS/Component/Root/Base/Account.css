@@ -464,9 +464,9 @@
 	row-gap: 4px;
 	width: max-content;
 	max-width: 100%;
-	margin-inline: auto;
+	margin-inline: 0;
 	overflow-wrap: anywhere;
-	padding: 8px 10px 4px;
+	padding: 8px 10px 4px 26px;
 	text-align: left;
 	word-break: break-word;
 }
@@ -715,3 +715,7 @@
 #save_address_split_toggle.is-split svg { transform: rotate(90deg); }
 #save_address_split_toggle:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; border-radius: 4px; }
 html.dark-mode #save_address_split_toggle { color: #aaa; }
+
+#account_dialog_save_list > div:has(.bookmark-info-toggle) .row-code {
+	padding-left: 58px;
+}

@@ -16,6 +16,32 @@ function scanner() {
  context.codeScanState.originalSourceCanvas = canvas;
  return { context, canvas };
 }
+
+test('gallery photos preserve native resolution for the preview, source and OCR', async () => {
+ for(const [width, height] of [[4032, 3024], [3024, 4032]]) {
+  const { context, canvas } = scanner(); let draw;
+  canvas.getContext = () => ({ drawImage: (...args) => draw = args });
+  context.FileReader = function() { this.readAsDataURL = () => { this.result = 'photo'; this.onload(); }; };
+  context.Image = function() {
+   this.naturalWidth = width; this.naturalHeight = height;
+   Object.defineProperty(this, 'src', { set: () => this.onload() });
+  };
+  context.saveCodeScanSourceFromCanvas = () => {
+   context.codeScanState.originalSourceCanvas = { width: canvas.width, height: canvas.height };
+  };
+  for(const name of ['resetCodeScanZoom', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible'])
+   context[name] = () => {};
+  context.codeScanState.worker = { recognize: async input => {
+   assert.equal(input.width, width); assert.equal(input.height, height);
+   return { match: null };
+  } };
+  await context.recognizeCodeScanPhoto({});
+  assert.equal(canvas.width, width); assert.equal(canvas.height, height);
+  assert.deepEqual(draw.slice(1), [0, 0, width, height]);
+  assert.equal(context.codeScanState.originalSourceCanvas.width, width);
+  assert.equal(context.codeScanState.originalSourceCanvas.height, height);
+ }
+});
 test('recognition preserves the complete captured preview on success and no match', async () => {
  for(const match of [{ code: 'test' }, null]) {
   const { context, canvas } = scanner();

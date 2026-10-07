@@ -302,3 +302,5 @@ The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.
 Scanner: the capture control is 20% larger. Live recognition crops the visible guide, highlights the recognized words, and captures after three stable matches. Sparse-text OCR preserves separators; capture does not depend on a printed rectangular border or the aspect ratio of text.
 
 Scanner detection adds 10% padding around recognized text. Live capture immediately populates the review fields using the detected code. Zoom and pan automatically rerun OCR on the framed area after a 350ms debounce, ignoring outdated results; live zoom requests fresh detection.
+
+Scanner gallery: selected photos preserve their original pixel dimensions for preview, zoom, pan and OCR, without the former 1600px width reduction.

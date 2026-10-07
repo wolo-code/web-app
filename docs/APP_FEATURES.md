@@ -186,3 +186,5 @@ The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.
 Scanner capture control is 20% larger. OCR uses sparse-text segmentation and preserves code separators. Live OCR reads the visible guide region and highlights recognized text within it; three stable matches trigger capture without requiring a printed border or a 3:1 text rectangle. The highlighted rectangle bounds recognized words, not the physical label.
 
 The detected text rectangle adds 10% centered padding, clipped at image edges. Live capture fills review fields immediately with the recognized code. Zoom and pan rerun framed OCR after 350ms of inactivity; outdated crop results are ignored and a pending read waits for ongoing recognition to finish. Live zoom resets detection and requests a fresh frame.
+
+Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. Initial and crop OCR use full-resolution pixels rather than a photo reduced to 1600 pixels wide.

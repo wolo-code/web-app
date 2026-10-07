@@ -1061,8 +1061,6 @@ function recognizeCodeScanPhoto(file) {
 				var canvas = getCodeScanCanvas();
 				var width;
 				var height;
-				var targetWidth;
-				var targetHeight;
 				var ocrCanvas;
 				if(!canvas) {
 					reject(new Error('Missing scan canvas'));
@@ -1074,11 +1072,9 @@ function recognizeCodeScanPhoto(file) {
 					reject(new Error('Invalid photo dimensions'));
 					return;
 				}
-				targetWidth = Math.min(width, 1600);
-				targetHeight = Math.round(height * (targetWidth / width));
-				canvas.width = targetWidth;
-				canvas.height = targetHeight;
-				canvas.getContext('2d').drawImage(image, 0, 0, targetWidth, targetHeight);
+				canvas.width = width;
+				canvas.height = height;
+				canvas.getContext('2d').drawImage(image, 0, 0, width, height);
 				saveCodeScanSourceFromCanvas(canvas, true);
 				resetCodeScanZoom();
 				setCodeScanFrozenPreview(true);

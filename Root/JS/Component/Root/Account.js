@@ -220,13 +220,16 @@ function savedCityDisplayName(city, entry) {
 }
 
 function setSavedRowCodeText(row_code, cityName, words) {
+	var slash = document.createElement('span');
+	slash.className = 'row-code-slash';
+	slash.textContent = '\\';
 	var cityLine = document.createElement('div');
 	cityLine.className = 'row-code-city';
-	cityLine.textContent = '\\ ' + (cityName || '');
+	cityLine.textContent = cityName || '';
 	var codeLine = document.createElement('div');
 	codeLine.className = 'row-code-words';
 	codeLine.textContent = (words || []).join(' ') + ' /';
-	row_code.replaceChildren(cityLine, codeLine);
+	row_code.replaceChildren(slash, cityLine, codeLine);
 }
 
 function getSaveEntryRow(node) {

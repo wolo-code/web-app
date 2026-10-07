@@ -460,20 +460,35 @@
 }
 
 .row-code {
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	column-gap: 6px;
+	row-gap: 4px;
+	width: max-content;
+	max-width: 100%;
+	margin-inline: auto;
 	overflow-wrap: anywhere;
 	padding: 8px 10px 4px;
 	text-align: left;
-	white-space: pre-line;
 	word-break: break-word;
 }
 
+.row-code-slash {
+	grid-column: 1;
+	grid-row: 1;
+}
+
 .row-code-city {
+	grid-column: 2;
+	grid-row: 1;
 	text-align: left;
-	margin-bottom: 4px;
 }
 
 .row-code-words {
-	text-align: center;
+	grid-column: 2;
+	grid-row: 2;
+	text-align: left;
 }
 
 .row-address {

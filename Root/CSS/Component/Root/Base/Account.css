@@ -616,7 +616,7 @@
 	background: transparent;
 	border: 0;
 	box-shadow: none;
-	bottom: 6px;
+	top: 4px;
 	color: white;
 	cursor: pointer;
 	height: 30px;
@@ -624,7 +624,7 @@
 	padding: 6px;
 	pointer-events: auto;
 	position: absolute;
-	right: 40px;
+	right: 32px;
 	width: 30px;
 }
 
@@ -634,19 +634,23 @@
 	width: 18px;
 }
 
-.bookmark-info-panel {
-	padding: 10px;
+#bookmark_info_dialog .message_dialog_body {
 	text-align: left;
 }
 
-.bookmark-info-panel p {
+#bookmark_info_close {
+	background: transparent;
+	border: 0;
+}
+
+#bookmark_info_message {
 	font-family: 'Roboto', sans-serif;
 	font-size: 13px;
 	line-height: 1.4;
 	margin: 0 0 8px;
 }
 
-.bookmark-info-panel .bookmark-sync {
+#bookmark_info_dialog .bookmark-sync {
 	background: transparent;
 	border: 1px solid currentColor;
 	border-radius: 4px;

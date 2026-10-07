@@ -30,6 +30,8 @@ function showAccountDialog() {
 }
 
 function hideAccountDialog() {
+	hideOverlay(document.getElementById('bookmark_info_dialog_container'));
+	bookmarkInfoKey = null;
 	hideOverlay(document.getElementById('account_dialog_container'));
 	hideOverlay(document.getElementById('saved_dialog_container'));
 	closeSaveEntryMenus();
@@ -340,6 +342,7 @@ var bookmarkCloudRef = null;
 var bookmarkCloudListener = null;
 var cloudBookmarks = {};
 var syncingLocalBookmarks = {};
+var bookmarkInfoKey = null;
 
 function getBookmarkUser() {
  return typeof firebase !== 'undefined' && firebase && typeof firebase.auth === 'function' ? firebase.auth().currentUser : null;
@@ -388,40 +391,59 @@ function loadSaveList() {
 }
 function addLocalBookmarkInfo(row, header, key) {
 	var info = document.createElement('button');
+	info.id = 'bookmark_info_toggle_' + key;
 	info.type = 'button';
 	info.className = 'bookmark-info-toggle control';
 	info.setAttribute('aria-label', 'Bookmark storage information');
-	info.setAttribute('aria-expanded', 'false');
-	info.setAttribute('aria-controls', 'bookmark_info_' + key);
+	info.setAttribute('aria-haspopup', 'dialog');
+	info.setAttribute('aria-controls', 'bookmark_info_dialog');
 	info.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10v7" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="1" fill="currentColor"/></svg>';
-	var panel = document.createElement('div');
-	panel.id = 'bookmark_info_' + key;
-	panel.className = 'bookmark-info-panel hide';
-	panel.addEventListener('click', function(event) { event.stopPropagation(); });
-	var message = document.createElement('p');
-	message.textContent = 'This bookmark is saved only in this browser, not to the cloud. Clearing browser data removes it.';
-	var sync = document.createElement('button');
-	sync.type = 'button';
-	sync.className = 'bookmark-sync control';
+	info.addEventListener('click', function(event) {
+		event.stopPropagation();
+		showBookmarkInfoDialog(key);
+	});
+	header.appendChild(info);
+}
+
+function showBookmarkInfoDialog(key) {
+	bookmarkInfoKey = key;
+	var sync = document.getElementById('bookmark_info_sync');
 	sync.textContent = syncingLocalBookmarks[key] ? 'Syncing…' : 'Sync to cloud';
 	sync.disabled = !!syncingLocalBookmarks[key];
 	sync.setAttribute('aria-disabled', !getBookmarkUser() || sync.disabled ? 'true' : 'false');
-	if(!getBookmarkUser()) sync.title = 'Sign in to sync this bookmark';
-	sync.addEventListener('click', function(event) {
+	sync.title = getBookmarkUser() ? '' : 'Sign in to sync this bookmark';
+	showOverlay(document.getElementById('bookmark_info_dialog_container'));
+	document.getElementById('bookmark_info_close').focus();
+}
+
+function closeBookmarkInfoDialog() {
+	var key = bookmarkInfoKey;
+	bookmarkInfoKey = null;
+	showOverlay(document.getElementById('saved_dialog_container'));
+	var info = document.getElementById('bookmark_info_toggle_' + key);
+	if(info) info.focus();
+	else document.getElementById('saved_dialog_close').focus();
+}
+
+function onBookmarkInfoKeydown(event) {
+	if(event.key === 'Escape') {
+		event.preventDefault();
 		event.stopPropagation();
-		syncLocalBookmark(key, sync);
-	});
-	info.addEventListener('click', function(event) {
-		event.stopPropagation();
-		var open = panel.classList.contains('hide');
-		panel.classList.toggle('hide', !open);
-		info.setAttribute('aria-expanded', open ? 'true' : 'false');
-		queueSaveListEndIndicatorUpdate();
-	});
-	panel.appendChild(message);
-	panel.appendChild(sync);
-	header.appendChild(info);
-	row.appendChild(panel);
+		closeBookmarkInfoDialog();
+	}
+	else if(event.key === 'Tab') {
+		var close = document.getElementById('bookmark_info_close');
+		var sync = document.getElementById('bookmark_info_sync');
+		if(sync.disabled || (event.shiftKey && event.target === close) || (!event.shiftKey && event.target === sync)) {
+			event.preventDefault();
+			(event.shiftKey && !sync.disabled ? sync : close).focus();
+		}
+	}
+}
+
+function onBookmarkInfoSync() {
+	if(bookmarkInfoKey)
+		return syncLocalBookmark(bookmarkInfoKey, document.getElementById('bookmark_info_sync'));
 }
 
 function syncLocalBookmark(key, button) {
@@ -480,6 +502,7 @@ function syncLocalBookmark(key, button) {
 		button.setAttribute('aria-disabled', getBookmarkUser() ? 'false' : 'true');
 		button.textContent = 'Sync to cloud';
 		renderAllBookmarks();
+		if(bookmarkInfoKey === key && !readLocalBookmarks()[key]) closeBookmarkInfoDialog();
 		return result;
 	});
 }
@@ -741,7 +764,7 @@ function deleteSaveEntry(e) {
 }
 
 function onPressSaveEntry(e) {
-	if(e && e.target && (e.target.closest('.bookmark-info-toggle') || e.target.closest('.bookmark-info-panel') || e.target.closest('.row-process') || e.target.closest('.row-menu-toggle') || e.target.closest('#account_dialog_row_menu')))
+	if(e && e.target && (e.target.closest('.bookmark-info-toggle') || e.target.closest('.row-process') || e.target.closest('.row-menu-toggle') || e.target.closest('#account_dialog_row_menu')))
 		return;
 	var row = e.currentTarget || getSaveEntryRow(e.target);
 	if(!row)

@@ -90,3 +90,15 @@
 		</div>
 	</div>
 </div>
+<div id='bookmark_info_dialog_container' class='center hide'>
+	<div id='bookmark_info_dialog' class='message_dialog saved-compatible-dialog' role='dialog' aria-modal='true' aria-labelledby='bookmark_info_title' aria-describedby='bookmark_info_message'>
+		<h2 id='bookmark_info_title' class='message_dialog_label'>Bookmark storage</h2>
+		<button id='bookmark_info_close' type='button' class='message_dialog_close control' aria-label='Close bookmark information'>
+			<span class='image'><?php includeSVG('', 'Close'); ?></span>
+		</button>
+		<div class='message_dialog_body'>
+			<p id='bookmark_info_message'>This bookmark is saved only in this browser, not to the cloud. Clearing browser data removes it.</p>
+			<button id='bookmark_info_sync' type='button' class='bookmark-sync control'>Sync to cloud</button>
+		</div>
+	</div>
+</div>

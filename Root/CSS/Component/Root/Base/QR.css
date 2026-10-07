@@ -234,5 +234,9 @@
 #qr_address_preview { white-space: pre-wrap; overflow-wrap: anywhere; text-align: center; }
 #qr_address_split_toggle { position: absolute; right: 0; top: 0; width: 32px; height: 32px; padding: 6px; border: 0; background: transparent; color: #6a6a6a; }
 #qr_address_split_toggle svg { display: block; width: 20px; height: 20px; }
-#qr_address_split_toggle.is-split svg { transform: rotate(90deg); }
+#qr_address_split_toggle { opacity: 0; pointer-events: none; }
+#qr_address_fields:focus-within #qr_address_split_toggle { opacity: 1; pointer-events: auto; }
+#qr_address_split_toggle .address-merge-symbol { display: none; }
+#qr_address_split_toggle.is-split .address-split-symbol { display: none; }
+#qr_address_split_toggle.is-split .address-merge-symbol { display: block; }
 #qr_address_split_toggle:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; border-radius: 4px; }

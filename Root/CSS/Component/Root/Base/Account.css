@@ -712,7 +712,11 @@
 	padding: 6px; border: 0; background: transparent; color: #6a6a6a;
 }
 #save_address_split_toggle svg { display: block; width: 20px; height: 20px; }
-#save_address_split_toggle.is-split svg { transform: rotate(90deg); }
+#save_address_split_toggle { opacity: 0; pointer-events: none; }
+#save_address_container:focus-within #save_address_split_toggle { opacity: 1; pointer-events: auto; }
+#save_address_split_toggle .address-merge-symbol { display: none; }
+#save_address_split_toggle.is-split .address-split-symbol { display: none; }
+#save_address_split_toggle.is-split .address-merge-symbol { display: block; }
 #save_address_split_toggle:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; border-radius: 4px; }
 html.dark-mode #save_address_split_toggle { color: #aaa; }
 

@@ -731,7 +731,7 @@ body.map-source-single #action_menu_map {
 	transform: scale(1.08);
 }
 
-#decode_code_scan_button svg {
+#decode_code_scan_button > .image {
 	background-color: rgb(255 255 255 / 65%);
 	-webkit-backdrop-filter: blur(4px);
 	backdrop-filter: blur(4px);
@@ -785,9 +785,14 @@ body.decode #saved_button svg { box-sizing: border-box; padding: 5px; }
  box-sizing: content-box; width: 39px; height: 39px;
  padding: 8px; margin: -8px;
 }
-.decode #decode_code_scan_button svg {
+.decode #decode_code_scan_button > .image {
  width: 39px; height: 39px; padding: 5px; border: 0; border-radius: 25px;
  background-color: rgb(255 255 255 / 50%);
  box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
 .decode #decode_code_scan_button .decode_chrome_caption { bottom: calc(100% + 6px); }
+
+/* Keep the camera artwork outside the disc's rounded clipping geometry. */
+#decode_code_scan_button > .image > svg {
+ display: block; width: 100%; height: 100%; overflow: visible;
+}

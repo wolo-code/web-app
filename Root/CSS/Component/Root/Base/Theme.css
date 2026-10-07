@@ -341,7 +341,7 @@ html.dark-mode #location_button svg,
 html.dark-mode #map_type_button svg,
 html.dark-mode #decode_map_view_button svg,
 html.dark-mode body.decode #saved_button svg,
-html.dark-mode #decode_code_scan_button svg {
+html.dark-mode #decode_code_scan_button > .image {
 	background-color: rgb(34 34 68 / 80%);
 }
 

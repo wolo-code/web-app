@@ -322,7 +322,6 @@ html.dark-mode #decode_input_button.active {
 	color: #69B7CF;
 }
 
-html.dark-mode body:not(.decode).decode-icon-guide #map_city_history_toggle,
 html.dark-mode body:not(.decode).decode-icon-guide #decode_button {
 	background-color: #222244;
 	color: #69B7CF;

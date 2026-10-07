@@ -167,3 +167,5 @@ Service-worker partial responses: Range requests pass directly to the network. H
 Scanner city chooser: The city-list icon has no persistent circle in either theme. Pressing it shows a circle that fades over 450 ms after release.
 
 Scanner city choices appear as a vertical list of full-width, left-aligned rows with subtle separators in both themes. Selecting a row fills the review city and closes the chooser.
+
+City-list icon placement: The scanner review icon sits 4 px higher. In Map View, the previous-city icon sits inside the right edge of the search input with space reserved for text; it has no square background and shows a circle on press that fades over 450 ms after release in both themes.

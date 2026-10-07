@@ -445,7 +445,7 @@ test('chrome controls include native tooltips', () => {
 	assert.match(index, /id='location_button'[\s\S]*title='Locate'/);
 	assert.match(index, /id='map_search_cluster'/);
 	assert.match(index, /id='map_city_history_toggle'/);
-	assert.match(index, /id='map_city_history_toggle'[\s\S]*?<\/button>\s*<div id='map_search_bar'>/);
+	assert.match(index, /id='map_search_field'>\s*<button id='map_city_history_toggle'[\s\S]*?<\/button>[\s\S]*?<input id='pac-input'/);
 	assert.match(index, /id='map_search_bar'/);
 	assert.match(index, /id='decode_button'[\s\S]*title='Go'/);
 	assert.match(index, /class='decode_icon_caption decode_chrome_caption'[\s\S]*Search/);
@@ -773,4 +773,3 @@ test('FirebaseUI missing or deferred does not crash authInit or trigger crash pr
 	assert.equal(context.ui, undefined);
 	assert.ok(context.uiConfig);
 });
-

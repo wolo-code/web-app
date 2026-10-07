@@ -396,8 +396,6 @@ body:not(.decode).decode-icon-guide #map_search_bar {
 }
 
 body:not(.decode).decode-icon-guide #map_city_history_toggle {
-	background-color: #fff;
-	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
 	color: #69B7CF;
 }
 

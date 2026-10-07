@@ -82,12 +82,33 @@
 }
 
 #map_city_history_toggle {
-	border-radius: 5px;
+	background: transparent;
+	border: 2px solid transparent;
+	border-radius: 50%;
 	flex: 0 0 auto;
-	height: 42px;
+	height: 34px;
 	overflow: visible;
-	position: relative;
-	width: 42px;
+	position: absolute;
+	right: 4px;
+	top: 4px;
+	width: 34px;
+	z-index: 1;
+	transition: border-color 450ms ease-out, background 450ms ease-out;
+}
+
+#map_search_field #pac-input {
+	padding-right: 42px;
+}
+
+html.dark-mode #map_city_history_toggle {
+	background: transparent;
+}
+
+#map_city_history_toggle:active,
+html.dark-mode #map_city_history_toggle:active {
+	border-color: #69B7CF;
+	background: rgb(105 183 207 / 12%);
+	transition-duration: 0ms;
 }
 
 #map_city_history_toggle:hover:not(:disabled),

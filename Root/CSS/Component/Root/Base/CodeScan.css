@@ -719,7 +719,7 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_zoom_reset.code_scan_zoom_changed svg { visibility: visible; }
 .code_scan_review_city_row { display: flex; position: relative; width: 75%; margin: 0 auto; }
 .code_scan_review_city_row > button {
- position: absolute; left: 2px; bottom: 7px; width: 32px; height: 32px;
+ position: absolute; left: 2px; bottom: 11px; width: 32px; height: 32px;
  border: none; background: transparent;
 }
 #code_scan_city_select,

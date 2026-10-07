@@ -279,3 +279,5 @@ Scanner City label sits just outside the input's left edge with an 8px gap, pres
 Scanner city choices open in a centered modal popup when the city icon is clicked, above the scanner with a dimmed backdrop. Selection updates the review city and dismisses the popup; Escape or backdrop click also dismisses it.
 
 Service-worker partial responses: Range requests pass directly to the network. HTTP 206 responses are never cached, and background cache-write failures do not interrupt successful network responses.
+
+Scanner city chooser: The city-list icon has no persistent circle in either theme. Pressing it shows a circle that fades over 450 ms after release.

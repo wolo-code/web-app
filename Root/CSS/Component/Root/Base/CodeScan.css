@@ -722,6 +722,25 @@ html.dark-mode .code_scan_apply_crop {
  position: absolute; left: 2px; bottom: 7px; width: 32px; height: 32px;
  border: none; background: transparent;
 }
+#code_scan_city_select,
+html.dark-mode #code_scan_city_select {
+ border: 2px solid transparent;
+ background: transparent;
+ box-sizing: border-box;
+ transition: border-color 450ms ease-out, background 450ms ease-out;
+ -webkit-tap-highlight-color: transparent;
+}
+#code_scan_city_select:hover,
+html.dark-mode #code_scan_city_select:hover {
+ background: transparent;
+ transform: none;
+}
+#code_scan_city_select:active,
+html.dark-mode #code_scan_city_select:active {
+ border-color: #69B7CF;
+ background: rgb(105 183 207 / 12%);
+ transition-duration: 0ms;
+}
 .code_scan_review_city_row .code_scan_review_input { padding-left: 40px; padding-right: 40px; }
 .code_scan_review_city_row > label { flex: 1; min-width: 0; }
 .code_scan_city_label { display: block; width: max-content; transform: translateX(calc(-100% - 8px)); }

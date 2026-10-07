@@ -284,4 +284,6 @@ Scanner city chooser: The city-list icon has no persistent circle in either them
 
 Scanner city choices appear as a vertical list of full-width, left-aligned rows with subtle separators in both themes. Selecting a row fills the review city and closes the chooser.
 
-City-list icon placement: The scanner review icon sits 4 px higher. In Map View, the previous-city icon sits inside the right edge of the search input with space reserved for text; it has no square background and shows a circle on press that fades over 450 ms after release in both themes.
+City-list icon placement: The scanner review icon sits 4 px higher. In Map View, the previous-city icon sits inside the left edge of the search input with space reserved for text; it has no square background and shows a circle on press that fades over 450 ms after release in both themes.
+
+The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.

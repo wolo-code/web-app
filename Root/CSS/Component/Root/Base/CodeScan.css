@@ -760,15 +760,32 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 .code_scan_city_choices::backdrop { background: rgb(0 0 0 / 35%); }
 html.dark-mode .code_scan_city_choices { background: #222244; }
 .code_scan_city_choices.hide { display: none; }
-.code_scan_city_choices > button {
+.code_scan_city_choices > button,
+#decode_city_history_message_list > div {
  background: transparent; border: none;
  border-radius: 0; color: #69B7CF; padding: 12px 16px; cursor: pointer;
  font: inherit; text-align: left; width: 100%; min-height: 44px;
  flex: 0 0 auto; box-sizing: border-box; margin: 0;
 }
-.code_scan_city_choices > button:not(:last-child) {
+.code_scan_city_choices > button:not(:last-child),
+#decode_city_history_message_list > div:not(:last-child) {
  border-bottom: 1px solid rgb(105 183 207 / 20%);
 }
 .code_scan_city_choices > button:hover,
 .code_scan_city_choices > button:focus-visible,
-.code_scan_city_choices > button:active { background: rgb(105 183 207 / 12%); }
+.code_scan_city_choices > button:active,
+#decode_city_history_message_list > div:hover,
+#decode_city_history_message_list > div:active { background: rgb(105 183 207 / 12%); }
+
+#decode_city_history_message {
+ box-sizing: border-box; width: min(320px, calc(100vw - 40px));
+ min-width: 0; max-width: 320px; background: #fff;
+ border: 1px solid rgb(105 183 207 / 40%); border-radius: 10px;
+ box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+html.dark-mode #decode_city_history_message { background: #222244; }
+#decode_city_history_message_prompt { padding: 0 0 8px; }
+#decode_city_history_message_list {
+ padding: 0; max-height: min(300px, calc(100dvh - 160px)); overflow-y: auto;
+}
+#decode_city_history_delete { padding: 0 16px; }

@@ -389,6 +389,8 @@
 }
 
 .row-header {
+	box-sizing: border-box;
+	min-height: 70px;
 	background: #69B7CF !important;
 	color: white !important;
 	position: relative;
@@ -469,22 +471,21 @@
 	box-shadow: none;
 	cursor: pointer;
 	display: flex;
-	height: 40px;
+	height: 30px;
 	justify-content: center;
 	margin: 0;
-	padding: 8px;
+	padding: 6px;
 	pointer-events: auto;
 	position: absolute;
-	right: 30px;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 40px;
+	right: 6px;
+	bottom: 6px;
+	width: 30px;
 }
 
 .row-process > img {
 	filter: brightness(0) invert(1);
-	height: 24px;
-	width: 24px;
+	height: 18px;
+	width: 18px;
 	pointer-events: none;
 }
 

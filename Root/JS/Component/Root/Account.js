@@ -535,7 +535,6 @@ function renderSaveList(entries) {
 			row_process_img.alt = '';
 			addLongpressListener(row_process, processSaveEntry_internal, processSaveEntry_external);
 			row_process.appendChild(row_process_img);
-			row_header.appendChild(row_process);
 			let row_details = document.createElement('div');
 			let row_details_inner = document.createElement('div');
 			row_details.setAttribute('class', 'row-details');
@@ -547,6 +546,7 @@ function renderSaveList(entries) {
 			row.appendChild(row_header);
 			if(isLocalBookmark(key)) addLocalBookmarkInfo(row, row_header, key);
 			row.appendChild(row_details);
+			row.appendChild(row_process);
 			row.data_process_continue_flag = false;
 			var savedCityId = saveList[key].city_id;
 			if(!isUsableCityId(savedCityId) && saveList[key].gp_id)

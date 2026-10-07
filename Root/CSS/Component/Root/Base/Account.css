@@ -84,6 +84,7 @@
 }
 
 #account_dialog_save_list > div {
+	position: relative;
 	background-color: #69B7CF;
 	box-sizing: border-box;
 	color: #ffffff;
@@ -478,7 +479,7 @@
 	word-break: break-word;
 }
 
-.row-header .row-process {
+#account_dialog_save_list .row-process {
 	align-items: center;
 	background: transparent;
 	border: 0;
@@ -497,10 +498,19 @@
 }
 
 .row-process > img {
-	filter: brightness(0) invert(1);
 	height: 18px;
 	width: 18px;
 	pointer-events: none;
+}
+
+#account_dialog_save_list > div:not(.active) .row-process > img {
+	filter: brightness(0) invert(1);
+}
+
+.row-details-inner::after {
+	content: '';
+	display: block;
+	height: 36px;
 }
 
 .row-menu-toggle {

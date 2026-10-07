@@ -253,6 +253,11 @@ function downloadURI(uri, name) {
 	link.click();
 }
 
+function isQRAddressPlaceholder(text) {
+	var value = (text || '').replace(/\u00a0/g, ' ').trim().toLowerCase();
+	return !value || value === 'address' || value === 'address (optional)';
+}
+
 function onQRDialogSave() {
 	if(!document.getElementById('qr_title_main').value.length) {
 		showNotification("Title is required");
@@ -266,7 +271,7 @@ function onQRDialogSave() {
 	if(user != null)
 		uid = user.uid;
 	var saveAddr = document.getElementById('qr_address').innerText;
-	if(qr_address_active_first || saveAddr == '\xa0\xa0Address' || saveAddr.trim() == 'Address' || saveAddr == '')
+	if(qr_address_active_first || isQRAddressPlaceholder(saveAddr))
 		saveAddr = address;
 	current_title = document.getElementById('qr_title_main').value;
 	current_segment = document.getElementById('qr_title_segment').value;
@@ -294,7 +299,7 @@ function updateQRBookmarkStatus() {
  var field = document.getElementById('qr_address');
  var marker = document.getElementById('qr_bookmark_changed');
  if(!button || !field || !marker) return;
- var labelAddress = qr_address_active_first || isSaveAddressPlaceholder(field.innerText) ? address : field.innerText;
+ var labelAddress = qr_address_active_first || isQRAddressPlaceholder(field.innerText) ? address : field.innerText;
  var entries = Object.assign({}, cloudBookmarks, readLocalBookmarks());
  var state = getQRBookmarkState(entries, getCodeCity(), getCodeWCode(), labelAddress);
  button.classList.toggle('bookmarked', state.saved);

@@ -135,6 +135,78 @@
 		};
 	}
 
+	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
+		var words = result && result.data && result.data.words;
+		var rows = [];
+		var best = null;
+		if(!words || !words.length) return null;
+		words.filter(function(word) {
+			return word && word.bbox && normalizeOcrText(word.text);
+		}).sort(function(a, b) {
+			return a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0;
+		}).forEach(function(word) {
+			var box = word.bbox;
+			var row = rows.find(function(candidate) {
+				var overlap = Math.min(candidate.bbox.y1, box.y1) - Math.max(candidate.bbox.y0, box.y0);
+				return overlap >= Math.min(candidate.bbox.y1 - candidate.bbox.y0, box.y1 - box.y0) * 0.5;
+			});
+			if(!row) {
+				row = { words: [], bbox: box };
+				rows.push(row);
+			}
+			row.words.push(word);
+			row.bbox = unionBboxes([row.bbox, box]);
+		});
+		rows.forEach(function(row) {
+			var tokens = [];
+			row.words.sort(function(a, b) { return a.bbox.x0 - b.bbox.x0; }).forEach(function(word) {
+				normalizeOcrText(word.text).split(' ').forEach(function(token) {
+					tokens.push({ text: token, bbox: word.bbox, confidence: word.confidence || 0 });
+				});
+			});
+			for(var i = 0; i <= tokens.length - 3; i++) {
+				var triplet = tokens.slice(i, i + 3);
+				var corrected = triplet.map(function(word) { return fuzzyMatchWord(word.text, includesFn, canonicalWords || []); });
+				if(corrected.some(function(word) { return !word; })) continue;
+				var bbox = unionBboxes(triplet.map(function(word) { return word.bbox; }));
+				var score = triplet.reduce(function(sum, word) {
+					return sum + (includesFn(word.text) ? 1000 : 0) + word.confidence;
+				}, 0) + (bbox.y1 - bbox.y0);
+				if(!best || score > best.score) best = { words: corrected, bbox: bbox, score: score };
+			}
+		});
+		if(!best) return null;
+		var codeBox = best.bbox;
+		var codeWidth = codeBox.x1 - codeBox.x0;
+		var codeHeight = codeBox.y1 - codeBox.y0;
+		// Anchor the three-word row near the bottom of a golden-ratio label.
+		var containerWidth = codeWidth * 1.1;
+		var containerHeight = Math.max(containerWidth / ((1 + Math.sqrt(5)) / 2), codeHeight * 2.5);
+		var container = {
+			x0: codeBox.x0 - codeWidth * 0.05,
+			x1: codeBox.x1 + codeWidth * 0.05,
+			y0: codeBox.y1 + codeHeight * 0.35 - containerHeight,
+			y1: codeBox.y1 + codeHeight * 0.35
+		};
+		var cityWords = words.filter(function(word) {
+			var box = word && word.bbox;
+			return box && normalizeOcrText(word.text) && box.y1 <= codeBox.y0 &&
+				box.x0 >= container.x0 && box.x1 <= container.x1 && box.y0 >= container.y0;
+		}).sort(function(a, b) {
+			var overlap = Math.min(a.bbox.y1, b.bbox.y1) - Math.max(a.bbox.y0, b.bbox.y0);
+			return overlap > 0 ? a.bbox.x0 - b.bbox.x0 : a.bbox.y0 - b.bbox.y0;
+		});
+		var city = normalizeOcrText(cityWords.map(function(word) { return word.text; }).join(' '));
+		var cityTokens = city ? city.split(' ') : [];
+		var matched = cityTokens.concat(best.words);
+		return {
+			words: matched,
+			code: matched.join(' '),
+			cityWordCount: cityTokens.length,
+			regions: { container: container, city: unionBboxes(cityWords.map(function(word) { return word.bbox; })), code: codeBox }
+		};
+	}
+
 	function buildCodeFromReview(city, w1, w2, w3) {
 		var parts = [];
 		var cityTokens;
@@ -487,6 +559,7 @@
 		correctTokens: correctTokens,
 		findWoloCodeInTokens: findWoloCodeInTokens,
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
+		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		splitMatchForReview: splitMatchForReview,
 		buildCodeFromReview: buildCodeFromReview,
 		validateReviewWords: validateReviewWords,

@@ -12,6 +12,7 @@ var codeScanState = {
 	stableMatchCount: 0,
 	lastMatchBBox: null,
 	lastDetectedMatch: null,
+	reviewMatch: null,
 	cropScanTimer: null,
 	cropRevision: 0,
 	tesseractPromise: null,
@@ -95,6 +96,9 @@ function initCodeScan() {
 	bindControl('code_scan_apply_crop', 'click', applyCodeScanCrop);
 	bindCodeScanReviewInputListeners();
 	initCodeScanZoomAndPan();
+	window.addEventListener('resize', redrawCodeScanReviewRegions);
+	var previewCanvas = getCodeScanCanvas();
+	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput)
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
@@ -175,6 +179,7 @@ function stopCodeScan() {
 }
 
 function resetCodeScanUi() {
+	codeScanState.reviewMatch = null;
 	setCodeScanPhase('live');
 	clearCodeScanReviewFields();
 	setCodeScanFrozenPreview(false);
@@ -600,7 +605,7 @@ function extractMatchFromOcrResult(result) {
 	var confidence = result && result.data && typeof result.data.confidence == 'number' ? result.data.confidence : 0;
 	if(!text || confidence < CODE_SCAN_MIN_CONFIDENCE)
 		return null;
-	return codeScanOcrMatch.matchOcrTextToWoloCode(text, wordList.includes.bind(wordList), wordList.curList);
+	return codeScanOcrMatch.matchOcrRegionsToWoloCode(result, wordList.includes.bind(wordList), wordList.curList);
 }
 
 function extractGuidanceFromOcrResult(result, canvas) {
@@ -608,7 +613,7 @@ function extractGuidanceFromOcrResult(result, canvas) {
 	var bbox;
 	if(!match)
 		return null;
-	bbox = codeScanOcrMatch.extractMatchBBoxFromOcr(result, match, wordList.includes.bind(wordList), wordList.curList);
+	bbox = match.regions.code;
 	return {
 		match: match,
 		bbox: bbox
@@ -630,7 +635,8 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 	match = guidance.match;
 	codeScanState.lastDetectedMatch = match;
 	bbox = guidance.bbox;
-	setCodeScanCandidateHighlight(bbox, canvas);
+	if(match.regions) drawCodeScanMatchRegions(match, canvas);
+	else setCodeScanCandidateHighlight(bbox, canvas);
 	setCodeScanWoloFoundCue(true);
 	setCodeScanStatus('Wolo Code found');
 	if(match.code === codeScanState.lastMatchCode && codeScanState.lastMatchBBox && bbox)
@@ -650,7 +656,24 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 		var autoVideo = getCodeScanVideo();
 		var autoCanvas = getCodeScanCanvas();
 		if(autoVideo && autoCanvas && autoVideo.readyState >= 2) {
+			var recognitionWidth = canvas.width;
+			var recognitionHeight = canvas.height;
+			var viewport = document.querySelector('.code_scan_viewport');
+			var guide = document.getElementById('code_scan_fixed_guide');
+			var viewportRect = viewport && viewport.getBoundingClientRect();
+			var guideRect = guide && guide.getBoundingClientRect();
 			captureCodeScanFullRes(autoVideo, autoCanvas);
+			if(match.regions) {
+				var framed = codeScanState.detectionMode === 'fixed' && guideRect && viewportRect && viewportRect.width && viewportRect.height;
+				var sx = framed ? (guideRect.left - viewportRect.left) / viewportRect.width * autoCanvas.width : 0;
+				var sy = framed ? (guideRect.top - viewportRect.top) / viewportRect.height * autoCanvas.height : 0;
+				var scaleX = (framed ? guideRect.width / viewportRect.width : 1) * autoCanvas.width / recognitionWidth;
+				var scaleY = (framed ? guideRect.height / viewportRect.height : 1) * autoCanvas.height / recognitionHeight;
+				Object.keys(match.regions).forEach(function(key) {
+					var box = match.regions[key];
+					if(box) match.regions[key] = { x0: sx + box.x0 * scaleX, y0: sy + box.y0 * scaleY, x1: sx + box.x1 * scaleX, y1: sy + box.y1 * scaleY };
+				});
+			}
 			resetCodeScanLiveZoom();
 			saveCodeScanSourceFromCanvas(autoCanvas, true);
 			resetCodeScanZoom();
@@ -749,6 +772,7 @@ function processCodeScanCapture(detectedMatch) {
 }
 
 function showCodeScanReview(match) {
+	codeScanState.reviewMatch = match;
 	var review = codeScanOcrMatch.splitMatchForReview(match);
 	setCodeScanPhase('review');
 	setCodeScanReviewVisible(true);
@@ -761,6 +785,7 @@ function showCodeScanReview(match) {
 	populateCodeScanReviewFields(review.city, review.words[0], review.words[1], review.words[2]);
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
+	drawCodeScanMatchRegions(match, getCodeScanCanvas());
 	setCodeScanStatus('Check the words below. Drag or zoom to adjust the framed area.');
 }
 
@@ -1094,8 +1119,8 @@ function recognizeCodeScanPhoto(file) {
 	});
 }
 
-function setCodeScanCandidateHighlight(bbox, canvas) {
-	var highlight = document.getElementById('code_scan_candidate_highlight');
+function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
+	var highlight = document.getElementById(id || 'code_scan_candidate_highlight');
 	var viewport = document.querySelector('.code_scan_viewport');
 	var video = getCodeScanVideo();
 	var width;
@@ -1110,8 +1135,8 @@ function setCodeScanCandidateHighlight(bbox, canvas) {
 	height = canvas.height;
 	if(!width || !height)
 		return;
-	var padX = (bbox.x1 - bbox.x0) * 0.05;
-	var padY = (bbox.y1 - bbox.y0) * 0.05;
+	var padX = padded === false ? 0 : (bbox.x1 - bbox.x0) * 0.05;
+	var padY = padded === false ? 0 : (bbox.y1 - bbox.y0) * 0.05;
 	var x0 = Math.max(0, bbox.x0 - padX);
 	var y0 = Math.max(0, bbox.y0 - padY);
 	left = (x0 / width) * 100;
@@ -1122,13 +1147,38 @@ function setCodeScanCandidateHighlight(bbox, canvas) {
 	highlight.style.top = top + '%';
 	highlight.style.width = boxWidth + '%';
 	highlight.style.height = boxHeight + '%';
+	if(viewport.classList && viewport.classList.contains('code_scan_viewport_frozen')) {
+		var guide = document.getElementById('code_scan_fixed_guide');
+		if(guide) {
+			var imageRect = getCodeScanRenderedImageRect(canvas);
+			var guideRect = guide.getBoundingClientRect();
+			highlight.style.left = (imageRect.left - guideRect.left - guide.clientLeft + left / 100 * imageRect.width) + 'px';
+			highlight.style.top = (imageRect.top - guideRect.top - guide.clientTop + top / 100 * imageRect.height) + 'px';
+			highlight.style.width = (boxWidth / 100 * imageRect.width) + 'px';
+			highlight.style.height = (boxHeight / 100 * imageRect.height) + 'px';
+		}
+	}
 	highlight.classList.remove('hide');
 }
 
+function drawCodeScanMatchRegions(match, canvas) {
+	clearCodeScanCandidateHighlight();
+	if(!match || !match.regions || !canvas) return;
+	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);
+	setCodeScanCandidateHighlight(match.regions.code, canvas);
+	if(match.regions.city) setCodeScanCandidateHighlight(match.regions.city, canvas, 'code_scan_city_highlight');
+}
+
+function redrawCodeScanReviewRegions() {
+	if(codeScanState.active && codeScanState.reviewMatch)
+		drawCodeScanMatchRegions(codeScanState.reviewMatch, getCodeScanCanvas());
+}
+
 function clearCodeScanCandidateHighlight() {
-	var highlight = document.getElementById('code_scan_candidate_highlight');
-	if(highlight)
-		highlight.classList.add('hide');
+	['code_scan_candidate_highlight', 'code_scan_container_highlight', 'code_scan_city_highlight'].forEach(function(id) {
+		var highlight = document.getElementById(id);
+		if(highlight) highlight.classList.add('hide');
+	});
 }
 
 function positionCodeScanGuideToDetectedRegion(bbox, canvas) {
@@ -1269,6 +1319,8 @@ function setCodeScanZoom(zoom, panX, panY) {
 	}
 	if(previousZoom !== codeScanState.zoom || previousPanX !== codeScanState.panX || previousPanY !== codeScanState.panY)
 		scheduleCodeScanCropRecognition();
+	if(codeScanState.reviewMatch && codeScanState.phase === 'review')
+		drawCodeScanMatchRegions(codeScanState.reviewMatch, canvas);
 }
 
 function scheduleCodeScanCropRecognition() {
@@ -1582,6 +1634,10 @@ function applyCodeScanCrop() {
 		}
 		var match = extractMatchFromOcrResult(result);
 		if(match) {
+			Object.keys(match.regions).forEach(function(key) {
+				var box = match.regions[key];
+				if(box) match.regions[key] = { x0: box.x0 + cropSx, y0: box.y0 + cropSy, x1: box.x1 + cropSx, y1: box.y1 + cropSy };
+			});
 			showCodeScanReview(match);
 			setCodeScanStatus('Wolo Code recognized from crop! Check details below.');
 		}

@@ -66,6 +66,24 @@ test('crop OCR intersects letterboxing and does not replace the editable image',
  assert.equal(canvas.width, 1200); assert.equal(canvas.height, 800);
 });
 
+test('crop OCR translates all three rectangles back into original image coordinates', async () => {
+ const { context } = scanner();
+ const guide = { getBoundingClientRect: () => ({ left: 50, top: 25, width: 100, height: 60 }) };
+ context.document.getElementById = id => id === 'code_scan_fixed_guide' ? guide : null;
+ context.document.createElement = () => ({ getContext: () => ({ drawImage() {} }) });
+ context.getCodeScanRenderedImageRect = () => ({ left: 0, top: 0, width: 300, height: 200 });
+ const match = { regions: {
+  container: { x0: 0, y0: 0, x1: 300, y1: 180 },
+  city: { x0: 50, y0: 30, x1: 150, y1: 50 },
+  code: { x0: 10, y0: 100, x1: 290, y1: 130 }
+ } };
+ context.codeScanState.worker = { recognize: async () => ({ match }) };
+ context.applyCodeScanCrop(); await new Promise(resolve => setImmediate(resolve));
+ assert.deepEqual({ ...context.reviewMatch.regions.container }, { x0: 200, y0: 100, x1: 500, y1: 280 });
+ assert.deepEqual({ ...context.reviewMatch.regions.city }, { x0: 250, y0: 130, x1: 350, y1: 150 });
+ assert.deepEqual({ ...context.reviewMatch.regions.code }, { x0: 210, y0: 200, x1: 490, y1: 230 });
+});
+
 test('live OCR captures stable text without requiring a printed border or text aspect ratio', () => {
  const { context, canvas } = scanner();
  const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };

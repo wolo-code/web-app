@@ -115,6 +115,9 @@
 	transition: opacity 120ms ease;
 }
 
+.code_scan_container_highlight { border-color: #69B7CF; box-shadow: none; }
+.code_scan_city_highlight { border-color: #e8c568; box-shadow: none; }
+
 .code_scan_viewport.code_scan_viewport_frozen.code_scan_is_editing_crop .code_scan_fixed_guide {
 	aspect-ratio: 3 / 1;
 	border: 2px dashed rgba(105, 183, 207, 0.9);

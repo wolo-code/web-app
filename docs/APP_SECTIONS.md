@@ -304,3 +304,5 @@ Scanner: the capture control is 20% larger. Live recognition crops the visible g
 Scanner detection adds 10% padding around recognized text. Live capture immediately populates the review fields using the detected code. Zoom and pan automatically rerun OCR on the framed area after a 350ms debounce, ignoring outdated results; live zoom requests fresh detection.
 
 Scanner gallery: selected photos preserve their original pixel dimensions for preview, zoom, pan and OCR, without the former 1600px width reduction.
+
+Scanner spatial recognition: the three Wolo words define a code rectangle and an inferred golden-ratio container. Only OCR words above that code within the container become city text. Live and gallery review show separate blue container, gold city and green code rectangles; review overlays follow zoom, pan and viewport resizing.

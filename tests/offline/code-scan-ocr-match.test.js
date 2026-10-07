@@ -28,6 +28,64 @@ test('normalizeOcrText lowercases and strips punctuation', () => {
 	assert.equal(ocrMatch.normalizeOcrText('BENGALURU CAT, APPLE!'), 'bengaluru cat apple');
 });
 
+function regionWord(text, x0, y0, x1, y1) {
+	return { text, confidence: 95, bbox: { x0, y0, x1, y1 } };
+}
+
+test('spatial matching reads only city words above the code inside the container', () => {
+	const words = [
+		regionWord('Delhi', 250, 100, 340, 125),
+		regionWord('tomato', 350, 180, 440, 220),
+		regionWord('unrelated', 600, 100, 750, 125),
+		regionWord('New', 180, 100, 240, 125),
+		regionWord('apple', 230, 180, 330, 220),
+		regionWord('cat', 100, 180, 210, 220),
+		regionWord('footer', 180, 250, 240, 280),
+		regionWord('heading', 180, -100, 240, -70)
+	];
+	const vocab = buildIncludes();
+	const match = ocrMatch.matchOcrRegionsToWoloCode({ data: { words } }, vocab.includes, vocab.canonical);
+	assert.equal(match.code, 'new delhi cat apple tomato');
+	assert.deepEqual(match.regions.code, { x0: 100, y0: 180, x1: 440, y1: 220 });
+	assert.deepEqual(match.regions.city, { x0: 180, y0: 100, x1: 340, y1: 125 });
+	const container = match.regions.container;
+	assert.ok(Math.abs((container.x1 - container.x0) / (container.y1 - container.y0) - (1 + Math.sqrt(5)) / 2) < 0.001);
+});
+
+test('city spelling is preserved instead of corrected using Wolo dictionary words', () => {
+	const vocab = buildIncludes();
+	const match = ocrMatch.matchOcrRegionsToWoloCode({ data: { words: [
+		regionWord('Bunbury', 170, 100, 330, 130),
+		regionWord('cat', 100, 180, 210, 220),
+		regionWord('apple', 230, 180, 330, 220),
+		regionWord('tomato', 350, 180, 440, 220)
+	] } }, vocab.includes, vocab.canonical);
+	assert.equal(ocrMatch.splitMatchForReview(match).city, 'bunbury');
+});
+
+test('text outside the label does not become a city and repeated code words do not enlarge the code region', () => {
+	const includes = word => ['cat', 'apple'].includes(word);
+	const match = ocrMatch.matchOcrRegionsToWoloCode({ data: { words: [
+		regionWord('cat', 900, 10, 950, 50),
+		regionWord('cat', 100, 180, 210, 220),
+		regionWord('apple', 230, 180, 330, 220),
+		regionWord('cat', 350, 180, 440, 220)
+	] } }, includes, ['cat', 'apple']);
+	assert.equal(match.code, 'cat apple cat');
+	assert.equal(match.cityWordCount, 0);
+	assert.equal(match.regions.city, null);
+	assert.equal(match.regions.code.x1, 440);
+});
+
+test('three dictionary words on separate lines are not treated as a code row', () => {
+	const vocab = buildIncludes();
+	assert.equal(ocrMatch.matchOcrRegionsToWoloCode({ data: { words: [
+		regionWord('cat', 100, 20, 200, 50),
+		regionWord('apple', 100, 100, 200, 130),
+		regionWord('tomato', 100, 180, 200, 210)
+	] } }, vocab.includes, vocab.canonical), null);
+});
+
 test('fuzzyMatchWord corrects common OCR typos against the word list', () => {
 	const vocab = buildIncludes();
 	assert.equal(ocrMatch.fuzzyMatchWord('appl', vocab.includes, vocab.canonical), 'apple');
@@ -148,4 +206,3 @@ test('extractMatchRegionDetails extracts union bbox and tilt angle from matched 
 	// dx = 240, dy = 20 -> angle = Math.atan2(20, 240) ≈ 0.0831 rad
 	assert.ok(Math.abs(details.angle - Math.atan2(20, 240)) < 0.001);
 });
-

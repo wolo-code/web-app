@@ -1,5 +1,6 @@
 #qr_container {
 	position: relative;
+	padding-inline: 5px;
 }
 
 #qr_body {

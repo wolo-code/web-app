@@ -552,7 +552,8 @@ html.dark-mode .row-menu-toggle circle {
 
 html.dark-mode #save_title_main,
 html.dark-mode #save_title_segment,
-html.dark-mode #save_address {
+html.dark-mode #save_address,
+html.dark-mode #save_address_line_2 {
 	background-color: #222244;
 	border-color: #33335a;
 	color: #aaa;

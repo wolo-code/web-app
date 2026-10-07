@@ -48,16 +48,7 @@ function syncAccountDialogSaveForm() {
 		document.getElementById('save_title_segment').value = current_segment;
 	else
 		document.getElementById('save_title_segment').value = '';
-	if(current_address) {
-		var saveAddressField = document.getElementById('save_address');
-		if(saveAddressField)
-			saveAddressField.innerText = current_address;
-		removeClassIfPresent(saveAddressField, 'initial');
-		account_dialog_address_active_first = false;
-	}
-	else {
-		resetAccountDialogAddressField();
-	}
+	setAccountDialogAddressFields(current_address || '');
 }
 
 function setAccountDialogAddOpen(open) {
@@ -113,25 +104,20 @@ function toggleAccountDialogSaves() {
 	setAccountDialogSavesOpen(!(toggle && toggle.getAttribute('aria-expanded') === 'true'));
 }
 
-function isSaveAddressPlaceholder(text) {
-	var value = (text || '').replace(/\u00a0/g, ' ').trim().toLowerCase();
-	return !value || value === 'address' || value === 'address (optional)';
+function setAccountDialogAddressFields(value) {
+	var lines = (value || '').split(/\r?\n/);
+	document.getElementById('save_address').value = lines.shift() || '';
+	document.getElementById('save_address_line_2').value = lines.join(', ');
 }
 
 function resetAccountDialogAddressField() {
-	var field = document.getElementById('save_address');
-	if(!field)
-		return;
-	field.textContent = 'Address';
-	field.classList.add('initial');
-	account_dialog_address_active_first = true;
+	setAccountDialogAddressFields('');
 }
 
 function getAccountDialogSaveAddressText() {
-	var field = document.getElementById('save_address');
-	if(!field || account_dialog_address_active_first || field.classList.contains('initial') || isSaveAddressPlaceholder(field.innerText))
-		return address || '';
-	return field.innerText;
+	var line1 = document.getElementById('save_address').value.trim();
+	var line2 = document.getElementById('save_address_line_2').value.trim();
+	return line2 ? line1 + '\n' + line2 : line1;
 }
 
 function normalizeSavedWcode(code) {
@@ -335,16 +321,6 @@ function clearAccountDialogSaveForm() {
 	resetAccountDialogAddressField();
 }
 
-function onAccountDialogAddressActive() {
-	if (account_dialog_address_active_first) {
-		account_dialog_address_active_first = false;
-		var field = document.getElementById('save_address');
-		removeClassIfPresent(field, 'initial');
-		if(field)
-			field.innerText = address || '';
-	}
-}
-
 function updateSaveListEndIndicator() {
 	var list = document.getElementById('account_dialog_save_list');
 	var endIndicator = document.getElementById('account_dialog_save_list_end');
@@ -430,11 +406,9 @@ function renderSaveList(entries) {
 			let row_header = document.createElement('div');
 			let row_title = document.createElement('div');
 			let row_segment = document.createElement('div');
-			let row_controls_container = document.createElement('div');
-			let row_controls = document.createElement('div');
 			let row_address = document.createElement('div');
 			let row_code = document.createElement('div');
-			let row_process = document.createElement('span');
+			let row_process = document.createElement('button');
 			let row_process_img = document.createElement('img');
 			let savedCode = normalizeSavedWcode(saveList[key].code);
 			row_header.setAttribute('class', 'row-header');
@@ -471,24 +445,21 @@ function renderSaveList(entries) {
 			row_address.innerText = saveList[key].address;
 			row_code.setAttribute('class', 'row-code');
 			setSavedRowCodeText(row_code, savedCityDisplayName(null, saveList[key]), savedCode);
-			row_controls.setAttribute('class', 'row-controls');
-			row_process.setAttribute('class', 'row-process');
+			row_process.setAttribute('class', 'row-process control');
+			row_process.setAttribute('type', 'button');
 			row_process.setAttribute('title', 'Go');
 			row_process.setAttribute('aria-label', 'Go');
 			row_process_img.src = svg_front;
 			row_process_img.alt = '';
 			addLongpressListener(row_process, processSaveEntry_internal, processSaveEntry_external);
 			row_process.appendChild(row_process_img);
-			row_controls.appendChild(row_process);
-			row_controls_container.setAttribute('class', 'row-controls-container');
-			row_controls_container.appendChild(row_controls);
+			row_header.appendChild(row_process);
 			let row_details = document.createElement('div');
 			let row_details_inner = document.createElement('div');
 			row_details.setAttribute('class', 'row-details');
 			row_details_inner.setAttribute('class', 'row-details-inner');
 			row_details_inner.appendChild(row_code);
 			row_details_inner.appendChild(row_address);
-			row_details_inner.appendChild(row_controls_container);
 			row_details.appendChild(row_details_inner);
 			container.appendChild(row);
 			row.appendChild(row_header);
@@ -642,16 +613,7 @@ function editSaveEntry(e) {
 	setAccountDialogAddOpen(true);
 	document.getElementById('save_title_main').value = entry.title || '';
 	document.getElementById('save_title_segment').value = entry.segment || '';
-	var field = document.getElementById('save_address');
-	if(entry.address) {
-		if(field)
-			field.innerText = entry.address;
-		removeClassIfPresent(field, 'initial');
-		account_dialog_address_active_first = false;
-	}
-	else {
-		resetAccountDialogAddressField();
-	}
+	setAccountDialogAddressFields(entry.address || '');
 	if(lastActiveSaveEntry && lastActiveSaveEntry != row)
 		toggleSaveEntry(lastActiveSaveEntry);
 	if(!row.classList.contains('active'))

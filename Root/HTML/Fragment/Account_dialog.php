@@ -61,7 +61,8 @@
 					<input id='save_title_segment' type='text' placeholder="Segment – e.g. Main gate" aria-label='Segment'>
 				</div>
 				<div id='save_address_container'>
-					<div id='save_address' class='initial' contentEditable>Address</div>
+					<input id='save_address' type='text' placeholder='Address line 1 (optional)' aria-label='Address line 1 (optional)' autocomplete='address-line1'>
+					<input id='save_address_line_2' type='text' placeholder='Address line 2 (optional)' aria-label='Address line 2 (optional)' autocomplete='address-line2'>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_cancel' class="message_dialog_control">

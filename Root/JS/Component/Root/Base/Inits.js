@@ -98,7 +98,6 @@ var programmaticMapFocus = false;
 // Account Dialog
 var saveList;
 var lastActiveSaveEntry;
-var account_dialog_address_active_first;
 
 // Title
 var current_title;

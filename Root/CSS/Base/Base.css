@@ -1,5 +1,6 @@
 :root {
 	--app-safe-top: env(safe-area-inset-top, 0px);
+	--app-logo-offset-x: 12px;
 	--app-background-wcode: #efefef;
 	--app-background-map: #60d0e5;
 	--app-background-satellite: #1b2f62;
@@ -164,7 +165,7 @@ body.satellite #map {
 
 #logo {
 	position: absolute;
-	right: 10px;
+	right: max(0px, calc(10px - var(--app-logo-offset-x)));
 	top: calc(10px + var(--app-safe-top));
 	width: auto;
 }

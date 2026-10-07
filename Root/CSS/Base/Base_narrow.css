@@ -58,7 +58,7 @@
 			max-width: calc(100vw - 16px);
 			right: auto;
 			text-align: left;
-			transform: translateX(-50%);
+			transform: translateX(calc(-50% + var(--app-logo-offset-x)));
 		}
 
 		#logo_surface {

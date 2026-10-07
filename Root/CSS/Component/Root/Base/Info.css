@@ -32,6 +32,7 @@
 	align-items: end;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+	transform: translateX(var(--app-logo-offset-x));
 }
 
 #info_message > p {

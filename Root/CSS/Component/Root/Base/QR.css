@@ -206,7 +206,7 @@
 	word-break: break-word;
 }
 
-#logo_qr { cursor: default; user-select: none; caret-color: transparent; transform: translateX(8px); }
+#logo_qr { cursor: default; user-select: none; caret-color: transparent; }
 #qr_wcode_text {
 	flex: 1 0 auto;
 	display: grid;

@@ -39,7 +39,14 @@
 		</div>
 		</div>
 		<div id='qr_address_container' class='center'>
-			<div id='qr_address' class='initial' contentEditable>&nbsp;&nbsp;Address</div>
+			<div id='qr_address_fields' class='section-to-not-print'>
+				<div class='qr-address-first-row'>
+					<div id='qr_address' contenteditable='true' role='textbox' aria-multiline='true' aria-label='Address (optional)' data-placeholder='Address (optional)'></div>
+					<button id='qr_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='qr_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M4 5h16M4 19h16M12 8v8m-3-5 3-3 3 3m-6 2 3 3 3-3' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></button>
+				</div>
+				<div id='qr_address_line_2' contenteditable='false' role='textbox' aria-multiline='true' aria-label='Address line 2 (optional)' data-placeholder='Address line 2 – e.g. Flat 4B, second floor' hidden></div>
+			</div>
+			<div id='qr_address_preview' hidden></div>
 		</div>
 		<div id='qr_webapp_url' class='center'>
 			<div>www.wolo.codes</div>

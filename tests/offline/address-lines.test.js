@@ -8,14 +8,17 @@ function harness() {
  const storage = new Map();
  const notices = [];
  let focused;
- for (const id of ['save_address', 'save_address_line_2', 'save_address_split_toggle', 'save_title_main', 'save_title_segment']) {
-  fields[id] = { value: '', attributes: {}, classList: { toggle() {} }, setAttribute(k, v) { this.attributes[k] = v; }, focus() { focused = id; } };
+ for (const id of ['save_address', 'save_address_line_2', 'save_address_split_toggle', 'save_title_main', 'save_title_segment', 'qr_address', 'qr_address_line_2', 'qr_address_split_toggle', 'qr_address_preview', 'qr_address_fields', 'qr_preview', 'qr_title_main', 'qr_title_segment']) {
+  const classes = new Set();
+  fields[id] = { value: '', innerText: '', attributes: {}, classList: { toggle() {}, add(name) { classes.add(name); }, remove(name) { classes.delete(name); }, contains(name) { return classes.has(name); } }, setAttribute(k, v) { this.attributes[k] = v; }, focus() { focused = id; } };
  }
  const context = {
-  window: { addEventListener() {} }, NOTIFICATION_DURATION_LONG: 1, saveList: {},
+  window: { addEventListener() {}, removeEventListener() {} }, NOTIFICATION_DURATION_LONG: 1, saveList: {},
   document: { getElementById: id => fields[id] || null },
   localStorage: { getItem: k => storage.get(k) || null, setItem: (k, v) => storage.set(k, v) },
   current_address_lines: null, current_address: '', locating: false,
+  addClassIfPresent: (node, name) => node && node.classList.add(name),
+  removeClassIfPresent: (node, name) => node && node.classList.remove(name),
   getCodeCity: () => ({ id: 'city-1', name: 'City' }), getCodeWCode: () => ['a', 'b', 'c'],
   showNotification: text => notices.push(text), isOfflineMode: () => false, setTimeout
  };
@@ -134,11 +137,11 @@ test('offline enqueue and local-to-cloud sync retain structured address lines', 
  assert.equal(c.readLocalBookmarks().local_test, undefined);
 });
 
-test('QR save preserves unchanged boundaries, parses edited text, and compares formatted bookmarks', () => {
+test('QR fields preserve address boundaries and compare formatted bookmarks', () => {
  const { context: c } = harness();
  c.current_address_lines = { address_line_1: '', address_line_2: 'Second only' };
- assert.deepEqual(plain(c.getQRSaveAddressLines('Second only')), { address_line_1: '', address_line_2: 'Second only' });
- assert.deepEqual(plain(c.getQRSaveAddressLines('Road\nFlat\nFloor')), { address_line_1: 'Road', address_line_2: 'Flat, Floor' });
+ c.setQRAddressFields(c.current_address_lines);
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), { address_line_1: '', address_line_2: 'Second only' });
  c.current_address_lines = lines;
  assert.equal(c.getCodeQRValue('address'), '12 MG Road\nFlat 4B, second floor');
  const state = c.getQRBookmarkState({ key: { city_id: 'city-1', code: ['a','b','c'], ...lines } }, { id: 'city-1' }, ['a','b','c'], c.formatSavedAddress(lines));
@@ -163,4 +166,90 @@ test('opening a saved address carries both lines to the map panel, reopened form
  c.syncAccountDialogSaveForm();
  assert.equal(c.saveAddressSplit, true);
  assert.deepEqual(plain(c.getAccountDialogSaveAddressLines()), lines);
+});
+
+test('label split/merge remembers boundaries and merged save clears line 2', () => {
+ const { context: c, fields, focused } = harness(); let saved;
+ c.firebase = { auth: () => ({ currentUser: null }) };
+ c.saveAddress = (title, segment, address) => { saved = plain(address); };
+ fields.qr_title_main.value = 'Home';
+ c.setQRAddressFields(lines);
+ c.toggleQRAddressSplit();
+ assert.equal(fields.qr_address_line_2.hidden, true);
+ assert.equal(fields.qr_address_split_toggle.attributes['aria-label'], 'Split address');
+ c.onQRDialogSave();
+ assert.deepEqual(saved, { address_line_1: '12 MG Road, Flat 4B, second floor', address_line_2: '' });
+ c.toggleQRAddressSplit();
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
+ assert.equal(focused(), 'qr_address_line_2');
+ c.onQRDialogSave(); assert.deepEqual(saved, lines);
+});
+
+test('label merged edits discard remembered split and permit intentional blank addresses', () => {
+ const { context: c, fields } = harness();
+ c.setQRAddressFields(lines); c.toggleQRAddressSplit();
+ fields.qr_address.innerText = 'New address'; c.onQRAddressInput(); c.toggleQRAddressSplit();
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), { address_line_1: 'New address', address_line_2: '' });
+ fields.qr_address.innerText = ''; c.onQRAddressInput();
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), { address_line_1: '', address_line_2: '' });
+});
+
+test('label preview hides editors and restores the split draft without changing save mode', () => {
+ const { context: c, fields } = harness();
+ c.setQRAddressFields(lines); c.previewQR_activate();
+ assert.equal(fields.qr_address_fields.classList.contains('hide'), true);
+ assert.equal(fields.qr_address_preview.hidden, false);
+ assert.equal(fields.qr_address_preview.innerText, '12 MG Road\nFlat 4B, second floor');
+ c.previewQR_deactivate();
+ assert.equal(fields.qr_address_preview.hidden, true);
+ assert.equal(fields.qr_address_fields.classList.contains('hide'), false);
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
+ c.toggleQRAddressSplit(); c.previewQR_activate();
+ assert.equal(fields.qr_address_preview.innerText, '12 MG Road, Flat 4B, second floor');
+ c.previewQR_deactivate(); assert.equal(c.qrAddressSplit, false);
+ c.toggleQRAddressSplit(); assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
+});
+
+test('label preview omits empty text; legacy multiline values stay entirely in line 1', () => {
+ const { context: c, fields } = harness();
+ c.setQRAddressFields({ address: 'Legacy\ntext' });
+ assert.equal(c.qrAddressSplit, false);
+ assert.equal(c.getQRDialogAddressLines().address_line_1, 'Legacy\ntext');
+ c.setQRAddressFields({}); c.previewQR_activate();
+ assert.equal(fields.qr_address_preview.hidden, true);
+ assert.equal(fields.qr_address_preview.innerText, '');
+ c.previewQR_deactivate();
+ assert.equal(fields.qr_address_split_toggle.attributes['aria-expanded'], 'false');
+});
+
+test('label PNG capture uses text-only preview and restores the split editor', async () => {
+ const { context: c, fields } = harness(); let downloaded;
+ for (const id of ['overlay', 'qr_close', 'qr_save', 'qr_controls', 'qr_body'])
+  fields[id] = { classList: { add() {}, remove() {}, toggle() {} }, offsetWidth: 320, offsetHeight: 480, setAttribute() {}, removeAttribute() {} };
+ c.document.querySelector = () => fields.qr_body;
+ c.getCodeFull_text = () => 'Sample';
+ c.downloadURI = (data, name) => { downloaded = { data, name }; };
+ c.html2canvas = async () => {
+  assert.equal(fields.qr_address_fields.classList.contains('hide'), true);
+  assert.equal(fields.qr_address_preview.innerText, '12 MG Road\nFlat 4B, second floor');
+  return { toDataURL: () => 'data:image/png;base64,sample' };
+ };
+ c.setQRAddressFields(lines); c.mode_preview = false;
+ c.downloadQR(); await Promise.resolve();
+ assert.equal(downloaded.name, 'Wolo Code - Sample.png');
+ assert.equal(fields.qr_address_fields.classList.contains('hide'), false);
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
+});
+
+test('label print lifecycle hides address controls and restores editing afterward', () => {
+ const { context: c, fields } = harness();
+ for (const id of ['overlay', 'qr_close', 'qr_save']) fields[id] = { classList: { add() {}, remove() {} } };
+ c.document.body = { classList: { add() {}, remove() {} } };
+ c.setQRAddressFields(lines); c.mode_preview = false;
+ c.beforeQRprint();
+ assert.equal(fields.qr_address_fields.classList.contains('hide'), true);
+ assert.equal(fields.qr_address_preview.innerText, '12 MG Road\nFlat 4B, second floor');
+ c.afterQRprint();
+ assert.equal(fields.qr_address_fields.classList.contains('hide'), false);
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
 });

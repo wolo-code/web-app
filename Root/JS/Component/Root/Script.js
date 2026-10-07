@@ -246,7 +246,9 @@ function setupControls() {
 	bindControl('qr_print', 'click', printQR);
 	bindControl('qr_download', 'click', downloadQR);
 	bindControl('qr_address', 'focus', qr_address_active);
-	bindControl('qr_address', 'input', updateQRBookmarkStatus);
+	bindControl('qr_address', 'input', onQRAddressInput);
+	bindControl('qr_address_line_2', 'input', onQRAddressInput);
+	bindControl('qr_address_split_toggle', 'click', toggleQRAddressSplit);
 	bindControl('decode_input', 'input', resizeInput);
 	if(typeof syncProceedButtons == 'function') {
 		syncProceedButtons();

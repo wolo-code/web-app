@@ -223,3 +223,16 @@
 #qr_controls { display: flex; justify-content: center; gap: 44px; float: none; left: auto; margin-inline: auto; text-align: center; }
 #qr_controls > button { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 44px; height: 44px; min-width: 44px; padding: 10px; margin: 2px 0 10px; left: auto; border-radius: 50%; }
 #qr_controls > button .image { display: flex; align-items: center; justify-content: center; }
+
+#qr_address_fields, #qr_address_preview { width: 244px; max-width: calc(100% - 32px); margin: 6px auto 20px; }
+.qr-address-first-row { position: relative; }
+#qr_address, #qr_address_line_2 { box-sizing: border-box; width: 100%; min-width: 0; min-height: 32px; margin: 0; padding: 6px 2px; text-align: left; overflow-wrap: anywhere; white-space: pre-wrap; }
+#qr_address { padding-right: 32px; }
+#qr_address_line_2 { border-bottom: 2px inset; outline: none; }
+#qr_address:empty::before, #qr_address_line_2:empty::before { content: attr(data-placeholder); color: #999; font-size: small; pointer-events: none; }
+#qr_address_line_2[hidden], #qr_address_preview[hidden] { display: none; }
+#qr_address_preview { white-space: pre-wrap; overflow-wrap: anywhere; text-align: center; }
+#qr_address_split_toggle { position: absolute; right: 0; top: 0; width: 32px; height: 32px; padding: 6px; border: 0; background: transparent; color: #6a6a6a; }
+#qr_address_split_toggle svg { display: block; width: 20px; height: 20px; }
+#qr_address_split_toggle.is-split svg { transform: rotate(90deg); }
+#qr_address_split_toggle:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; border-radius: 4px; }

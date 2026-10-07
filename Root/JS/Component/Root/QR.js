@@ -9,14 +9,7 @@ function showQR() {
 	else
 		document.getElementById('qr_title_segment').value = '';
 		
-	if(current_address) {
-		document.getElementById('qr_address').innerText = current_address;
-		qr_address_active_first = false;
-	}
-	else {
-		document.getElementById('qr_address').innerHTML = "&nbsp;&nbsp;Address";
-		qr_address_active_first = true;
-	}
+	setQRAddressFields(current_address_lines || { address_line_1: current_address || '', address_line_2: '' });
 	
 	var city_accent = getProperCityAccent(code_city);
 	var code_string = code_wcode.join(' ');
@@ -37,44 +30,107 @@ function closeQR() {
 	current_title = document.getElementById('qr_title_main').value;
 	current_segment = document.getElementById('qr_title_segment').value;
 	if(!qr_address_active_first) {
-		var text = document.getElementById('qr_address').innerText;
-		current_address_lines = getQRSaveAddressLines(text);
+		current_address_lines = getQRDialogAddressLines();
 		current_address = formatSavedAddress(current_address_lines);
 	}
 }
 
+var qrAddressSplit = false;
+var qrRememberedAddressLines = null;
+var qrMergedAddressText = '';
+
+function renderQRAddressMode() {
+	var first = document.getElementById('qr_address');
+	var second = document.getElementById('qr_address_line_2');
+	var toggle = document.getElementById('qr_address_split_toggle');
+	first.setAttribute('data-placeholder', qrAddressSplit ? 'Address line 1 – e.g. 12 MG Road' : 'Address (optional)');
+	first.setAttribute('aria-label', qrAddressSplit ? 'Address line 1 (optional)' : 'Address (optional)');
+	second.hidden = !qrAddressSplit;
+	second.setAttribute('contenteditable', String(qrAddressSplit));
+	toggle.setAttribute('aria-expanded', String(qrAddressSplit));
+	toggle.setAttribute('aria-label', qrAddressSplit ? 'Merge address' : 'Split address');
+	toggle.title = qrAddressSplit ? 'Merge address' : 'Split address';
+	toggle.classList.toggle('is-split', qrAddressSplit);
+}
+
+function setQRAddressFields(value) {
+	var lines = readSavedAddressLines(value);
+	qrAddressSplit = !!lines.address_line_2;
+	qrRememberedAddressLines = null;
+	qrMergedAddressText = lines.address_line_1;
+	document.getElementById('qr_address').innerText = lines.address_line_1;
+	document.getElementById('qr_address_line_2').innerText = lines.address_line_2;
+	qr_address_active_first = !formatSavedAddress(lines);
+	renderQRAddressMode();
+}
+
+function getQRDialogAddressLines() {
+	if(qr_address_active_first)
+		return readSavedAddressLines(current_address_lines || { address: address || '' });
+	return readSavedAddressLines({
+		address_line_1: document.getElementById('qr_address').innerText,
+		address_line_2: qrAddressSplit ? document.getElementById('qr_address_line_2').innerText : ''
+	});
+}
+
+function onQRAddressInput() {
+	qr_address_active_first = false;
+	if(!qrAddressSplit) qrRememberedAddressLines = null;
+	['qr_address', 'qr_address_line_2'].forEach(function(id) {
+		var field = document.getElementById(id);
+		if(!field.innerText.trim()) field.textContent = '';
+	});
+	updateQRBookmarkStatus();
+}
+
+function toggleQRAddressSplit() {
+	var first = document.getElementById('qr_address');
+	var second = document.getElementById('qr_address_line_2');
+	if(qrAddressSplit) {
+		qrRememberedAddressLines = getQRDialogAddressLines();
+		qrMergedAddressText = formatSavedAddress(qrRememberedAddressLines, ', ');
+		first.innerText = qrMergedAddressText;
+		second.innerText = '';
+		qrAddressSplit = false;
+	} else {
+		var lines = qrRememberedAddressLines && first.innerText === qrMergedAddressText ? qrRememberedAddressLines : getQRDialogAddressLines();
+		first.innerText = lines.address_line_1;
+		second.innerText = lines.address_line_2;
+		qrAddressSplit = true;
+		qrRememberedAddressLines = null;
+	}
+	qr_address_active_first = false;
+	renderQRAddressMode();
+	(qrAddressSplit ? second : first).focus();
+	updateQRBookmarkStatus();
+}
+
 function previewQR_activate() {
-	var addressNode = document.getElementById('qr_address');
 	mode_preview = true;
 	hideEmptyElsePreview(document.getElementById('qr_title_main'));
 	hideEmptyElsePreview(document.getElementById('qr_title_segment'));
-	if(qr_address_active_first || !addressNode || addressNode.innerHTML.trim().length == 0)
-		addClassIfPresent(addressNode, 'hide');
-	else {
-		addClassIfPresent(addressNode, 'preview');
-		addressNode.setAttribute('contenteditable', false);
-	}
+	var text = qr_address_active_first ? '' : formatSavedAddress(getQRDialogAddressLines());
+	var preview = document.getElementById('qr_address_preview');
+	preview.innerText = text;
+	preview.hidden = !text;
+	addClassIfPresent(document.getElementById('qr_address_fields'), 'hide');
 	addClassIfPresent(document.getElementById('qr_preview'), 'button_active');
 }
 
 function previewQR_deactivate() {
-	var addressNode = document.getElementById('qr_address');
 	mode_preview = false;
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_main'));
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_segment'));
-	if(addressNode)
-		addressNode.setAttribute('contenteditable', true);
-	removeClassIfPresent(addressNode, 'preview');
-	removeClassIfPresent(addressNode, 'hide');
+	document.getElementById('qr_address_preview').hidden = true;
+	removeClassIfPresent(document.getElementById('qr_address_fields'), 'hide');
 	removeClassIfPresent(document.getElementById('qr_preview'), 'button_active');
 }
 
 function qr_address_active() {
-	var addressNode = document.getElementById('qr_address');
-	if (qr_address_active_first) {
+	if(qr_address_active_first) {
+		var lines = getQRDialogAddressLines();
+		setQRAddressFields(lines);
 		qr_address_active_first = false;
-		if(addressNode)
-			addressNode.innerHTML = address;
 	}
 	updateQRBookmarkStatus();
 }
@@ -256,19 +312,6 @@ function downloadURI(uri, name) {
 	link.click();
 }
 
-function isQRAddressPlaceholder(text) {
-	var value = (text || '').replace(/\u00a0/g, ' ').trim().toLowerCase();
-	return !value || value === 'address' || value === 'address (optional)';
-}
-
-function getQRSaveAddressLines(text) {
-	text = String(text || '').trim();
-	if(current_address_lines && text === formatSavedAddress(current_address_lines))
-		return readSavedAddressLines(current_address_lines);
-	var lines = text.split(/\r?\n/);
-	return readSavedAddressLines({ address_line_1: lines.shift() || '', address_line_2: lines.filter(function(line) { return line.trim(); }).join(', ') });
-}
-
 function onQRDialogSave() {
 	if(!document.getElementById('qr_title_main').value.length) {
 		showNotification("Title is required");
@@ -281,12 +324,10 @@ function onQRDialogSave() {
 	var user = firebase.auth().currentUser;
 	if(user != null)
 		uid = user.uid;
-	var saveAddr = document.getElementById('qr_address').innerText;
-	if(qr_address_active_first || isQRAddressPlaceholder(saveAddr))
-		saveAddr = address;
+	var saveAddr = getQRDialogAddressLines();
 	current_title = document.getElementById('qr_title_main').value;
 	current_segment = document.getElementById('qr_title_segment').value;
-	current_address_lines = getQRSaveAddressLines(saveAddr);
+	current_address_lines = saveAddr;
 	current_address = formatSavedAddress(current_address_lines);
 	saveAddress(current_title, current_segment, current_address_lines);
 }
@@ -310,7 +351,7 @@ function updateQRBookmarkStatus() {
  var field = document.getElementById('qr_address');
  var marker = document.getElementById('qr_bookmark_changed');
  if(!button || !field || !marker) return;
- var labelAddress = qr_address_active_first || isQRAddressPlaceholder(field.innerText) ? address : field.innerText;
+ var labelAddress = formatSavedAddress(getQRDialogAddressLines());
  var entries = Object.assign({}, cloudBookmarks, readLocalBookmarks());
  var state = getQRBookmarkState(entries, getCodeCity(), getCodeWCode(), labelAddress);
  button.classList.toggle('bookmarked', state.saved);

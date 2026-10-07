@@ -98,6 +98,7 @@ function flushOfflineSaveQueue() {
 }
 
 function pushOfflineSave(payload) {
+	var lines = readSavedAddressLines(payload);
 	return new Promise(function(resolve, reject) {
 		firebase.database().ref('/UserData/' + payload.uid).push({
 			city_id: payload.city_id,
@@ -106,7 +107,8 @@ function pushOfflineSave(payload) {
 			code: payload.code,
 			title: payload.title,
 			segment: payload.segment,
-			address: payload.address,
+			address_line_1: lines.address_line_1,
+			address_line_2: lines.address_line_2,
 			time: firebase.database.ServerValue.TIMESTAMP
 		}, function(error) {
 			if (error) {

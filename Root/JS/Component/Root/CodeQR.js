@@ -10,7 +10,7 @@ function getCodeQRValue(kind) {
 		return code_digipin ? String(code_digipin).toUpperCase() : '';
 	if(kind == 'plus')
 		return code_plus_code ? String(code_plus_code) : '';
-	return address ? String(address) : '';
+	return current_address_lines ? formatSavedAddress(current_address_lines) : (address ? String(address) : '');
 }
 
 function getCodeQRTitle(kind) {
@@ -81,7 +81,7 @@ function syncAddressQRButtons() {
 	var button = document.getElementById('address_text_address_qr');
 	if(!button)
 		return;
-	if(address && String(address).trim())
+	if(getCodeQRValue('address').trim())
 		button.classList.remove('hide');
 	else
 		button.classList.add('hide');

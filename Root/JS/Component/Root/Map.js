@@ -815,6 +815,7 @@ function cleanUp(full = false) {
 	current_title = null;
 	current_segment = null;
 	current_address = null;
+	current_address_lines = null;
 }
 
 function activateMapType() {

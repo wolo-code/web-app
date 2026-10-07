@@ -10,7 +10,7 @@ function getAddress(latLng, session_id, callback) {
 		if (status === 'OK') {
 			if (address_components[0]) {
 				getCity_by_address_list(address_components);
-				address = address_components[0].formatted_address;
+				address = current_address_lines ? formatSavedAddress(current_address_lines) : address_components[0].formatted_address;
 				gpId = getCityGpId(address_components);
 				if(typeof code_city != 'undefined' && code_city.gp_id != null && gpId != code_city.gp_id) {
 					setCurrentCity_status(false);
@@ -83,7 +83,7 @@ function showAddress() {
 	else
 		setAddressPanelHeading(current_title, current_segment);
 	if(address_text_content)
-		address_text_content.innerText = address || '';
+		address_text_content.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -120,9 +120,9 @@ function clearAddress() {
 function refreshAddress() {
 	var content = document.getElementById('address_text_content');
 	if(content)
-		content.innerText = address;
+		content.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : address;
 	if(typeof external_address != 'undefined' && external_address)
-		external_address.innerText = address;
+		external_address.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : address;
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();

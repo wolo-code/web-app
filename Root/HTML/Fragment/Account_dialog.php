@@ -60,8 +60,11 @@
 					<input id='save_title_segment' type='text' placeholder="Segment – e.g. Main gate" aria-label='Segment'>
 				</div>
 				<div id='save_address_container'>
-					<input id='save_address' type='text' placeholder='Address line 1 (optional)' aria-label='Address line 1 (optional)' autocomplete='address-line1'>
-					<input id='save_address_line_2' type='text' placeholder='Address line 2 (optional)' aria-label='Address line 2 (optional)' autocomplete='address-line2'>
+					<div class='save-address-first-row'>
+						<textarea id='save_address' rows='1' placeholder='Address (optional)' aria-label='Address (optional)' autocomplete='address-line1'></textarea>
+						<button id='save_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='save_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M4 5h16M4 19h16M12 8v8m-3-5 3-3 3 3m-6 2 3 3 3-3' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></button>
+					</div>
+					<input id='save_address_line_2' type='text' placeholder='Address line 2 – e.g. Flat 4B, second floor' aria-label='Address line 2 (optional)' autocomplete='address-line2' hidden disabled>
 				</div>
 				<div class='message_dialog_control_container'>
 					<div id='account_dialog_cancel' class="message_dialog_control">

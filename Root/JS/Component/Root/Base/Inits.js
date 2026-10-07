@@ -103,6 +103,7 @@ var lastActiveSaveEntry;
 var current_title;
 var current_segment;
 var current_address;
+var current_address_lines = null;
 
 // GeoIp
 var geoIp_country_code;

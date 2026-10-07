@@ -36,8 +36,11 @@ function closeQR() {
 	window.removeEventListener('beforeprint', beforeQRprint);
 	current_title = document.getElementById('qr_title_main').value;
 	current_segment = document.getElementById('qr_title_segment').value;
-	if(!qr_address_active_first)
-		current_address = document.getElementById('qr_address').innerText;
+	if(!qr_address_active_first) {
+		var text = document.getElementById('qr_address').innerText;
+		current_address_lines = getQRSaveAddressLines(text);
+		current_address = formatSavedAddress(current_address_lines);
+	}
 }
 
 function previewQR_activate() {
@@ -258,6 +261,14 @@ function isQRAddressPlaceholder(text) {
 	return !value || value === 'address' || value === 'address (optional)';
 }
 
+function getQRSaveAddressLines(text) {
+	text = String(text || '').trim();
+	if(current_address_lines && text === formatSavedAddress(current_address_lines))
+		return readSavedAddressLines(current_address_lines);
+	var lines = text.split(/\r?\n/);
+	return readSavedAddressLines({ address_line_1: lines.shift() || '', address_line_2: lines.filter(function(line) { return line.trim(); }).join(', ') });
+}
+
 function onQRDialogSave() {
 	if(!document.getElementById('qr_title_main').value.length) {
 		showNotification("Title is required");
@@ -275,9 +286,9 @@ function onQRDialogSave() {
 		saveAddr = address;
 	current_title = document.getElementById('qr_title_main').value;
 	current_segment = document.getElementById('qr_title_segment').value;
-	if(!qr_address_active_first)
-		current_address = document.getElementById('qr_address').innerText;
-	saveAddress(current_title, current_segment, saveAddr);
+	current_address_lines = getQRSaveAddressLines(saveAddr);
+	current_address = formatSavedAddress(current_address_lines);
+	saveAddress(current_title, current_segment, current_address_lines);
 }
 
 function getQRBookmarkState(entries, city, words, labelAddress) {
@@ -290,7 +301,7 @@ function getQRBookmarkState(entries, city, words, labelAddress) {
   return sameCity && normalizeSavedWcode(entry.code).join(' ').toLowerCase() === code;
  });
  return { saved: matches.length > 0, changed: matches.length > 0 && !matches.some(function(entry) {
-  return normalizeAddress(entry.address) === normalizeAddress(labelAddress);
+  return normalizeAddress(formatSavedAddress(entry)) === normalizeAddress(labelAddress);
  }) };
 }
 

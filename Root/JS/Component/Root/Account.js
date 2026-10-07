@@ -48,7 +48,7 @@ function syncAccountDialogSaveForm() {
 		document.getElementById('save_title_segment').value = current_segment;
 	else
 		document.getElementById('save_title_segment').value = '';
-	setAccountDialogAddressFields(current_address || '');
+	setAccountDialogAddressFields(current_address_lines || { address_line_1: current_address || '', address_line_2: '' });
 }
 
 function setAccountDialogAddOpen(open) {
@@ -104,20 +104,85 @@ function toggleAccountDialogSaves() {
 	setAccountDialogSavesOpen(!(toggle && toggle.getAttribute('aria-expanded') === 'true'));
 }
 
+// Structured saved addresses; legacy text is always one address line.
+function readSavedAddressLines(value) {
+	if(typeof value === 'string') value = { address: value };
+	value = value || {};
+	var structured = Object.prototype.hasOwnProperty.call(value, 'address_line_1') || Object.prototype.hasOwnProperty.call(value, 'address_line_2');
+	return {
+		address_line_1: String((structured ? value.address_line_1 : value.address) || '').trim(),
+		address_line_2: String((structured ? value.address_line_2 : '') || '').trim()
+	};
+}
+
+function formatSavedAddress(value, separator) {
+	var lines = readSavedAddressLines(value);
+	return [lines.address_line_1, lines.address_line_2].filter(Boolean).join(separator == null ? '\n' : separator);
+}
+
+var saveAddressSplit = false;
+var rememberedAddressLines = null;
+var mergedAddressText = '';
+
+function renderAccountDialogAddressMode() {
+	var first = document.getElementById('save_address');
+	var second = document.getElementById('save_address_line_2');
+	var toggle = document.getElementById('save_address_split_toggle');
+	first.placeholder = saveAddressSplit ? 'Address line 1 – e.g. 12 MG Road' : 'Address (optional)';
+	first.setAttribute('aria-label', saveAddressSplit ? 'Address line 1 (optional)' : 'Address (optional)');
+	second.hidden = !saveAddressSplit;
+	second.disabled = !saveAddressSplit;
+	if(toggle) {
+		toggle.setAttribute('aria-expanded', String(saveAddressSplit));
+		toggle.setAttribute('aria-label', saveAddressSplit ? 'Merge address' : 'Split address');
+		toggle.title = saveAddressSplit ? 'Merge address' : 'Split address';
+		toggle.classList.toggle('is-split', saveAddressSplit);
+	}
+}
+
 function setAccountDialogAddressFields(value) {
-	var lines = (value || '').split(/\r?\n/);
-	document.getElementById('save_address').value = lines.shift() || '';
-	document.getElementById('save_address_line_2').value = lines.join(', ');
+	var lines = readSavedAddressLines(value);
+	saveAddressSplit = !!lines.address_line_2;
+	rememberedAddressLines = null;
+	document.getElementById('save_address').value = lines.address_line_1;
+	document.getElementById('save_address_line_2').value = lines.address_line_2;
+	mergedAddressText = lines.address_line_1;
+	renderAccountDialogAddressMode();
+}
+
+function onMergedAddressInput() {
+	if(!saveAddressSplit) rememberedAddressLines = null;
+}
+
+function toggleAccountDialogAddressSplit() {
+	var first = document.getElementById('save_address');
+	var second = document.getElementById('save_address_line_2');
+	if(saveAddressSplit) {
+		rememberedAddressLines = getAccountDialogSaveAddressLines();
+		mergedAddressText = formatSavedAddress(rememberedAddressLines, ', ');
+		first.value = mergedAddressText;
+		second.value = '';
+		saveAddressSplit = false;
+	} else {
+		var lines = rememberedAddressLines && first.value === mergedAddressText ? rememberedAddressLines : { address_line_1: first.value, address_line_2: '' };
+		first.value = lines.address_line_1;
+		second.value = lines.address_line_2;
+		saveAddressSplit = true;
+		rememberedAddressLines = null;
+	}
+	renderAccountDialogAddressMode();
+	(saveAddressSplit ? second : first).focus();
 }
 
 function resetAccountDialogAddressField() {
-	setAccountDialogAddressFields('');
+	setAccountDialogAddressFields({});
 }
 
-function getAccountDialogSaveAddressText() {
-	var line1 = document.getElementById('save_address').value.trim();
-	var line2 = document.getElementById('save_address_line_2').value.trim();
-	return line2 ? line1 + '\n' + line2 : line1;
+function getAccountDialogSaveAddressLines() {
+	return readSavedAddressLines({
+		address_line_1: document.getElementById('save_address').value,
+		address_line_2: saveAddressSplit ? document.getElementById('save_address_line_2').value : ''
+	});
 }
 
 function normalizeSavedWcode(code) {
@@ -195,10 +260,11 @@ function onAccountDialogSave() {
 
 	var segmentField = document.getElementById('save_title_segment');
 	var segment = segmentField ? segmentField.value : '';
-	var saveAddr = getAccountDialogSaveAddressText();
+	var saveAddr = getAccountDialogSaveAddressLines();
 	current_title = title;
 	current_segment = segment;
-	current_address = saveAddr;
+	current_address_lines = saveAddr;
+	current_address = formatSavedAddress(saveAddr);
 	if(editingSaveKey) {
 		updateSavedAddress(editingSaveKey, title, segment, saveAddr, function() {
 			editingSaveKey = null;
@@ -215,19 +281,21 @@ function onAccountDialogSave() {
 	});
 }
 
-function buildSaveAddressPayload(title, segment, address, city, code) {
+function buildSaveAddressPayload(title, segment, addressLines, city, code) {
 	if(!city || city.id == null || city.id === '') {
 		return null;
 	}
 	if(!code || !code.length) {
 		return null;
 	}
+	var lines = readSavedAddressLines(addressLines);
 	return {
 		city_id: city.id,
 		code: code,
 		title: title,
 		segment: segment,
-		address: address
+		address_line_1: lines.address_line_1,
+		address_line_2: lines.address_line_2
 	};
 }
 
@@ -248,7 +316,8 @@ function saveAddress(title, segment, savedAddress, callback) {
 		code: basePayload.code,
 		title: basePayload.title,
 		segment: basePayload.segment,
-		address: basePayload.address
+		address_line_1: basePayload.address_line_1,
+		address_line_2: basePayload.address_line_2
 	};
 	if(!user) {
 		var local = readLocalBookmarks();
@@ -285,13 +354,16 @@ function saveAddress(title, segment, savedAddress, callback) {
 }
 
 function updateSavedAddress(key, title, segment, savedAddress, callback) {
+	var lines = readSavedAddressLines(savedAddress);
 	var user = getBookmarkUser();
 	if(isLocalBookmark(key)) {
 		var local = readLocalBookmarks();
 		if(!local[key]) return;
 		local[key].title = title;
 		local[key].segment = segment;
-		local[key].address = savedAddress;
+		local[key].address_line_1 = lines.address_line_1;
+		local[key].address_line_2 = lines.address_line_2;
+		delete local[key].address;
 		if(writeLocalBookmarks(local)) {
 			loadSaveList();
 			if(typeof callback === 'function') callback();
@@ -307,7 +379,9 @@ function updateSavedAddress(key, title, segment, savedAddress, callback) {
 	firebase.database().ref('/UserData/' + uid + '/' + key).update({
 		title: title,
 		segment: segment,
-		address: savedAddress
+		address_line_1: lines.address_line_1,
+		address_line_2: lines.address_line_2,
+		address: null
 	}, function(error) {
 		if(error) {
 			showNotification('Could not save address');
@@ -444,7 +518,8 @@ function syncLocalBookmark(key) {
 		code: normalizeSavedWcode(entry.code),
 		title: entry.title || '',
 		segment: entry.segment || '',
-		address: entry.address || '',
+		address_line_1: readSavedAddressLines(entry).address_line_1,
+		address_line_2: readSavedAddressLines(entry).address_line_2,
 		time: firebase.database.ServerValue.TIMESTAMP
 	};
 	syncingLocalBookmarks[key] = true;
@@ -524,7 +599,7 @@ function renderSaveList(entries) {
 			row.data_key = key;
 			row.data_code = savedCode;
 			row_address.setAttribute('class', 'row-address');
-			row_address.innerText = saveList[key].address;
+			row_address.innerText = formatSavedAddress(saveList[key]);
 			row_code.setAttribute('class', 'row-code');
 			setSavedRowCodeText(row_code, savedCityDisplayName(null, saveList[key]), savedCode);
 			row_process.setAttribute('class', 'row-process control');
@@ -619,12 +694,13 @@ function processSaveEntry_continue(row) {
 				segment.innerText = entry.segment || '';
 		}
 		if(content)
-			content.innerText = entry.address || '';
+			content.innerText = formatSavedAddress(entry);
 		if(panel && panel.classList)
 			panel.classList.remove('hide');
 		current_title = entry.title;
 		current_segment = entry.segment;
-		current_address = entry.address;
+		current_address_lines = readSavedAddressLines(entry);
+		current_address = formatSavedAddress(current_address_lines);
 		decode_continue(city, savedCode);
 	}, { refresh: true });
 }
@@ -697,7 +773,7 @@ function editSaveEntry(e) {
 	setAccountDialogAddOpen(true);
 	document.getElementById('save_title_main').value = entry.title || '';
 	document.getElementById('save_title_segment').value = entry.segment || '';
-	setAccountDialogAddressFields(entry.address || '');
+	setAccountDialogAddressFields(entry);
 	if(lastActiveSaveEntry && lastActiveSaveEntry != row)
 		toggleSaveEntry(lastActiveSaveEntry);
 	if(!row.classList.contains('active'))

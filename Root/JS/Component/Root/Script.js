@@ -170,6 +170,8 @@ function setupControls() {
 	bindControl('account_dialog_logout_button', 'click', onLogout);
 	bindControl('account_dialog_cancel_button', 'click', onAccountDialogCancel);
 	bindControl('account_dialog_save_button', 'click', onAccountDialogSave);
+	bindControl('save_address_split_toggle', 'click', toggleAccountDialogAddressSplit);
+	bindControl('save_address', 'input', onMergedAddressInput);
 	bindControl('account_dialog_add_toggle', 'click', toggleAccountDialogAdd);
 	bindControl('account_dialog_saves_hit', 'click', toggleAccountDialogSaves);
 	bindControl('account_dialog_row_edit', 'click', editSaveEntry);

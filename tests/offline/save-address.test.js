@@ -22,6 +22,7 @@ function extractFunction(source, name) {
 function loadSaveAddressApi() {
 	const sandbox = {};
 	vm.createContext(sandbox);
+	vm.runInContext(extractFunction(read('Root/JS/Component/Root/Account.js'), 'readSavedAddressLines'), sandbox);
 	vm.runInContext(extractFunction(read('Root/JS/Component/Root/Account.js'), 'buildSaveAddressPayload'), sandbox);
 	return sandbox;
 }
@@ -79,7 +80,9 @@ test('buildSaveAddressPayload keeps city id and wcode when encode finished', () 
 	assert.equal(payload.city_id, 'city-1');
 	assert.equal(payload.title, 'Home');
 	assert.equal(payload.segment, 'Apt 2');
-	assert.equal(payload.address, '12 Main St');
+	assert.equal(payload.address_line_1, '12 Main St');
+	assert.equal(payload.address_line_2, '');
+	assert.equal(payload.address, undefined);
 	assert.equal(payload.code.join(' '), 'alpha bravo charlie');
 });
 

@@ -11,6 +11,9 @@ var codeScanState = {
 	lastMatchCode: '',
 	stableMatchCount: 0,
 	lastMatchBBox: null,
+	lastDetectedMatch: null,
+	cropScanTimer: null,
+	cropRevision: 0,
 	tesseractPromise: null,
 	cameraAvailable: false,
 	sourceCanvas: null,
@@ -151,6 +154,9 @@ function closeCodeScan(event) {
 }
 
 function stopCodeScan() {
+	clearTimeout(codeScanState.cropScanTimer);
+	codeScanState.cropScanTimer = null;
+	codeScanState.cropRevision += 1;
 	codeScanState.active = false;
 	codeScanState.processing = false;
 	codeScanState.cameraAvailable = false;
@@ -188,6 +194,7 @@ function resetCodeScanUi() {
 }
 
 function resetCodeScanMatchState() {
+	codeScanState.lastDetectedMatch = null;
 	codeScanState.lastMatchCode = '';
 	codeScanState.stableMatchCount = 0;
 	codeScanState.lastMatchBBox = null;
@@ -375,6 +382,7 @@ function handleCodeScanWorkerError() {
 }
 
 function runCodeScanFrame() {
+	var revision = codeScanState.cropRevision;
 	if(!codeScanState.active || codeScanState.processing || codeScanState.phase !== 'live' || codeScanState.hasCaptured) {
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
@@ -394,6 +402,10 @@ function runCodeScanFrame() {
 		codeScanState.processing = false;
 		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
 			return;
+		if(revision !== codeScanState.cropRevision) {
+			scheduleCodeScanFrame();
+			return;
+		}
 		handleCodeScanLiveOcrResult(result, ocrCanvas);
 		scheduleCodeScanFrame();
 	}).catch(function() {
@@ -616,6 +628,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 		return;
 	}
 	match = guidance.match;
+	codeScanState.lastDetectedMatch = match;
 	bbox = guidance.bbox;
 	setCodeScanCandidateHighlight(bbox, canvas);
 	setCodeScanWoloFoundCue(true);
@@ -643,7 +656,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 			resetCodeScanZoom();
 		}
 		resetCodeScanGuide();
-		beginCodeScanCapture();
+		beginCodeScanCapture(match);
 		return;
 	}
 	if(codeScanState.stableMatchCount >= 2)
@@ -669,7 +682,7 @@ function captureCodeScanManually(event) {
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
 	resetCodeScanGuide();
-	beginCodeScanCapture();
+	beginCodeScanCapture(codeScanState.lastDetectedMatch);
 }
 
 function captureCodeScanFullRes(video, canvas) {
@@ -687,7 +700,7 @@ function captureCodeScanFullRes(video, canvas) {
 	);
 }
 
-function beginCodeScanCapture() {
+function beginCodeScanCapture(detectedMatch) {
 	clearCodeScanTimer();
 	codeScanState.hasCaptured = true;
 	codeScanState.processing = true;
@@ -702,17 +715,22 @@ function beginCodeScanCapture() {
 	setCodeScanCropControlsVisible(true);
 	setCodeScanStatus('Reading label on your device...');
     playShutterSound();
-	processCodeScanCapture();
+	if(detectedMatch) {
+		codeScanState.processing = false;
+		showCodeScanReview(detectedMatch);
+	}
+	else
+		processCodeScanCapture();
 }
 
-function processCodeScanCapture() {
+function processCodeScanCapture(detectedMatch) {
 	var canvas = getCodeScanCanvas();
 	var rawCanvas = codeScanState.originalSourceCanvas || canvas;
 	var ocrCanvas;
 	if(!codeScanState.worker || !canvas) {
 		codeScanState.processing = false;
 		if(codeScanState.active)
-			showCodeScanReview(null);
+			showCodeScanReview(detectedMatch || null);
 		return;
 	}
 	ocrCanvas = canvas;
@@ -720,13 +738,13 @@ function processCodeScanCapture() {
 		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
-		var match = extractMatchFromOcrResult(result);
+		var match = detectedMatch || extractMatchFromOcrResult(result);
 		showCodeScanReview(match);
 		if(!match) setCodeScanStatus('');
 	}).catch(function() {
 		codeScanState.processing = false;
 		if(codeScanState.active)
-			showCodeScanReview(null);
+			showCodeScanReview(detectedMatch || null);
 	});
 }
 
@@ -1096,10 +1114,14 @@ function setCodeScanCandidateHighlight(bbox, canvas) {
 	height = canvas.height;
 	if(!width || !height)
 		return;
-	left = (bbox.x0 / width) * 100;
-	top = (bbox.y0 / height) * 100;
-	boxWidth = ((bbox.x1 - bbox.x0) / width) * 100;
-	boxHeight = ((bbox.y1 - bbox.y0) / height) * 100;
+	var padX = (bbox.x1 - bbox.x0) * 0.05;
+	var padY = (bbox.y1 - bbox.y0) * 0.05;
+	var x0 = Math.max(0, bbox.x0 - padX);
+	var y0 = Math.max(0, bbox.y0 - padY);
+	left = (x0 / width) * 100;
+	top = (y0 / height) * 100;
+	boxWidth = ((Math.min(width, bbox.x1 + padX) - x0) / width) * 100;
+	boxHeight = ((Math.min(height, bbox.y1 + padY) - y0) / height) * 100;
 	highlight.style.left = left + '%';
 	highlight.style.top = top + '%';
 	highlight.style.width = boxWidth + '%';
@@ -1229,6 +1251,9 @@ function setCodeScanZoom(zoom, panX, panY) {
 	var canvas = getCodeScanCanvas();
 	var zoomLevelNode = document.getElementById('code_scan_zoom_level');
 	var clampedZoom = Math.max(1, Math.min(4, typeof zoom === 'number' ? zoom : 1));
+	var previousZoom = codeScanState.zoom;
+	var previousPanX = codeScanState.panX;
+	var previousPanY = codeScanState.panY;
 	codeScanState.zoom = Math.round(clampedZoom * 100) / 100;
 	if(typeof panX === 'number')
 		codeScanState.panX = panX;
@@ -1246,6 +1271,24 @@ function setCodeScanZoom(zoom, panX, panY) {
 	if (codeScanState.phase !== 'live' && (codeScanState.zoom !== 1 || codeScanState.panX !== 0 || codeScanState.panY !== 0 || (codeScanState.originalSourceCanvas && codeScanState.sourceCanvas === codeScanState.originalSourceCanvas))) {
 		setCodeScanEditingCrop(true);
 	}
+	if(previousZoom !== codeScanState.zoom || previousPanX !== codeScanState.panX || previousPanY !== codeScanState.panY)
+		scheduleCodeScanCropRecognition();
+}
+
+function scheduleCodeScanCropRecognition() {
+	if(!codeScanState.active || !codeScanState.hasCaptured || !codeScanState.worker)
+		return;
+	codeScanState.cropRevision += 1;
+	clearTimeout(codeScanState.cropScanTimer);
+	codeScanState.cropScanTimer = setTimeout(function retry() {
+		codeScanState.cropScanTimer = null;
+		if(!codeScanState.active || !codeScanState.hasCaptured) return;
+		if(codeScanState.phase === 'processing' || codeScanState.isDragging) {
+			codeScanState.cropScanTimer = setTimeout(retry, 350);
+			return;
+		}
+		applyCodeScanCrop();
+	}, 350);
 }
 
 function resetCodeScanZoom() {
@@ -1281,12 +1324,20 @@ function zoomOutCodeScan() {
 }
 
 function setCodeScanLiveZoom(zoom) {
+	codeScanState.cropRevision += 1;
 	var video = getCodeScanVideo();
 	var clampedZoom = Math.max(1, Math.min(4, typeof zoom === 'number' ? zoom : 1));
 	codeScanState.liveZoom = Math.round(clampedZoom * 100) / 100;
 	if(video)
 		video.style.transform = codeScanState.liveZoom > 1 ? 'scale(' + codeScanState.liveZoom + ')' : '';
 	updateCodeScanLiveZoomIndicator();
+	resetCodeScanMatchState();
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
+	if(codeScanState.active && codeScanState.phase === 'live') {
+		clearCodeScanTimer();
+		codeScanState.scanTimer = setTimeout(runCodeScanFrame, 350);
+	}
 }
 
 function resetCodeScanLiveZoom() {
@@ -1473,6 +1524,7 @@ function getCodeScanRenderedImageRect(canvas) {
 }
 
 function applyCodeScanCrop() {
+	var revision = codeScanState.cropRevision;
 	var canvas = getCodeScanCanvas();
 	var guide = document.getElementById('code_scan_fixed_guide');
 	var source = codeScanState.sourceCanvas || canvas;
@@ -1493,6 +1545,8 @@ function applyCodeScanCrop() {
 	var croppedCtx;
 	if(!canvas || !guide || !source || !codeScanState.worker || codeScanState.phase === 'processing')
 		return;
+	clearTimeout(codeScanState.cropScanTimer);
+	codeScanState.cropScanTimer = null;
 	guideRect = guide.getBoundingClientRect();
 	imgRect = getCodeScanRenderedImageRect(canvas);
 	if(!guideRect.width || !guideRect.height || !imgRect.width || !imgRect.height)
@@ -1526,6 +1580,10 @@ function applyCodeScanCrop() {
 			cropButton.disabled = false;
 		if(!codeScanState.active)
 			return;
+		if(revision !== codeScanState.cropRevision) {
+			setCodeScanPhase('review');
+			return;
+		}
 		var match = extractMatchFromOcrResult(result);
 		if(match) {
 			showCodeScanReview(match);

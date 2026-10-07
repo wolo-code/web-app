@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 function scanner() {
  const canvas = { width: 1200, height: 800 };
- const context = { Audio: function() { this.load = () => {}; }, document: { getElementById: () => null }, console };
+ const context = { setTimeout, clearTimeout, Audio: function() { this.load = () => {}; }, document: { getElementById: () => null }, console };
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.getCodeScanCanvas = () => canvas;
@@ -70,4 +70,69 @@ test('live OCR crop follows the visible guide rather than an unrelated 3:1 slice
  assert.equal(crop.width, 900);
  assert.equal(crop.height, 480);
  assert.deepEqual(draw.slice(1, 5), [60, 80, 900, 480]);
+});
+
+test('capture keeps the detected code when full-frame OCR fails or finds another code', async () => {
+ for(const result of [null, { code: 'different code' }, 'error']) {
+  const { context } = scanner();
+  const detected = { code: 'apple berry cherry' };
+  context.codeScanState.worker = { recognize: async () => {
+   if(result === 'error') throw new Error('OCR failed');
+   return { match: result };
+  } };
+  context.processCodeScanCapture(detected);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(context.reviewMatch, detected);
+ }
+});
+
+test('live capture fills review immediately without a second OCR read', () => {
+ const { context } = scanner();
+ for(const name of ['clearCodeScanTimer', 'setCodeScanCaptureEnabled', 'setCodeScanLiveControlsVisible',
+  'setCodeScanPhotoFallbackVisible', 'clearCodeScanCandidateHighlight', 'setCodeScanWoloFoundCue',
+  'stopCodeScanCamera', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible', 'playShutterSound'])
+  context[name] = () => {};
+ context.processCodeScanCapture = () => { throw new Error('Unexpected second OCR read'); };
+ const detected = { code: 'apple berry cherry' };
+ context.beginCodeScanCapture(detected);
+ assert.equal(context.reviewMatch, detected);
+ assert.equal(context.codeScanState.processing, false);
+ assert.equal(context.codeScanState.hasCaptured, true);
+});
+
+test('detected rectangle grows ten percent around its center and stays within the image', () => {
+ const { context } = scanner();
+ const highlight = { style: {}, classList: { remove() {} } };
+ context.document.getElementById = () => highlight;
+ context.document.querySelector = () => ({});
+ context.getCodeScanVideo = () => null;
+ context.setCodeScanCandidateHighlight({ x0: 100, y0: 100, x1: 300, y1: 200 }, { width: 1000, height: 500 });
+ assert.equal(highlight.style.left, '9%');
+ assert.equal(highlight.style.top, '19%');
+ assert.equal(highlight.style.width, '22%');
+ assert.equal(highlight.style.height, '22%');
+ context.setCodeScanCandidateHighlight({ x0: 0, y0: 0, x1: 1000, y1: 500 }, { width: 1000, height: 500 });
+ assert.equal(highlight.style.left, '0%');
+ assert.equal(highlight.style.width, '100%');
+});
+
+test('zoom and pan debounce crop OCR and wait for an in-flight read to finish', () => {
+ const { context } = scanner();
+ const timers = new Map(); let next = 0; let scans = 0;
+ context.setTimeout = fn => { timers.set(++next, fn); return next; };
+ context.clearTimeout = id => timers.delete(id);
+ context.getCodeScanCanvas = () => ({ style: {} });
+ context.document.querySelector = () => null;
+ context.codeScanState.hasCaptured = true;
+ context.codeScanState.phase = 'review';
+ context.codeScanState.worker = {};
+ context.applyCodeScanCrop = () => scans++;
+ context.setCodeScanZoom(1.25, 0, 0);
+ context.setCodeScanZoom(1.25, 20, 0);
+ assert.equal(timers.size, 1);
+ const run = () => { const [id, fn] = timers.entries().next().value; timers.delete(id); fn(); };
+ context.codeScanState.phase = 'processing'; run();
+ assert.equal(scans, 0);
+ context.codeScanState.phase = 'review'; run();
+ assert.equal(scans, 1);
 });

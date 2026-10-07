@@ -42,7 +42,7 @@
 			<div id='qr_address_fields' class='section-to-not-print'>
 				<div class='qr-address-first-row'>
 					<div id='qr_address' contenteditable='true' role='textbox' aria-multiline='true' aria-label='Address (optional)' data-placeholder='Address (optional)'></div>
-					<button id='qr_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='qr_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><path class='address-split-symbol' d='M4 4h16M12 7v4M6 15v-4h12v4M3 12l3 3 3-3m6 0 3 3 3-3M3 20h7m4 0h7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/><path class='address-merge-symbol' d='M3 4h7m4 0h7M6 7v4h12V7M12 11v6m-3-3 3 3 3-3M4 20h16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg></button>
+					<button id='qr_address_split_toggle' class='control' type='button' title='Split address' aria-label='Split address' aria-expanded='false' aria-controls='qr_address_line_2'><svg viewBox='0 0 24 24' aria-hidden='true'><g class='address-split-symbol'><path d='M4 4h16M3 20h7m4 0h7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 9h10l-5 6z'/></g><g class='address-merge-symbol'><path d='M3 4h7m4 0h7M4 20h16' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round'/><path class='address-toggle-caret' d='M7 9h10l-5 6z'/></g></svg></button>
 				</div>
 				<div id='qr_address_line_2' contenteditable='false' role='textbox' aria-multiline='true' aria-label='Address line 2 (optional)' data-placeholder='Address line 2 – e.g. Flat 4B, second floor' hidden></div>
 			</div>

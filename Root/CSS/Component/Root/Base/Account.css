@@ -712,6 +712,7 @@
 	padding: 6px; border: 0; background: transparent; color: #6a6a6a;
 }
 #save_address_split_toggle svg { display: block; width: 20px; height: 20px; }
+#save_address_split_toggle .address-toggle-caret { fill: #69B7CF; }
 #save_address_split_toggle { opacity: 0; pointer-events: none; }
 #save_address_container:focus-within #save_address_split_toggle { opacity: 1; pointer-events: auto; }
 #save_address_split_toggle .address-merge-symbol { display: none; }

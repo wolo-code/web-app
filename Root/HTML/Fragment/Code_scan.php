@@ -22,6 +22,7 @@
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
 				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
 				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom' title='Reset zoom'>
+					<svg class='code_scan_zoom_default_icon' viewBox='0 0 24 24' aria-hidden='true'><circle cx='10' cy='10' r='6' fill='none' stroke='currentColor' stroke-width='2'/><path d='m15 15 5 5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg>
 					<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 8a8 8 0 1 1-1 8M5 3v5h5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>
 					<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
 				</button>

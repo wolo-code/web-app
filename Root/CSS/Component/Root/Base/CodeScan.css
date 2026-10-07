@@ -717,6 +717,10 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_zoom_reset.code_scan_zoom_changed .code_scan_zoom_level { visibility: visible; }
 .code_scan_zoom_reset svg { width: 12px; height: 12px; display: block; visibility: hidden; }
 .code_scan_zoom_reset.code_scan_zoom_changed svg { visibility: visible; }
+.code_scan_zoom_reset svg.code_scan_zoom_default_icon {
+ position: absolute; width: 14px; height: 14px; color: #9a9a9a; visibility: visible;
+}
+.code_scan_zoom_reset.code_scan_zoom_changed svg.code_scan_zoom_default_icon { visibility: hidden; }
 .code_scan_review_city_row { display: flex; position: relative; width: 75%; margin: 0 auto; }
 .code_scan_review_city_row > button {
  position: absolute; left: 2px; bottom: 11px; width: 32px; height: 32px;

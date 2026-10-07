@@ -287,3 +287,5 @@ Scanner city choices appear as a vertical list of full-width, left-aligned rows 
 City-list icon placement: The scanner review icon sits 4 px higher. In Map View, the previous-city icon sits inside the left edge of the search input with space reserved for text; it has no square background and shows a circle on press that fades over 450 ms after release in both themes.
 
 The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.
+
+Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at normal zoom. Changed zoom displays the reset glyph in the same slot, retaining the existing reset target, percentage position, and behavior.

@@ -1,5 +1,9 @@
 .choose_city_message {
 	position: relative;
+	max-height: 80vh;
+	max-height: 80dvh;
+	display: flex;
+	flex-direction: column;
 	max-width: 360px;
 	margin: auto;
 	font-family: 'Abel';
@@ -43,7 +47,8 @@
 	margin-bottom: 10px;
 }
 
-#choose_city_by_periphery_message_list {
-	overflow: auto;
-	max-height: 500px;
+.choose_city_message > .message_dialog_body {
+	min-height: 0;
+	overflow-y: auto;
+	flex: 0 1 auto;
 }

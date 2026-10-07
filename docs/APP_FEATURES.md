@@ -116,7 +116,7 @@ Opening a QR label safely skips closing a missing copy-code dialog, including wh
 | `Proceed.svg` | Submit/proceed action for map and decode inputs, and Search map in the unrecognized-code dialog. |
 | `Reverse.svg` | Left-facing play triangle for Edit code in the unrecognized-code dialog. |
 | `Preview.svg` | Eye-only preview toggle on QR Label View. |
-| `Save.svg` | Address-book icon on QR Label View that saves the current label to the signed-in address book. |
+| `Save.svg` | Bookmark icon on QR Label View that saves the current label to the signed-in address book. |
 | `Plus.svg` | Expand the add-current-address form on Account Address Book View. |
 | `Caret.svg` | Expand or collapse the saved address list on Account Address Book View. |
 | `Logout.svg` | Sign out from Account Address Book View. |
@@ -192,3 +192,5 @@ The detected text rectangle adds 10% centered padding, clipped at image edges. L
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. Initial and crop OCR use full-resolution pixels rather than a photo reduced to 1600 pixels wide.
 
 Scanner city recognition uses OCR geometry: identify a row of three dictionary-matched Wolo words, infer a containing label rectangle with a preferred golden ratio, then read city words above the code inside that container. City text is not fuzzy-corrected against the Wolo dictionary. Blue container, gold city and green code rectangles are displayed in live and photo review, with coordinates mapped through capture, crop, zoom and pan. The container is inferred from text geometry rather than detected from a printed border.
+
+Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.

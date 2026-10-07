@@ -760,7 +760,7 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
  position: fixed; inset: 0; margin: auto; box-sizing: border-box;
  display: flex; flex-direction: column; gap: 0; padding: 8px 0;
  width: min(320px, calc(100vw - 40px));
- max-height: min(360px, calc(100dvh - 80px)); overflow-y: auto; background: #fff;
+ max-height: 80vh; max-height: 80dvh; overflow-y: auto; background: #fff;
  border: 1px solid rgb(105 183 207 / 40%); border-radius: 10px;
  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
 }
@@ -793,7 +793,7 @@ html.dark-mode .code_scan_city_choices { background: #222244; }
 html.dark-mode #decode_city_history_message { background: #222244; }
 #decode_city_history_message_prompt { padding: 0 0 8px; }
 #decode_city_history_message_list {
- padding: 0; max-height: min(300px, calc(100dvh - 160px)); overflow-y: auto;
+ padding: 0;
 }
 #decode_city_history_delete { padding: 0 16px; }
 

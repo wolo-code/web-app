@@ -39,3 +39,35 @@ test('crop OCR intersects letterboxing and does not replace the editable image',
  assert.equal(context.codeScanState.sourceCanvas, canvas);
  assert.equal(canvas.width, 1200); assert.equal(canvas.height, 800);
 });
+
+test('live OCR captures stable text without requiring a printed border or text aspect ratio', () => {
+ const { context, canvas } = scanner();
+ const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };
+ context.extractGuidanceFromOcrResult = () => ({ match: { code: 'apple berry cherry' }, bbox });
+ context.codeScanOcrMatch = { bboxIoU: () => 1 };
+ context.setCodeScanCandidateHighlight = () => {};
+ context.setCodeScanWoloFoundCue = () => {};
+ context.getCodeScanVideo = () => null;
+ context.resetCodeScanGuide = () => {};
+ let captures = 0;
+ context.beginCodeScanCapture = () => captures++;
+ context.handleCodeScanLiveOcrResult({}, canvas);
+ context.handleCodeScanLiveOcrResult({}, canvas);
+ assert.equal(captures, 0);
+ context.handleCodeScanLiveOcrResult({}, canvas);
+ assert.equal(captures, 1);
+});
+
+test('live OCR crop follows the visible guide rather than an unrelated 3:1 slice', () => {
+ const { context, canvas } = scanner();
+ let draw;
+ const guide = { getBoundingClientRect: () => ({ left: 30, top: 40, width: 300, height: 180 }) };
+ const viewport = { clientWidth: 400, clientHeight: 300, getBoundingClientRect: () => ({ left: 10, top: 10, width: 400, height: 300 }) };
+ context.document.getElementById = () => guide;
+ context.document.querySelector = () => viewport;
+ context.document.createElement = () => ({ getContext: () => ({ drawImage: (...args) => draw = args }) });
+ const crop = context.getCodeScanFixedRatioSlice(canvas);
+ assert.equal(crop.width, 900);
+ assert.equal(crop.height, 480);
+ assert.deepEqual(draw.slice(1, 5), [60, 80, 900, 480]);
+});

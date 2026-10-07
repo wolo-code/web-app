@@ -182,3 +182,5 @@ The scan camera disc is styled on its image wrapper, with an unclipped SVG insid
 Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 240ms icon growth transition on mouse hover and keyboard focus. Only the artwork scales; hit areas and guide captions stay fixed. Touch avoids sticky hover growth, and reduced-motion preferences disable the transition.
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
+
+Scanner capture control is 20% larger. OCR uses sparse-text segmentation and preserves code separators. Live OCR reads the visible guide region and highlights recognized text within it; three stable matches trigger capture without requiring a printed border or a 3:1 text rectangle. The highlighted rectangle bounds recognized words, not the physical label.

@@ -682,28 +682,13 @@ function processSaveEntry_continue(row) {
 	getCityCenterFromId(row.data_city, function(city) {
 		var entry = saveList[row.data_key] || {};
 		var savedCode = row.data_code && row.data_code.length ? row.data_code : normalizeSavedWcode(entry.code);
-		var title = document.getElementById('address_text_title');
-		var segment = document.getElementById('address_text_segment');
-		var content = document.getElementById('address_text_content');
-		var panel = typeof getAddressPanel == 'function' ? getAddressPanel() : (typeof address_text != 'undefined' ? address_text : null);
 		if(typeof beginProgrammaticMapFocus == 'function')
 			beginProgrammaticMapFocus();
-		if(typeof setAddressPanelHeading == 'function')
-			setAddressPanelHeading(entry.title, entry.segment);
-		else {
-			if(title)
-				title.innerText = entry.title || '';
-			if(segment)
-				segment.innerText = entry.segment || '';
-		}
-		if(content)
-			content.innerText = formatSavedAddress(entry);
-		if(panel && panel.classList)
-			panel.classList.remove('hide');
 		current_title = entry.title;
 		current_segment = entry.segment;
 		current_address_lines = readSavedAddressLines(entry);
 		current_address = formatSavedAddress(current_address_lines);
+		showAddress();
 		decode_continue(city, savedCode);
 	}, { refresh: true });
 }

@@ -81,6 +81,7 @@
 }
 
 #address_text_content {
+	white-space: pre-line;
 	display: block;
 	flex: 1 1 auto;
 	font-family: 'Roboto';

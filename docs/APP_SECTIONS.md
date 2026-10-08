@@ -330,3 +330,5 @@ The profile artwork (default icon and signed-in avatar) is 42px with a padded ta
 QR Label View adds 5px of horizontal padding on each side, increasing the label modal width by 10px.
 
 Info Modal View and the footer Details (Info Links View) share rounded corners. The top-right #info_message_close is a native button labeled Close information, with a 44px hit area and an elevated stacking order.
+
+Saved-address navigation and the info-window Address action use the same Address Panel renderer. Both preserve the separator between saved address lines and show the address QR button whenever the address has nonempty text. The QR payload retains both lines in order.

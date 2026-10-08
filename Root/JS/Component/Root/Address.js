@@ -83,7 +83,7 @@ function showAddress() {
 	else
 		setAddressPanelHeading(current_title, current_segment);
 	if(address_text_content)
-		address_text_content.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
+		address_text_content.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -97,7 +97,7 @@ function hideAddress() {
 	keepAddressPanelOpen = false;
 	setAddressPanelHeading('', '');
 	if(content)
-		content.innerText = '';
+		content.textContent = '';
 	clearAddressCodeRows();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -111,7 +111,7 @@ function clearAddress() {
 	gpId = null;
 	code_plus_code = null;
 	if(content)
-		content.innerText = '';
+		content.textContent = '';
 	clearAddressCodeRows();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -120,9 +120,9 @@ function clearAddress() {
 function refreshAddress() {
 	var content = document.getElementById('address_text_content');
 	if(content)
-		content.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : address;
+		content.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : address;
 	if(typeof external_address != 'undefined' && external_address)
-		external_address.innerText = current_address_lines ? formatSavedAddress(current_address_lines) : address;
+		external_address.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : address;
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();

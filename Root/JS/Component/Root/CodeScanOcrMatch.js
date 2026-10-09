@@ -191,11 +191,21 @@
 		var cityWords = words.filter(function(word) {
 			var box = word && word.bbox;
 			return box && normalizeOcrText(word.text) && box.y1 <= codeBox.y0 &&
-				box.x0 >= container.x0 && box.x1 <= container.x1 && box.y0 >= container.y0;
+				box.x1 > codeBox.x0 && box.x0 < codeBox.x1 && box.y0 >= container.y0;
 		}).sort(function(a, b) {
 			var overlap = Math.min(a.bbox.y1, b.bbox.y1) - Math.max(a.bbox.y0, b.bbox.y0);
 			return overlap > 0 ? a.bbox.x0 - b.bbox.x0 : a.bbox.y0 - b.bbox.y0;
 		});
+		// The rounded label contains both city and code, including wider city names.
+		var content = unionBboxes([codeBox].concat(cityWords.map(function(word) { return word.bbox; })));
+		var pad = Math.max(codeHeight * 0.35, (content.x1 - content.x0) * 0.05);
+		container = { x0: content.x0 - pad, y0: Math.min(container.y0, content.y0 - pad), x1: content.x1 + pad, y1: content.y1 + pad };
+		var labelHeight = Math.max(container.y1 - container.y0, (container.x1 - container.x0) / ((1 + Math.sqrt(5)) / 2));
+		var labelWidth = labelHeight * ((1 + Math.sqrt(5)) / 2);
+		var centerX = (container.x0 + container.x1) / 2;
+		container.x0 = centerX - labelWidth / 2;
+		container.x1 = centerX + labelWidth / 2;
+		container.y0 = container.y1 - labelHeight;
 		var city = normalizeOcrText(cityWords.map(function(word) { return word.text; }).join(' '));
 		var cityTokens = city ? city.split(' ') : [];
 		var matched = cityTokens.concat(best.words);

@@ -1,5 +1,7 @@
 var codeScanState = {
 	active: false,
+	showRegions: false,
+	regionPressConsumed: false,
 	source: 'decode',
 	phase: 'live',
 	detectionMode: 'fixed',
@@ -72,7 +74,11 @@ function initCodeScan() {
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', closeCodeScan);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
-	bindControl('code_scan_capture', 'click', captureCodeScanManually);
+	bindControl('code_scan_capture', 'click', function(event) {
+		if(codeScanState.regionPressConsumed) { event.preventDefault(); codeScanState.regionPressConsumed = false; return; }
+		captureCodeScanManually(event);
+	});
+	initCodeScanRegionPress();
 	bindControl('code_scan_use_code', 'click', useCodeScanReview);
 	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
@@ -103,6 +109,36 @@ function initCodeScan() {
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput)
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
+}
+
+function initCodeScanRegionPress() {
+	var button = document.getElementById('code_scan_capture');
+	var timer;
+	if(!button) return;
+	function endPress() {
+		clearTimeout(timer);
+		codeScanState.showRegions = false;
+		clearCodeScanCandidateHighlight();
+	}
+	function startPress(event) {
+		if(event.type === 'pointerdown' && event.button !== 0) return;
+		if(event.type === 'keydown' && (event.repeat || (event.key !== ' ' && event.key !== 'Enter'))) return;
+		endPress();
+		codeScanState.regionPressConsumed = false;
+		timer = setTimeout(function() {
+			if(!codeScanState.active) return;
+			codeScanState.showRegions = true;
+			codeScanState.regionPressConsumed = true;
+			drawCodeScanMatchRegions(codeScanState.regionMatch, codeScanState.regionCanvas);
+		}, 500);
+	}
+	button.addEventListener('pointerdown', startPress);
+	button.addEventListener('keydown', startPress);
+	button.addEventListener('keyup', function(event) { if(event.key === ' ' || event.key === 'Enter') endPress(); });
+	button.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+	window.addEventListener('pointerup', endPress);
+	window.addEventListener('pointercancel', endPress);
+	window.addEventListener('blur', endPress);
 }
 
 function bindCodeScanReviewInputListeners() {
@@ -652,7 +688,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 		codeScanState.lastMatchBBox = bbox;
 	}
 	// OCR boxes describe text, so a printed rectangular border is not required.
-	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES) {
+	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.showRegions) {
 		setCodeScanStatus('Wolo Code found. Capturing...');
 		var autoVideo = getCodeScanVideo();
 		var autoCanvas = getCodeScanCanvas();
@@ -1130,7 +1166,7 @@ function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
 	var top;
 	var boxWidth;
 	var boxHeight;
-	if(!highlight || !viewport || !bbox || !canvas)
+	if(!codeScanState.showRegions || !highlight || !viewport || !bbox || !canvas)
 		return;
 	width = canvas.width;
 	height = canvas.height;
@@ -1163,6 +1199,8 @@ function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
 }
 
 function drawCodeScanMatchRegions(match, canvas) {
+	codeScanState.regionMatch = match;
+	codeScanState.regionCanvas = canvas;
 	clearCodeScanCandidateHighlight();
 	if(!match || !match.regions || !canvas) return;
 	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);

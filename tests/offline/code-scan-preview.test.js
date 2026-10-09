@@ -150,11 +150,13 @@ test('detected rectangle grows ten percent around its center and stays within th
  context.document.getElementById = () => highlight;
  context.document.querySelector = () => ({});
  context.getCodeScanVideo = () => null;
+ context.codeScanState.showRegions = true;
  context.setCodeScanCandidateHighlight({ x0: 100, y0: 100, x1: 300, y1: 200 }, { width: 1000, height: 500 });
  assert.equal(highlight.style.left, '9%');
  assert.equal(highlight.style.top, '19%');
  assert.equal(highlight.style.width, '22%');
  assert.equal(highlight.style.height, '22%');
+ context.codeScanState.showRegions = true;
  context.setCodeScanCandidateHighlight({ x0: 0, y0: 0, x1: 1000, y1: 500 }, { width: 1000, height: 500 });
  assert.equal(highlight.style.left, '0%');
  assert.equal(highlight.style.width, '100%');
@@ -180,3 +182,19 @@ test('zoom and pan debounce crop OCR and wait for an in-flight read to finish', 
  context.codeScanState.phase = 'review'; run();
  assert.equal(scans, 1);
 });
+
+ test('region outlines appear only after holding capture and hide on release', () => {
+ const { context } = scanner(); const buttonEvents = {}, windowEvents = {}; let timer, draws = 0, clears = 0;
+ context.document.getElementById = () => ({ addEventListener: (name, fn) => buttonEvents[name] = fn });
+ context.window = { addEventListener: (name, fn) => windowEvents[name] = fn };
+ context.setTimeout = fn => { timer = fn; return 1; }; context.clearTimeout = () => { timer = null; };
+ context.drawCodeScanMatchRegions = () => draws++; context.clearCodeScanCandidateHighlight = () => clears++;
+ context.initCodeScanRegionPress();
+ buttonEvents.pointerdown({ type: 'pointerdown', button: 0 });
+ assert.equal(context.codeScanState.showRegions, false);
+ windowEvents.pointerup(); assert.equal(timer, null);
+ buttonEvents.pointerdown({ type: 'pointerdown', button: 0 }); timer();
+ assert.equal(context.codeScanState.showRegions, true); assert.equal(draws, 1);
+ windowEvents.pointerup(); assert.equal(context.codeScanState.showRegions, false);
+ assert.equal(context.codeScanState.regionPressConsumed, true); assert.ok(clears > 0);
+ });

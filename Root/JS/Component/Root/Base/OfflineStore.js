@@ -280,17 +280,59 @@ function applyWordListSnapshot(list) {
 	return true;
 }
 
+function syncCanonicalWordListInBackground() {
+	if (typeof fetch !== 'function') {
+		return Promise.resolve(false);
+	}
+	if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+		return Promise.resolve(false);
+	}
+	return fetch('https://wordlist.wcodes.org/wordlist.json', { cache: 'no-cache' })
+		.then(function(response) {
+			if (!response.ok) {
+				return null;
+			}
+			return response.json();
+		})
+		.then(function(rawWords) {
+			if (!Array.isArray(rawWords) || rawWords.length !== 1024) {
+				return false;
+			}
+			var existing = (wordList && wordList.wordList) ? wordList.wordList : [];
+			var formatted = rawWords.map(function(item, idx) {
+				var clean = typeof item === 'string' ? item.trim().toLowerCase() : item[0];
+				var existingEntry = existing[idx];
+				if (Array.isArray(existingEntry) && existingEntry.length > 1) {
+					var aliases = existingEntry.slice(1).filter(function(a) { return a !== clean; });
+					return [clean].concat(aliases);
+				}
+				return [clean];
+			});
+			if (JSON.stringify(formatted) !== JSON.stringify(existing)) {
+				applyWordListSnapshot(formatted);
+				saveWordListSnapshot(formatted);
+			}
+			return true;
+		})
+		.catch(function() {
+			return false;
+		});
+}
+
 function initOfflineWordList() {
 	return getWordListSnapshot()
 		.then(function(snapshot) {
 			if (applyWordListSnapshot(snapshot)) {
 				initData();
+				syncCanonicalWordListInBackground();
 				return true;
 			}
 			return loadBootstrapWordList().then(function(list) {
 				if (applyWordListSnapshot(list)) {
 					initData();
-					return saveWordListSnapshot(list);
+					saveWordListSnapshot(list);
+					syncCanonicalWordListInBackground();
+					return true;
 				}
 				return false;
 			});

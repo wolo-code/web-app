@@ -40,6 +40,16 @@ Before baking the app during `project/render-native.ps1` (dev or prod):
 
 ---
 
+## Runtime Immediate Background Revalidation
+
+To ensure dictionary updates propagate to existing active client browsers immediately without waiting for a re-bake:
+- **Instant Boot**: On app launch, `initOfflineWordList()` in `OfflineStore.js` boots synchronously from the local IndexedDB snapshot (0ms latency, zero offline blocking).
+- **Non-blocking Background Check**: Immediately kicks off `syncCanonicalWordListInBackground()`, which queries `https://wordlist.wcodes.org/wordlist.json` with `{ cache: 'no-cache' }`.
+- **Hot Swap**: If a change is detected at the Cloudflare edge, it updates the in-memory `wordList` and writes the new snapshot directly to IndexedDB.
+- **Replaces Realtime Database**: Replaces the retired Firebase RTDB `/WordList` subscription with a standard, free HTTP conditional edge fetch, eliminating permanent WebSocket listener overhead and RTDB bandwidth costs.
+
+---
+
 ## Backward Compatibility Model in Wolo
 
 Wolo's runtime decoder in `Root/JS/Component/Root/Code/WordList.js` supports aliases within each slot:

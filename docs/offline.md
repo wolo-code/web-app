@@ -37,7 +37,7 @@ The generator scans `public/index.html` for hashed bundles such as `root-<hash>.
 
 | Data | Online source | Offline source |
 |------|---------------|----------------|
-| Word list | Firebase `/WordList` | IndexedDB snapshot, then `/offline-data/WordList.json` bootstrap |
+| Word list | Bundled bootstrap `/offline-data/WordList.json` (synced at build from `wordlist.wcodes.org`) | IndexedDB snapshot, then `/offline-data/WordList.json` bootstrap |
 | City metadata | Firebase `/CityDetail/{id}` | IndexedDB snapshot after first successful fetch |
 | City center | Firebase `/CityCenter/{id}` | IndexedDB snapshot after first successful fetch |
 

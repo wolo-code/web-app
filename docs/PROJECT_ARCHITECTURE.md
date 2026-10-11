@@ -27,7 +27,7 @@ Wolo Code is a Firebase-hosted PHP/JavaScript web app for encoding and decoding 
 | `root/Framework` | PHP framework helpers that assemble component HTML, CSS, and JavaScript. |
 | `functions` | Node 16 Cloud Functions project. |
 | `database` | Seed/reference JSON data such as city list, rules, and word list. |
-| `docs` | Human-maintained app documentation. |
+| `docs` | Human-maintained app documentation (including [`WORDLIST_SYNCHRONIZATION.md`](WORDLIST_SYNCHRONIZATION.md)). |
 | `public`, `interim` | Generated build output; do not edit these for source changes. |
 
 ## Browser App

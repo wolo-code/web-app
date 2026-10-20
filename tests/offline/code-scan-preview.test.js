@@ -10,7 +10,9 @@ function scanner() {
  context.getCodeScanCanvas = () => canvas;
  context.setCodeScanStatus = () => {};
  context.showCodeScanReview = match => { context.reviewMatch = match; };
+ context.extractSpatialMatch = context.extractMatchFromOcrResult;
  context.extractMatchFromOcrResult = result => result.match;
+ context.detectCodeScanContainers = () => [];
  context.codeScanState.active = true;
  context.codeScanState.sourceCanvas = canvas;
  context.codeScanState.originalSourceCanvas = canvas;
@@ -75,16 +77,70 @@ test('crop OCR translates all three rectangles back into original image coordina
  const match = { regions: {
   container: { x0: 0, y0: 0, x1: 300, y1: 180 },
   city: { x0: 50, y0: 30, x1: 150, y1: 50 },
-  code: { x0: 10, y0: 100, x1: 290, y1: 130 }
- } };
+  code: { x0: 10, y0: 100, x1: 290, y1: 130 },
+  title: { x0: 50, y0: 1, x1: 100, y1: 15 },
+  section: null,
+  address: { x0: 20, y0: 190, x1: 290, y1: 220 }
+ }, metadata: { title: 'Ram', section: '', address: '#43, Main St.' } };
  context.codeScanState.worker = { recognize: async () => ({ match }) };
  context.applyCodeScanCrop(); await new Promise(resolve => setImmediate(resolve));
  assert.deepEqual({ ...context.reviewMatch.regions.container }, { x0: 200, y0: 100, x1: 500, y1: 280 });
  assert.deepEqual({ ...context.reviewMatch.regions.city }, { x0: 250, y0: 130, x1: 350, y1: 150 });
  assert.deepEqual({ ...context.reviewMatch.regions.code }, { x0: 210, y0: 200, x1: 490, y1: 230 });
+ assert.deepEqual({ ...context.reviewMatch.regions.title }, { x0: 250, y0: 101, x1: 300, y1: 115 });
+ assert.deepEqual({ ...context.reviewMatch.regions.address }, { x0: 220, y0: 290, x1: 490, y1: 320 });
+ assert.equal(context.reviewMatch.regions.section, null);
+ assert.deepEqual(context.reviewMatch.metadata, match.metadata);
 });
 
-test('live OCR captures stable text without requiring a printed border or text aspect ratio', () => {
+test('every recognition detects printed boxes before OCR and retains its pixel coordinates', async () => {
+ const { context, canvas } = scanner();
+ const calls = [];
+ const containers = [{ x0: 90, y0: 225, x1: 370, y1: 330 }];
+ context.detectCodeScanContainers = input => { assert.equal(input, canvas); calls.push('detect'); return containers; };
+ context.codeScanState.worker = { recognize: async input => {
+  assert.equal(input, canvas); calls.push('ocr'); return { data: { text: 'Bengaluru mail nebula flower', words: [] } };
+ } };
+ const result = await context.recognizeCodeScanCanvas(canvas);
+ assert.deepEqual(calls, ['detect', 'ocr']);
+ assert.equal(result.data.labelContainers, containers);
+});
+
+test('recognition uses word confidence inside a box even when unrelated OCR lowers page confidence', () => {
+ const { context } = scanner();
+ context.codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
+ const vocabulary = ['mail', 'nebula', 'flower'];
+ context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
+ const words = vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 100 + i * 100, y0: 150, x1: 180 + i * 100, y1: 180 } }));
+ const data = { text: '', confidence: 10, words, labelContainers: [{ x0: 80, y0: 100, x1: 400, y1: 200 }] };
+ assert.equal(context.extractSpatialMatch({ data }).code, 'mail nebula flower');
+ assert.equal(context.extractSpatialMatch({ data: { ...data, labelContainers: [] } }), null);
+});
+
+test('bounded border detection maps back to native photo dimensions without reducing OCR resolution', () => {
+ const context = { Audio: function() { this.load = () => {}; }, document: {}, console };
+ vm.createContext(context);
+ vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
+ const image = {};
+ let working, draw;
+ context.document.createElement = () => (working = { getContext: () => ({
+  drawImage: (...args) => draw = args,
+  getImageData: (...args) => { assert.deepEqual(args, [0, 0, 1200, 900]); return image; }
+ }) });
+ context.codeScanOcrMatch = { detectLabelRectangles: (input, width, height) => {
+  assert.equal(input, image); assert.equal(width, 1200); assert.equal(height, 900);
+  return [{ x0: 100, y0: 150, x1: 300, y1: 250 }];
+ } };
+ const canvas = { width: 4000, height: 3000 };
+ const [detected] = context.detectCodeScanContainers(canvas);
+ assert.equal(working.width, 1200); assert.equal(working.height, 900);
+ assert.deepEqual(draw, [canvas, 0, 0, 1200, 900]);
+ for(const [key, expected] of Object.entries({ x0: 1000 / 3, y0: 500, x1: 1000, y1: 2500 / 3 }))
+  assert.ok(Math.abs(detected[key] - expected) < 1e-6);
+ assert.equal(canvas.width, 4000); assert.equal(canvas.height, 3000);
+});
+
+test('live OCR captures a stable box-first candidate without imposing a text aspect ratio', () => {
  const { context, canvas } = scanner();
  const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };
  context.extractGuidanceFromOcrResult = () => ({ match: { code: 'apple berry cherry' }, bbox });

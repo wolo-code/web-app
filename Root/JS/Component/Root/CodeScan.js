@@ -386,8 +386,7 @@ function prepareCodeScanWorker() {
 		});
 	}).then(function(worker) {
 		return worker.setParameters({
-			tessedit_pageseg_mode: '11',
-			tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-/\\'
+			tessedit_pageseg_mode: '11'
 		}).then(function() {
 			codeScanState.worker = worker;
 			return worker;
@@ -440,7 +439,7 @@ function runCodeScanFrame() {
 	codeScanState.processing = true;
 	captureCodeScanFrame(video, canvas);
 	ocrCanvas = codeScanState.detectionMode === 'fixed' ? getCodeScanFixedRatioSlice(canvas) : canvas;
-	codeScanState.worker.recognize(ocrCanvas).then(function(result) {
+	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
 		codeScanState.processing = false;
 		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
 			return;
@@ -637,11 +636,34 @@ function straightenAndCropCanvasToRegion(sourceCanvas, regionDetails) {
 	return cropCanvas;
 }
 
+function detectCodeScanContainers(canvas) {
+	// Detection uses a bounded working image; preview and OCR keep native pixels.
+	var scale = Math.min(1, 1200 / Math.max(canvas.width, canvas.height));
+	var detectionCanvas = canvas;
+	if(scale < 1) {
+		detectionCanvas = document.createElement('canvas');
+		detectionCanvas.width = Math.round(canvas.width * scale);
+		detectionCanvas.height = Math.round(canvas.height * scale);
+		detectionCanvas.getContext('2d').drawImage(canvas, 0, 0, detectionCanvas.width, detectionCanvas.height);
+	}
+	var image = detectionCanvas.getContext('2d').getImageData(0, 0, detectionCanvas.width, detectionCanvas.height);
+	var sx = canvas.width / detectionCanvas.width;
+	var sy = canvas.height / detectionCanvas.height;
+	return codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height).map(function(box) {
+		return { x0: box.x0 * sx, y0: box.y0 * sy, x1: box.x1 * sx, y1: box.y1 * sy };
+	});
+}
+
+function recognizeCodeScanCanvas(canvas) {
+	var containers = detectCodeScanContainers(canvas);
+	return codeScanState.worker.recognize(canvas).then(function(result) {
+		result.data = result.data || {};
+		result.data.labelContainers = containers;
+		return result;
+	});
+}
+
 function extractMatchFromOcrResult(result) {
-	var text = result && result.data && result.data.text ? result.data.text : '';
-	var confidence = result && result.data && typeof result.data.confidence == 'number' ? result.data.confidence : 0;
-	if(!text || confidence < CODE_SCAN_MIN_CONFIDENCE)
-		return null;
 	return codeScanOcrMatch.matchOcrRegionsToWoloCode(result, wordList.includes.bind(wordList), wordList.curList);
 }
 
@@ -687,7 +709,7 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 		codeScanState.stableMatchCount = 1;
 		codeScanState.lastMatchBBox = bbox;
 	}
-	// OCR boxes describe text, so a printed rectangular border is not required.
+	// A candidate already has a detected printed container and three words inside.
 	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.showRegions) {
 		setCodeScanStatus('Wolo Code found. Capturing...');
 		var autoVideo = getCodeScanVideo();
@@ -794,7 +816,7 @@ function processCodeScanCapture(detectedMatch) {
 		return;
 	}
 	ocrCanvas = canvas;
-	codeScanState.worker.recognize(ocrCanvas).then(function(result) {
+	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
 		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
@@ -1146,7 +1168,7 @@ function recognizeCodeScanPhoto(file) {
 					reject(new Error('Scanner not ready'));
 					return;
 				}
-				codeScanState.worker.recognize(ocrCanvas).then(resolve).catch(reject);
+				recognizeCodeScanCanvas(ocrCanvas).then(resolve).catch(reject);
 			};
 			image.onerror = reject;
 			image.src = reader.result;
@@ -1662,7 +1684,7 @@ function applyCodeScanCrop() {
 	croppedCtx = croppedCanvas.getContext('2d');
 	croppedCtx.drawImage(source, cropSx, cropSy, cropSw, cropSh, 0, 0, cropSw, cropSh);
 
-	codeScanState.worker.recognize(croppedCanvas).then(function(result) {
+	recognizeCodeScanCanvas(croppedCanvas).then(function(result) {
 		if(cropButton)
 			cropButton.disabled = false;
 		if(!codeScanState.active)

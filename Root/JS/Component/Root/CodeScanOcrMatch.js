@@ -135,14 +135,9 @@
 		};
 	}
 
-	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
-		var words = result && result.data && result.data.words;
+	function groupOcrRows(words) {
 		var rows = [];
-		var best = null;
-		if(!words || !words.length) return null;
-		words.filter(function(word) {
-			return word && word.bbox && normalizeOcrText(word.text);
-		}).sort(function(a, b) {
+		words.slice().sort(function(a, b) {
 			return a.bbox.y0 - b.bbox.y0 || a.bbox.x0 - b.bbox.x0;
 		}).forEach(function(word) {
 			var box = word.bbox;
@@ -158,62 +153,170 @@
 			row.bbox = unionBboxes([row.bbox, box]);
 		});
 		rows.forEach(function(row) {
-			var tokens = [];
-			row.words.sort(function(a, b) { return a.bbox.x0 - b.bbox.x0; }).forEach(function(word) {
-				normalizeOcrText(word.text).split(' ').forEach(function(token) {
-					tokens.push({ text: token, bbox: word.bbox, confidence: word.confidence || 0 });
-				});
-			});
-			for(var i = 0; i <= tokens.length - 3; i++) {
-				var triplet = tokens.slice(i, i + 3);
-				var corrected = triplet.map(function(word) { return fuzzyMatchWord(word.text, includesFn, canonicalWords || []); });
-				if(corrected.some(function(word) { return !word; })) continue;
-				var bbox = unionBboxes(triplet.map(function(word) { return word.bbox; }));
-				var score = triplet.reduce(function(sum, word) {
-					return sum + (includesFn(word.text) ? 1000 : 0) + word.confidence;
-				}, 0) + (bbox.y1 - bbox.y0);
-				if(!best || score > best.score) best = { words: corrected, bbox: bbox, score: score };
+			row.words.sort(function(a, b) { return a.bbox.x0 - b.bbox.x0; });
+			row.text = row.words.map(function(word) { return word.text; }).join(' ').trim();
+		});
+		return rows.sort(function(a, b) { return a.bbox.y0 - b.bbox.y0; });
+	}
+
+	function containsBBox(outer, inner) {
+		return inner.x0 >= outer.x0 && inner.x1 <= outer.x1 && inner.y0 >= outer.y0 && inner.y1 <= outer.y1;
+	}
+
+	// Locate four printed sides before interpreting text. Central side samples
+	// tolerate rounded corners; no text-derived or fixed-aspect box is invented.
+	function detectLabelRectangles(imageData, width, height) {
+		if(!imageData || !imageData.data || width < 60 || height < 30) return [];
+		var data = imageData.data;
+		var horizontal = new Uint8Array(width * height);
+		var vertical = new Uint8Array(width * height);
+		var verticalSums = new Uint32Array(width * (height + 1));
+		var segments = [];
+		var rectangles = [];
+		var minWidth = Math.max(50, Math.round(width * 0.12));
+		var minHeight = Math.max(25, Math.round(height * 0.04));
+		function contrast(a, b) {
+			return Math.max(Math.abs(data[a] - data[b]), Math.abs(data[a + 1] - data[b + 1]), Math.abs(data[a + 2] - data[b + 2]));
+		}
+		for(var y = 1; y < height - 1; y++) {
+			var start = -1;
+			var last = -1;
+			for(var x = 1; x < width - 1; x++) {
+				var index = y * width + x;
+				var pixel = index * 4;
+				horizontal[index] = Math.max(contrast(pixel, pixel - width * 4), contrast(pixel, pixel + width * 4)) >= 18 ? 1 : 0;
+				vertical[index] = Math.max(contrast(pixel, pixel - 4), contrast(pixel, pixel + 4)) >= 18 ? 1 : 0;
+				verticalSums[index + width] = verticalSums[index] + vertical[index];
+				if(horizontal[index]) {
+					if(start < 0) start = x;
+					last = x;
+				}
+				if(start >= 0 && (!horizontal[index] && x - last > 2 || x === width - 2)) {
+					if(last - start >= minWidth) segments.push({ x0: start, x1: last, y: y });
+					start = -1;
+				}
 			}
+		}
+		// Collapse the neighboring edge rows of the same horizontal stroke.
+		var strokes = [];
+		segments.forEach(function(segment) {
+			var previous = strokes.find(function(stroke) {
+				return segment.y - stroke.bottom <= 3 && Math.abs(stroke.x0 - segment.x0) <= 4 && Math.abs(stroke.x1 - segment.x1) <= 4;
+			});
+			if(previous) previous.bottom = segment.y;
+			else strokes.push({ x0: segment.x0, x1: segment.x1, top: segment.y, bottom: segment.y });
+		});
+		// Bound work for busy camera frames; long printed sides take priority.
+		strokes.sort(function(a, b) { return (b.x1 - b.x0) - (a.x1 - a.x0); });
+		strokes = strokes.slice(0, 120).sort(function(a, b) { return a.top - b.top; });
+		function findSide(from, to, y0, y1) {
+			var best = null;
+			for(var sx = Math.max(1, Math.floor(from)); sx <= Math.min(width - 2, Math.ceil(to)); sx++) {
+				var hits = verticalSums[(y1 + 1) * width + sx] - verticalSums[y0 * width + sx];
+				var coverage = hits / (y1 - y0 + 1);
+				if(coverage >= 0.8 && (!best || coverage > best.coverage)) best = { x: sx, coverage: coverage };
+			}
+			return best;
+		}
+		function cornerConnected(sideX, edgeY, radius, directionX, directionY) {
+			var hits = 0;
+			radius = Math.max(0, radius);
+			for(var step = 0; step <= 4; step++) {
+				var angle = step * Math.PI / 8;
+				var cx = Math.round(sideX + directionX * radius * (1 - Math.cos(angle)));
+				var cy = Math.round(edgeY + directionY * radius * (1 - Math.sin(angle)));
+				var found = false;
+				for(var dy = -2; dy <= 2 && !found; dy++) {
+					for(var dx = -2; dx <= 2; dx++) {
+						var px = cx + dx;
+						var py = cy + dy;
+						if(px >= 0 && px < width && py >= 0 && py < height && (horizontal[py * width + px] || vertical[py * width + px])) { found = true; break; }
+					}
+				}
+				if(found) hits++;
+			}
+			return hits >= 4;
+		}
+		strokes.forEach(function(top, i) {
+			strokes.slice(i + 1).forEach(function(bottom) {
+				var h = bottom.bottom - top.top;
+				var w = top.x1 - top.x0;
+				var corner = Math.min(w * 0.18, h * 0.3);
+				if(h < minHeight || Math.abs(top.x0 - bottom.x0) > corner || Math.abs(top.x1 - bottom.x1) > corner) return;
+				var middleTop = Math.ceil(top.bottom + h * 0.22);
+				var middleBottom = Math.floor(bottom.top - h * 0.22);
+				if(middleBottom <= middleTop) return;
+				var left = findSide(Math.min(top.x0, bottom.x0) - corner, Math.min(top.x0, bottom.x0) + 3, middleTop, middleBottom);
+				var right = findSide(Math.max(top.x1, bottom.x1) - 3, Math.max(top.x1, bottom.x1) + corner, middleTop, middleBottom);
+				if(!left || !right || right.x - left.x < minWidth) return;
+				if(!cornerConnected(left.x, top.top, top.x0 - left.x, 1, 1) ||
+					!cornerConnected(right.x, top.top, right.x - top.x1, -1, 1) ||
+					!cornerConnected(left.x, bottom.bottom, bottom.x0 - left.x, 1, -1) ||
+					!cornerConnected(right.x, bottom.bottom, right.x - bottom.x1, -1, -1)) return;
+				var rect = { x0: left.x, y0: top.top, x1: right.x + 1, y1: bottom.bottom + 1 };
+				if(!rectangles.some(function(existing) { return bboxIoU(existing, rect) > 0.9; })) rectangles.push(rect);
+			});
+		});
+		return rectangles;
+	}
+
+	function extractLabelMetadata(words, container) {
+		var height = container.y1 - container.y0;
+		var rows = groupOcrRows(words.filter(function(word) {
+			return word.bbox.x0 >= container.x0 && word.bbox.x1 <= container.x1 &&
+				(typeof word.confidence !== 'number' || word.confidence >= 55);
+		})).filter(function(row) { return !/(?:www\.|https?:)/i.test(row.text) && !/^(?:wolo(?: codes?)?|codes?)$/.test(normalizeOcrText(row.text)); });
+		var above = rows.filter(function(row) {
+			return row.bbox.y1 <= container.y0 && row.bbox.y0 >= container.y0 - height * 0.75;
+		}).slice(-2);
+		var below = rows.filter(function(row) {
+			return row.bbox.y0 >= container.y1 && row.bbox.y1 <= container.y1 + height;
+		});
+		// Keep the contiguous address block, stopping at a separated footer.
+		for(var i = 1; i < below.length; i++) {
+			if(below[i].bbox.y0 - below[i - 1].bbox.y1 > (below[i].bbox.y1 - below[i].bbox.y0) * 1.5) { below = below.slice(0, i); break; }
+		}
+		var title = above[0];
+		var section = above[1];
+		return {
+			metadata: { title: title ? title.text : '', section: section ? section.text : '', address: below.map(function(row) { return row.text; }).join('\n') },
+			regions: { title: title ? title.bbox : null, section: section ? section.bbox : null, address: unionBboxes(below.map(function(row) { return row.bbox; })) }
+		};
+	}
+
+	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
+		var words = result && result.data && result.data.words;
+		var containers = result && result.data && result.data.labelContainers;
+		var best = null;
+		if(!words || !containers || !containers.length) return null;
+		words = words.filter(function(word) { return word && word.bbox && normalizeOcrText(word.text); });
+		containers.forEach(function(container) {
+			var rows = groupOcrRows(words.filter(function(word) { return containsBBox(container, word.bbox); }));
+			rows.forEach(function(row) {
+				var tokens = normalizeOcrText(row.text).split(' ');
+				if(tokens.length !== 3 || row.words.some(function(word) { return typeof word.confidence === 'number' && word.confidence < 55; })) return;
+				var corrected = tokens.map(function(token) { return fuzzyMatchWord(token, includesFn, canonicalWords || []); });
+				if(corrected.some(function(word) { return !word; })) return;
+				var score = (row.bbox.y1 - row.bbox.y0) / (container.y1 - container.y0) * 1000 + tokens.reduce(function(sum, token) { return sum + (includesFn(token) ? 10 : 0); }, 0);
+				var area = (container.x1 - container.x0) * (container.y1 - container.y0);
+				if(!best || score > best.score || (score === best.score && area < best.area))
+					best = { words: corrected, bbox: row.bbox, container: container, rows: rows, score: score, area: area };
+			});
 		});
 		if(!best) return null;
 		var codeBox = best.bbox;
-		var codeWidth = codeBox.x1 - codeBox.x0;
-		var codeHeight = codeBox.y1 - codeBox.y0;
-		// Anchor the three-word row near the bottom of a golden-ratio label.
-		var containerWidth = codeWidth * 1.1;
-		var containerHeight = Math.max(containerWidth / ((1 + Math.sqrt(5)) / 2), codeHeight * 2.5);
-		var container = {
-			x0: codeBox.x0 - codeWidth * 0.05,
-			x1: codeBox.x1 + codeWidth * 0.05,
-			y0: codeBox.y1 + codeHeight * 0.35 - containerHeight,
-			y1: codeBox.y1 + codeHeight * 0.35
-		};
-		var cityWords = words.filter(function(word) {
-			var box = word && word.bbox;
-			return box && normalizeOcrText(word.text) && box.y1 <= codeBox.y0 &&
-				box.x1 > codeBox.x0 && box.x0 < codeBox.x1 && box.y0 >= container.y0;
-		}).sort(function(a, b) {
-			var overlap = Math.min(a.bbox.y1, b.bbox.y1) - Math.max(a.bbox.y0, b.bbox.y0);
-			return overlap > 0 ? a.bbox.x0 - b.bbox.x0 : a.bbox.y0 - b.bbox.y0;
-		});
-		// The rounded label contains both city and code, including wider city names.
-		var content = unionBboxes([codeBox].concat(cityWords.map(function(word) { return word.bbox; })));
-		var pad = Math.max(codeHeight * 0.35, (content.x1 - content.x0) * 0.05);
-		container = { x0: content.x0 - pad, y0: Math.min(container.y0, content.y0 - pad), x1: content.x1 + pad, y1: content.y1 + pad };
-		var labelHeight = Math.max(container.y1 - container.y0, (container.x1 - container.x0) / ((1 + Math.sqrt(5)) / 2));
-		var labelWidth = labelHeight * ((1 + Math.sqrt(5)) / 2);
-		var centerX = (container.x0 + container.x1) / 2;
-		container.x0 = centerX - labelWidth / 2;
-		container.x1 = centerX + labelWidth / 2;
-		container.y0 = container.y1 - labelHeight;
-		var city = normalizeOcrText(cityWords.map(function(word) { return word.text; }).join(' '));
+		var cityRow = best.rows.filter(function(row) { return row.bbox.y1 <= codeBox.y0; }).pop();
+		if(cityRow && cityRow.words.some(function(word) { return typeof word.confidence === 'number' && word.confidence < 55; })) cityRow = null;
+		var city = cityRow ? normalizeOcrText(cityRow.text) : '';
 		var cityTokens = city ? city.split(' ') : [];
 		var matched = cityTokens.concat(best.words);
+		var optional = extractLabelMetadata(words, best.container);
 		return {
 			words: matched,
 			code: matched.join(' '),
 			cityWordCount: cityTokens.length,
-			regions: { container: container, city: unionBboxes(cityWords.map(function(word) { return word.bbox; })), code: codeBox }
+			metadata: optional.metadata,
+			regions: Object.assign({ container: best.container, city: cityRow ? cityRow.bbox : null, code: codeBox }, optional.regions)
 		};
 	}
 
@@ -570,6 +673,7 @@
 		findWoloCodeInTokens: findWoloCodeInTokens,
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
+		detectLabelRectangles: detectLabelRectangles,
 		splitMatchForReview: splitMatchForReview,
 		buildCodeFromReview: buildCodeFromReview,
 		validateReviewWords: validateReviewWords,

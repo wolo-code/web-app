@@ -187,13 +187,13 @@ Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
 
-Scanner capture control is 20% larger. OCR uses sparse-text segmentation and preserves code separators. Live OCR reads the visible guide region and highlights recognized text within it; three stable matches trigger capture without requiring a printed border or a 3:1 text rectangle. The highlighted rectangle bounds recognized words, not the physical label.
+Scanner capture control is 20% larger. Sparse-text OCR reads the visible guide after detecting the printed rectangle or rounded rectangle. Three stable box-contained matches trigger capture without imposing a text aspect ratio.
 
 The detected text rectangle adds 10% centered padding, clipped at image edges. Live capture fills review fields immediately with the recognized code. Zoom and pan rerun framed OCR after 350ms of inactivity; outdated crop results are ignored and a pending read waits for ongoing recognition to finish. Live zoom resets detection and requests a fresh frame.
 
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. Initial and crop OCR use full-resolution pixels rather than a photo reduced to 1600 pixels wide.
 
-Scanner city recognition uses OCR geometry: identify a row of three dictionary-matched Wolo words, infer a containing label rectangle with a preferred golden ratio, then read city words above the code inside that container. City text is not fuzzy-corrected against the Wolo dictionary. Blue container, gold city and green code rectangles are displayed in live and photo review, with coordinates mapped through capture, crop, zoom and pan. The container is inferred from text geometry rather than detected from a printed border.
+Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/section above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 

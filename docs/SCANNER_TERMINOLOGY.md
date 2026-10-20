@@ -6,7 +6,7 @@ Call the overall process **Spatial Wolo Code Recognition**: recognizing a Wolo C
 
 | Term | Meaning | Current overlay |
 | --- | --- | --- |
-| **Label Region** | The enclosing region containing the city and the three Wolo words. Prefer a golden-ratio shape where the layout permits. | Blue |
+| **Label Region** | The enclosing region containing the city and the three Wolo words. Its actual printed rectangle or rounded rectangle is detected first. | Blue |
 | **City Region** | The region containing city text above the three Wolo words and inside the Label Region. | Gold |
 | **Three-Word Region** | The region containing exactly the three recognized Wolo dictionary words. | Green |
 
@@ -37,19 +37,19 @@ The City Region is optional when no city text is recognized. The Three-Word Regi
 
 ## Recognition Sequence
 
-1. **Three-word localization:** identify a row of three Wolo dictionary words and calculate its bounding box.
-2. **Label region estimation:** infer an enclosing Label Region around that row, preferably with a width-to-height ratio of approximately 1.618:1.
-3. **City extraction:** read OCR words above the Three-Word Region that lie inside the Label Region. Preserve city text rather than correcting it against the Wolo dictionary.
-4. **Code assembly:** combine the city, when present, with the three Wolo words.
-5. **Review:** populate the editable fields before the user applies the code.
+1. **Label border detection:** identify the actual printed rectangle or rounded rectangle in image pixels.
+2. **Three-word extraction:** read exactly three Wolo dictionary words on one row inside that detected box.
+3. **City extraction:** read the nearest city row above the words, fully inside the same box. Preserve city spelling.
+4. **Optional metadata extraction:** read title and section above the box and address below it when readable, keeping them separate from the city and code.
+5. **Review:** populate editable city and word fields before the user applies the code; retain optional fields in match metadata.
 
-The current Label Region is **inferred from text geometry**. Call this **label region estimation**, not **label border detection**. Border detection would mean locating an actual printed boundary in the image.
+See [the scanner algorithm](CODE_SCAN.md) for rules, output fields and verification. The Label Region follows the detected physical border; it is not estimated from text geometry and has no enforced aspect ratio.
 
 ## Supporting Terms
 
 | Term | Meaning |
 | --- | --- |
-| **Scan Frame** | The dashed guide defining the area the user frames for recognition. It is distinct from the inferred Label Region. |
+| **Scan Frame** | The dashed guide defining the area the user frames for recognition. It is distinct from the detected Label Region. |
 | **OCR Word Box** | The bounding box returned by OCR for an individual recognized word. |
 | **Region of Interest (ROI)** | An image area selected for processing, such as the area inside the Scan Frame. |
 | **Detection Padding** | Extra space added around a detected text bounding box. A 10% size increase adds 5% on each side before clipping at image edges. |

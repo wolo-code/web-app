@@ -1,73 +1,55 @@
-# On-device Wolo Code label scanning
+# Wolo Code scanner algorithm
 
-The web app can read printed Wolo Code labels (city + three words) from the device camera. OCR runs entirely in the browser; no image frames are uploaded.
+The scanner reads printed Wolo Code labels locally in the browser. Camera frames and gallery photos follow the same algorithm; no images are sent to a server.
 
-## Where to find it
+## Required extraction order
 
-- **Decode view:** tap **Scan** centered in the empty rectangular area below the input box.
+1. **Identify the rectangle or rounded rectangle in the image.** This is the printed box enclosing the city and three Wolo words. Detect its actual boundary before interpreting OCR. The dashed scan guide, page edge, title and address are distinct from this box. Do not estimate the box from the words or impose a golden or 3:1 aspect ratio.
+2. **Read exactly three Wolo Code words from inside that box.** Use a single horizontal row, in left-to-right order. All word boxes must be fully contained in the same detected rectangle. Normalize separators and case, and apply Wolo dictionary correction only to these three words. Reject incomplete rows, rows with extra words, and low-confidence code words.
+3. **Read the city above those three words, still inside the same rectangle.** Use the nearest OCR row above the word row. Preserve the city spelling rather than correcting it against the Wolo dictionary. Multiword cities and cities wider than the word row are supported. Never append the title, section or street address to the city.
+4. **Optionally read the title and section above the rectangle, and the address below it, when readable.** Keep these fields separate from the city and code. Their absence or low confidence must not prevent reviewing the three words.
 
-See [Wolo Code Format & Layout](WOLO_CODE_FORMAT_AND_LAYOUT.md) for printed label specifications, typography, and aspect ratio detection rules.
+For the supplied example:
 
-## Sequence checklist (iOS parity)
+| Field | Expected value |
+| --- | --- |
+| City | Bengaluru |
+| Word 1 | mail |
+| Word 2 | nebula |
+| Word 3 | flower |
+| Optional title | Ram |
+| Optional section (also called segment) | Main door |
+| Optional address | Printed street-address lines below the rounded box |
 
-1. **Entry** — open the full-screen overlay scanner from the code-input camera/scan control (`#decode_code_scan_button`). On narrow screens (`max-width: 662px`), the dialog takes full viewport height and width (`100dvh`), with top header pinned to the top, bottom controls pinned to the bottom, and an enlarged viewfinder filling the vertical space between.
-2. **Live** — rear-camera preview with throttled on-device OCR for **guidance only** and clean viewfinder (no mask or dotted rectangle during live preview). Control bar flanks the manual shutter with **Gallery** (`#code_scan_use_photo`) and **Typing** (`#code_scan_type_instead`) icon buttons.
-3. **Capture** via:
-   - Always-visible **manual shutter** (`#code_scan_capture`), or
-   - **Auto-capture** after **3 consecutive stable frames** with the same candidate text, bounding-box IoU ≥ 0.55, and ~3:1 label border (20% aspect tolerance) with edge contrast in the guide region.
-4. **Automatic Processing & Review (2-Stage Workflow)**:
-   - Immediately after the picture is taken, region finding, perspective fixing (angle leveling), straightening, and auto-cropping to the 3:1 label region execute automatically.
-   - Text recognition runs automatically on the straightened/cropped region, directly populating review fields (`city`, `w1`, `w2`, `w3`) and activating **Use Code**.
-   - User can zoom in/out, pan, or tap **Reset** to adjust the crop region if required, and tap **Proceed** (`#code_scan_apply_crop`, `>`) to re-crop/re-recognize.
-   - Underlined editable inputs styled in primary accent allow direct edits.
-5. **Use Code** (`#code_scan_use_code`, on the right on narrow devices and on the left on full-width displays; enabled only when valid) → fill `#decode_input` or `#pac-input` and call `decode_input_from_form()` / `decode_input_from_map()`, then dismiss. **Cancel** (`#code_scan_cancel`, on the left on narrow devices and on the right on full-width displays) dismisses without applying. Dismiss can also be done via the dialog close button (`#code_scan_close`) or Typing icon (`#code_scan_type_instead`).
+`Ram Main door Bengaluru` is never a valid city extraction for this label.
 
-**Gallery photo picker** (`#code_scan_use_photo`) follows the same automatic 2-step capture → auto-straighten/crop/review path with crop adjustment controls.
+## Implementation
 
-## Hard rules
+- `Root/JS/Component/Root/CodeScanOcrMatch.js` exposes `detectLabelRectangles(imageData, width, height)` and `matchOcrRegionsToWoloCode(result, includesFn, canonicalWords)`.
+- Border detection finds paired horizontal strokes, verifies both vertical sides and their corner connections, and tolerates rounded corners. It uses image pixels, independently of OCR. It does not fabricate a container when no printed boundary is found.
+- `CodeScan.js` routes live frames, manual capture, gallery photos and framed rescans through `recognizeCodeScanCanvas()`. This detects borders first and attaches them as `result.data.labelContainers` to the OCR result. Text-only matching is not a fallback in scanner flows.
+- The border working image is at most 1200 pixels on its longest side. Border coordinates are mapped back using the actual working dimensions. OCR and the editable preview retain native image dimensions.
+- OCR uses sparse-text segmentation. Per-word confidence below 55 rejects a code row; low-confidence text elsewhere does not veto a clear code. Unreadable city text leaves an editable blank city.
+- Each detected box is matched independently. Among candidates, the larger relative code-row height wins, then exact dictionary matches, then the smaller enclosing box. This favors the inner printed code box over an enclosing page or card.
+- A successful match contains `words`, `code`, `cityWordCount`, `metadata: { title, section, address }`, and `regions: { container, city, code, title, section, address }`. Absent metadata uses empty strings and absent optional regions use null. Address lines retain newlines; metadata retains OCR punctuation and case.
+- Optional metadata uses horizontally contained text: up to two nearby rows above the box (within 75% of box height), and a contiguous address block below it (within one box height). Branding and URL rows are excluded. One readable header row is treated as a title. Metadata is retained in `codeScanState.reviewMatch`; current editable review and decode fields remain city plus three words.
 
-- Explicit shutter control is always shown on live preview.
-- Live OCR may track/highlight candidates only; the final path is **capture → editable review → explicit Use Code**.
-- Photo fallback lands in **Review** (with crop & zoom toolbar), not auto-decode-only.
-- Interactive crop frames strictly target the 3-word single line at ~3:1 aspect ratio.
+## Capture, review and reframing
 
-## How to verify manually
+Both Scan buttons open the same scanner. Manual shutter, Gallery and Typing remain available. Auto-capture requires three consecutive matches with the same city/code and code-box IoU of at least 0.55. A detected printed container is required for recognition; no text aspect-ratio gate is applied.
 
-1. Open [wolo.codes](https://wolo.codes) on a phone (Android Chrome is the primary target; iOS Safari is best-effort).
-2. Tap **Scan** from decode view and allow camera access.
-3. Confirm the shutter button is visible on live preview.
-4. Point at a printed label; status should show guidance (“Wolo Code found”, “Hold steady…”) without filling the main decode field.
-5. Tap shutter (or hold steady for auto-capture).
-6. In review preview, test crop & zoom:
-   - Tap `+` or use pinch-to-zoom / wheel to zoom in to 150-200%.
-   - Drag to frame the 3 words inside the dashed guide.
-   - Tap **Proceed** (`>`) → confirms cropped recognition updates the 3 words.
-   - Tap **Reset** → restores 100% zoom and uncropped original.
-7. On review, edit city + three words; confirm **Use Code** stays disabled until three valid words are entered.
-8. Tap **Use Code** → map decodes. Tap **Rescan** (`<`) in crop toolbar → live preview returns.
-9. Tap **Cancel** or close → overlay dismisses with no decode applied.
-10. **Use photo instead** → test crop and zoom on chosen photo → review screen → **Use Code** (same as camera path).
-11. Confirm no image uploads during scanning.
+Review preserves the full photo. City and all three words are editable; Use Code requires three valid dictionary words and invokes the existing decode flow only when pressed. Cancel closes without decoding. Zoom and pan rerun framed recognition after 350 ms of inactivity, ignoring stale results. Keep the complete printed rectangle inside the frame when adjusting the image; optional metadata outside the frame can remain blank. Region coordinates, including optional metadata regions, follow native-image capture and crop transformations. Holding the shutter for 500 ms displays blue container, gold city and green word outlines; release hides them.
 
-### Without a physical label
+## Verification
 
-```
-Bengaluru
-cat apple tomato
+Run `npm test` from `Web/app/project`, or run the focused scanner tests:
+
+```powershell
+node --test tests/offline/code-scan-*.test.js
 ```
 
-You can also generate a label from the app (Label / QR dialog) and scan the three words printed in the center.
+Tests cover rectangular and rounded borders at different proportions, a missing border side, the supplied screenshot's actual pixels, the Ram/Main door city regression, code and city containment, separate nearby labels, dictionary correction, confidence, missing metadata, metadata punctuation, native gallery resolution, and crop coordinate mapping. The screenshot fixture stores losslessly compressed RGBA pixels with dimensions in `tests/fixtures/scanner-label.json`; parser regression boxes are transcribed from that image.
 
-## Fallbacks
+Manual verification: open the local app, scan or select a label, verify the city and words, reframe with the full border visible, then use or cancel the code. Check the supplied example returns Bengaluru with mail / nebula / flower. Tiny optional text can remain unreadable at screenshot resolution.
 
-- **Camera denied or unavailable:** **Gallery** photo picker (`#code_scan_use_photo`) or **Typing** (`#code_scan_type_instead`) icon button.
-- **Unsupported browser:** same gallery/typing fallbacks.
-- **Low-confidence OCR:** try better lighting, framing within the guide, or **Gallery** photo picker; edit fields manually on review.
-
-## Technical notes
-
-- OCR engine: [Tesseract.js](https://github.com/naptha/tesseract.js) v5.1.1, self-hosted under `/tesseract/` (`tesseract.min.js`, `worker.min.js`, `tesseract-core.wasm.min.js`, and `lang/eng.traineddata.gz`). Lazy-loaded when Scan is opened; assets are precached by the service worker for offline use. Bake copies them via `Config/URL.tsv` Path column (`tesseract/`, `tesseract/lang/`).
-- Matching: `CodeScanOcrMatch.js` normalizes OCR text, fuzzy-matches tokens, extracts match bounding boxes, and exposes review helpers (`splitMatchForReview`, `buildCodeFromReview`, `validateReviewWords`, `bboxIoU`, `isFixedBorderReady`).
-- UI states: `CodeScan.js` phases are `live` → `processing` → `review`; `hasCaptured` latches after the first capture. Constants: `CODE_SCAN_STABLE_MATCHES = 3`, `CODE_SCAN_BBOX_IOU_MIN = 0.55`.
-- Decode hooks: **Use Code** fills `#decode_input` / `#pac-input` and calls the existing `decode_input_from_form()` / `decode_input_from_map()` paths. No parallel decode parser is introduced.
-- Outbound label QR (`QR.js`, `qrcode.min.js`) is generate-only and is not used for inbound scanning.
+The current pixel detector targets complete, approximately axis-aligned borders. Faint, heavily blurred, rotated, perspective-skewed or partly cropped borders may need reframing or manual entry; no automatic perspective rectification is claimed.

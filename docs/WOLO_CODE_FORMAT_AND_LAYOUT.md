@@ -53,29 +53,11 @@ When a Wolo Code is printed or exported as a physical label (via the app's Label
 
 ## 3. Camera Scanner Viewfinder & Detection Rules
 
-The scanner UI in `Code_scan.php` and `CodeScan.js` is optimized specifically for this 3-word line layout:
+The normative algorithm is documented in [CODE_SCAN.md](CODE_SCAN.md). The scanner first detects the printed rectangle or rounded rectangle enclosing the city and words. It then reads exactly three Wolo words inside the box, followed by the nearest city row above them inside that same box. Readable title/section above the box and address below it are optional metadata.
 
-### Viewfinder Elements
+The dashed scan guide defines the working image area and uses a golden-ratio presentation layout. It is distinct from the detected physical label border. Keep the complete printed code box visible inside the guide. No golden or 3:1 ratio is required of the detected box or word row.
 
-| Element | Appearance | Purpose |
-| :--- | :--- | :--- |
-| **Fixed Guide** (`#code_scan_fixed_guide`) | `2px dashed rgba(105, 183, 207, 0.9)` with 3:1 aspect ratio and dark backdrop mask | Guides the user to frame the 3-word line horizontally in the center of the camera preview. |
-| **Dynamic Line** (`#code_scan_candidate_highlight`) | `2px solid #7fd4a0` with soft glow | Dynamic candidate bounding box that highlights the detected 3-word line. |
-
-### Detection & Aspect Ratio Matching:
-1. **Targeting the 3 Words**:
-   - OCR recognizes all visible text in the viewfinder.
-   - Any recognized city tokens (which are on their own line) are separated; the candidate bounding box is calculated **strictly from the 3 Wolo words**.
-2. **Aspect Ratio Gating**:
-   - In **Fixed 3:1** mode, the dynamic line appears **only when the detected 3-word candidate bounding box is close to the 3:1 ratio** (`CODE_SCAN_FIXED_ASPECT = 3`, tolerance = 0.35, accepting ratios between ~1.95:1 and ~4.05:1).
-   - If the candidate text is vertical, square, or distorted, the dynamic line stays hidden.
-3. **Coordinate Mapping**:
-   - The dynamic rectangle is rendered within `#code_scan_fixed_guide`.
-   - Because the guide has a true 3:1 aspect ratio on screen, the dynamic rectangle maintains the identical horizontal aspect ratio without vertical distortion or swapped axes.
-4. **Auto-Capture Criteria**:
-   - The candidate text matches across 3 consecutive frames (`CODE_SCAN_STABLE_MATCHES = 3`).
-   - The bounding box IoU exceeds 0.55 (`CODE_SCAN_BBOX_IOU_MIN = 0.55`).
-   - In Fixed mode, the candidate ratio is verified near 3:1 before capture latches.
+Holding capture displays the actual blue container outline, the gold city outline and the green word outline. Coordinate mapping follows the original image through live capture, review zoom/pan and crop rescans. Auto-capture requires the same candidate on three consecutive frames and a code-box IoU of at least 0.55.
 
 ---
 
@@ -85,7 +67,7 @@ Once an image is captured via the camera or selected from device storage / camer
 
 1. **Frozen Viewport & Source Retention**:
    - The original high-resolution capture or photo is preserved in memory.
-   - The dashed 3:1 guide stays centered over the viewport as an interactive framing viewfinder.
+   - The dashed scan guide stays centered over the viewport as an interactive framing viewfinder.
 2. **Crop & Zoom Controls Toolbar**:
    - **Zoom In (`+`) / Zoom Out (`-`)**: Step zoom by 25% increments (from 100% up to 400%).
    - **Zoom Level**: Real-time percentage display (`100%` - `400%`).
@@ -94,7 +76,7 @@ Once an image is captured via the camera or selected from device storage / camer
      - 2-finger pinch gesture smoothly zooms the image.
      - Mouse wheel zooms in and out.
    - **Reset**: Restores 100% zoom, recenters pan, and restores the original uncropped image.
-   - **Crop & Scan**: Computes the exact high-resolution sub-rectangle bounded by the 3:1 dashed guide, crops the pixels, and re-runs on-device Tesseract OCR to refresh the review fields.
+   - **Crop & Scan**: Computes the exact high-resolution sub-rectangle bounded by the dashed scan guide, crops the pixels, and re-runs on-device Tesseract OCR to refresh the review fields.
 3. **Review Dialog Fields**:
    - **City**: Auto-filled if recognized on the label, with fallback datalist choices from history and geolocation.
    - **Word 1, Word 2, Word 3**: Distributed into three individual input fields in a 3-column grid for easy verification and typo correction.

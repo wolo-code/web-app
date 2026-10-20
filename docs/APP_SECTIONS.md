@@ -303,13 +303,13 @@ Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
 
-Scanner: the capture control is 20% larger. Live recognition crops the visible guide, highlights the recognized words, and captures after three stable matches. Sparse-text OCR preserves separators; capture does not depend on a printed rectangular border or the aspect ratio of text.
+Scanner: the capture control is 20% larger. Live recognition detects the printed rectangle or rounded rectangle in the visible guide, then reads exactly three words inside it. Three stable matches trigger capture without a text aspect-ratio gate.
 
 Scanner detection adds 10% padding around recognized text. Live capture immediately populates the review fields using the detected code. Zoom and pan automatically rerun OCR on the framed area after a 350ms debounce, ignoring outdated results; live zoom requests fresh detection.
 
 Scanner gallery: selected photos preserve their original pixel dimensions for preview, zoom, pan and OCR, without the former 1600px width reduction.
 
-Scanner spatial recognition: the three Wolo words define a code rectangle and an inferred golden-ratio container. Only OCR words above that code within the container become city text. Live and gallery review show separate blue container, gold city and green code rectangles; review overlays follow zoom, pan and viewport resizing.
+Scanner spatial recognition: detect the printed rectangle or rounded rectangle before reading three Wolo words inside it. Read only the nearest city row above the words within the same box; preserve its spelling. Optional readable title/section above and address below are kept in match metadata. Review fields remain city plus three words. Blue container, gold city and green code outlines follow capture, crop, zoom and pan.
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 

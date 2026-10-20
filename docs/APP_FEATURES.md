@@ -187,13 +187,13 @@ Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
 
-Scanner capture control is 20% larger. Sparse-text OCR reads the visible guide after detecting the printed rectangle or rounded rectangle. Three stable box-contained matches trigger capture without imposing a text aspect ratio.
+Scanner capture control is 20% larger. Sparse-text OCR reads the visible guide after detecting the inner code box and outer card boundary. Three stable box-contained matches trigger capture without imposing a text aspect ratio.
 
 The detected text rectangle adds 10% centered padding, clipped at image edges. Live capture fills review fields immediately with the recognized code. Zoom and pan rerun framed OCR after 350ms of inactivity; outdated crop results are ignored and a pending read waits for ongoing recognition to finish. Live zoom resets detection and requests a fresh frame.
 
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. Initial and crop OCR use full-resolution pixels rather than a photo reduced to 1600 pixels wide.
 
-Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/section above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
+Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/segment above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 
@@ -216,3 +216,6 @@ QR Label View adds 5px of horizontal padding on each side, increasing the label 
 Info and footer Details share a modal with 25px rounded corners. Its close action is a keyboard-accessible button with a 44px hit area above the modal content, supporting mouse and touch dismissal.
 
 Saved-address navigation and the info-window Address action use the same Address Panel renderer. Both preserve the separator between saved address lines and show the address QR button whenever the address has nonempty text. The QR payload retains both lines in order.
+
+
+Scanner card and optional details: detect the inner Wolo code box and the whole card against its background separately. The initial dashed frame is only a guide; live and repeat recognition use the full image, with pan/zoom changing candidate focus. The Address icon between Use Code and Cancel expands optional Title, Segment, Address line 1 and Address line 2 fields. Title and Segment are separate rows above the inner box; both address parts are below it inside the card, line 1 first with blank-paragraph spacing before line 2. Wrapped rows stay in their paragraph. Edited values survive recognition of the same card and flow into the decoded location and its label/save editors only on Use Code. The core code remains usable when the card or optional text is unreadable. Region inspection adds a purple whole-card outline independently of the guide.

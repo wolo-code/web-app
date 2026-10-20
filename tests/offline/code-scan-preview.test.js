@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 function scanner() {
  const canvas = { width: 1200, height: 800 };
- const context = { setTimeout, clearTimeout, Audio: function() { this.load = () => {}; }, document: { getElementById: () => null }, console };
+ const context = { setTimeout, clearTimeout, Audio: function() { this.load = () => {}; }, document: { getElementById: () => null, querySelector: () => null }, console };
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.getCodeScanCanvas = () => canvas;
@@ -54,43 +54,36 @@ test('recognition preserves the complete captured preview on success and no matc
   assert.equal(context.reviewMatch, match);
  }
 });
-test('crop OCR intersects letterboxing and does not replace the editable image', async () => {
- const { context, canvas } = scanner(); let scanned, draw;
- const guide = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 300, height: 200 }) };
+test('reframing scans the complete image even when a small guide clips the card', async () => {
+ const { context, canvas } = scanner(); let scanned;
+ const guide = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 30, height: 20 }) };
  context.document.getElementById = id => id === 'code_scan_fixed_guide' ? guide : null;
- context.document.createElement = () => ({ getContext: () => ({ drawImage: (...args) => draw = args }) });
- context.getCodeScanRenderedImageRect = () => ({ left: 50, top: 25, width: 300, height: 200 });
+ context.document.createElement = () => { throw new Error('The guide must not crop pixels'); };
  context.codeScanState.worker = { recognize: async input => { scanned = input; return { match: null }; } };
  context.applyCodeScanCrop(); await new Promise(resolve => setImmediate(resolve));
- assert.equal(scanned.width, 1000); assert.equal(scanned.height, 700);
- assert.deepEqual(draw.slice(1, 5), [0, 0, 1000, 700]);
+ assert.equal(scanned, canvas);
  assert.equal(context.codeScanState.sourceCanvas, canvas);
  assert.equal(canvas.width, 1200); assert.equal(canvas.height, 800);
 });
 
-test('crop OCR translates all three rectangles back into original image coordinates', async () => {
+test('reframing preserves native card, code and metadata coordinates', async () => {
  const { context } = scanner();
- const guide = { getBoundingClientRect: () => ({ left: 50, top: 25, width: 100, height: 60 }) };
- context.document.getElementById = id => id === 'code_scan_fixed_guide' ? guide : null;
- context.document.createElement = () => ({ getContext: () => ({ drawImage() {} }) });
- context.getCodeScanRenderedImageRect = () => ({ left: 0, top: 0, width: 300, height: 200 });
  const match = { regions: {
-  container: { x0: 0, y0: 0, x1: 300, y1: 180 },
-  city: { x0: 50, y0: 30, x1: 150, y1: 50 },
-  code: { x0: 10, y0: 100, x1: 290, y1: 130 },
-  title: { x0: 50, y0: 1, x1: 100, y1: 15 },
-  section: null,
-  address: { x0: 20, y0: 190, x1: 290, y1: 220 }
- }, metadata: { title: 'Ram', section: '', address: '#43, Main St.' } };
+  card: { x0: 100, y0: 10, x1: 600, y1: 750 },
+  container: { x0: 150, y0: 180, x1: 500, y1: 400 },
+  city: { x0: 200, y0: 200, x1: 300, y1: 230 },
+  code: { x0: 170, y0: 270, x1: 480, y1: 320 },
+  title: { x0: 200, y0: 80, x1: 300, y1: 110 },
+  segment: null,
+  address_line_1: { x0: 140, y0: 430, x1: 550, y1: 480 }
+ }, metadata: { title: 'Ram', segment: '', address_line_1: '#43, Main St.', address_line_2: '' } };
  context.codeScanState.worker = { recognize: async () => ({ match }) };
  context.applyCodeScanCrop(); await new Promise(resolve => setImmediate(resolve));
- assert.deepEqual({ ...context.reviewMatch.regions.container }, { x0: 200, y0: 100, x1: 500, y1: 280 });
- assert.deepEqual({ ...context.reviewMatch.regions.city }, { x0: 250, y0: 130, x1: 350, y1: 150 });
- assert.deepEqual({ ...context.reviewMatch.regions.code }, { x0: 210, y0: 200, x1: 490, y1: 230 });
- assert.deepEqual({ ...context.reviewMatch.regions.title }, { x0: 250, y0: 101, x1: 300, y1: 115 });
- assert.deepEqual({ ...context.reviewMatch.regions.address }, { x0: 220, y0: 290, x1: 490, y1: 320 });
- assert.equal(context.reviewMatch.regions.section, null);
- assert.deepEqual(context.reviewMatch.metadata, match.metadata);
+ assert.equal(context.reviewMatch, match);
+ assert.equal(context.reviewMatch.regions.card.x0, 100);
+ assert.equal(context.reviewMatch.regions.container.y0, 180);
+ assert.equal(context.reviewMatch.regions.title.x0, 200);
+ assert.equal(context.reviewMatch.regions.address_line_1.y0, 430);
 });
 
 test('every recognition detects printed boxes before OCR and retains its pixel coordinates', async () => {
@@ -104,6 +97,18 @@ test('every recognition detects printed boxes before OCR and retains its pixel c
  const result = await context.recognizeCodeScanCanvas(canvas);
  assert.deepEqual(calls, ['detect', 'ocr']);
  assert.equal(result.data.labelContainers, containers);
+});
+
+test('live recognition reads the full viewport instead of clipping to the initial guide', async () => {
+ const { context, canvas } = scanner(); let scanned, handled;
+ context.getCodeScanVideo = () => ({ readyState: 2 });
+ context.captureCodeScanFrame = () => {};
+ context.getCodeScanFixedRatioSlice = () => { throw new Error('Guide cannot restrict recognition'); };
+ context.scheduleCodeScanFrame = () => {};
+ context.handleCodeScanLiveOcrResult = (result, input) => handled = input;
+ context.codeScanState.worker = { recognize: async input => { scanned = input; return { data: {} }; } };
+ context.runCodeScanFrame(); await new Promise(resolve => setImmediate(resolve));
+ assert.equal(scanned, canvas); assert.equal(handled, canvas);
 });
 
 test('recognition uses word confidence inside a box even when unrelated OCR lowers page confidence', () => {

@@ -181,6 +181,8 @@
 		for(var y = 1; y < height - 1; y++) {
 			var start = -1;
 			var last = -1;
+			var colorStart = -1;
+			var colorLast = -1;
 			for(var x = 1; x < width - 1; x++) {
 				var index = y * width + x;
 				var pixel = index * 4;
@@ -190,10 +192,20 @@
 				if(horizontal[index]) {
 					if(start < 0) start = x;
 					last = x;
+					if(colorStart >= 0 && contrast(pixel, (y * width + colorStart) * 4) > 35) {
+						if(colorLast - colorStart >= minWidth) segments.push({ x0: colorStart, x1: colorLast, y: y });
+						colorStart = -1;
+					}
+					if(colorStart < 0) colorStart = x;
+					colorLast = x;
 				}
 				if(start >= 0 && (!horizontal[index] && x - last > 2 || x === width - 2)) {
 					if(last - start >= minWidth) segments.push({ x0: start, x1: last, y: y });
 					start = -1;
+				}
+				if(colorStart >= 0 && (!horizontal[index] && x - colorLast > 2 || x === width - 2)) {
+					if(colorLast - colorStart >= minWidth) segments.push({ x0: colorStart, x1: colorLast, y: y });
+					colorStart = -1;
 				}
 			}
 		}
@@ -209,12 +221,12 @@
 		// Bound work for busy camera frames; long printed sides take priority.
 		strokes.sort(function(a, b) { return (b.x1 - b.x0) - (a.x1 - a.x0); });
 		strokes = strokes.slice(0, 120).sort(function(a, b) { return a.top - b.top; });
-		function findSide(from, to, y0, y1) {
+		function findSide(from, to, y0, y1, preferRight) {
 			var best = null;
 			for(var sx = Math.max(1, Math.floor(from)); sx <= Math.min(width - 2, Math.ceil(to)); sx++) {
 				var hits = verticalSums[(y1 + 1) * width + sx] - verticalSums[y0 * width + sx];
 				var coverage = hits / (y1 - y0 + 1);
-				if(coverage >= 0.8 && (!best || coverage > best.coverage)) best = { x: sx, coverage: coverage };
+				if(coverage >= 0.8 && (!best || coverage > best.coverage || preferRight && coverage === best.coverage)) best = { x: sx, coverage: coverage };
 			}
 			return best;
 		}
@@ -246,7 +258,7 @@
 				var middleTop = Math.ceil(top.bottom + h * 0.22);
 				var middleBottom = Math.floor(bottom.top - h * 0.22);
 				if(middleBottom <= middleTop) return;
-				var left = findSide(Math.min(top.x0, bottom.x0) - corner, Math.min(top.x0, bottom.x0) + 3, middleTop, middleBottom);
+				var left = findSide(Math.min(top.x0, bottom.x0) - corner, Math.min(top.x0, bottom.x0) + 3, middleTop, middleBottom, true);
 				var right = findSide(Math.max(top.x1, bottom.x1) - 3, Math.max(top.x1, bottom.x1) + corner, middleTop, middleBottom);
 				if(!left || !right || right.x - left.x < minWidth) return;
 				if(!cornerConnected(left.x, top.top, top.x0 - left.x, 1, 1) ||
@@ -260,37 +272,73 @@
 		return rectangles;
 	}
 
-	function extractLabelMetadata(words, container) {
+	function findLabelCard(containers, container) {
+		var width = container.x1 - container.x0;
 		var height = container.y1 - container.y0;
+		var cards = containers.filter(function(card) {
+			return containsBBox(card, container) && card.x1 - card.x0 >= width + Math.max(4, width * 0.04) && card.y1 - card.y0 >= height * 1.25;
+		});
+		if(!cards.length) return null;
+		var minWidth = Math.min.apply(null, cards.map(function(card) { return card.x1 - card.x0; }));
+		// Prefer the paper's close side margins, then its complete vertical extent.
+		return cards.filter(function(card) { return card.x1 - card.x0 <= minWidth * 1.02; }).sort(function(a, b) {
+			return (b.y1 - b.y0) - (a.y1 - a.y0);
+		})[0];
+	}
+
+	function formatScanAddress(metadata) {
+		return [metadata.address_line_1, metadata.address_line_2].map(function(part) { return String(part || '').trim(); }).filter(Boolean).join('\n\n');
+	}
+
+	function extractLabelMetadata(words, container, card) {
+		var metadata = { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' };
+		var regions = { title: null, segment: null, address_line_1: null, address_line_2: null, address: null };
+		if(!card) return { metadata: metadata, regions: regions };
 		var rows = groupOcrRows(words.filter(function(word) {
-			return word.bbox.x0 >= container.x0 && word.bbox.x1 <= container.x1 &&
-				(typeof word.confidence !== 'number' || word.confidence >= 55);
+			return containsBBox(card, word.bbox) && (typeof word.confidence !== 'number' || word.confidence >= 70);
 		})).filter(function(row) { return !/(?:www\.|https?:)/i.test(row.text) && !/^(?:wolo(?: codes?)?|codes?)$/.test(normalizeOcrText(row.text)); });
 		var above = rows.filter(function(row) {
-			return row.bbox.y1 <= container.y0 && row.bbox.y0 >= container.y0 - height * 0.75;
+			return row.bbox.y1 <= container.y0;
 		}).slice(-2);
-		var below = rows.filter(function(row) {
-			return row.bbox.y0 >= container.y1 && row.bbox.y1 <= container.y1 + height;
+		var below = rows.filter(function(row) { return row.bbox.y0 >= container.y1; });
+		var paragraphs = [];
+		below.forEach(function(row, i) {
+			var previous = below[i - 1];
+			var gap = previous ? row.bbox.y0 - previous.bbox.y1 : 0;
+			var lineHeight = previous ? Math.max(row.bbox.y1 - row.bbox.y0, previous.bbox.y1 - previous.bbox.y0) : 0;
+			if(!i || gap > lineHeight * 0.9) paragraphs.push([]);
+			paragraphs[paragraphs.length - 1].push(row);
 		});
-		// Keep the contiguous address block, stopping at a separated footer.
-		for(var i = 1; i < below.length; i++) {
-			if(below[i].bbox.y0 - below[i - 1].bbox.y1 > (below[i].bbox.y1 - below[i].bbox.y0) * 1.5) { below = below.slice(0, i); break; }
-		}
-		var title = above[0];
-		var section = above[1];
-		return {
-			metadata: { title: title ? title.text : '', section: section ? section.text : '', address: below.map(function(row) { return row.text; }).join('\n') },
-			regions: { title: title ? title.bbox : null, section: section ? section.bbox : null, address: unionBboxes(below.map(function(row) { return row.bbox; })) }
-		};
+		// Legacy labels have two physical address rows without a blank separator.
+		if(paragraphs.length === 1 && below.length === 2) paragraphs = [[below[0]], [below[1]]];
+		if(above[0]) { metadata.title = above[0].text; regions.title = above[0].bbox; }
+		if(above[1]) { metadata.segment = above[1].text; regions.segment = above[1].bbox; }
+		[paragraphs[0] || [], [].concat.apply([], paragraphs.slice(1))].forEach(function(paragraph, i) {
+			var key = 'address_line_' + (i + 1);
+			metadata[key] = paragraph.map(function(row) { return row.text; }).join(' ');
+			regions[key] = unionBboxes(paragraph.map(function(row) { return row.bbox; }));
+		});
+		metadata.address = formatScanAddress(metadata);
+		regions.address = unionBboxes([regions.address_line_1, regions.address_line_2]);
+		return { metadata: metadata, regions: regions };
 	}
 
 	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
 		var words = result && result.data && result.data.words;
 		var containers = result && result.data && result.data.labelContainers;
+		var focus = result && result.data && result.data.scanFocus;
 		var best = null;
 		if(!words || !containers || !containers.length) return null;
 		words = words.filter(function(word) { return word && word.bbox && normalizeOcrText(word.text); });
 		containers.forEach(function(container) {
+			// A surrounding card cannot rescue words that spill out of its inner box.
+			var width = container.x1 - container.x0;
+			var height = container.y1 - container.y0;
+			if(containers.some(function(inner) {
+				var iw = inner.x1 - inner.x0;
+				var ih = inner.y1 - inner.y0;
+				return containsBBox(container, inner) && iw >= width * 0.35 && ih >= height * 0.12 && iw * ih < width * height * 0.9;
+			})) return;
 			var rows = groupOcrRows(words.filter(function(word) { return containsBBox(container, word.bbox); }));
 			rows.forEach(function(row) {
 				var tokens = normalizeOcrText(row.text).split(' ');
@@ -299,8 +347,9 @@
 				if(corrected.some(function(word) { return !word; })) return;
 				var score = (row.bbox.y1 - row.bbox.y0) / (container.y1 - container.y0) * 1000 + tokens.reduce(function(sum, token) { return sum + (includesFn(token) ? 10 : 0); }, 0);
 				var area = (container.x1 - container.x0) * (container.y1 - container.y0);
-				if(!best || score > best.score || (score === best.score && area < best.area))
-					best = { words: corrected, bbox: row.bbox, container: container, rows: rows, score: score, area: area };
+				var distance = focus ? Math.pow((row.bbox.x0 + row.bbox.x1) / 2 - focus.x, 2) + Math.pow((row.bbox.y0 + row.bbox.y1) / 2 - focus.y, 2) : 0;
+				if(!best || distance < best.distance || distance === best.distance && (score > best.score || score === best.score && area < best.area))
+					best = { words: corrected, bbox: row.bbox, container: container, rows: rows, score: score, area: area, distance: distance };
 			});
 		});
 		if(!best) return null;
@@ -310,13 +359,14 @@
 		var city = cityRow ? normalizeOcrText(cityRow.text) : '';
 		var cityTokens = city ? city.split(' ') : [];
 		var matched = cityTokens.concat(best.words);
-		var optional = extractLabelMetadata(words, best.container);
+		var card = findLabelCard(containers, best.container);
+		var optional = extractLabelMetadata(words, best.container, card);
 		return {
 			words: matched,
 			code: matched.join(' '),
 			cityWordCount: cityTokens.length,
 			metadata: optional.metadata,
-			regions: Object.assign({ container: best.container, city: cityRow ? cityRow.bbox : null, code: codeBox }, optional.regions)
+			regions: Object.assign({ card: card, container: best.container, city: cityRow ? cityRow.bbox : null, code: codeBox }, optional.regions)
 		};
 	}
 
@@ -674,6 +724,7 @@
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		detectLabelRectangles: detectLabelRectangles,
+		formatScanAddress: formatScanAddress,
 		splitMatchForReview: splitMatchForReview,
 		buildCodeFromReview: buildCodeFromReview,
 		validateReviewWords: validateReviewWords,

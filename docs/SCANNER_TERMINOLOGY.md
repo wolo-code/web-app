@@ -6,7 +6,8 @@ Call the overall process **Spatial Wolo Code Recognition**: recognizing a Wolo C
 
 | Term | Meaning | Current overlay |
 | --- | --- | --- |
-| **Label Region** | The enclosing region containing the city and the three Wolo words. Its actual printed rectangle or rounded rectangle is detected first. | Blue |
+| **Label Region / Wolo Code Region** | The enclosing region containing the city and the three Wolo words. Its actual printed rectangle or rounded rectangle is detected first. | Blue |
+| **Card Region** | The whole card separated from its background, containing the inner Label Region and optional outside text. | Purple |
 | **City Region** | The region containing city text above the three Wolo words and inside the Label Region. | Gold |
 | **Three-Word Region** | The region containing exactly the three recognized Wolo dictionary words. | Green |
 
@@ -37,11 +38,11 @@ The City Region is optional when no city text is recognized. The Three-Word Regi
 
 ## Recognition Sequence
 
-1. **Label border detection:** identify the actual printed rectangle or rounded rectangle in image pixels.
+1. **Label border detection:** identify both the actual inner code rectangle and the outer card boundary in image pixels. The initial scan frame only guides alignment.
 2. **Three-word extraction:** read exactly three Wolo dictionary words on one row inside that detected box.
 3. **City extraction:** read the nearest city row above the words, fully inside the same box. Preserve city spelling.
-4. **Optional metadata extraction:** read title and section above the box and address below it when readable, keeping them separate from the city and code.
-5. **Review:** populate editable city and word fields before the user applies the code; retain optional fields in match metadata.
+4. **Optional metadata extraction:** read Title and Segment on separate rows above the inner box and two address paragraphs below it, all within the card, when readable, keeping them separate from the city and code.
+5. **Review:** populate editable city and word fields before the user applies the code; expose optional fields behind the Address icon, line 1 before line 2 with blank-line spacing, and retain edits for the same card.
 
 See [the scanner algorithm](CODE_SCAN.md) for rules, output fields and verification. The Label Region follows the detected physical border; it is not estimated from text geometry and has no enforced aspect ratio.
 
@@ -49,7 +50,7 @@ See [the scanner algorithm](CODE_SCAN.md) for rules, output fields and verificat
 
 | Term | Meaning |
 | --- | --- |
-| **Scan Frame** | The dashed guide defining the area the user frames for recognition. It is distinct from the detected Label Region. |
+| **Scan Frame** | The dashed alignment guide; recognition uses the full image and can find both rectangles beyond it. It is distinct from the detected Label Region. |
 | **OCR Word Box** | The bounding box returned by OCR for an individual recognized word. |
 | **Region of Interest (ROI)** | An image area selected for processing, such as the area inside the Scan Frame. |
 | **Detection Padding** | Extra space added around a detected text bounding box. A 10% size increase adds 5% on each side before clipping at image edges. |

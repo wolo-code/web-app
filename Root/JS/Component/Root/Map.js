@@ -522,8 +522,16 @@ function decode_input_from_form_external() {
 	decode_input_from_form();
 }
 
-function beginDecode(code) {
+function beginDecode(code, scannedMetadata) {
 	cleanUp();
+	if(scannedMetadata) {
+		current_title = scannedMetadata.title || '';
+		current_segment = scannedMetadata.segment || '';
+		current_address_lines = scannedMetadata.address_line_1 || scannedMetadata.address_line_2 ? {
+			address_line_1: scannedMetadata.address_line_1 || '', address_line_2: scannedMetadata.address_line_2 || ''
+		} : null;
+		current_address = current_address_lines ? formatSavedAddress(current_address_lines) : '';
+	}
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	execDecode(code);
 }

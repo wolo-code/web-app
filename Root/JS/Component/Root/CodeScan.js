@@ -15,6 +15,8 @@ var codeScanState = {
 	lastMatchBBox: null,
 	lastDetectedMatch: null,
 	reviewMatch: null,
+	reviewMetadata: null,
+	metadataDirty: {},
 	cropScanTimer: null,
 	cropRevision: 0,
 	tesseractPromise: null,
@@ -86,6 +88,10 @@ function initCodeScan() {
 	bindControl('code_scan_zoom_in', 'click', zoomInCodeScan);
 	bindControl('code_scan_zoom_reset', 'click', resetCodeScanZoom);
 	bindControl('code_scan_city_select', 'click', toggleCodeScanCityChoices);
+	bindControl('code_scan_details_toggle', 'click', toggleCodeScanDetails);
+	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+		bindControl('code_scan_' + key, 'input', function(event) { editCodeScanMetadata(key, event.target.value); });
+	});
 	document.addEventListener('click', function(event) {
 		var row = document.querySelector('.code_scan_review_city_row');
 		var choices = document.getElementById('code_scan_city_choices');
@@ -217,6 +223,7 @@ function stopCodeScan() {
 
 function resetCodeScanUi() {
 	codeScanState.reviewMatch = null;
+	resetCodeScanDetails();
 	setCodeScanPhase('live');
 	clearCodeScanReviewFields();
 	setCodeScanFrozenPreview(false);
@@ -438,7 +445,8 @@ function runCodeScanFrame() {
 	}
 	codeScanState.processing = true;
 	captureCodeScanFrame(video, canvas);
-	ocrCanvas = codeScanState.detectionMode === 'fixed' ? getCodeScanFixedRatioSlice(canvas) : canvas;
+	// The dashed frame is a guide; both the code box and whole card may extend beyond it.
+	ocrCanvas = canvas;
 	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
 		codeScanState.processing = false;
 		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
@@ -654,11 +662,12 @@ function detectCodeScanContainers(canvas) {
 	});
 }
 
-function recognizeCodeScanCanvas(canvas) {
+function recognizeCodeScanCanvas(canvas, focus) {
 	var containers = detectCodeScanContainers(canvas);
 	return codeScanState.worker.recognize(canvas).then(function(result) {
 		result.data = result.data || {};
 		result.data.labelContainers = containers;
+		result.data.scanFocus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
 		return result;
 	});
 }
@@ -717,20 +726,13 @@ function handleCodeScanLiveOcrResult(result, canvas) {
 		if(autoVideo && autoCanvas && autoVideo.readyState >= 2) {
 			var recognitionWidth = canvas.width;
 			var recognitionHeight = canvas.height;
-			var viewport = document.querySelector('.code_scan_viewport');
-			var guide = document.getElementById('code_scan_fixed_guide');
-			var viewportRect = viewport && viewport.getBoundingClientRect();
-			var guideRect = guide && guide.getBoundingClientRect();
 			captureCodeScanFullRes(autoVideo, autoCanvas);
 			if(match.regions) {
-				var framed = codeScanState.detectionMode === 'fixed' && guideRect && viewportRect && viewportRect.width && viewportRect.height;
-				var sx = framed ? (guideRect.left - viewportRect.left) / viewportRect.width * autoCanvas.width : 0;
-				var sy = framed ? (guideRect.top - viewportRect.top) / viewportRect.height * autoCanvas.height : 0;
-				var scaleX = (framed ? guideRect.width / viewportRect.width : 1) * autoCanvas.width / recognitionWidth;
-				var scaleY = (framed ? guideRect.height / viewportRect.height : 1) * autoCanvas.height / recognitionHeight;
+				var scaleX = autoCanvas.width / recognitionWidth;
+				var scaleY = autoCanvas.height / recognitionHeight;
 				Object.keys(match.regions).forEach(function(key) {
 					var box = match.regions[key];
-					if(box) match.regions[key] = { x0: sx + box.x0 * scaleX, y0: sy + box.y0 * scaleY, x1: sx + box.x1 * scaleX, y1: sy + box.y1 * scaleY };
+					if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
 				});
 			}
 			resetCodeScanLiveZoom();
@@ -764,7 +766,8 @@ function captureCodeScanManually(event) {
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
 	resetCodeScanGuide();
-	beginCodeScanCapture(codeScanState.lastDetectedMatch);
+	// Read the full-resolution card again on a manual shutter press.
+	beginCodeScanCapture();
 }
 
 function captureCodeScanFullRes(video, canvas) {
@@ -831,6 +834,7 @@ function processCodeScanCapture(detectedMatch) {
 }
 
 function showCodeScanReview(match) {
+	populateCodeScanMetadata(match);
 	codeScanState.reviewMatch = match;
 	var review = codeScanOcrMatch.splitMatchForReview(match);
 	setCodeScanPhase('review');
@@ -845,7 +849,58 @@ function showCodeScanReview(match) {
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
 	drawCodeScanMatchRegions(match, getCodeScanCanvas());
-	setCodeScanStatus('Check the words below. Drag or zoom to adjust the framed area.');
+	setCodeScanStatus('Check the city and words. Address details are optional.');
+}
+
+function setCodeScanDetailsExpanded(expanded) {
+	var panel = document.getElementById('code_scan_details');
+	var toggle = document.getElementById('code_scan_details_toggle');
+	if(panel) panel.hidden = !expanded;
+	if(toggle) {
+		toggle.setAttribute('aria-expanded', String(expanded));
+		toggle.setAttribute('aria-label', expanded ? 'Hide address details' : 'Show address details');
+	}
+}
+
+function toggleCodeScanDetails() {
+	var panel = document.getElementById('code_scan_details');
+	if(!panel) return;
+	setCodeScanDetailsExpanded(panel.hidden);
+	redrawCodeScanReviewRegions();
+}
+
+function resetCodeScanDetails() {
+	codeScanState.reviewMetadata = null;
+	codeScanState.metadataDirty = {};
+	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+		var field = document.getElementById('code_scan_' + key);
+		if(field) field.value = '';
+	});
+	setCodeScanDetailsExpanded(false);
+}
+
+function populateCodeScanMetadata(match) {
+	var previous = codeScanState.reviewMatch;
+	var same = match && previous && match.code === previous.code && match.regions && previous.regions &&
+		codeScanOcrMatch.bboxIoU(match.regions.card || match.regions.container, previous.regions.card || previous.regions.container) >= 0.55;
+	if(!same) resetCodeScanDetails();
+	var metadata = {};
+	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+		metadata[key] = same && codeScanState.metadataDirty[key] ? codeScanState.reviewMetadata[key] : (match && match.metadata && match.metadata[key] || '');
+		var field = document.getElementById('code_scan_' + key);
+		if(field) field.value = metadata[key];
+	});
+	metadata.address = codeScanOcrMatch.formatScanAddress(metadata);
+	codeScanState.reviewMetadata = metadata;
+	if(match) match.metadata = metadata;
+}
+
+function editCodeScanMetadata(key, value) {
+	if(!codeScanState.reviewMetadata) return;
+	codeScanState.metadataDirty[key] = true;
+	codeScanState.reviewMetadata[key] = value;
+	codeScanState.reviewMetadata.address = codeScanOcrMatch.formatScanAddress(codeScanState.reviewMetadata);
+	if(codeScanState.reviewMatch) codeScanState.reviewMatch.metadata = codeScanState.reviewMetadata;
 }
 
 function populateCodeScanReviewFields(city, w1, w2, w3) {
@@ -1042,6 +1097,8 @@ function rescanCodeScan(event) {
 	codeScanState.originalSourceCanvas = null;
 	codeScanState.sourceCanvas = null;
 	clearCodeScanReviewFields();
+	codeScanState.reviewMatch = null;
+	resetCodeScanDetails();
 	setCodeScanReviewVisible(false);
 	setCodeScanFrozenPreview(false);
 	setCodeScanCropControlsVisible(false);
@@ -1069,6 +1126,9 @@ function applyScannedWoloCode(code) {
 	var decodeInput = document.getElementById('decode_input');
 	var pacInput = document.getElementById('pac-input');
 	var fromMap = codeScanState.source === 'map';
+	var metadata = codeScanState.reviewMetadata && Object.assign({}, codeScanState.reviewMetadata);
+	if(metadata) ['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) { metadata[key] = String(metadata[key] || '').trim(); });
+	var hasMetadata = metadata && (metadata.title || metadata.segment || metadata.address_line_1 || metadata.address_line_2);
 	stopCodeScan();
 	hideOverlay(document.getElementById('code_scan_message'));
 	if(fromMap) {
@@ -1076,7 +1136,8 @@ function applyScannedWoloCode(code) {
 			pacInput.value = code;
 		if(typeof syncProceedButtons == 'function')
 			syncProceedButtons();
-		if(typeof decode_input_from_map == 'function')
+		if(hasMetadata && typeof beginDecode == 'function') beginDecode(code, metadata);
+		else if(typeof decode_input_from_map == 'function')
 			decode_input_from_map();
 		return;
 	}
@@ -1086,7 +1147,8 @@ function applyScannedWoloCode(code) {
 		resizeInput.call(decodeInput);
 	if(typeof syncProceedButtons == 'function')
 		syncProceedButtons();
-	if(typeof decode_input_from_form == 'function')
+	if(hasMetadata && typeof beginDecode == 'function') beginDecode(code, metadata);
+	else if(typeof decode_input_from_form == 'function')
 		decode_input_from_form();
 }
 
@@ -1094,6 +1156,8 @@ function handleCodeScanPhotoInput(event) {
 	var file = event && event.target && event.target.files && event.target.files[0];
 	if(!file)
 		return;
+	codeScanState.reviewMatch = null;
+	resetCodeScanDetails();
 	if(!codeScanState.active) {
 		codeScanState.active = true;
 		codeScanState.hasCaptured = false;
@@ -1207,15 +1271,12 @@ function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
 	highlight.style.width = boxWidth + '%';
 	highlight.style.height = boxHeight + '%';
 	if(viewport.classList && viewport.classList.contains('code_scan_viewport_frozen')) {
-		var guide = document.getElementById('code_scan_fixed_guide');
-		if(guide) {
 			var imageRect = getCodeScanRenderedImageRect(canvas);
-			var guideRect = guide.getBoundingClientRect();
-			highlight.style.left = (imageRect.left - guideRect.left - guide.clientLeft + left / 100 * imageRect.width) + 'px';
-			highlight.style.top = (imageRect.top - guideRect.top - guide.clientTop + top / 100 * imageRect.height) + 'px';
+			var viewportRect = viewport.getBoundingClientRect();
+			highlight.style.left = (imageRect.left - viewportRect.left + left / 100 * imageRect.width) + 'px';
+			highlight.style.top = (imageRect.top - viewportRect.top + top / 100 * imageRect.height) + 'px';
 			highlight.style.width = (boxWidth / 100 * imageRect.width) + 'px';
 			highlight.style.height = (boxHeight / 100 * imageRect.height) + 'px';
-		}
 	}
 	highlight.classList.remove('hide');
 }
@@ -1225,6 +1286,7 @@ function drawCodeScanMatchRegions(match, canvas) {
 	codeScanState.regionCanvas = canvas;
 	clearCodeScanCandidateHighlight();
 	if(!match || !match.regions || !canvas) return;
+	if(match.regions.card) setCodeScanCandidateHighlight(match.regions.card, canvas, 'code_scan_card_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.code, canvas);
 	if(match.regions.city) setCodeScanCandidateHighlight(match.regions.city, canvas, 'code_scan_city_highlight');
@@ -1236,7 +1298,7 @@ function redrawCodeScanReviewRegions() {
 }
 
 function clearCodeScanCandidateHighlight() {
-	['code_scan_candidate_highlight', 'code_scan_container_highlight', 'code_scan_city_highlight'].forEach(function(id) {
+	['code_scan_card_highlight', 'code_scan_candidate_highlight', 'code_scan_container_highlight', 'code_scan_city_highlight'].forEach(function(id) {
 		var highlight = document.getElementById(id);
 		if(highlight) highlight.classList.add('hide');
 	});
@@ -1635,84 +1697,43 @@ function getCodeScanRenderedImageRect(canvas) {
 function applyCodeScanCrop() {
 	var revision = codeScanState.cropRevision;
 	var canvas = getCodeScanCanvas();
-	var guide = document.getElementById('code_scan_fixed_guide');
-	var source = codeScanState.sourceCanvas || canvas;
+	var source = codeScanState.originalSourceCanvas || codeScanState.sourceCanvas || canvas;
 	var cropButton = document.getElementById('code_scan_apply_crop');
-	var guideRect;
-	var imgRect;
-	var normX;
-	var normY;
-	var normW;
-	var normH;
-	var sourceWidth;
-	var sourceHeight;
-	var cropSx;
-	var cropSy;
-	var cropSw;
-	var cropSh;
-	var croppedCanvas;
-	var croppedCtx;
-	if(!canvas || !guide || !source || !codeScanState.worker || codeScanState.phase === 'processing')
-		return;
+	if(!canvas || !source || !codeScanState.worker || codeScanState.phase === 'processing') return;
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = null;
-	guideRect = guide.getBoundingClientRect();
-	imgRect = getCodeScanRenderedImageRect(canvas);
-	if(!guideRect.width || !guideRect.height || !imgRect.width || !imgRect.height)
-		return;
-	normX = (guideRect.left - imgRect.left) / imgRect.width;
-	normY = (guideRect.top - imgRect.top) / imgRect.height;
-	normW = guideRect.width / imgRect.width;
-	normH = guideRect.height / imgRect.height;
-	sourceWidth = source.width;
-	sourceHeight = source.height;
-	cropSx = Math.max(0, Math.round(normX * sourceWidth));
-	cropSy = Math.max(0, Math.round(normY * sourceHeight));
-	cropSw = Math.min(sourceWidth, Math.round((normX + normW) * sourceWidth)) - cropSx;
-	cropSh = Math.min(sourceHeight, Math.round((normY + normH) * sourceHeight)) - cropSy;
-	if(cropSw <= 20 || cropSh <= 10) {
-		showNotification('Framed area is too small. Zoom out or adjust framing.');
-		return;
-	}
-	if(cropButton)
-		cropButton.disabled = true;
-	setCodeScanPhase('processing');
-	setCodeScanStatus('Reading framed area on your device...');
-	croppedCanvas = document.createElement('canvas');
-	croppedCanvas.width = cropSw;
-	croppedCanvas.height = cropSh;
-	croppedCtx = croppedCanvas.getContext('2d');
-	croppedCtx.drawImage(source, cropSx, cropSy, cropSw, cropSh, 0, 0, cropSw, cropSh);
-
-	recognizeCodeScanCanvas(croppedCanvas).then(function(result) {
-		if(cropButton)
-			cropButton.disabled = false;
-		if(!codeScanState.active)
-			return;
-		if(revision !== codeScanState.cropRevision) {
-			setCodeScanPhase('review');
-			return;
+	var focus = { x: source.width / 2, y: source.height / 2 };
+	var viewport = document.querySelector('.code_scan_viewport');
+	if(viewport) {
+		var viewportRect = viewport.getBoundingClientRect();
+		var imageRect = getCodeScanRenderedImageRect(canvas);
+		if(imageRect.width && imageRect.height) {
+			focus.x = Math.max(0, Math.min(source.width, (viewportRect.left + viewportRect.width / 2 - imageRect.left) / imageRect.width * source.width));
+			focus.y = Math.max(0, Math.min(source.height, (viewportRect.top + viewportRect.height / 2 - imageRect.top) / imageRect.height * source.height));
 		}
+	}
+	if(cropButton) cropButton.disabled = true;
+	setCodeScanPhase('processing');
+	setCodeScanStatus('Reading label on your device...');
+	// Reframing changes candidate preference, never clips the card to the guide.
+	recognizeCodeScanCanvas(source, focus).then(function(result) {
+		if(cropButton) cropButton.disabled = false;
+		if(!codeScanState.active) return;
+		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 		var match = extractMatchFromOcrResult(result);
 		if(match) {
-			Object.keys(match.regions).forEach(function(key) {
-				var box = match.regions[key];
-				if(box) match.regions[key] = { x0: box.x0 + cropSx, y0: box.y0 + cropSy, x1: box.x1 + cropSx, y1: box.y1 + cropSy };
-			});
 			showCodeScanReview(match);
-			setCodeScanStatus('Wolo Code recognized from crop! Check details below.');
+			setCodeScanStatus('Label recognized. Check the city and words.');
 		}
 		else {
 			setCodeScanPhase('review');
-			setCodeScanStatus('Could not read Wolo Code from this crop. Adjust framing or zoom.');
+			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 		}
 	}).catch(function() {
-		if(cropButton)
-			cropButton.disabled = false;
-		if(!codeScanState.active)
-			return;
+		if(cropButton) cropButton.disabled = false;
+		if(!codeScanState.active) return;
 		setCodeScanPhase('review');
-		setCodeScanStatus('Recognition failed for this crop. Try adjusting the frame.');
+		setCodeScanStatus('Recognition failed. Try again or edit the words.');
 	});
 }
 

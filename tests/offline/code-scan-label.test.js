@@ -11,7 +11,8 @@ const includes = word => vocabulary.includes(word);
 const word = (text, x0, y0, x1, y1, confidence = 95) => ({ text, bbox: { x0, y0, x1, y1 }, confidence });
 const box = { x0: 90, y0: 225, x1: 370, y1: 330 };
 const codeWords = () => [word('mail', 140, 275, 180, 297), word('nebula', 190, 275, 260, 297), word('flower /', 270, 275, 345, 297)];
-const match = (words, labelContainers = [box]) => matcher.matchOcrRegionsToWoloCode({ data: { words, labelContainers } }, includes, vocabulary);
+const card = { x0: 60, y0: 60, x1: 400, y1: 465 };
+const match = (words, labelContainers = [box, card]) => matcher.matchOcrRegionsToWoloCode({ data: { words, labelContainers } }, includes, vocabulary);
 
 function raster(width, height, rectangles = []) {
 	const data = new Uint8ClampedArray(width * height * 4).fill(255);
@@ -62,9 +63,12 @@ test('supplied screenshot detects the inner printed box and excludes Ram and Mai
 	], detected);
 	assert.deepEqual(matcher.splitMatchForReview(result), { city: 'bengaluru', words: ['mail', 'nebula', 'flower'] });
 	assert.ok(matcher.bboxIoU(result.regions.container, box) > 0.9);
+	assert.ok(matcher.bboxIoU(result.regions.card, card) > 0.9);
 	assert.deepEqual(result.metadata, {
-		title: 'Ram', section: 'Main door',
-		address: '#43, 6th Main, Gaurav Nagar, Phase 7, J.P Nagar\nBengaluru, Karnataka, India - 560078'
+		title: 'Ram', segment: 'Main door',
+		address_line_1: '#43, 6th Main, Gaurav Nagar, Phase 7, J.P Nagar',
+		address_line_2: 'Bengaluru, Karnataka, India - 560078',
+		address: '#43, 6th Main, Gaurav Nagar, Phase 7, J.P Nagar\n\nBengaluru, Karnataka, India - 560078'
 	});
 });
 
@@ -101,7 +105,7 @@ test('optional unreadable metadata and city do not prevent review of three words
 		...codeWords(), word('Address', 110, 350, 200, 365, 20)
 	]);
 	assert.equal(result.code, 'mail nebula flower');
-	assert.deepEqual(result.metadata, { title: '', section: '', address: '' });
+	assert.deepEqual(result.metadata, { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' });
 	assert.equal(result.regions.city, null);
 	const badCode = codeWords(); badCode[1].confidence = 20;
 	assert.equal(match(badCode), null);
@@ -127,4 +131,57 @@ test('separate nearby labels do not mix their code words, cities or metadata', (
 	], [box, { x0: 390, y0: 225, x1: 570, y1: 330 }]);
 	assert.equal(result.code, 'bengaluru mail nebula flower');
 	assert.equal(result.metadata.title, '');
+});
+
+test('two wrapped address paragraphs preserve line 1 then line 2 with an empty line', () => {
+	const result = match([
+		...codeWords(), word('Ram', 200, 175, 240, 187), word('Main door', 190, 195, 260, 207),
+		word('12 Long Road,', 70, 340, 230, 352), word('Bengaluru 560078', 70, 355, 230, 367),
+		word('Flat 4B,', 70, 390, 230, 402), word('Second floor', 70, 405, 230, 417),
+		word('www.wolo.codes', 160, 440, 300, 452), word('Background text', 70, 470, 230, 482)
+	]);
+	assert.equal(result.metadata.title, 'Ram');
+	assert.equal(result.metadata.segment, 'Main door');
+	assert.equal(result.metadata.address_line_1, '12 Long Road, Bengaluru 560078');
+	assert.equal(result.metadata.address_line_2, 'Flat 4B, Second floor');
+	assert.equal(result.metadata.address, '12 Long Road, Bengaluru 560078\n\nFlat 4B, Second floor');
+});
+
+test('metadata can extend beyond the code width but must be inside the whole card', () => {
+	const result = match([
+		...codeWords(), word('Wide title', 65, 180, 395, 195),
+		word('12 Long Road', 65, 350, 395, 365), word('Outside', 30, 380, 395, 395)
+	]);
+	assert.equal(result.metadata.title, 'Wide title');
+	assert.equal(result.metadata.address_line_1, '12 Long Road');
+	assert.equal(result.metadata.address_line_2, '');
+});
+
+test('missing outer card keeps the code usable and leaves outside text for manual optional editing', () => {
+	const result = match([word('Background title', 150, 180, 300, 195), ...codeWords()], [box]);
+	assert.equal(result.code, 'mail nebula flower');
+	assert.equal(result.regions.card, null);
+	assert.equal(result.metadata.title, '');
+});
+
+test('title and segment may sit high above a shallow code box within the card', () => {
+	const result = match([
+		word('Wolo Code', 100, 65, 300, 80), word('Ram', 180, 100, 220, 115),
+		word('Main door', 160, 130, 240, 145), ...codeWords()
+	]);
+	assert.equal(result.metadata.title, 'Ram');
+	assert.equal(result.metadata.segment, 'Main door');
+});
+
+test('address line 2 on its own has no leading blank paragraph', () => {
+	assert.equal(matcher.formatScanAddress({ address_line_1: '', address_line_2: 'Flat 4B' }), 'Flat 4B');
+	assert.equal(matcher.formatScanAddress({ address_line_1: '  ', address_line_2: ' Flat 4B ' }), 'Flat 4B');
+});
+
+test('reframing prefers the code near the image focus without restricting recognition to a guide', () => {
+	const result = matcher.matchOcrRegionsToWoloCode({ data: {
+		words: [...codeWords(), word('cat', 450, 275, 480, 295), word('apple', 490, 275, 530, 295), word('tomato', 540, 275, 590, 295)],
+		labelContainers: [box, { x0: 440, y0: 225, x1: 620, y1: 330 }], scanFocus: { x: 530, y: 280 }
+	} }, includes, vocabulary);
+	assert.equal(result.code, 'cat apple tomato');
 });

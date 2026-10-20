@@ -10,6 +10,9 @@
 			<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
 			<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
 			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'>
+			</div>
+			<div class='code_scan_regions' aria-hidden='true'>
+				<div id='code_scan_card_highlight' class='code_scan_candidate_highlight code_scan_card_highlight hide' aria-hidden='true'></div>
 				<div id='code_scan_container_highlight' class='code_scan_candidate_highlight code_scan_container_highlight hide' aria-hidden='true'></div>
 				<div id='code_scan_city_highlight' class='code_scan_candidate_highlight code_scan_city_highlight hide' aria-hidden='true'></div>
 				<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
@@ -30,7 +33,7 @@
 				</button>
 				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
 			</div>
-			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Crop and scan' title='Crop and scan'>
+			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Read label again' title='Read label again'>
 				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			</button>
 		</div>
@@ -69,9 +72,28 @@
 				</label>
 			</div>
 			<p id='code_scan_review_validity' class='code_scan_review_validity' role='status' aria-live='polite'></p>
+			<div id='code_scan_details' class='code_scan_details' role='group' aria-label='Optional label details' hidden>
+				<label class='code_scan_review_field' for='code_scan_title'>Title
+					<input id='code_scan_title' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
+				</label>
+				<label class='code_scan_review_field' for='code_scan_segment'>Segment
+					<input id='code_scan_segment' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
+				</label>
+				<div class='code_scan_address_parts'>
+					<label class='code_scan_review_field' for='code_scan_address_line_1'>Address line 1
+						<textarea id='code_scan_address_line_1' class='code_scan_review_input' rows='2' placeholder='Optional'></textarea>
+					</label>
+					<label class='code_scan_review_field' for='code_scan_address_line_2'>Address line 2
+						<textarea id='code_scan_address_line_2' class='code_scan_review_input' rows='2' placeholder='Optional'></textarea>
+					</label>
+				</div>
+			</div>
 			<div class='code_scan_review_actions'>
 				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
 					Use Code
+				</button>
+				<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_details'>
+					<span class='image'><?php includeSVG('', 'Address'); ?></span>
 				</button>
 				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
 					Cancel

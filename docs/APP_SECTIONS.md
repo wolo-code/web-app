@@ -303,13 +303,13 @@ Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
 
-Scanner: the capture control is 20% larger. Live recognition detects the printed rectangle or rounded rectangle in the visible guide, then reads exactly three words inside it. Three stable matches trigger capture without a text aspect-ratio gate.
+Scanner: the capture control is 20% larger. Live recognition detects the inner code box and enclosing card across the full image, then reads exactly three words inside it. Three stable matches trigger capture without a text aspect-ratio gate.
 
 Scanner detection adds 10% padding around recognized text. Live capture immediately populates the review fields using the detected code. Zoom and pan automatically rerun OCR on the framed area after a 350ms debounce, ignoring outdated results; live zoom requests fresh detection.
 
 Scanner gallery: selected photos preserve their original pixel dimensions for preview, zoom, pan and OCR, without the former 1600px width reduction.
 
-Scanner spatial recognition: detect the printed rectangle or rounded rectangle before reading three Wolo words inside it. Read only the nearest city row above the words within the same box; preserve its spelling. Optional readable title/section above and address below are kept in match metadata. Review fields remain city plus three words. Blue container, gold city and green code outlines follow capture, crop, zoom and pan.
+Scanner spatial recognition: detect the printed rectangle or rounded rectangle before reading three Wolo words inside it. Read only the nearest city row above the words within the same box; preserve its spelling. Optional readable title/segment above and address below are kept in match metadata. Core review fields remain city plus three words; the Address icon expands the optional fields. Blue container, gold city and green code outlines follow capture, crop, zoom and pan.
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 
@@ -332,3 +332,6 @@ QR Label View adds 5px of horizontal padding on each side, increasing the label 
 Info Modal View and the footer Details (Info Links View) share rounded corners. The top-right #info_message_close is a native button labeled Close information, with a 44px hit area and an elevated stacking order.
 
 Saved-address navigation and the info-window Address action use the same Address Panel renderer. Both preserve the separator between saved address lines and show the address QR button whenever the address has nonempty text. The QR payload retains both lines in order.
+
+
+Scanner card and optional details: detect the inner Wolo code box and the whole card against its background separately. The initial dashed frame is only a guide; live and repeat recognition use the full image, with pan/zoom changing candidate focus. The Address icon between Use Code and Cancel expands optional Title, Segment, Address line 1 and Address line 2 fields. Title and Segment are separate rows above the inner box; both address parts are below it inside the card, line 1 first with blank-paragraph spacing before line 2. Wrapped rows stay in their paragraph. Edited values survive recognition of the same card and flow into the decoded location and its label/save editors only on Use Code. The core code remains usable when the card or optional text is unreadable. Region inspection adds a purple whole-card outline independently of the guide.

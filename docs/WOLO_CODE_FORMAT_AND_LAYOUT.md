@@ -53,11 +53,11 @@ When a Wolo Code is printed or exported as a physical label (via the app's Label
 
 ## 3. Camera Scanner Viewfinder & Detection Rules
 
-The normative algorithm is documented in [CODE_SCAN.md](CODE_SCAN.md). The scanner first detects the printed rectangle or rounded rectangle enclosing the city and words. It then reads exactly three Wolo words inside the box, followed by the nearest city row above them inside that same box. Readable title/section above the box and address below it are optional metadata.
+The normative algorithm is documented in [CODE_SCAN.md](CODE_SCAN.md). The scanner separately detects the inner rectangle or rounded rectangle enclosing the city and words, and the whole card against the background. It then reads exactly three Wolo words inside the box, followed by the nearest city row above them inside that same box. Readable Title and Segment above the inner box and address paragraphs below it are optional metadata bounded by the whole card. Line 1 precedes line 2 with an empty paragraph between; the Address icon expands their editor.
 
-The dashed scan guide defines the working image area and uses a golden-ratio presentation layout. It is distinct from the detected physical label border. Keep the complete printed code box visible inside the guide. No golden or 3:1 ratio is required of the detected box or word row.
+The dashed scan guide only suggests alignment and uses a golden-ratio presentation layout. It is distinct from the detected physical label border. Recognition uses the full image; either detected rectangle may extend beyond the guide. No golden or 3:1 ratio is required of the detected box or word row.
 
-Holding capture displays the actual blue container outline, the gold city outline and the green word outline. Coordinate mapping follows the original image through live capture, review zoom/pan and crop rescans. Auto-capture requires the same candidate on three consecutive frames and a code-box IoU of at least 0.55.
+Holding capture displays the purple whole-card outline, blue inner-box outline, gold city outline and green word outline. Coordinate mapping follows the original image through live capture, review zoom/pan and crop rescans. Auto-capture requires the same candidate on three consecutive frames and a code-box IoU of at least 0.55.
 
 ---
 
@@ -76,7 +76,7 @@ Once an image is captured via the camera or selected from device storage / camer
      - 2-finger pinch gesture smoothly zooms the image.
      - Mouse wheel zooms in and out.
    - **Reset**: Restores 100% zoom, recenters pan, and restores the original uncropped image.
-   - **Crop & Scan**: Computes the exact high-resolution sub-rectangle bounded by the dashed scan guide, crops the pixels, and re-runs on-device Tesseract OCR to refresh the review fields.
+   - **Crop & Scan**: Reruns on-device Tesseract OCR on the full original image. Pan and zoom change preferred candidate focus without clipping either rectangle to the guide.
 3. **Review Dialog Fields**:
    - **City**: Auto-filled if recognized on the label, with fallback datalist choices from history and geolocation.
    - **Word 1, Word 2, Word 3**: Distributed into three individual input fields in a 3-column grid for easy verification and typo correction.

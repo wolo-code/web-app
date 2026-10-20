@@ -50,6 +50,14 @@
 			</button>
 		</div>
 		<div id='code_scan_review' class='code_scan_review hide'>
+			<div id='code_scan_heading_details' class='code_scan_details' role='group' aria-label='Optional label heading' hidden>
+				<label class='code_scan_review_field' for='code_scan_title'>Title
+					<input id='code_scan_title' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
+				</label>
+				<label class='code_scan_review_field' for='code_scan_segment'>Segment
+					<input id='code_scan_segment' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
+				</label>
+			</div>
 			<div class='code_scan_review_city_row'>
 			<label class='code_scan_review_field' for='code_scan_review_city'>
 				<span class='code_scan_city_label'>City</span>
@@ -73,12 +81,6 @@
 			</div>
 			<p id='code_scan_review_validity' class='code_scan_review_validity' role='status' aria-live='polite'></p>
 			<div id='code_scan_details' class='code_scan_details' role='group' aria-label='Optional label details' hidden>
-				<label class='code_scan_review_field' for='code_scan_title'>Title
-					<input id='code_scan_title' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
-				</label>
-				<label class='code_scan_review_field' for='code_scan_segment'>Segment
-					<input id='code_scan_segment' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
-				</label>
 				<div class='code_scan_address_parts'>
 					<label class='code_scan_review_field' for='code_scan_address_line_1'>Address line 1
 						<textarea id='code_scan_address_line_1' class='code_scan_review_input' rows='2' placeholder='Optional'></textarea>
@@ -89,11 +91,14 @@
 				</div>
 			</div>
 			<div class='code_scan_review_actions'>
-				<button id='code_scan_use_code' class='code_scan_use_code' type='button' disabled>
-					Use Code
+				<button id='code_scan_use_code' class='code_scan_icon_button' type='button' aria-label='Use address' title='Use address' disabled>
+					<span class='image'><?php includeSVG('', 'Caret'); ?></span>
 				</button>
-				<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_details'>
+				<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_heading_details code_scan_details'>
 					<span class='image'><?php includeSVG('', 'Address'); ?></span>
+				</button>
+				<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
+					<span class='image'><?php includeSVG('', 'Save'); ?></span>
 				</button>
 				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
 					Cancel

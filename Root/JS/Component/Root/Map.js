@@ -522,7 +522,7 @@ function decode_input_from_form_external() {
 	decode_input_from_form();
 }
 
-function beginDecode(code, scannedMetadata) {
+function beginDecode(code, scannedMetadata, options) {
 	cleanUp();
 	if(scannedMetadata) {
 		current_title = scannedMetadata.title || '';
@@ -532,6 +532,8 @@ function beginDecode(code, scannedMetadata) {
 		} : null;
 		current_address = current_address_lines ? formatSavedAddress(current_address_lines) : '';
 	}
+	keepAddressPanelOpen = !!(options && options.showAddress);
+	if(keepAddressPanelOpen) address = current_address || '';
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	execDecode(code);
 }

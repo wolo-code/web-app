@@ -59,3 +59,16 @@ test('invalid local storage is tolerated and a location is required', () => {
  context.getCodeCity = () => null; context.saveAddress('Home', '', '');
  assert.equal(storage.get(context.LOCAL_BOOKMARKS_KEY), 'invalid');
 });
+
+test('explicit scanner location saves reviewed words instead of the previous map location', () => {
+ const { context } = harness();
+ context.saveAddress('Scanned', 'Door', { address_line_1: '12 Main St', address_line_2: 'Floor 2' }, undefined,
+  { city: { id: 'scanned-city', name: 'Scanned City' }, code: ['mail', 'nebula', 'flower'] });
+ const entries = Object.values(context.readLocalBookmarks());
+ assert.equal(entries.length, 1);
+ assert.equal(entries[0].city_id, 'scanned-city');
+ assert.equal(entries[0].code.join(' '), 'mail nebula flower');
+ assert.equal(entries[0].address_line_1, '12 Main St');
+ assert.equal(entries[0].address_line_2, 'Floor 2');
+ assert.equal(context.getCodeCity().id, 'city-1');
+});

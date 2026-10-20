@@ -662,7 +662,7 @@ function getCityFromId(id, callback, options) {
 	});
 }
 
-function getCityFromName(group, name, callback) {
+function getCityFromName(group, name, callback, onFailure) {
 	var city_name_part = group.concat([name]);
 	var query_list = [];
 	for(var i = 0; i < city_name_part.length; i++) {
@@ -672,15 +672,16 @@ function getCityFromName(group, name, callback) {
 		});
 	}
 
-	getCityFromNameQuery(query_list, 0, callback);
+	getCityFromNameQuery(query_list, 0, callback, onFailure);
 }
 
-function getCityFromNameQuery(query_list, index, callback) {
+function getCityFromNameQuery(query_list, index, callback, onFailure) {
 	if(index >= query_list.length) {
 		if (isOfflineMode()) {
 			showNotification('City not available offline. Open this city once while online.');
 		}
-		decode_continue();
+		if(typeof onFailure === 'function') onFailure();
+		else decode_continue();
 		return;
 	}
 
@@ -699,10 +700,10 @@ function getCityFromNameQuery(query_list, index, callback) {
 				});
 				chooseCity(list, filtered.map(function(city) { return city.id; }), callback);
 			} else {
-				getCityFromNameQuery(query_list, index + 1, callback);
+				getCityFromNameQuery(query_list, index + 1, callback, onFailure);
 			}
 		}).catch(function() {
-			getCityFromNameQuery(query_list, index + 1, callback);
+			getCityFromNameQuery(query_list, index + 1, callback, onFailure);
 		});
 		return;
 	}
@@ -715,7 +716,7 @@ function getCityFromNameQuery(query_list, index, callback) {
 		let matchList;
 		matchList = matchCityByGroup(list, query.group, query.name);
 		if(matchList.length == 0)
-			getCityFromNameQuery(query_list, index+1, callback);
+			getCityFromNameQuery(query_list, index+1, callback, onFailure);
 		else {
 			if(matchList.length == 1) {
 				let i = matchList[0];
@@ -728,7 +729,7 @@ function getCityFromNameQuery(query_list, index, callback) {
 		}
 	}).catch(function() {
 		popLoader();
-		getCityFromNameQuery(query_list, index + 1, callback);
+		getCityFromNameQuery(query_list, index + 1, callback, onFailure);
 	});
 }
 

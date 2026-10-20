@@ -144,5 +144,9 @@ function setCodeCoord(city, position, code) {
 		}
 		getAddress(position);
 		focus__(city, position, code);
+		if(keepAddressPanelOpen) {
+			latLng_p = position;
+			showAddress();
+		}
 	}
 }

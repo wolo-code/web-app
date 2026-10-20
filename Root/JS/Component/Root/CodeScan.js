@@ -17,6 +17,8 @@ var codeScanState = {
 	reviewMatch: null,
 	reviewMetadata: null,
 	metadataDirty: {},
+	saveRevision: 0,
+	saving: false,
 	cropScanTimer: null,
 	cropRevision: 0,
 	tesseractPromise: null,
@@ -82,6 +84,7 @@ function initCodeScan() {
 	});
 	initCodeScanRegionPress();
 	bindControl('code_scan_use_code', 'click', useCodeScanReview);
+	bindControl('code_scan_save', 'click', saveCodeScanReview);
 	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_zoom_out', 'click', zoomOutCodeScan);
@@ -854,8 +857,10 @@ function showCodeScanReview(match) {
 
 function setCodeScanDetailsExpanded(expanded) {
 	var panel = document.getElementById('code_scan_details');
+	var heading = document.getElementById('code_scan_heading_details');
 	var toggle = document.getElementById('code_scan_details_toggle');
 	if(panel) panel.hidden = !expanded;
+	if(heading) heading.hidden = !expanded;
 	if(toggle) {
 		toggle.setAttribute('aria-expanded', String(expanded));
 		toggle.setAttribute('aria-label', expanded ? 'Hide address details' : 'Show address details');
@@ -870,6 +875,8 @@ function toggleCodeScanDetails() {
 }
 
 function resetCodeScanDetails() {
+	codeScanState.saveRevision += 1;
+	codeScanState.saving = false;
 	codeScanState.reviewMetadata = null;
 	codeScanState.metadataDirty = {};
 	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
@@ -1032,6 +1039,8 @@ function updateCodeScanReviewValidity() {
 	});
 	if(useCodeButton)
 		useCodeButton.disabled = !valid;
+	var saveButton = document.getElementById('code_scan_save');
+	if(saveButton) saveButton.disabled = !valid || codeScanState.saving;
 	if(validityNode) {
 		if(!invalidWords.length) {
 			clearTimeout(codeScanWordPopupTimer);
@@ -1058,7 +1067,7 @@ function updateCodeScanReviewValidity() {
 		cityInput.placeholder = selected_decode_city.name;
 }
 
-function useCodeScanReview(event) {
+function getCodeScanReviewCode(event) {
 	var cityInput;
 	var w1Input;
 	var w2Input;
@@ -1085,7 +1094,60 @@ function useCodeScanReview(event) {
 		w2Input.value,
 		w3Input.value
 	);
-	applyScannedWoloCode(code);
+	return code;
+}
+
+function useCodeScanReview(event) {
+	var code = getCodeScanReviewCode(event);
+	if(code) applyScannedWoloCode(code);
+}
+
+function getCodeScanReviewMetadata() {
+	var metadata = Object.assign({}, codeScanState.reviewMetadata);
+	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+		metadata[key] = String(metadata[key] || '').trim();
+	});
+	return metadata;
+}
+
+function saveCodeScanReview(event) {
+	var code = getCodeScanReviewCode(event);
+	if(!code || codeScanState.saving) return;
+	var metadata = getCodeScanReviewMetadata();
+	if(!metadata.title) {
+		setCodeScanDetailsExpanded(true);
+		document.getElementById('code_scan_title').focus();
+		showNotification('Title is required');
+		return;
+	}
+	var parts = code.split(' ');
+	var words = parts.slice(-3);
+	var cityParts = parts.slice(0, -3);
+	var revision = ++codeScanState.saveRevision;
+	codeScanState.saving = true;
+	updateCodeScanReviewValidity();
+	function resolved(city) {
+		if(!codeScanState.active || revision !== codeScanState.saveRevision) return;
+		codeScanState.saving = false;
+		updateCodeScanReviewValidity();
+		if(!city || city.id == null) {
+			showNotification('Choose a recognized city before saving');
+			return;
+		}
+		var dialog = document.getElementById('code_scan_message');
+		if(dialog && dialog.classList.contains('hide')) showOverlay(dialog);
+		saveAddress(metadata.title, metadata.segment, metadata, undefined, { city: city, code: words });
+	}
+	if(cityParts.length) {
+		getCityFromName(cityParts.slice(0, -1), cityParts[cityParts.length - 1], resolved, function() { resolved(null); });
+	}
+	else {
+		var selected = typeof selected_decode_city !== 'undefined' ? selected_decode_city : null;
+		if(selected && selected.id == null && selected.name) {
+			getCityFromName([], selected.name.toLowerCase(), resolved, function() { resolved(null); });
+		}
+		else resolved(selected);
+	}
 }
 
 function rescanCodeScan(event) {
@@ -1126,9 +1188,10 @@ function applyScannedWoloCode(code) {
 	var decodeInput = document.getElementById('decode_input');
 	var pacInput = document.getElementById('pac-input');
 	var fromMap = codeScanState.source === 'map';
-	var metadata = codeScanState.reviewMetadata && Object.assign({}, codeScanState.reviewMetadata);
-	if(metadata) ['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) { metadata[key] = String(metadata[key] || '').trim(); });
+	var metadata = getCodeScanReviewMetadata();
 	var hasMetadata = metadata && (metadata.title || metadata.segment || metadata.address_line_1 || metadata.address_line_2);
+	var details = document.getElementById('code_scan_details');
+	var options = { showAddress: !!details && !details.hidden };
 	stopCodeScan();
 	hideOverlay(document.getElementById('code_scan_message'));
 	if(fromMap) {
@@ -1136,7 +1199,7 @@ function applyScannedWoloCode(code) {
 			pacInput.value = code;
 		if(typeof syncProceedButtons == 'function')
 			syncProceedButtons();
-		if(hasMetadata && typeof beginDecode == 'function') beginDecode(code, metadata);
+		if((hasMetadata || options.showAddress) && typeof beginDecode == 'function') beginDecode(code, metadata, options);
 		else if(typeof decode_input_from_map == 'function')
 			decode_input_from_map();
 		return;
@@ -1147,7 +1210,7 @@ function applyScannedWoloCode(code) {
 		resizeInput.call(decodeInput);
 	if(typeof syncProceedButtons == 'function')
 		syncProceedButtons();
-	if(hasMetadata && typeof beginDecode == 'function') beginDecode(code, metadata);
+	if((hasMetadata || options.showAddress) && typeof beginDecode == 'function') beginDecode(code, metadata, options);
 	else if(typeof decode_input_from_form == 'function')
 		decode_input_from_form();
 }

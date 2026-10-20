@@ -302,10 +302,10 @@ function buildSaveAddressPayload(title, segment, addressLines, city, code) {
 	};
 }
 
-function saveAddress(title, segment, savedAddress, callback) {
+function saveAddress(title, segment, savedAddress, callback, location) {
 	var user = getBookmarkUser();
-	var city = typeof getCodeCity == 'function' ? getCodeCity() : null;
-	var code = normalizeSavedWcode(typeof getCodeWCode == 'function' ? getCodeWCode() : null);
+	var city = location ? location.city : (typeof getCodeCity == 'function' ? getCodeCity() : null);
+	var code = normalizeSavedWcode(location ? location.code : (typeof getCodeWCode == 'function' ? getCodeWCode() : null));
 	var basePayload = buildSaveAddressPayload(title, segment, savedAddress, city, code);
 	if(!basePayload) {
 		showNotification('Locate or decode a Wolo Code first');

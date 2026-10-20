@@ -13,7 +13,7 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
    setCustomValidity(value) { this.error = value; }
   };
  }
- nodes.code_scan_use_code = {};
+ nodes.code_scan_apply_crop = {};
  nodes.code_scan_review_validity = { classList: { add() {}, remove() {} } };
  let popupTimer;
  const timers = { setTimeout(fn) { popupTimer = fn; return 1; }, clearTimeout() {} };
@@ -22,12 +22,13 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.codeScanCityChoices = ['Delhi'];
+ context.codeScanState.phase = 'review';
  nodes.code_scan_review_city.value = 'Delhi';
  nodes.code_scan_review_w1.value = ' APPLE ';
  nodes.code_scan_review_w2.value = 'unknown';
  nodes.code_scan_review_w3.value = 'cherry';
  context.updateCodeScanReviewValidity();
- assert.equal(nodes.code_scan_use_code.disabled, true);
+ assert.equal(nodes.code_scan_apply_crop.disabled, true);
  assert.equal(nodes.code_scan_review_w2.attributes['aria-invalid'], 'true');
  assert.match(nodes.code_scan_review_validity.textContent, /unknown/);
  popupTimer();
@@ -36,7 +37,7 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  context.updateCodeScanReviewValidity();
  assert.equal(nodes.code_scan_review_w2.attributes['aria-invalid'], 'false');
  assert.equal(nodes.code_scan_review_w2.classList.contains('code_scan_word_pending'), true);
- assert.equal(nodes.code_scan_use_code.disabled, true);
+ assert.equal(nodes.code_scan_apply_crop.disabled, true);
  assert.equal(nodes.code_scan_review_validity.textContent, '');
  nodes.code_scan_review_w2.value = 'zz';
  context.updateCodeScanReviewValidity();
@@ -46,10 +47,20 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  nodes.code_scan_review_w2.value = 'banana';
  nodes.code_scan_review_city.value = 'Unknown city';
  context.updateCodeScanReviewValidity();
- assert.equal(nodes.code_scan_use_code.disabled, false);
+ assert.equal(nodes.code_scan_apply_crop.disabled, false);
  assert.equal(nodes.code_scan_review_w2.error, '');
  assert.equal(nodes.code_scan_review_validity.textContent, '');
  assert.equal(nodes.code_scan_review_city.classList.contains('code_scan_city_tag'), false);
+ context.setCodeScanPhase('processing');
+ assert.equal(nodes.code_scan_apply_crop.disabled, true);
+ context.updateCodeScanReviewValidity();
+ assert.equal(nodes.code_scan_apply_crop.disabled, true);
+ context.setCodeScanPhase('review');
+ assert.equal(nodes.code_scan_apply_crop.disabled, false);
+ nodes.code_scan_review_w3.value = '';
+ context.setCodeScanPhase('processing');
+ context.setCodeScanPhase('review');
+ assert.equal(nodes.code_scan_apply_crop.disabled, true);
 });
 
 test('zoom reset indicator follows zoom changes and clears on reset', () => {

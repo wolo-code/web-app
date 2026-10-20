@@ -33,7 +33,7 @@
 				</button>
 				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
 			</div>
-			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Read label again' title='Read label again'>
+			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
 				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			</button>
 		</div>
@@ -91,17 +91,14 @@
 				</div>
 			</div>
 			<div class='code_scan_review_actions'>
-				<button id='code_scan_use_code' class='code_scan_icon_button' type='button' aria-label='Use address' title='Use address' disabled>
-					<span class='image'><?php includeSVG('', 'Caret'); ?></span>
-				</button>
 				<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_heading_details code_scan_details'>
 					<span class='image'><?php includeSVG('', 'Address'); ?></span>
 				</button>
 				<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
 					<span class='image'><?php includeSVG('', 'Save'); ?></span>
 				</button>
-				<button id='code_scan_cancel' class='border code_scan_cancel' type='button'>
-					Cancel
+				<button id='code_scan_cancel' class='code_scan_icon_button code_scan_cancel' type='button' aria-label='Cancel' title='Cancel'>
+					<span class='image'><?php includeSVG('', 'Close'); ?></span>
 				</button>
 			</div>
 		</div>

@@ -83,7 +83,6 @@ function initCodeScan() {
 		captureCodeScanManually(event);
 	});
 	initCodeScanRegionPress();
-	bindControl('code_scan_use_code', 'click', useCodeScanReview);
 	bindControl('code_scan_save', 'click', saveCodeScanReview);
 	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
@@ -109,7 +108,7 @@ function initCodeScan() {
 			document.getElementById('code_scan_city_select').focus();
 		}
 	}, true);
-	bindControl('code_scan_apply_crop', 'click', applyCodeScanCrop);
+	bindControl('code_scan_apply_crop', 'click', useCodeScanReview);
 	bindCodeScanReviewInputListeners();
 	initCodeScanZoomAndPan();
 	window.addEventListener('resize', redrawCodeScanReviewRegions);
@@ -267,7 +266,11 @@ function isCodeScanVisible() {
 function setCodeScanPhase(phase) {
 	codeScanState.phase = phase || 'live';
 	var cropButton = document.getElementById('code_scan_apply_crop');
-	if(cropButton) cropButton.disabled = codeScanState.phase === 'processing';
+	if(cropButton) cropButton.disabled = codeScanState.phase !== 'review' ||
+		!['w1', 'w2', 'w3'].every(function(key) {
+			var field = document.getElementById('code_scan_review_' + key);
+			return field && typeof field.value === 'string' && typeof wordList !== 'undefined' && wordList && wordList.includes(field.value.trim().toLowerCase());
+		});
 }
 
 function setCodeScanDetectionMode(mode) {
@@ -1014,7 +1017,7 @@ function updateCodeScanReviewValidity() {
 	var w1Input = document.getElementById('code_scan_review_w1');
 	var w2Input = document.getElementById('code_scan_review_w2');
 	var w3Input = document.getElementById('code_scan_review_w3');
-	var useCodeButton = document.getElementById('code_scan_use_code');
+	var useCodeButton = document.getElementById('code_scan_apply_crop');
 	var validityNode = document.getElementById('code_scan_review_validity');
 	var inputs = [w1Input, w2Input, w3Input];
 	var invalidWords = [];
@@ -1038,7 +1041,7 @@ function updateCodeScanReviewValidity() {
 		if(invalid) invalidWords.push(input.value.trim());
 	});
 	if(useCodeButton)
-		useCodeButton.disabled = !valid;
+		useCodeButton.disabled = !valid || codeScanState.phase !== 'review';
 	var saveButton = document.getElementById('code_scan_save');
 	if(saveButton) saveButton.disabled = !valid || codeScanState.saving;
 	if(validityNode) {
@@ -1761,7 +1764,6 @@ function applyCodeScanCrop() {
 	var revision = codeScanState.cropRevision;
 	var canvas = getCodeScanCanvas();
 	var source = codeScanState.originalSourceCanvas || codeScanState.sourceCanvas || canvas;
-	var cropButton = document.getElementById('code_scan_apply_crop');
 	if(!canvas || !source || !codeScanState.worker || codeScanState.phase === 'processing') return;
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = null;
@@ -1775,12 +1777,10 @@ function applyCodeScanCrop() {
 			focus.y = Math.max(0, Math.min(source.height, (viewportRect.top + viewportRect.height / 2 - imageRect.top) / imageRect.height * source.height));
 		}
 	}
-	if(cropButton) cropButton.disabled = true;
 	setCodeScanPhase('processing');
 	setCodeScanStatus('Reading label on your device...');
 	// Reframing changes candidate preference, never clips the card to the guide.
 	recognizeCodeScanCanvas(source, focus).then(function(result) {
-		if(cropButton) cropButton.disabled = false;
 		if(!codeScanState.active) return;
 		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 		var match = extractMatchFromOcrResult(result);
@@ -1793,7 +1793,6 @@ function applyCodeScanCrop() {
 			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 		}
 	}).catch(function() {
-		if(cropButton) cropButton.disabled = false;
 		if(!codeScanState.active) return;
 		setCodeScanPhase('review');
 		setCodeScanStatus('Recognition failed. Try again or edit the words.');

@@ -97,6 +97,7 @@ Opening a QR label safely skips closing a missing copy-code dialog, including wh
 
 | Icon | Purpose |
 | --- | --- |
+| `Address.svg` | Address details action in scanner review: an outlined address card with a location pin, distinct from the two-line city-list icon. |
 | `Map-terrain.svg` | Roadmap/Terrain map-type action icon, and the Wolo Code Input View map button. |
 | `Map-satellite.svg` | Google Satellite view map-type action icon. |
 | `Map-osm.svg` | OpenStreetMap map-type action icon. |

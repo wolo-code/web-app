@@ -3,8 +3,8 @@
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	max-height: 100vh;
-	max-height: 100dvh;
+	max-height: calc(100vh - 28px);
+	max-height: calc(100dvh - 28px);
 	max-width: 440px;
 	overflow: hidden;
 	width: calc(100vw - 28px);
@@ -437,7 +437,6 @@
 
 .code_scan_use_photo:hover,
 .code_scan_type_instead:hover,
-.code_scan_cancel:hover,
 .code_scan_icon_button:hover {
 	opacity: 0.92;
 }
@@ -495,7 +494,6 @@ html.dark-mode .code_scan_review_validity.code_scan_review_valid {
 	color: #9fd4e8;
 }
 
-html.dark-mode .code_scan_cancel,
 html.dark-mode .code_scan_crop_rescan {
 	background: transparent;
 	border-color: #69B7CF;
@@ -543,23 +541,23 @@ html.dark-mode .code_scan_apply_crop {
 @media (max-width: 662px) {
 
 	#overlay:has(.code_scan_dialog) {
-		padding: 0 !important;
+		padding: 14px 0 !important;
 	}
 
 	#overlay > .code_scan_dialog,
 	.code_scan_dialog {
 		border: none;
-		border-radius: 0;
-		box-shadow: none;
+		border-radius: 12px;
+		box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
-		height: 100vh !important;
-		height: 100dvh !important;
-		inset: 0;
-		margin: 0 !important;
-		max-height: 100vh !important;
-		max-height: 100dvh !important;
+		height: calc(100vh - 28px) !important;
+		height: calc(100dvh - 28px) !important;
+		inset: 14px 0;
+		margin: auto !important;
+		max-height: calc(100vh - 28px) !important;
+		max-height: calc(100dvh - 28px) !important;
 		max-width: 100vw !important;
 		overscroll-behavior: none;
 		padding-bottom: env(safe-area-inset-bottom);
@@ -634,7 +632,7 @@ html.dark-mode .code_scan_apply_crop {
 
 
 /* Keep capture, adjustment and recognition in the same visual shell. */
-.code_scan_dialog { height: auto; min-height: min(780px, 100dvh); }
+.code_scan_dialog { height: auto; min-height: min(780px, calc(100dvh - 28px)); margin: 14px auto; }
 .code_scan_body { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 8px; }
 .code_scan_viewport {
  container-type: size; flex: 0 0 auto;

@@ -75,4 +75,4 @@ Manual verification: open the local app, scan or select a label, verify the city
 
 The current pixel detector targets complete, approximately axis-aligned borders. Faint, heavily blurred, rotated, perspective-skewed or partly cropped borders may need reframing or manual entry; no automatic perspective rectification is claimed.
 
-Scanner review reads the full-resolution captured image again to recover small title, segment and address text, retaining the live code if that read fails or chooses a different code. Recognized details expand automatically on a new card; the Address card icon can collapse or reveal the fields. Manual edits and the chosen expanded state survive re-reading the same card. The redundant bottom-right Close action is removed.
+Scanner review reads the full-resolution captured image again to recover small title, segment and address text, retaining the live code if that read fails or chooses a different code. Address details remain collapsed initially; the Address card icon can expand or collapse the fields. Manual edits and the chosen expanded state survive re-reading the same card. The redundant bottom-right Close action is removed.

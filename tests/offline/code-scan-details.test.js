@@ -27,21 +27,25 @@ function candidate(code = 'bengaluru mail nebula flower') {
 	} };
 }
 
-test('recognized details appear automatically and can collapse without discarding edits', () => {
+test('recognized details stay collapsed initially and can expand without discarding edits', () => {
 	const { context, nodes } = scanner();
 	context.populateCodeScanMetadata(candidate());
-	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'true');
-	assert.equal(nodes.code_scan_details.hidden, false);
-	assert.equal(nodes.code_scan_heading_details.hidden, false);
-	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'true');
+	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'false');
+	assert.equal(nodes.code_scan_details.hidden, true);
+	assert.equal(nodes.code_scan_heading_details.hidden, true);
 	assert.equal(nodes.code_scan_title.value, 'Ram');
 	assert.equal(nodes.code_scan_segment.value, 'Main door');
 	assert.equal(nodes.code_scan_address_line_1.value, '12 MG Road');
 	assert.equal(nodes.code_scan_address_line_2.value, 'Flat 4B, second floor');
+	context.toggleCodeScanDetails();
+	assert.equal(nodes.code_scan_details.hidden, false);
+	assert.equal(nodes.code_scan_heading_details.hidden, false);
+	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'true');
 	context.editCodeScanMetadata('address_line_2', 'Side entrance');
 	context.toggleCodeScanDetails();
 	assert.equal(nodes.code_scan_details.hidden, true);
 	assert.equal(nodes.code_scan_heading_details.hidden, true);
+	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'false');
 	assert.equal(context.codeScanState.reviewMetadata.address, '12 MG Road\n\nSide entrance');
 });
 
@@ -50,6 +54,7 @@ test('new OCR of the same card preserves edited fields including deliberate clea
 	const first = candidate();
 	context.populateCodeScanMetadata(first);
 	context.codeScanState.reviewMatch = first;
+	context.toggleCodeScanDetails();
 	context.editCodeScanMetadata('title', 'Office');
 	context.editCodeScanMetadata('segment', '');
 	const next = candidate(); next.metadata.address_line_1 = 'Corrected OCR address';
@@ -60,17 +65,18 @@ test('new OCR of the same card preserves edited fields including deliberate clea
 	assert.equal(nodes.code_scan_details.hidden, false);
 });
 
-test('a different code or card clears edits and shows its recognized details', () => {
+test('a different code or card clears edits and keeps details collapsed initially', () => {
 	for(const change of ['code', 'position']) {
 		const { context, nodes } = scanner();
 		const first = candidate();
 		context.populateCodeScanMetadata(first); context.codeScanState.reviewMatch = first;
-		context.editCodeScanMetadata('title', 'Office'); context.toggleCodeScanDetails();
+		context.toggleCodeScanDetails();
+		context.editCodeScanMetadata('title', 'Office');
 		const next = candidate(change === 'code' ? 'delhi cat apple tomato' : first.code);
 		if(change === 'position') next.regions.container = { x0: 500, y0: 500, x1: 900, y1: 700 };
 		context.populateCodeScanMetadata(next);
 		assert.equal(next.metadata.title, 'Ram');
-		assert.equal(nodes.code_scan_details.hidden, false);
+		assert.equal(nodes.code_scan_details.hidden, true);
 	}
 });
 

@@ -1024,7 +1024,7 @@ function populateCodeScanMetadata(match) {
 	metadata.address = codeScanOcrMatch.formatScanAddress(metadata);
 	codeScanState.reviewMetadata = metadata;
 	if(match) match.metadata = metadata;
-	if(!same) setCodeScanDetailsExpanded(Object.keys(metadata).some(function(key) { return !!metadata[key]; }));
+	if(!same) setCodeScanDetailsExpanded(false);
 }
 
 function editCodeScanMetadata(key, value) {

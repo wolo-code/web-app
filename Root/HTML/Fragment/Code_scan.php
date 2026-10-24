@@ -97,9 +97,6 @@
 				<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
 					<span class='image'><?php includeSVG('', 'Save'); ?></span>
 				</button>
-				<button id='code_scan_cancel' class='code_scan_icon_button code_scan_cancel' type='button' aria-label='Cancel' title='Cancel'>
-					<span class='image'><?php includeSVG('', 'Close'); ?></span>
-				</button>
 			</div>
 		</div>
 	</div>

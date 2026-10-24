@@ -191,16 +191,113 @@ test('capture keeps the detected code when full-frame OCR fails or finds another
  }
 });
 
-test('live capture fills review immediately without a second OCR read', () => {
+test('capture reads scaled bands when the code pass missed title, segment, and address', async () => {
+ const { context, canvas } = scanner();
+ const matcher = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
+ const container = { x0: 90, y0: 225, x1: 370, y1: 330 };
+ const card = { x0: 60, y0: 60, x1: 400, y1: 465 };
+ const bands = matcher.detailScanBands(container, card);
+ const match = {
+  code: 'bengaluru mail nebula flower',
+  regions: { container, card },
+  metadata: { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' }
+ };
+ const modes = [];
+ const seen = [];
+ context.codeScanOcrMatch = matcher;
+ canvas.width = 479; canvas.height = 812;
+ let crop;
+ context.document.createElement = () => ({ getContext: () => ({ fillRect() {}, drawImage(_image, x, y, width, height) {
+  crop = { x, y, width, height };
+ } }) });
+ context.codeScanState.worker = {
+  setParameters: async params => { modes.push(params.tessedit_pageseg_mode); },
+  recognize: async target => {
+   const band = bands.find(item => Math.round(item.x0) === crop.x && Math.round(item.y0) === crop.y);
+   seen.push(band && band.role);
+   const scale = target.height < 360 ? 4 : 3;
+   const place = (text, x0, y0, x1, y1) => ({ text, confidence: 96, bbox: {
+    x0: (x0 - band.x0) * scale, y0: (y0 - band.y0) * scale, x1: (x1 - band.x0) * scale, y1: (y1 - band.y0) * scale
+   } });
+   if(band.role === 'above') return { data: { words: [place('Ram', 180, 170, 230, 185), place('Main door', 170, 196, 260, 208)] } };
+   return { data: { words: [place('#43, 6th Main', 100, 350, 340, 365), place('Flat 4B', 120, 400, 220, 415)] } };
+  }
+ };
+ const detailed = await context.enrichCodeScanMetadata(canvas, match);
+ assert.deepEqual(seen, ['above', 'below']);
+ assert.deepEqual(modes, ['6', '11']);
+ assert.equal(detailed.code, 'bengaluru mail nebula flower');
+ assert.equal(detailed.metadata.title, 'Ram');
+ assert.equal(detailed.metadata.segment, 'Main door');
+ assert.equal(detailed.metadata.address_line_1, '#43, 6th Main');
+ assert.equal(detailed.metadata.address_line_2, 'Flat 4B');
+ assert.equal(detailed.regions.card, card);
+});
+
+test('capture reads bands around the code box when no outer card is printed', async () => {
+ const { context, canvas } = scanner();
+ const matcher = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
+ const container = { x0: 61, y0: 284, x1: 539, y1: 460 };
+ const match = {
+  code: 'bengaluru mail nebula flower',
+  regions: { container, card: null },
+  metadata: { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' }
+ };
+ const crops = [];
+ context.codeScanOcrMatch = matcher;
+ canvas.width = 609; canvas.height = 697;
+ context.document.createElement = () => ({ getContext: () => ({ fillRect() {}, drawImage(_image, x, y, width, height) {
+  crops.push({ x, y, width, height });
+ } }) });
+ context.codeScanState.worker = {
+  setParameters: async () => {},
+  recognize: async target => {
+   const crop = crops.at(-1);
+   const scale = target.height < 360 ? 4 : 3;
+   const place = (text, x0, y0, x1, y1) => ({ text, confidence: 96, bbox: {
+    x0: (x0 - crop.x) * scale, y0: (y0 - crop.y) * scale, x1: (x1 - crop.x) * scale, y1: (y1 - crop.y) * scale
+   } });
+   if(crop.y + crop.height <= container.y0) return { data: { words: [
+    place('Ram', 274, 200, 324, 212), place('Main door', 256, 232, 340, 245)
+   ] } };
+   return { data: { words: [
+    place('#43, 6th Main, Gaurav Nagar, Phase 7, J.P. Nagar', 84, 511, 511, 530),
+    place('Bengaluru, Karnataka, India - 560078', 135, 541, 461, 557)
+   ] } };
+  }
+ };
+ const detailed = await context.enrichCodeScanMetadata(canvas, match);
+ const above = crops.filter(crop => crop.y + crop.height <= container.y0);
+ const below = crops.filter(crop => crop.y >= container.y1);
+ assert.equal(above.length, 1);
+ assert.ok(above[0].y <= 200 && above[0].y + above[0].height >= 245 && above[0].y > 141);
+ assert.equal(below.length, 1);
+ assert.ok(below[0].y <= 511 && below[0].y + below[0].height >= 557 && below[0].y + below[0].height < 615);
+ assert.equal(detailed.regions.card, null);
+ assert.equal(detailed.metadata.title, 'Ram');
+ assert.equal(detailed.metadata.segment, 'Main door');
+ assert.equal(detailed.metadata.address_line_1, '#43, 6th Main, Gaurav Nagar, Phase 7, J.P. Nagar');
+ assert.equal(detailed.metadata.address_line_2, 'Bengaluru, Karnataka, India - 560078');
+});
+
+test('live capture rereads the full-resolution card for optional text', async () => {
  const { context } = scanner();
  for(const name of ['clearCodeScanTimer', 'setCodeScanCaptureEnabled', 'setCodeScanLiveControlsVisible',
   'setCodeScanPhotoFallbackVisible', 'clearCodeScanCandidateHighlight', 'setCodeScanWoloFoundCue',
   'stopCodeScanCamera', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible', 'playShutterSound'])
   context[name] = () => {};
- context.processCodeScanCapture = () => { throw new Error('Unexpected second OCR read'); };
  const detected = { code: 'apple berry cherry' };
+ const complete = { code: detected.code, metadata: { title: 'Home', segment: 'Main door', address_line_1: '12 MG Road', address_line_2: 'Flat 4B' } };
+ let reads = 0;
+ context.codeScanState.worker = { recognize: async input => {
+  assert.equal(input, context.getCodeScanCanvas()); reads++;
+  return { match: complete };
+ } };
  context.beginCodeScanCapture(detected);
- assert.equal(context.reviewMatch, detected);
+ await new Promise(resolve => setImmediate(resolve));
+ assert.equal(reads, 1);
+ assert.equal(context.reviewMatch, complete);
+ assert.equal(context.reviewMatch.metadata.address_line_2, 'Flat 4B');
  assert.equal(context.codeScanState.processing, false);
  assert.equal(context.codeScanState.hasCaptured, true);
 });

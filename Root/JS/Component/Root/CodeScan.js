@@ -84,7 +84,6 @@ function initCodeScan() {
 	});
 	initCodeScanRegionPress();
 	bindControl('code_scan_save', 'click', saveCodeScanReview);
-	bindControl('code_scan_cancel', 'click', closeCodeScan);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_zoom_out', 'click', zoomOutCodeScan);
 	bindControl('code_scan_zoom_in', 'click', zoomInCodeScan);
@@ -682,6 +681,122 @@ function extractMatchFromOcrResult(result) {
 	return codeScanOcrMatch.matchOcrRegionsToWoloCode(result, wordList.includes.bind(wordList), wordList.curList);
 }
 
+function detailBandScale(height) {
+	return height < 100 ? 4 : 3;
+}
+
+function ocrCodeScanBand(canvas, band) {
+	var x0 = Math.max(0, Math.round(band.x0));
+	var y0 = Math.max(0, Math.round(band.y0));
+	var x1 = Math.min(canvas.width || 0, Math.round(band.x1));
+	var y1 = Math.min(canvas.height || 0, Math.round(band.y1));
+	var width = x1 - x0;
+	var height = y1 - y0;
+	var scale;
+	var target;
+	var ctx;
+	if(width < 20 || height < 12 || !codeScanState.worker) return Promise.resolve([]);
+	scale = detailBandScale(height);
+	target = document.createElement('canvas');
+	target.width = Math.round(width * scale);
+	target.height = Math.round(height * scale);
+	ctx = target.getContext('2d');
+	if(!ctx) return Promise.resolve([]);
+	ctx.fillStyle = '#ffffff';
+	ctx.fillRect(0, 0, target.width, target.height);
+	ctx.imageSmoothingEnabled = true;
+	ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(canvas, x0, y0, width, height, 0, 0, target.width, target.height);
+	return codeScanState.worker.recognize(target).then(function(result) {
+		var words = result && result.data && result.data.words || [];
+		return words.map(function(word) {
+			var box = word && word.bbox;
+			if(!word || !box) return null;
+			return {
+				text: word.text,
+				confidence: word.confidence,
+				bbox: {
+					x0: x0 + box.x0 / scale,
+					y0: y0 + box.y0 / scale,
+					x1: x0 + box.x1 / scale,
+					y1: y0 + box.y1 / scale
+				}
+			};
+		}).filter(Boolean);
+	});
+}
+
+function headingRowCount(words, match) {
+	var read = codeScanOcrMatch.readLabelMetadata(words, match.regions.container, match.regions.card);
+	return (read.metadata.title ? 1 : 0) + (read.metadata.segment ? 1 : 0);
+}
+
+function addressLineCount(words, match) {
+	var read = codeScanOcrMatch.readLabelMetadata(words, match.regions.container, match.regions.card);
+	return (read.metadata.address_line_1 ? 1 : 0) + (read.metadata.address_line_2 ? 1 : 0);
+}
+
+function withCodeScanDetailSegmentation(work) {
+	var worker = codeScanState.worker;
+	if(!worker || typeof worker.setParameters !== 'function') return Promise.resolve([]);
+	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(work).then(function(value) {
+		return worker.setParameters({ tessedit_pageseg_mode: '11' }).then(function() { return value; });
+	}, function(error) {
+		return worker.setParameters({ tessedit_pageseg_mode: '11' }).then(function() { throw error; });
+	});
+}
+
+function enrichCodeScanMetadata(canvas, match) {
+	var keys = ['title', 'segment', 'address_line_1', 'address_line_2'];
+	var bands;
+	var extra;
+	var headingRows;
+	var addressRows;
+	var syntheticCard = false;
+	function finish(value) {
+		if(syntheticCard) match.regions.card = null;
+		return value;
+	}
+	if(!canvas || !match || !match.regions || !match.regions.container) return Promise.resolve(match);
+	// No printed card: read nearest bands around the code box. This rect is not stored or highlighted.
+	if(!match.regions.card && canvas.width && canvas.height) {
+		match.regions.card = {
+			x0: Math.max(0, match.regions.container.x0),
+			y0: 0,
+			x1: Math.min(canvas.width, match.regions.container.x1),
+			y1: canvas.height
+		};
+		syntheticCard = true;
+	}
+	if(!match.regions.card) return Promise.resolve(match);
+	if(!codeScanState.worker || typeof codeScanState.worker.setParameters !== 'function') return Promise.resolve(finish(match));
+	if(keys.every(function(key) { return match.metadata && match.metadata[key]; })) return Promise.resolve(finish(match));
+	bands = codeScanOcrMatch.detailScanBands(match.regions.container, match.regions.card);
+	if(!bands.length) return Promise.resolve(finish(match));
+	extra = [];
+	headingRows = 0;
+	addressRows = 0;
+	return withCodeScanDetailSegmentation(function() {
+		var chain = Promise.resolve();
+		bands.forEach(function(band) {
+			chain = chain.then(function() {
+				if(band.role === 'above' && headingRows >= 2) return;
+				if(band.role === 'below' && addressRows >= 2) return;
+				return ocrCodeScanBand(canvas, band).then(function(words) {
+					extra = extra.concat(words);
+					if(band.role === 'above') headingRows = headingRowCount(extra, match);
+					if(band.role === 'below') addressRows = addressLineCount(extra, match);
+				});
+			});
+		});
+		return chain.then(function() { return extra; });
+	}).then(function(words) {
+		return finish(codeScanOcrMatch.fillLabelMetadata(match, words));
+	}).catch(function() {
+		return finish(match);
+	});
+}
+
 function extractGuidanceFromOcrResult(result, canvas) {
 	var match = extractMatchFromOcrResult(result);
 	var bbox;
@@ -806,12 +921,7 @@ function beginCodeScanCapture(detectedMatch) {
 	setCodeScanCropControlsVisible(true);
 	setCodeScanStatus('Reading label on your device...');
     playShutterSound();
-	if(detectedMatch) {
-		codeScanState.processing = false;
-		showCodeScanReview(detectedMatch);
-	}
-	else
-		processCodeScanCapture();
+	processCodeScanCapture(detectedMatch);
 }
 
 function processCodeScanCapture(detectedMatch) {
@@ -826,10 +936,21 @@ function processCodeScanCapture(detectedMatch) {
 	}
 	ocrCanvas = canvas;
 	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
+		if(!codeScanState.active)
+			return null;
+		var match = extractMatchFromOcrResult(result);
+		if(detectedMatch && (!match || match.code !== detectedMatch.code)) match = detectedMatch;
+		if(match && detectedMatch && match !== detectedMatch && detectedMatch.metadata) {
+			match.metadata = match.metadata || {};
+			['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+				if(!match.metadata[key]) match.metadata[key] = detectedMatch.metadata[key] || '';
+			});
+		}
+		return enrichCodeScanMetadata(ocrCanvas, match);
+	}).then(function(match) {
 		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
-		var match = detectedMatch || extractMatchFromOcrResult(result);
 		showCodeScanReview(match);
 		if(!match) setCodeScanStatus('');
 	}).catch(function() {
@@ -903,6 +1024,7 @@ function populateCodeScanMetadata(match) {
 	metadata.address = codeScanOcrMatch.formatScanAddress(metadata);
 	codeScanState.reviewMetadata = metadata;
 	if(match) match.metadata = metadata;
+	if(!same) setCodeScanDetailsExpanded(Object.keys(metadata).some(function(key) { return !!metadata[key]; }));
 }
 
 function editCodeScanMetadata(key, value) {
@@ -1243,14 +1365,17 @@ function handleCodeScanPhotoInput(event) {
 	prepareCodeScanWorker().then(function() {
 		return recognizeCodeScanPhoto(file);
 	}).then(function(result) {
-		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
 		setCodeScanFrozenPreview(true);
 		setCodeScanCropControlsVisible(true);
 		var photoCanvas = getCodeScanCanvas();
-		var rawCanvas = codeScanState.originalSourceCanvas || photoCanvas;
 		var match = extractMatchFromOcrResult(result);
+		return enrichCodeScanMetadata(photoCanvas, match);
+	}).then(function(match) {
+		codeScanState.processing = false;
+		if(!codeScanState.active || match === undefined)
+			return;
 		showCodeScanReview(match);
 		if(!match) setCodeScanStatus('');
 	}).catch(function() {
@@ -1784,14 +1909,17 @@ function applyCodeScanCrop() {
 		if(!codeScanState.active) return;
 		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 		var match = extractMatchFromOcrResult(result);
-		if(match) {
-			showCodeScanReview(match);
-			setCodeScanStatus('Label recognized. Check the city and words.');
-		}
-		else {
-			setCodeScanPhase('review');
-			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
-		}
+		return enrichCodeScanMetadata(source, match).then(function(detailed) {
+			if(!codeScanState.active || revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
+			if(detailed) {
+				showCodeScanReview(detailed);
+				setCodeScanStatus('Label recognized. Check the city and words.');
+			}
+			else {
+				setCodeScanPhase('review');
+				setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
+			}
+		});
 	}).catch(function() {
 		if(!codeScanState.active) return;
 		setCodeScanPhase('review');

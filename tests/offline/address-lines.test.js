@@ -150,7 +150,7 @@ test('QR fields preserve address boundaries and compare formatted bookmarks', ()
 
 test('opening a saved address carries both lines to the map panel, reopened form, and address QR', () => {
  const { context: c, fields } = harness();
- fields.address_text_content = { innerText: '' };
+ fields.address_text_content = { innerText: '', get textContent() { return this.innerText; }, set textContent(v) { this.innerText = v; } };
  c.address_text_content = fields.address_text_content;
  c.getAddressPanel = () => ({ classList: { remove() {} } });
  c.setAddressPanelHeading = () => {};

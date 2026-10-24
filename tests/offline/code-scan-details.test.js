@@ -27,12 +27,10 @@ function candidate(code = 'bengaluru mail nebula flower') {
 	} };
 }
 
-test('address icon reveals four separate optional fields and collapses without discarding edits', () => {
+test('recognized details appear automatically and can collapse without discarding edits', () => {
 	const { context, nodes } = scanner();
 	context.populateCodeScanMetadata(candidate());
-	assert.equal(nodes.code_scan_details.hidden, true);
-	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'false');
-	context.toggleCodeScanDetails();
+	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'true');
 	assert.equal(nodes.code_scan_details.hidden, false);
 	assert.equal(nodes.code_scan_heading_details.hidden, false);
 	assert.equal(nodes.code_scan_details_toggle.attributes['aria-expanded'], 'true');
@@ -54,7 +52,6 @@ test('new OCR of the same card preserves edited fields including deliberate clea
 	context.codeScanState.reviewMatch = first;
 	context.editCodeScanMetadata('title', 'Office');
 	context.editCodeScanMetadata('segment', '');
-	context.toggleCodeScanDetails();
 	const next = candidate(); next.metadata.address_line_1 = 'Corrected OCR address';
 	context.populateCodeScanMetadata(next);
 	assert.equal(next.metadata.title, 'Office');
@@ -63,7 +60,7 @@ test('new OCR of the same card preserves edited fields including deliberate clea
 	assert.equal(nodes.code_scan_details.hidden, false);
 });
 
-test('a different code or a different card clears edits and collapses optional details', () => {
+test('a different code or card clears edits and shows its recognized details', () => {
 	for(const change of ['code', 'position']) {
 		const { context, nodes } = scanner();
 		const first = candidate();
@@ -73,7 +70,7 @@ test('a different code or a different card clears edits and collapses optional d
 		if(change === 'position') next.regions.container = { x0: 500, y0: 500, x1: 900, y1: 700 };
 		context.populateCodeScanMetadata(next);
 		assert.equal(next.metadata.title, 'Ram');
-		assert.equal(nodes.code_scan_details.hidden, true);
+		assert.equal(nodes.code_scan_details.hidden, false);
 	}
 });
 

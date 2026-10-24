@@ -173,6 +173,43 @@ test('title and segment may sit high above a shallow code box within the card', 
 	assert.equal(result.metadata.segment, 'Main door');
 });
 
+test('detail bands stay inside the card, nearest strips above and below the code first', () => {
+	const bands = matcher.detailScanBands(box, card);
+	const below = bands.filter(band => band.role === 'below');
+	assert.equal(bands[0].role, 'above');
+	assert.ok(bands[0].y1 <= box.y0);
+	assert.ok(bands[0].y0 <= 176 && bands[0].y1 >= 208);
+	assert.ok(bands[0].y0 > 130);
+	assert.ok(below.length > 1);
+	assert.ok(below[0].y0 >= box.y1 && below[0].y0 < below[1].y0);
+	assert.ok(below[0].y1 < card.y1 - 2);
+	below.forEach(band => {
+		assert.ok(band.y1 <= card.y1);
+		assert.ok(band.x0 >= card.x0 && band.x1 <= card.x1);
+	});
+	assert.equal(matcher.detailScanBands(box, null).length, 0);
+});
+
+test('band text fills a blank title, segment, and address and does not replace the code', () => {
+	const found = match([word('Bengaluru', 110, 245, 200, 263), ...codeWords()]);
+	assert.equal(found.metadata.title, '');
+	matcher.fillLabelMetadata(found, [
+		word('Ram', 180, 170, 230, 185), word('Main', 170, 196, 210, 208), word('door', 214, 196, 260, 208),
+		word('#43, 6th Main, Gaurav Nagar', 100, 350, 360, 365),
+		word('Bengaluru, Karnataka, India - 560078', 120, 400, 340, 415),
+		word('www.wolo.codes', 160, 440, 300, 452, 90)
+	]);
+	assert.equal(found.code, 'bengaluru mail nebula flower');
+	assert.equal(found.metadata.title, 'Ram');
+	assert.equal(found.metadata.segment, 'Main door');
+	assert.equal(found.metadata.address_line_1, '#43, 6th Main, Gaurav Nagar');
+	assert.equal(found.metadata.address_line_2, 'Bengaluru, Karnataka, India - 560078');
+	const kept = match([word('Home', 180, 170, 230, 185), ...codeWords()]);
+	matcher.fillLabelMetadata(kept, [word('Ram', 180, 150, 230, 165)]);
+	assert.equal(kept.metadata.title, 'Home');
+	assert.equal(kept.metadata.segment, '');
+});
+
 test('address line 2 on its own has no leading blank paragraph', () => {
 	assert.equal(matcher.formatScanAddress({ address_line_1: '', address_line_2: 'Flat 4B' }), 'Flat 4B');
 	assert.equal(matcher.formatScanAddress({ address_line_1: '  ', address_line_2: ' Flat 4B ' }), 'Flat 4B');

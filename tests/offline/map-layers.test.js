@@ -570,7 +570,7 @@ test('Wolo Code Input View has first-launch icon captions', () => {
 	assert.match(decodeCss, /--app-background-wcode/);
 	assert.match(decodeCss, /#location_button \{[\s\S]*width:\s*39px/);
 	assert.doesNotMatch(rootCss, /body:not\(\.decode\) #action_menu_info/);
-	assert.match(rootCss, /body:not\(\.decode\) #action_menu_decode \{[\s\S]*left:\s*51px/);
+	assert.match(rootCss, /#action_menu_decode \{[\s\S]*left:\s*62px/);
 	assert.match(decodeNarrowCss, /max-width:\s*662px/);
 });
 

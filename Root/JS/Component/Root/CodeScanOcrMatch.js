@@ -323,6 +323,65 @@
 		return { metadata: metadata, regions: regions };
 	}
 
+	// Sparse OCR reads the three code words and misses the smaller type outside the box.
+	// Bands stay inside the card: short strips above and below the box, nearest first.
+	function detailScanBands(container, card) {
+		var bands = [];
+		var widthInset = 6;
+		var x0;
+		var x1;
+		var boxHeight;
+		var bandHeight;
+		var yBottom;
+		var yTop;
+		var guard = 0;
+		var belowTop;
+		var belowBottom;
+		if(!container || !card) return bands;
+		x0 = card.x0 + widthInset;
+		x1 = card.x1 - widthInset;
+		if(x1 - x0 < 20) return bands;
+		boxHeight = container.y1 - container.y0;
+		bandHeight = Math.max(36, Math.round(boxHeight * 0.75));
+		yBottom = container.y0 - 2;
+		while(yBottom - card.y0 > 10 && guard < 4) {
+			yTop = Math.max(card.y0 + 2, yBottom - bandHeight);
+			if(yBottom - yTop >= 12) bands.push({ x0: x0, y0: yTop, x1: x1, y1: yBottom, role: 'above' });
+			if(yTop <= card.y0 + 2) break;
+			yBottom = yTop;
+			guard += 1;
+		}
+		belowTop = container.y1 + 2;
+		guard = 0;
+		while(card.y1 - belowTop > 10 && guard < 4) {
+			belowBottom = Math.min(card.y1 - 2, belowTop + bandHeight);
+			if(belowBottom - belowTop >= 12) bands.push({ x0: x0, y0: belowTop, x1: x1, y1: belowBottom, role: 'below' });
+			if(belowBottom >= card.y1 - 2) break;
+			belowTop = belowBottom;
+			guard += 1;
+		}
+		return bands;
+	}
+
+	function fillLabelMetadata(match, extraWords) {
+		var read;
+		var keys;
+		var i;
+		if(!match || !match.regions || !match.regions.container || !match.regions.card || !extraWords || !extraWords.length) return match;
+		read = extractLabelMetadata(extraWords, match.regions.container, match.regions.card);
+		if(!match.metadata) match.metadata = { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' };
+		keys = ['title', 'segment', 'address_line_1', 'address_line_2'];
+		for(i = 0; i < keys.length; i++) {
+			if(!match.metadata[keys[i]] && read.metadata[keys[i]]) {
+				match.metadata[keys[i]] = read.metadata[keys[i]];
+				match.regions[keys[i]] = read.regions[keys[i]];
+			}
+		}
+		match.metadata.address = formatScanAddress(match.metadata);
+		match.regions.address = unionBboxes([match.regions.address_line_1, match.regions.address_line_2]);
+		return match;
+	}
+
 	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
 		var words = result && result.data && result.data.words;
 		var containers = result && result.data && result.data.labelContainers;
@@ -724,6 +783,9 @@
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		detectLabelRectangles: detectLabelRectangles,
+		detailScanBands: detailScanBands,
+		readLabelMetadata: extractLabelMetadata,
+		fillLabelMetadata: fillLabelMetadata,
 		formatScanAddress: formatScanAddress,
 		splitMatchForReview: splitMatchForReview,
 		buildCodeFromReview: buildCodeFromReview,

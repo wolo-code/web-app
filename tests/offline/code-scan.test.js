@@ -18,7 +18,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	const codeScan = read('Root/JS/Component/Root/CodeScan.js');
 	const css = read('Root/CSS/Component/Root/Base/CodeScan.css');
 	assert.match(index, /id='decode_code_scan_button'/);
-	assert.doesNotMatch(index, /id='map_code_scan_button'/);
+	assert.match(index, /id='map_code_scan_button'/);
 	assert.match(index, /includeSVG\('', 'Camera'\)/);
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
@@ -35,7 +35,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.doesNotMatch(fragment, /Enter three valid Wolo words/);
 	assert.doesNotMatch(fragment, /id='code_scan_use_code'/);
 	assert.match(fragment, /id='code_scan_rescan'/);
-	assert.match(fragment, /id='code_scan_cancel'/);
+	assert.doesNotMatch(fragment, /id='code_scan_cancel'/);
 	assert.doesNotMatch(fragment, /id='code_scan_mode_fixed'/);
 	assert.doesNotMatch(fragment, /id='code_scan_mode_general'/);
 	assert.match(fragment, /includeSVG\('', 'Gallery'\)/);
@@ -95,7 +95,6 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(css, /\.code_scan_zoom_button/);
 	assert.match(css, /\.code_scan_apply_crop/);
 	assert.match(css, /\.code_scan_crop_rescan/);
-	assert.match(css, /\.code_scan_cancel/);
 	assert.match(css, /\.code_scan_review_input[\s\S]*border-bottom:\s*1px/);
 	assert.match(css, /@media\s*\(max-width:\s*662px\)[\s\S]*\.code_scan_review_actions[\s\S]*flex-direction:\s*row-reverse/);
 });

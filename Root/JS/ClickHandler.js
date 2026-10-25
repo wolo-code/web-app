@@ -16,10 +16,14 @@ ClickEventHandler.prototype.handleClick = function(event) {
 		if(pacInput)
 			pacInput.focus();
 	}
-	if (event.placeId) {
-		// Calling e.stop() on the event prevents the default info window from showing.
-		// If you call stop here when there is no placeId you will prevent some other map click event handlers from receiving the event.
+	// Raster/Apple layers share Google's event surface, but its POIs belong
+	// only to the Google basemap. Other sources resolve the clicked coordinate.
+	var layer = typeof getCurrentMapLayer === 'function' ? getCurrentMapLayer() : 'roadmap';
+	if(event.placeId) {
+		// Suppress Google's default place popup on every source.
 		event.stop();
+	}
+	if (event.placeId && (layer === 'roadmap' || layer === 'satellite')) {
 		this.getPlaceInformation(event.placeId);
 	}
 	else {

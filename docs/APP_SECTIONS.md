@@ -339,3 +339,7 @@ Scanner card and optional details: detect the inner Wolo code box and the whole 
 Scanner review uses an outlined card icon with two horizontal lines starting from 30% width for Address details; the city chooser retains its two-line List icon so the actions have distinct silhouettes.
 
 Scanner review reads the full-resolution captured image again to recover small title, segment and address text, retaining the live code if that read fails or chooses a different code. Address details remain collapsed initially; the Address card icon can expand or collapse the fields. Manual edits and the chosen expanded state survive re-reading the same card. The redundant bottom-right Close action is removed.
+
+## Map and location lifecycle
+
+Location Wolo Label View remains open across background service-worker updates. New page assets apply on the next navigation or manual refresh. Completed/superseded Location Accuracy Indicator sessions ignore queued geolocation callbacks. Entering Wolo Code Input View or another map source hides the Apple Maps stage, including when MapKit finishes loading later. Hidden Google POIs do not replace coordinate-selected results on non-Google maps.

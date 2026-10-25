@@ -92,6 +92,7 @@ function noteWatchAccuracy(accuracy, pos) {
 	return countPoorAccuracySample();
 }
 
+var locateWatchSession = 0;
 var locateDidFocus = false;
 var locateLoaderHeld = false;
 
@@ -166,6 +167,7 @@ function locateExec(failure) {
 		showLocateWatchLoader();
 		if (navigator.geolocation) {
 			locating = true;
+			var watchSession = ++locateWatchSession;
 			locateDidFocus = false;
 			resetPoorAccuracyStreak();
 			if(myLocDot)
@@ -193,6 +195,8 @@ function locateExec(failure) {
 			watch_location_id = navigator.geolocation.watchPosition(
 				
 				function(position) {
+					if(!locating || watchSession !== locateWatchSession)
+						return;
 
 					var WATCH_LOCATION_MIN_ACCURACY = 10;
 					setLocationAccess(true);
@@ -257,12 +261,14 @@ function locateExec(failure) {
 
 				},
 				function(error) {
-					if(error.code = error.PERMISSION_DENIED) {
+					if(!locating || watchSession !== locateWatchSession)
+						return;
+					if(error.code === error.PERMISSION_DENIED) {
 						clearLocating(true);
 						showNotification(LOCATION_PERMISSION_DENIED);
 						setLocationAccess(false);
-						popLoader();
-						failure();
+						if(typeof failure === 'function')
+							failure();
 					}
 					else
 						handleLocationError(true);
@@ -393,6 +399,11 @@ function handleLocationError(browserHasGeolocation) {
 }
 
 function clearLocating(hideAccuracyContainer) {
+	// Ignore queued callbacks from a completed or superseded location watch.
+	locateWatchSession++;
+	clearTimeout(watch_location_timer);
+	if(navigator.geolocation)
+		navigator.geolocation.clearWatch(watch_location_id);
 	if(hideAccuracyContainer)
 		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	locating = false;

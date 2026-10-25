@@ -20,11 +20,8 @@ function requestServiceWorkerUpdate(registration) {
 }
 
 if ('serviceWorker' in navigator) {
-	// A worker taking control for the first time does not require a reload: the
-	// current page already came from the network. Only reload pages that began
-	// under an older controller and need to switch to an updated worker.
-	var hadServiceWorkerControllerAtLoad = !!navigator.serviceWorker.controller;
-
+	// Worker updates affect future requests. Keep the current UI and result alive;
+	// new page assets take effect on the next user navigation or refresh.
 	window.addEventListener('load', function() {
 		sessionStorage.removeItem('wolo_sw_reloading');
 		navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(function(registration) {
@@ -54,17 +51,6 @@ if ('serviceWorker' in navigator) {
 			return requestServiceWorkerUpdate(registration);
 		}).then(function() {}, function(err) {
 			ignoreServiceWorkerRegistrationError(err);
-		});
-
-		navigator.serviceWorker.addEventListener('controllerchange', function() {
-			if (!hadServiceWorkerControllerAtLoad) {
-				return;
-			}
-			if (sessionStorage.wolo_sw_reloading === '1') {
-				return;
-			}
-			sessionStorage.wolo_sw_reloading = '1';
-			window.location.reload();
 		});
 	});
 }

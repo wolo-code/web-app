@@ -475,7 +475,7 @@ function scheduleAppleMapFollow() {
 
 function createAppleMap() {
 	var el = getAppleMapElement();
-	if(!el || typeof mapkit === 'undefined') {
+	if(!el || typeof mapkit === 'undefined' || getCurrentMapLayer() !== MAP_LAYER_APPLE) {
 		return;
 	}
 	showAppleMapStage();
@@ -745,6 +745,7 @@ function syncOsmAttribution() {
 }
 
 function clearMapViewClasses() {
+	hideAppleMapStage();
 	document.body.classList.remove.apply(document.body.classList, MAP_VIEW_CLASSES);
 }
 

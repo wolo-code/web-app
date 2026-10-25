@@ -101,3 +101,5 @@ CI runs the same suite in `.github/workflows/offline-tests.yml`.
 ## FAQ note
 
 Older FAQ copy stated the web app lacked offline caching. With this work, the PWA shell, cached word list, cached cities, last-area map tiles, and offline save queue are supported within the limits above. Firebase Auth and worldwide offline maps are still out of scope.
+
+Background worker updates do not reload the active page or discard location/decode results. Newly baked page assets take effect on the next navigation or manual refresh.

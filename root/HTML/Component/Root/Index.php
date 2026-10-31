@@ -29,7 +29,7 @@
 			<input id='pac-input' data-suggest='map_input_suggestion_result' data-handler='decode_button' class='controls' type='text' placeholder='' tabindex='3' pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?' >
 			<span class='decode_icon_caption decode_chrome_caption' data-guide-id='search' aria-hidden='true'>Search</span>
 			<button id='map_code_scan_button' class='control' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label'>
-				<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+				<span class='image'><?php includeSVG('', 'Scan'); ?></span>
 				<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Scan</span>
 			</button>
 		</div>
@@ -71,7 +71,7 @@
 </div>
 <div id='decode_scan_area'>
 	<button id='decode_code_scan_button' class='control' type='button' aria-label='Scan Wolo Code label' title='Scan Wolo Code label' tabindex='5'>
-		<span class='image'><?php includeSVG('', 'Camera'); ?></span>
+		<span class='image'><?php includeSVG('', 'Scan'); ?></span>
 		<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Scan</span>
 	</button>
 </div>

@@ -19,7 +19,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	const css = read('Root/CSS/Component/Root/Base/CodeScan.css');
 	assert.match(index, /id='decode_code_scan_button'/);
 	assert.match(index, /id='map_code_scan_button'/);
-	assert.match(index, /includeSVG\('', 'Camera'\)/);
+	assert.match(index, /includeSVG\('', 'Scan'\)/);
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
 	assert.match(fragment, /id='code_scan_video'/);

@@ -111,7 +111,7 @@ Opening a QR label safely skips closing a missing copy-code dialog, including wh
 | `Info.svg` | Info action on Wolo Code Input View. |
 | `Location.svg` | Current-location action on the map. |
 | `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
-| `Camera.svg` | On-device label Scan action on Wolo Code Input View and Map View. |
+| `Scan.svg` | On-device label Scan action on Wolo Code Input View and Map View. |
 | `Gallery.svg` | Photo picker action flanking the shutter button on Wolo Code Scan Dialog. |
 | `Keyboard.svg` | Typing fallback action flanking the shutter button on Wolo Code Scan Dialog. |
 | `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |

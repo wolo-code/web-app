@@ -39,4 +39,9 @@
 			</div>
 		</div>
 	</div>
+	<div id='address_region_controls'>
+		<label for='address_region_select'>Code reference</label>
+		<select id='address_region_select' aria-label='Choose city or named region'></select>
+		<button type='button' id='address_propose_city' class='border'>Propose a city</button>
+	</div>
 </div>

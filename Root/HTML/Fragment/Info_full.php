@@ -39,6 +39,7 @@
 	</div>
 	
 	<div id='wolo_about'>
+		<p><button id='info_propose_city' type='button' class='border'>Propose a city</button></p>
 		<a class='link' href='https://wolo.codes/about'>wolo.codes/about</a>
 	</div>
 	

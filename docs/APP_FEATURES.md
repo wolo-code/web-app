@@ -1,5 +1,15 @@
 # App Features
 
+## Named regions and city proposals
+
+- City-based three-word codes retain their existing origins and encoding. Unavailable or out-of-range cities can fall back to a named region and compact local anchor index using the same word codec.
+- The bundled frozen v1 registry activates 321 source-matched regions; 160 additional names remain pending. Twelve fallback namespaces cover every half-degree global tile. Overlapping region/index references can share one center and identical three words.
+- Address Panel's **Code reference** selector switches between available regional alternatives. Regional links, previous contexts, and saved addresses resolve locally, including offline. See the app's `docs/REGIONAL_ANCHORS.md` for fixed geometry conventions, provenance, polar handling, and compatibility.
+- **Propose a city** in full Info view and Address Panel accepts a city name, optional country/region, and optional selected map location. It writes a request without automatically creating a city.
+- After the request is acknowledged, the user's email composer opens to support@wolo.codes with `Wolo add city request <request-id>` in the subject and editable details in the body. The saved request ID and **Add details by email** fallback remain visible. Failed writes do not announce success or open drafts; duplicate in-flight clicks are ignored.
+- The admin request console supports proposals without coordinates; the reviewer selects a center. Admin notification subjects also include the request ID.
+
+
 Bottom notifications remain visible above modal dialogs and their dimmed overlay, including feedback from modal actions.
 
 Use this file as a feature-level map of the Wolo Code root app. Pair it with `APP_SECTIONS.md` for screen/state naming.

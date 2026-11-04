@@ -4,7 +4,9 @@ This document describes the Wolo Code web app runtime architecture and the main 
 
 ## Overview
 
-Wolo Code is a Firebase-hosted PHP/JavaScript web app for encoding and decoding exact city-based locations into three-word codes. The browser app renders the main location workflows, talks directly to Firebase Realtime Database for most app data, and calls Firebase/Google Cloud Functions for server-side tasks such as IP city lookup and city creation.
+Wolo Code is a Firebase-hosted PHP/JavaScript web app for encoding and decoding city-based locations and named-region anchors into three-word codes. The browser app renders the main location workflows, talks directly to Firebase Realtime Database for most app data, and calls Firebase/Google Cloud Functions for server-side tasks such as IP city lookup and city creation.
+
+Named-region anchors use the bundled immutable registry and the existing relative-coordinate codec. Regional references also resolve through the existing city lookup interfaces for bookmarks and offline history. See [REGIONAL_ANCHORS.md](REGIONAL_ANCHORS.md) for mapping, geometry, and city-proposal/email details.
 
 ## Runtime Boundaries
 

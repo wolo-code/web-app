@@ -16,6 +16,7 @@ function setCode(city, wcode, latLng) {
 	code_postition = latLng;
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng);
+	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 }
 
 function clearCode() {
@@ -24,10 +25,14 @@ function clearCode() {
 }
 
 function getCodeComplete() {
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+		return [code_city.name_id].concat(code_wcode);
 	return [].concat(code_city.country.toLowerCase(), [getCodeCityGroupName().toLowerCase()], code_city.name_id, code_wcode);
 }
 
 function getCodeFull() {
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+		return [code_city.name_id].concat(code_wcode);
 	var codeFull_city_part = [code_city.name_id].concat(code_wcode);
 	var prefix;
 
@@ -45,6 +50,8 @@ function getCodeFull() {
 }
 
 function getCodeFull_capitalized() {
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+		return [code_city.name].concat(code_wcode);
 	var codeFull_city_part = [code_city.name].concat(code_wcode);
 	var prefix;
 

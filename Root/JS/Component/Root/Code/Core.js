@@ -11,6 +11,13 @@ function encode(position, locating_encode) {
 	var session_id;
 	session_id = encode_session_id = Date.now();
 	clearCode();
+	if(typeof isOfflineMode === 'function' && isOfflineMode()) {
+		if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.center && !isRegionAnchor(selected_decode_city)) {
+			encode_(selected_decode_city, position);
+			return;
+		}
+		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) return;
+	}
 	getAddress(position, session_id, function(address_components) {
 	
 			var city_gp_id = getCityGpId(address_components);
@@ -61,28 +68,9 @@ function encode_continue(city, position) {
 	encode_session_id = Date.now();
 	var session_id = encode_session_id;
 	if(city == null) {
-		if(!pendingCity) {
-			pendingPosition = position;
-			getAddress(position, session_id, function(address_components) {
-				 var city_gp_id = getCityGpId(address_components);
-				 if(city_gp_id != null)
-					 sessionForwarder(session_id, function() {
-						 addCity(city_gp_id, function(city_id) {
-							 sessionForwarder(session_id, function() {
-								 getCityFromId(city_id, function(city) {
-									 sessionForwarder(session_id, function() {
-										 getCityCenterFromId(city, function(city) {
-											 sessionForwarder(session_id, function() {
-												 encode_(city, position, session_id);
-											 });
-										 });
-									 });
-								 });
-							 });
-						 });
-					 });
-			 });
-		}
+		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position))
+			return;
+		areaNotCovered(position);
 	}
 	else {
 		if(pendingCity) {
@@ -111,7 +99,6 @@ function getCityGpId(address_components) {
 	if(found_city_i != null)
 		return address_components[found_city_i].place_id;
 	else {
-		noCity(latLng_p);
 		return null;
 	}
 }

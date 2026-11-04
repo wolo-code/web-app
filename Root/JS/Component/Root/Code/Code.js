@@ -55,13 +55,16 @@ function encode_(city, position) {
 		areaNotCovered(position);
 		return;
 	}
-	const cityBegin = getCityBegin(city.center);
+	const cityBegin = typeof getWoloAnchorBegin === 'function' ? getWoloAnchorBegin(city) : getCityBegin(city.center);
 	if(!cityBegin) {
 		areaNotCovered(position);
 		return;
 	}
-	const code = encode__(cityBegin, position);
+	var gridPosition = typeof isRegionAnchor === 'function' && isRegionAnchor(city) ? regionGridPosition(city, position) : position;
+	const code = gridPosition ? encode__(cityBegin, gridPosition) : null;
 	if(!isValidWoloIndexCode(code)) {
+		if(typeof isRegionAnchor === 'function' && !isRegionAnchor(city) && encodeRegionFallback(position))
+			return;
 		areaNotCovered(position);
 		return;
 	}
@@ -84,7 +87,7 @@ function decode_(city, code) {
 		code = normalizeSavedWcode(code);
 	else if(code && code.length > 3)
 		code = code.slice(-3);
-	var cityBegin = city && getCityBegin(city.center);
+	var cityBegin = city && (typeof getWoloAnchorBegin === 'function' ? getWoloAnchorBegin(city) : getCityBegin(city.center));
 	if(!city || !cityBegin || !code || code.length != 3) {
 		if(typeof showNotification == 'function')
 			showNotification('Could not open saved address');
@@ -102,6 +105,13 @@ function decode_(city, code) {
 		return;
 	}
 	var position = decode__(cityBegin, data);
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) {
+		position = positionFromRegionGrid(city, position);
+		if(!position) {
+			showNotification('This code is outside the supported coordinate range');
+			return;
+		}
+	}
 	setCodeCoord(city, position, code);
 	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	addClassIfPresent(document.getElementById('wait_loader'), 'hide');

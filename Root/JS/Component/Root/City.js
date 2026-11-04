@@ -567,6 +567,10 @@ function getCityMatchingId(id) {
 
 // only detail, not center
 function getCityFromId(id, callback, options) {
+	if(typeof regionAnchorFromId === 'function' && /^region:/.test(String(id || ''))) {
+		callback(regionAnchorFromId(id));
+		return;
+	}
 	var notify = !(options && options.notify === false);
 	var reportFailure = options && options.notify === false;
 	var useLoader = notify;
@@ -664,6 +668,19 @@ function getCityFromId(id, callback, options) {
 
 function getCityFromName(group, name, callback, onFailure) {
 	var city_name_part = group.concat([name]);
+	if(typeof regionAnchorFromName === 'function') {
+		var regional = regionAnchorFromName(city_name_part.join(' '));
+		if(regional) {
+			callback(regional);
+			return;
+		}
+		var regionalMatch = /^(.*?)\s+[0-9]+$/.exec(city_name_part.join(' '));
+		if(regionalMatch && regionByName(regionalMatch[1])) {
+			if(typeof onFailure === 'function') onFailure();
+			else decode_continue(null);
+			return;
+		}
+	}
 	var query_list = [];
 	for(var i = 0; i < city_name_part.length; i++) {
 		query_list.push({
@@ -758,6 +775,10 @@ function getCityCenterFromId_session(city, session_id, callback) {
 }
 
 function getCityCenterFromId(city, callback, options) {
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) {
+		callback(regionAnchorFromId(city.id));
+		return;
+	}
 	if(!city) {
 		if(typeof callback == 'function')
 			callback(null);
@@ -811,6 +832,10 @@ function getCityCenterFromId(city, callback, options) {
 }
 
 function getCitiesFromNameId(name_id, callback) {
+	if(typeof regionAnchorFromName === 'function') {
+		var anchor = regionAnchorFromName(name_id);
+		if(anchor) { var regional = {}; regional[anchor.id] = anchor; callback(regional); return; }
+	}
 	if(!database || typeof database.ref != 'function') {
 		if(typeof findCachedCitiesByNameId != 'function') {
 			callback(null);
@@ -922,7 +947,12 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 }
 
 function noCity(position) {
-	showNoCityMessage();
+	if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) {
+		showAddress();
+		return;
+	}
+	if(typeof showCityProposal === 'function') showCityProposal();
+	else showNoCityMessage();
 	showAddress();
 	infoWindow_setContent("City not in database");
 }
@@ -947,35 +977,16 @@ function areaNotCovered(position) {
 		wait_loader.classList.add('hide');
 }
 
-function submitCity() {
-	if(address == '')
-		pendingCitySubmit = true;
-	else {
-		execSubmitCity();
-		pendingCity = true;
-	}
-}
-
-function execSubmitCity() {
-	if(!database || typeof database.ref != 'function') {
-		if(typeof showNetworkRequiredMessage == 'function')
-			showNetworkRequiredMessage('Requesting a city');
-		else if(typeof showNotification == 'function')
-			showNotification('Requesting a city needs an internet connection');
-		return;
-	}
+function submitCity(data) {
+	if(!database || typeof database.ref != 'function')
+		return Promise.reject(new Error('Requesting a city needs an internet connection'));
 	var newPostKey = database.ref().child('CityRequest').push().key;
 	var updates = {};
-	var data = {
-			"time": firebase.database.ServerValue.TIMESTAMP,
-			"lat_lng": latLng_p,
-			"gp_id": gpId,
-			"address": address,
-			"processed": false
-		};
-	updates['/CityRequest/' + newPostKey] = data;
-	database.ref().update(updates);
-	showNotification("Request submitted");
+	updates['/CityRequest/' + newPostKey] = Object.assign({}, data, {
+		time: firebase.database.ServerValue.TIMESTAMP,
+		processed: false
+	});
+	return database.ref().update(updates).then(function() { return newPostKey; });
 }
 
 function tryDefaultCity() {

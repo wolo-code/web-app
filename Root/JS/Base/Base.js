@@ -100,13 +100,13 @@ function urlDecode() {
 			initWCode_jumpToMap = false;
 		}
 		
-		if(!code_string.match(/^[A-Za-z0-9._]+$/)) {
+		if(!code_string.match(/^[A-Za-z0-9._-]+$/)) {
 			window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
 			return false;
 		}
 		else {
 			pushLoader();
-			var code = code_string.toLowerCase().replace('_', ' ');
+			var code = code_string.toLowerCase().replace(/_/g, ' ');
 			pendingWords = code.split('.');
 			initWCode = true;
 			return true;

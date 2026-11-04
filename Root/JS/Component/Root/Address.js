@@ -29,14 +29,10 @@ function getAddress(latLng, session_id, callback) {
 				console.log('No geoCoding results found');
 			}
 		} else {
-			if(status == 'ZERO_RESULTS')
-				noCity(latLng_p);
-			else
+			if(typeof callback === 'function' && typeof encodeRegionFallback === 'function')
+				encodeRegionFallback(latLng);
+			else if(status !== 'ZERO_RESULTS')
 				console.log('Geocoder failed due to: ' + status);
-		}
-		if(pendingCitySubmit) {
-			execSubmitCity();
-			pendingCitySubmit = false;
 		}
 		if(keepAddressPanelOpen) {
 			showAddress();
@@ -77,6 +73,7 @@ function setAddressPanelHeading(title, segment) {
 }
 
 function showAddress() {
+	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 	var panel = getAddressPanel();
 	if(!current_title && !current_segment)
 		setAddressPanelHeading('', '');

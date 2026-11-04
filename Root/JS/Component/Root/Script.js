@@ -214,6 +214,10 @@ function setupControls() {
 	bindControl('invalid_code_correct', 'click', invalidCodeCorrect);
 	bindControl('invalid_code_search', 'click', invalidCodeSearchMap);
 	bindControl('no_city_submit_yes', 'click', noCity_add);
+	bindControl('no_city_new_request', 'click', newCityProposal);
+	bindControl('info_propose_city', 'click', showCityProposal);
+	bindControl('address_propose_city', 'click', showCityProposal);
+	bindControl('address_region_select', 'change', chooseAddressRegion);
 	bindControl('no_city_submit_no', 'click', noCity_cancel);
 	bindControl('no_city_submit_wait_continue', 'click', noCityWait_continue);
 	bindControl('no_city_submit_wait_stop', 'click', noCityWait_stop);

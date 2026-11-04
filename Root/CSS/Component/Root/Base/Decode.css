@@ -846,6 +846,15 @@ body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, 
 body:not(.decode) :is(#location_button, #map_type_button) svg {
  box-shadow: rgb(0 0 0 / 6%) 0px 1px 4px -1px;
 }
+body:not(.decode):not(.decode-icon-guide) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button, #saved_button) svg,
+body:not(.decode):not(.decode-icon-guide) #account > span.image,
+body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control > button,
+body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control menu li button {
+	background: #ffffff22 !important;
+	background-color: #ffffff22 !important;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
 html.dark-mode body :is(.action_menu_item, #map_type_button, #decode_map_view_button, #saved_button, #decode_code_scan_button) {
  background: transparent;
 }

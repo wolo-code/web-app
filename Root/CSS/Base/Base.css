@@ -232,7 +232,7 @@ body > #pac-input,
 #pac-input {
 	box-sizing: content-box;
 	height: 26px;
-	background-color: #fff;
+	background-color: #ffffff22;
 	font-family: Roboto;
 	font-size: 1.38em;
 	font-weight: 300;
@@ -245,7 +245,6 @@ body > #pac-input,
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	text-transform: lowercase;
-	opacity: 0.5;
 }
 
 #pac-input:valid {

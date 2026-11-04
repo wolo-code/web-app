@@ -308,12 +308,12 @@ html.dark-mode body .decode_city_source_button.activating svg {
 }
 
 html.dark-mode #pac-input {
-	background-color: #222244;
+	background-color: #22224422;
 	color: #d0d0d0;
 }
 
 html.dark-mode #decode_button {
-	background-color: #222244;
+	background-color: #22224422;
 	color: #9a9a9a;
 }
 
@@ -348,6 +348,14 @@ html.dark-mode #decode_code_scan_button > .image {
 html.dark-mode #map gmp-internal-camera-control > button,
 html.dark-mode #map gmp-internal-camera-control menu li button {
 	background-color: rgb(34 34 68 / 70%) !important;
+}
+
+html.dark-mode body:not(.decode):not(.decode-icon-guide) :is(#action_menu_info, #action_menu_decode, #map_type_button, #location_button, #saved_button) svg,
+html.dark-mode body:not(.decode):not(.decode-icon-guide) #account > span.image,
+html.dark-mode body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control > button,
+html.dark-mode body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control menu li button {
+	background: #22224422 !important;
+	background-color: #22224422 !important;
 }
 
 html.dark-mode #map gmp-internal-camera-control button img {

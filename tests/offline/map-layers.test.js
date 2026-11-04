@@ -773,3 +773,18 @@ test('FirebaseUI missing or deferred does not crash authInit or trigger crash pr
 	assert.equal(context.ui, undefined);
 	assert.ok(context.uiConfig);
 });
+
+test('map view controls replicate Go button transparency', () => {
+	const baseCss = read('Root/CSS/Base/Base.css');
+	const decodeCss = read('Root/CSS/Component/Root/Base/Decode.css');
+	const themeCss = read('Root/CSS/Component/Root/Base/Theme.css');
+
+	assert.match(baseCss, /#pac-input \{[\s\S]*background-color:\s*#ffffff22;/);
+	assert.doesNotMatch(baseCss, /#pac-input \{[\s\S]*opacity:\s*0\.5;/);
+	assert.match(decodeCss, /body:not\(\.decode\):not\(\.decode-icon-guide\) :is\(#action_menu_info, #action_menu_decode, #map_type_button, #location_button, #saved_button\) svg/);
+	assert.match(decodeCss, /background-color:\s*#ffffff22\s*!important/);
+	assert.match(decodeCss, /body:not\(\.decode\):not\(\.decode-icon-guide\) #account > span\.image/);
+	assert.match(themeCss, /html\.dark-mode #pac-input \{[\s\S]*background-color:\s*#22224422;/);
+	assert.match(themeCss, /html\.dark-mode #decode_button \{[\sS]*background-color:\s*#22224422;/);
+	assert.match(themeCss, /html\.dark-mode body:not\(\.decode\):not\(\.decode-icon-guide\) :is\(#action_menu_info, #action_menu_decode, #map_type_button, #location_button, #saved_button\) svg/);
+});

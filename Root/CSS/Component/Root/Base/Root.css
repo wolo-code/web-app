@@ -169,12 +169,13 @@ html body .decode_city_source_button.activating svg {
 	color: #7f7f7f;
 	font-family: Roboto, Arial, sans-serif;
 	font-size: 0.9375em;
-	background-color: rgb(255, 255, 255);
+	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	padding: 8px 10px;
 	border: none;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
-	background-color: #ffffff22;
 	transition: color 160ms ease;
 }
 

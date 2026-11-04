@@ -232,7 +232,9 @@ body > #pac-input,
 #pac-input {
 	box-sizing: content-box;
 	height: 26px;
-	background-color: #ffffff22;
+	background-color: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	font-family: Roboto;
 	font-size: 1.38em;
 	font-weight: 300;

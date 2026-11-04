@@ -850,10 +850,10 @@ body:not(.decode):not(.decode-icon-guide) :is(#action_menu_info, #action_menu_de
 body:not(.decode):not(.decode-icon-guide) #account > span.image,
 body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control > button,
 body:not(.decode):not(.decode-icon-guide) #map gmp-internal-camera-control menu li button {
-	background: #ffffff22 !important;
-	background-color: #ffffff22 !important;
-	-webkit-backdrop-filter: none;
-	backdrop-filter: none;
+	background: rgb(255 255 255 / 50%) !important;
+	background-color: rgb(255 255 255 / 50%) !important;
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 }
 html.dark-mode body :is(.action_menu_item, #map_type_button, #decode_map_view_button, #saved_button, #decode_code_scan_button) {
  background: transparent;

@@ -5,7 +5,7 @@
 - Country-level regions extend the registry with 257 country/territory namespaces, for 578 active named regions. Existing physical-region indices remain unchanged. Conflicting names gain a Region qualifier (e.g. Australia Region); unambiguous admin-0 three-letter codes are accepted as aliases.
 - Nearby-city, matching-name, and previous-city selectors all offer **Use a regional code** and **Propose a city**. Previous-city controls stay enabled with no history.
 - Regional choices for the current point include country and physical alternatives. A manual region/index form handles references elsewhere or no selected point. Map choices re-encode the point; manual map choices open the anchor center. Input-view choices set the three-word context; matching-name choices resolve the pending decode.
-- Regional indices have distinct outlined badges to the left of region names in the Use a regional code list in city selectors and use a clear monospace font in selectors, map info windows, and printed/downloaded labels (Courier for PDF indices). Manual region/country and anchor-index fields are indented 16px beneath their labels and use bottom borders; **Use regional code** is a left-aligned filled action, and the outlined **Propose a city** action aligns right.
+- Regional indices have distinct outlined badges immediately after region names in the Use a regional code list in city selectors and use a clear monospace font in selectors, map info windows, and printed/downloaded labels (Courier for PDF indices). Manual region/country and anchor-index fields are indented 16px beneath their labels and use bottom borders; **Use regional code** is a left-aligned filled action, and the outlined **Propose a city** action aligns right.
 
 
 ## Named regions and city proposals

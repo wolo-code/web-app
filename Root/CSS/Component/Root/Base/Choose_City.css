@@ -79,7 +79,7 @@ html.dark-mode .city_region_option {
 	color: #69b7cf;
 	cursor: pointer;
 }
-.city_region_option .wolo_region_index { order: -1; flex-shrink: 0; }
+.city_region_option .wolo_region_index { flex-shrink: 0; }
 .city_region_option .wolo_region_name { min-width: 0; overflow-wrap: anywhere; }
 .city_region_option:hover { background: rgb(105 183 207 / 10%); }
 .city_region_option[aria-pressed='true'],

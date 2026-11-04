@@ -7,12 +7,13 @@ The nearby, matching-name, and previous-city dialogs include the shared `CityReg
 Regional references separate the name from an outlined numeric index badge. The manual region/country selector and anchor-index input have underline-only borders, followed by a filled **Use regional code** button. The outlined **Propose a city** button aligns to the right. Regional indices use clear monospace digits here, in the map info window, and in Label view and its print/download output; minimal PDF labels use Courier for the index.
 
 
+The Address Panel omits the Code reference selector and Propose a city button.
+
 ## Regional reference and city proposal controls
 
 | Section | Controls | Behavior |
 | --- | --- | --- |
-| Address Panel code reference | `#address_region_controls`, `#address_region_select` | Lists region/index alternatives for the selected global tile; switching reuses the existing Wolo codec. |
-| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Open from full Info view or Address Panel. Name is required; country and selected location are optional. |
+| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Open from full Info view or city selectors. Name is required; country and selected location are optional. |
 | City proposal confirmation | `#no_city_request_id`, `#no_city_email_details` | Displays an acknowledged request ID, opens an editable email draft, and retains a fallback email link. Closing does not cancel an already submitted request. |
 
 

@@ -29,11 +29,7 @@
 #no_city_message .message_dialog_control button { left: 0; min-width: 0; margin: 0; font-size: 17px; }
 #no_city_message input[type='text'] { box-sizing: border-box; width: 100%; padding: 8px; color: inherit; background: transparent; border: 1px solid #999; border-radius: 4px; }
 #no_city_include_location { -webkit-appearance: checkbox; appearance: auto; accent-color: #69b7cf; width: 18px; height: 18px; flex-shrink: 0; }
-#no_city_message :is(input, button, a):focus-visible, #address_region_select:focus-visible { outline: 2px solid #69b7cf; outline-offset: 2px; }
+#no_city_message :is(input, button, a):focus-visible { outline: 2px solid #69b7cf; outline-offset: 2px; }
 #no_city_message .city_proposal_location { display: flex; align-items: center; gap: 6px; }
 #no_city_location { font-size: 14px; overflow-wrap: anywhere; }
 #no_city_request_id { user-select: text; overflow-wrap: anywhere; }
-#address_region_controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; }
-#address_region_select { max-width: min(70vw, 300px); padding: 6px; color: inherit; background: transparent; border: 1px solid #999; border-radius: 4px; }
-#address_region_select option { color: #222; background: #fff; }
-html.dark-mode #address_region_select option { color: #eee; background: #224; }

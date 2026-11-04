@@ -1,3 +1,12 @@
+.wolo_region_index {
+	font-family: 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+	font-variant-numeric: tabular-nums slashed-zero;
+	font-size: .88em;
+	font-weight: 500;
+	letter-spacing: .04em;
+	white-space: nowrap;
+}
+
 @font-face {
 	font-family: 'Abel';
 	font-style: normal;

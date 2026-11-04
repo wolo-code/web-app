@@ -239,7 +239,11 @@ function renderDecodeCityHistoryList() {
 	container.classList.remove('hide');
 	for(var i = 0; i < decode_city_history.length; i++) {
 		var row = document.createElement('div');
-		row.innerText = getDecodeCityDisplayName(decode_city_history[i]);
+		var city = decode_city_history[i];
+		if(typeof isRegionAnchor === 'function' && isRegionAnchor(city))
+			row.innerHTML = getRegionReferenceHTML(city, getDecodeCityDisplayName(city));
+		else
+			row.innerText = getDecodeCityDisplayName(city);
 		row.data_id = i;
 		row.title = 'Press and hold to remove';
 		row.addEventListener('contextmenu', preventDecodeCityHistoryContextMenu);
@@ -1001,7 +1005,7 @@ function getFullCity(city) {
 	if(!city) {
 		return '';
 	}
-	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) return city.name;
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) return getRegionReferenceHTML(city);
 	locality = typeof city.locality != 'undefined'? city.locality : null; 
 	cityGroupName = getCityGroupName(city, ' \\ ');
 	properCityAccent = getProperCityAccent(city);

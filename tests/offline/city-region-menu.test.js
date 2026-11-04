@@ -11,7 +11,7 @@ function node(tag = '') {
 	return { tag, children: [], listeners: {}, attributes: {}, value: '',
 		classList: { add(c) { classes.add(c); }, remove(c) { classes.delete(c); }, contains(c) { return classes.has(c); }, toggle(c, enabled) { enabled ? classes.add(c) : classes.delete(c); } },
 		set textContent(value) { this.children = []; this.text = value; }, get textContent() { return this.text; },
-		set innerHTML(value) { this.children = []; },
+		set innerHTML(value) { this.children = []; this.html = value; this.text = value.replace(/<[^>]*>/g, ''); },
 		appendChild(child) { this.children.push(child); if(this.tag === 'select' && this.children.length === 1) this.value = child.value; },
 		setAttribute(key, value) { this.attributes[key] = value; },
 		addEventListener(name, fn) { this.listeners[name] = fn; },

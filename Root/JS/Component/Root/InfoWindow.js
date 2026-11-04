@@ -47,8 +47,10 @@ function extractPlusCodeFromGeocode(results) {
 	return null;
 }
 
-function setInfoWindowText(city_accent, city_name, code_string, latLng) {
+function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	initInfoWindow();
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city))
+		city_accent = getRegionReferenceHTML(city, city_accent);
 	if(latLng) {
 		latLng_p = latLng;
 	}

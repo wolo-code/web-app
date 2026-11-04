@@ -91,6 +91,18 @@ function isRegionAnchor(city) {
 	return !!(city && /^region:/.test(city.id || ''));
 }
 
+// Keep the encoded reference as plain text; add presentation only at HTML sinks.
+function getRegionReferenceHTML(city, name) {
+	var text = String(name == null ? city.name : name);
+	function escape(value) {
+		return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+	}
+	var anchor = isRegionAnchor(city) && regionAnchorFromId(city.id);
+	var index = anchor && anchor.id.split(':').pop();
+	if(!index || !text.endsWith(' ' + index)) return escape(text);
+	return "<span class='wolo_region_name'>" + escape(text.slice(0, -index.length - 1)) + "</span> <span class='wolo_region_index'>" + index + '</span>';
+}
+
 function getWoloAnchorBegin(city) {
 	if(!isRegionAnchor(city)) return city && getCityBegin(city.center);
 	var anchor = regionAnchorFromId(city.id);

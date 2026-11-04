@@ -10,8 +10,8 @@
 			<select id='<?php echo $cityRegionMenuId; ?>_region_name' class='city_region_name'></select>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_index'>Anchor index</label>
 			<input id='<?php echo $cityRegionMenuId; ?>_region_index' class='city_region_index' type='number' min='1' step='1' inputmode='numeric' required>
-			<button type='button' class='city_region_use border'>Use regional code</button>
+			<button type='button' class='city_region_use'>Use regional code <span aria-hidden='true'>&rarr;</span></button>
 		</details>
 	</details>
-	<button type='button' class='city_region_propose border'>Propose a city</button>
+	<button type='button' class='city_region_propose'><span aria-hidden='true'>+</span> Propose a city</button>
 </div>

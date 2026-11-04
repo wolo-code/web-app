@@ -12,6 +12,8 @@ function showQR() {
 	setQRAddressFields(current_address_lines || { address_line_1: current_address || '', address_line_2: '' });
 	
 	var city_accent = getProperCityAccent(code_city);
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+		city_accent = getRegionReferenceHTML(code_city, city_accent);
 	var code_string = code_wcode.join(' ');
 	document.getElementById('qr_wcode_city').innerHTML = city_accent;
 	document.getElementById('qr_wcode_code').innerHTML = code_string;
@@ -283,7 +285,18 @@ function downloadQR_minimal() {
 		doc.text(text, x, y);
 		
 		x += doc.getTextWidth(text) + xSlashMargin;
-		doc.text(getCodeCityName(), x, y);
+		var cityName = getCodeCityName();
+		var regionalAnchor = typeof isRegionAnchor === 'function' && isRegionAnchor(getCodeCity()) && regionAnchorFromId(getCodeCity().id);
+		if(regionalAnchor) {
+			var index = regionalAnchor.id.split(':').pop();
+			var regionName = cityName.slice(0, -index.length);
+			doc.text(regionName, x, y);
+			x += doc.getTextWidth(regionName);
+			doc.setFont('courier', 'bold');
+			doc.text(index, x, y);
+		} else {
+			doc.text(cityName, x, y);
+		}
 		
 		doc.setFont('Abel', 'bold');
 		doc.setFontSize(sizeWCode);

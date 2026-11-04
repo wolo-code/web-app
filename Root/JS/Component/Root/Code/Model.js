@@ -15,7 +15,7 @@ function setCode(city, wcode, latLng) {
 	code_wcode = wcode;
 	code_postition = latLng;
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
-	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng);
+	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng, city);
 	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 }
 

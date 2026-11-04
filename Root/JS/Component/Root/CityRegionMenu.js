@@ -36,7 +36,7 @@ function renderCityRegionMenu(id, mode) {
 		var button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'city_region_option';
-		button.textContent = choice.anchor.name;
+		button.innerHTML = getRegionReferenceHTML(choice.anchor);
 		if(typeof code_city !== 'undefined' && code_city && choice.anchor.id === code_city.id)
 			button.setAttribute('aria-pressed', 'true');
 		button.addEventListener('click', function(event) {

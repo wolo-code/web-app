@@ -4,6 +4,8 @@
 
 The nearby, matching-name, and previous-city dialogs include the shared `CityRegionOptions.php` panel. **Use a regional code** lists relevant country/region anchors and provides manual region/index entry. **Propose a city** opens the existing proposal form. Empty previous-city history no longer disables the menu. The map selector labels its active city or regional anchor as **Current reference**.
 
+Regional references separate the name from an outlined numeric index badge. The manual region/country selector and anchor-index input have underline-only borders, followed by a filled **Use regional code** button. The outlined **Propose a city** button aligns to the right. Regional indices use clear monospace digits here, in the map info window, and in Label view and its print/download output; minimal PDF labels use Courier for the index.
+
 
 ## Regional reference and city proposal controls
 

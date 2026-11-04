@@ -1,6 +1,6 @@
 <div id='decode_city_history_message' class="choose_city_message message_dialog hide">
 	<h2 class='message_dialog_label'>
-		Choose the city
+		Choose city or region
 	</h2>
 	<div id='decode_city_history_message_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
@@ -16,5 +16,6 @@
 				<button id='decode_city_history_delete_cancel' class='border' type='button'>Cancel</button>
 			</div>
 		</div>
+		<?php $cityRegionMenuId = 'history'; require __DIR__ . '/CityRegionOptions.php'; ?>
 	</div>
 </div>

@@ -4,9 +4,11 @@ var chooseCity_by_periphery_gpid;
 var chooseCity_by_periphery_List_gpids = [];
 
 function showChooseCity_by_periphery_Message() {
+	chooseCity_by_periphery_List_gpids = [];
 	clearChooseCity_by_periphery_List();
 	showChooseCity_by_periphery_gpid();
 	showChooseCity_by_periphery_List();
+	if(typeof renderCityRegionMenu === 'function') renderCityRegionMenu('nearby', 'nearby');
 	showOverlay(document.getElementById('choose_city_by_periphery_message'));
 }
 
@@ -59,7 +61,7 @@ function chooseCity_by_periphery(list, callback) {
 function chooseCity_by_periphery_Continue(e) {
 	infoWindow_setContent(MESSAGE_LOADING);
 	hideChooseCity_by_periphery_Message();
-	var id = e.target.data_id;
+	var id = e.currentTarget.data_id;
 	var city = chooseCity_by_periphery_List[id].city;
 	chooseCity_by_periphery_Callback(city);
 }
@@ -94,7 +96,7 @@ function showChooseCity_by_periphery_gpid() {
 function chooseCity_by_periphery_gpid_Continue(e) {
 	infoWindow_setContent(MESSAGE_LOADING);
 	hideChooseCity_by_periphery_Message();
-	var id = e.target.data_id;
+	var id = e.currentTarget.data_id;
 	var gp_id = chooseCity_by_periphery_gpid[id].city.gp_id;
 	getCityFromCityGp_id (
 		gp_id,

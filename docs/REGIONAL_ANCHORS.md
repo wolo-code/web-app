@@ -1,5 +1,39 @@
 # Named-region anchors, registry v1
 
+## Country regions and city menus
+
+The country extension adds **257 country/territory namespaces**, bringing the active
+total to **578** (321 physical regions plus 257 administrative areas). It uses
+[Natural Earth admin-0 countries](https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_10m_admin_0_countries.geojson)
+with a pinned input SHA-256 in `CountryRegistry.js`. These are Natural Earth's
+administrative map units, including territories and some disputed areas, rather
+than a list of universally recognized sovereign states. Antarctica is excluded
+from this extension because it already has a broad physical fallback.
+
+Country grids use exactly the same global tile identities and three-word codec.
+The published physical registry file and all its prefix/index mappings are unchanged.
+Country keys use `country-<ADM0_A3>` within the existing `region:v1:` references.
+Where a country/territory name already belongs to a physical namespace, the new
+prefix adds `Region`: `Australia` retains its original meaning, while `Australia
+Region` identifies the administrative footprint. Globally unique three-letter
+admin-0 codes are also accepted as input aliases. Display names retain accents;
+country URL components use an ASCII-normalized form that resolves to the same ID.
+
+Rebuild with `python scripts/build-country-registry.py --countries <admin-0-geojson>`.
+The script refuses changed output once its v1 registry exists.
+
+All three existing city selectors (nearby, matching-name, and previous-city)
+include **Use a regional code** and **Propose a city**. Previous-city controls
+remain available with empty history. Regional options list the available country
+and geographic anchors for the selected location. A manual region/index form
+also supports a known reference elsewhere, including when no point is selected.
+
+Choosing a listed region on the map re-encodes the same location. Manual map
+selection opens the selected anchor center. In the input view, selection changes
+the context for three-word decoding. Matching-name selection resolves the pending
+decode through its callback and does not borrow an unrelated previous map point.
+City proposals use the existing saved-request/email-draft workflow from each menu.
+
 ## Public behavior
 
 Supported cities keep their existing centers and codes. When a city is unavailable,
@@ -9,7 +43,7 @@ overlapping regional alternatives for the selected tile. Changing that selection
 re-encodes the same location against the chosen anchor. A selected regional
 namespace remains preferred for subsequent regional fallbacks while applicable.
 
-The shipped registry has **321 active regions and 160 pending candidates** from
+The original physical registry has **321 active regions and 160 pending candidates** from
 the 481-name proposal. Missing source matches are not given invented footprints.
 Active and pending names are both listed in `RegionRegistry.js`. Matching is a
 first implementation from Natural Earth's named features, not a per-region survey.

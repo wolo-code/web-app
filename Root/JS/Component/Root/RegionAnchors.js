@@ -1,11 +1,15 @@
 // Regions select existing Wolo grids; the three-word packing stays unchanged.
 function normalizeRegionName(name) {
-	return String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[-_\s]+/g, ' ').trim();
+	return String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9 _-]/g, ' ').replace(/[-_\s]+/g, ' ').trim();
+}
+
+function allWoloRegions() {
+	return WOLO_REGION_REGISTRY.regions.concat(typeof WOLO_COUNTRY_REGISTRY === 'object' ? WOLO_COUNTRY_REGISTRY.regions : []);
 }
 
 function regionByName(name) {
 	var needle = normalizeRegionName(name);
-	return WOLO_REGION_REGISTRY.regions.find(function(region) {
+	return allWoloRegions().find(function(region) {
 		return normalizeRegionName(region.name) === needle || region.aliases.some(function(alias) { return normalizeRegionName(alias) === needle; });
 	}) || null;
 }
@@ -38,7 +42,7 @@ function regionAnchor(region, index) {
 	return {
 		id: 'region:v1:' + region.key + ':' + index,
 		name: region.name + ' ' + index,
-		name_id: region.name.toLowerCase() + ' ' + index,
+		name_id: (region.country_code ? normalizeRegionName(region.name) : region.name.toLowerCase()) + ' ' + index,
 		country: '',
 		center: { lat: Math.floor(cell / 720) / 2 - 89.75, lng: (cell % 720) / 2 - 179.75 }
 	};
@@ -47,7 +51,7 @@ function regionAnchor(region, index) {
 function regionAnchorFromId(id) {
 	var match = /^region:v1:([a-z0-9-]+):([1-9][0-9]*)$/.exec(String(id || ''));
 	if(!match) return null;
-	var region = WOLO_REGION_REGISTRY.regions.find(function(entry) { return entry.key === match[1]; });
+	var region = allWoloRegions().find(function(entry) { return entry.key === match[1]; });
 	return region ? regionAnchor(region, Number(match[2])) : null;
 }
 
@@ -75,7 +79,7 @@ function regionAnchorsForPosition(position) {
 	if(!point) return [];
 	var row = Math.min(359, Math.floor((point.lat + 90) * 2));
 	var cell = row * 720 + Math.floor((point.lng + 180) * 2);
-	return WOLO_REGION_REGISTRY.regions.map(function(region) {
+	return allWoloRegions().map(function(region) {
 		var index = regionIndexForCell(region, cell);
 		return index === null ? null : { region: region, anchor: regionAnchor(region, index) };
 	}).filter(Boolean).sort(function(a, b) {

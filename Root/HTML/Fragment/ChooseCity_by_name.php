@@ -11,5 +11,6 @@
 			Please select the correct one:
 		</p>
 		<div id='choose_city_by_name_message_list' class='choose_city_message_list'></div>
+		<?php $cityRegionMenuId = 'matching'; require __DIR__ . '/CityRegionOptions.php'; ?>
 	</div>
 </div>

@@ -1,5 +1,10 @@
 # App Section Names
 
+## Country and regional choices in city selectors
+
+The nearby, matching-name, and previous-city dialogs include the shared `CityRegionOptions.php` panel. **Use a regional code** lists relevant country/region anchors and provides manual region/index entry. **Propose a city** opens the existing proposal form. Empty previous-city history no longer disables the menu. The map selector labels its active city or regional anchor as **Current reference**.
+
+
 ## Regional reference and city proposal controls
 
 | Section | Controls | Behavior |
@@ -71,7 +76,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | --- | --- | --- | --- | --- |
 | Map canvas | Terrain Map Canvas | `#map`, Google Maps `ROADMAP` | Full viewport | Standard map surface for selection, pan, zoom, and place context. |
 | Search field | Place Search Input | `#pac-input` | Top-left, inside `#map_search_bar` | Accepts place names and Wolo Codes while in the map flow and stays focused so typing can begin immediately, except during Input Icon Guide, when the field is blurred and the caret is hidden. CSS shows DIGIPIN and plus-code values in uppercase while the field is `:valid`; other input stays lowercase. |
-| Previous city control | Map Previous City Button | `#map_city_history_toggle`, `#map_search_cluster` | Immediately left of Place Search Input, outside the search field, flush with no gap | Opens the same Input Previous City Popup used on Wolo Code Input View. On Map View the control is a 5px-rounded rectangle. Disabled when no previous cities are stored. Choosing a city sets decode city context, zooms out to the viewport-fill overview if needed, then pans to that city center and animates zoom-in to city-scope (the ~32.8 km encode coverage). |
+| Previous city control | Map Previous City Button | `#map_city_history_toggle`, `#map_search_cluster` | Immediately left of Place Search Input, outside the search field, flush with no gap | Opens the same Input Previous City Popup used on Wolo Code Input View. On Map View the control is a 5px-rounded rectangle. Remains enabled without previous cities so regional selection and city proposals stay available. Choosing a city sets decode city context, zooms out to the viewport-fill overview if needed, then pans to that city center and animates zoom-in to city-scope (the ~32.8 km encode coverage). |
 | Search affordance | Search Icon | `#search_icon` | Inside left edge of Place Search Input | Visual cue for the map search field before input focus. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Shows suggestions for the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |

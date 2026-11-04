@@ -2,7 +2,8 @@ var cityProposalInFlight = false;
 var cityProposalLocation = null;
 var cityProposalRequest = null;
 
-function showCityProposal() {
+function showCityProposal(event) {
+	if(event && event.stopPropagation) event.stopPropagation();
 	if(!cityProposalInFlight && !cityProposalRequest) {
 		cityProposalLocation = regionPosition(typeof code_postition !== 'undefined' && code_postition) || regionPosition(typeof latLng_p !== 'undefined' && latLng_p);
 		var include = document.getElementById('no_city_include_location');

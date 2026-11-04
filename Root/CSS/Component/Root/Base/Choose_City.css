@@ -52,3 +52,15 @@
 	overflow-y: auto;
 	flex: 0 1 auto;
 }
+
+.city_region_menu { border-top: 1px solid #9995; margin-top: 18px; padding-top: 12px; }
+.city_region_choices summary { cursor: pointer; color: #69b7cf; padding: 6px 0; }
+.city_region_list { display: grid; gap: 8px; margin: 10px 0; }
+.city_region_option { display: block; width: 100%; text-align: left; border: 1px solid #69b7cf; padding: 8px; color: #69b7cf; cursor: pointer; }
+.city_region_option[aria-pressed='true'] { background: #69b7cf; color: white; }
+.city_region_manual label { display: block; margin: 8px 0 4px; }
+.city_region_manual :is(select, input) { box-sizing: border-box; width: 100%; max-width: 100%; background: transparent; color: inherit; padding: 8px; border: 1px solid #999; border-radius: 4px; }
+.city_region_manual option { background: white; color: #222; }
+html.dark-mode .city_region_manual option { background: #224; color: #eee; }
+.city_region_propose, .city_region_use { margin-top: 12px; padding: 8px 12px; color: #69b7cf; cursor: pointer; }
+.city_region_menu :is(button, select, input, summary):focus-visible { outline: 2px solid #69b7cf; outline-offset: 2px; }

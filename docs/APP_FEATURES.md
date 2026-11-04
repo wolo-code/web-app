@@ -1,9 +1,16 @@
 # App Features
 
+## Country regions and city menu actions
+
+- Country-level regions extend the registry with 257 country/territory namespaces, for 578 active named regions. Existing physical-region indices remain unchanged. Conflicting names gain a Region qualifier (e.g. Australia Region); unambiguous admin-0 three-letter codes are accepted as aliases.
+- Nearby-city, matching-name, and previous-city selectors all offer **Use a regional code** and **Propose a city**. Previous-city controls stay enabled with no history.
+- Regional choices for the current point include country and physical alternatives. A manual region/index form handles references elsewhere or no selected point. Map choices re-encode the point; manual map choices open the anchor center. Input-view choices set the three-word context; matching-name choices resolve the pending decode.
+
+
 ## Named regions and city proposals
 
 - City-based three-word codes retain their existing origins and encoding. Unavailable or out-of-range cities can fall back to a named region and compact local anchor index using the same word codec.
-- The bundled frozen v1 registry activates 321 source-matched regions; 160 additional names remain pending. Twelve fallback namespaces cover every half-degree global tile. Overlapping region/index references can share one center and identical three words.
+- The bundled frozen physical v1 registry activates 321 source-matched regions; 160 additional names remain pending. Twelve fallback namespaces cover every half-degree global tile. Overlapping region/index references can share one center and identical three words.
 - Address Panel's **Code reference** selector switches between available regional alternatives. Regional links, previous contexts, and saved addresses resolve locally, including offline. See the app's `docs/REGIONAL_ANCHORS.md` for fixed geometry conventions, provenance, polar handling, and compatibility.
 - **Propose a city** in full Info view and Address Panel accepts a city name, optional country/region, and optional selected map location. It writes a request without automatically creating a city.
 - After the request is acknowledged, the user's email composer opens to support@wolo.codes with `Wolo add city request <request-id>` in the subject and editable details in the body. The saved request ID and **Add details by email** fallback remain visible. Failed writes do not announce success or open drafts; duplicate in-flight clicks are ignored.

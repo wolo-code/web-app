@@ -3,6 +3,7 @@ var chooseCityList;
 
 function showChooseCityMessage() {
 	clearChooseCityList();
+	if(typeof renderCityRegionMenu === 'function') renderCityRegionMenu('matching', 'matching');
 	showOverlay(document.getElementById('choose_city_by_name_message'));
 	var container = document.getElementById('choose_city_by_name_message_list');
 	for(let key in chooseCityList) {
@@ -35,7 +36,7 @@ function chooseCity(list, matchCount, callback) {
 
 function chooseCityContinue(e) {
 	hideChooseCityMessage();
-	var id = e.target.data_id;
+	var id = e.currentTarget.data_id;
 	var city = chooseCityList[id];
 	city.id = id;
 	chooseCityCallback(city);

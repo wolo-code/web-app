@@ -195,7 +195,7 @@ function getDecodeCityHistoryToggles() {
 function syncDecodeCityHistoryControl() {
 	decode_city_history = getDecodeCityHistory();
 
-	var disabled = decode_city_history.length == 0 && !document.body.classList.contains('decode-icon-guide');
+	var disabled = false; // Region selection and city proposals also work without history.
 	var toggles = getDecodeCityHistoryToggles();
 	for(var i = 0; i < toggles.length; i++)
 		toggles[i].disabled = disabled;
@@ -214,12 +214,11 @@ function setDecodeCityHistoryExpanded(expanded) {
 
 function showDecodeCityHistoryMessage() {
 	decode_city_history = getDecodeCityHistory();
-	if(decode_city_history.length == 0)
-		return;
 
 	initDecodeCityHistoryDeleteControls();
 	hideDecodeCityHistoryDeletePrompt();
 	renderDecodeCityHistoryList();
+	if(typeof renderCityRegionMenu === 'function') renderCityRegionMenu('history', 'history');
 	setDecodeCityHistoryExpanded(true);
 	showOverlay(document.getElementById('decode_city_history_message'));
 }
@@ -1002,6 +1001,7 @@ function getFullCity(city) {
 	if(!city) {
 		return '';
 	}
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) return city.name;
 	locality = typeof city.locality != 'undefined'? city.locality : null; 
 	cityGroupName = getCityGroupName(city, ' \\ ');
 	properCityAccent = getProperCityAccent(city);

@@ -167,16 +167,27 @@ function applyOsmFallbackZoom(tilesMissing) {
 }
 
 function scheduleOsmZoomFallback(tilesMissing) {
+	var requestedZoom = map.getZoom();
 	if(osmZoomFallbackTimer) {
 		clearTimeout(osmZoomFallbackTimer);
 	}
 	osmZoomFallbackTimer = setTimeout(function() {
 		osmZoomFallbackTimer = 0;
+		if(!isOsmMapLayerActive() || map.getZoom() !== requestedZoom) {
+			return;
+		}
+		if(osmFallbackApplying) {
+			scheduleOsmZoomFallback(tilesMissing);
+			return;
+		}
 		applyOsmFallbackZoom(tilesMissing);
 	}, 80);
 }
 
-function onOsmTileLoad() {
+function onOsmTileLoad(zoom) {
+	if(!isOsmMapLayerActive() || zoom !== map.getZoom()) {
+		return;
+	}
 	osmTileOkStreak++;
 	if(osmTileOkStreak > 2) {
 		osmTileErrorStreak = 0;
@@ -184,7 +195,7 @@ function onOsmTileLoad() {
 }
 
 function onOsmTileError(zoom) {
-	if(!isOsmMapLayerActive()) {
+	if(!isOsmMapLayerActive() || zoom !== map.getZoom()) {
 		return;
 	}
 	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -252,7 +263,9 @@ function bindOsmTileNode(node, zoom) {
 			continue;
 		}
 		imgs[i].__woloOsmBound = true;
-		imgs[i].addEventListener('load', onOsmTileLoad);
+		imgs[i].addEventListener('load', function() {
+			onOsmTileLoad(zoom);
+		});
 		imgs[i].addEventListener('error', function() {
 			onOsmTileError(zoom);
 		});

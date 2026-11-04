@@ -28,6 +28,51 @@ test('OSM high zoom falls back when tiles are missing', () => {
 	assert.match(mapLayers, /if\(tilesMissing\)\s*notifyOsmMapDataUnavailable/);
 });
 
+test('OSM retries missing tiles through consecutive zoom transitions and ignores old tiles', () => {
+	let zoom = 19;
+	let timerId = 0;
+	const timers = new Map();
+	const context = {
+		map: { getZoom: () => zoom, setZoom: value => { zoom = value; } },
+		document: { body: { classList: { contains: name => name === 'osm' } } },
+		navigator: { onLine: true },
+		setTimeout: fn => { timers.set(++timerId, fn); return timerId; },
+		clearTimeout: id => timers.delete(id)
+	};
+	vm.runInNewContext(read('Root/JS/Component/Root/MapLayers.js'), context);
+	function runNextTimer() {
+		const [id, fn] = timers.entries().next().value;
+		timers.delete(id);
+		fn();
+	}
+	function failTiles() {
+		for(let i = 0; i < 3; i++) context.onOsmTileError(zoom);
+	}
+	failTiles();
+	runNextTimer();
+	assert.equal(zoom, 18);
+	failTiles();
+	// Fire the fallback before the previous transition's cooldown ends.
+	const pending = context.osmZoomFallbackTimer;
+	const retry = timers.get(pending);
+	timers.delete(pending);
+	retry();
+	assert.equal(zoom, 18);
+	runNextTimer();
+	runNextTimer();
+	assert.equal(zoom, 17);
+	context.onOsmTileError(19);
+	context.onOsmTileLoad(19);
+	assert.equal(context.osmTileErrorStreak, 0);
+	assert.equal(context.osmTileOkStreak, 0);
+	runNextTimer();
+	assert.equal(timers.size, 0);
+	failTiles();
+	zoom = 12; // A new navigation invalidates the pending fallback.
+	runNextTimer();
+	assert.equal(zoom, 12);
+});
+
 test('OSM and raster tiles do not steal map click or drag', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const mapJs = read('Root/JS/Component/Root/Map.js');

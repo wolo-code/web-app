@@ -1064,13 +1064,13 @@ function buildCityChoiceList(entries, depth) {
 			button.appendChild(label);
 
 			var status = entry.choice.status;
-			if(status) {
+			if(status === 'Current') {
+				button.setAttribute('aria-current', 'true');
+			} else if(status) {
 				var badge = document.createElement('span');
 				badge.className = 'city_choice_status';
 				badge.textContent = status;
 				button.appendChild(badge);
-				if(status === 'Current')
-					button.setAttribute('aria-current', 'true');
 			}
 			if(depth)
 				button.setAttribute('aria-label', entry.path.join(' \\ ') + (status ? ', ' + status : ''));

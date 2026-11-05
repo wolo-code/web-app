@@ -23,9 +23,14 @@ function runtime() {
 	const panels = new Map(), nodes = new Map(), events = [];
 	for(const id of ['nearby', 'matching', 'history']) {
 		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
+		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_cancel']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
 		const panel = { querySelector: key => children.get(key), children };
 		if(id === 'nearby') {
+			const manual = children.get('.city_region_manual');
+			const form = {};
+			manual.querySelector = key => key === 'form' ? form : children.get(key);
+			manual.showModal = () => { manual.open = true; };
+			manual.close = () => { manual.open = false; };
 			const cities = { querySelector: key => children.get(key) };
 			panel.parentElement = {
 				sections: [cities, panel],
@@ -127,7 +132,7 @@ test('nearby picker opens the active reference section and pins the current regi
 	assert.equal(cities.open, false);
 	assert.equal(list.children[0].attributes['aria-pressed'], 'true');
 	assert.match(list.children[0].html, /wolo_region_index/);
-	assert.equal(list.children[0].children[0].textContent, 'Current');
+	assert.equal(list.children[0].children.length, 0);
 	assert.equal(list.children.filter(button => button.attributes['aria-pressed'] === 'true').length, 1);
 
 	api.code_city = { id: 'city' };
@@ -135,4 +140,32 @@ test('nearby picker opens the active reference section and pins the current regi
 	assert.equal(panel.parentElement.sections[0], cities);
 	assert.equal(regionDetails.open, false);
 	assert.equal(cities.open, true);
+});
+
+test('nearby manual region dialog can cancel or submit an anchor', () => {
+	const { api, panels, events } = runtime();
+	api.renderCityRegionMenu('nearby', 'nearby');
+	const children = panels.get('nearby_region_menu').children;
+	const manual = children.get('.city_region_manual');
+	const open = children.get('.city_region_manual_open');
+	open.onclick();
+	assert.equal(manual.open, true);
+	children.get('.city_region_manual_cancel').onclick();
+	assert.equal(manual.open, false);
+	assert.deepEqual(events, []);
+
+	open.onclick();
+	const select = children.get('.city_region_name');
+	select.value = 'country-npl';
+	const input = children.get('.city_region_index');
+	const submit = manual.querySelector('form').onsubmit;
+	const event = { preventDefault() {} };
+	input.value = '999999';
+	submit(event);
+	assert.equal(manual.open, true);
+	assert.deepEqual(events, []);
+	input.value = '1';
+	submit(event);
+	assert.equal(manual.open, false);
+	assert.equal(events[1].encoded.id, 'region:v1:country-npl:1');
 });

@@ -48,22 +48,15 @@ function renderCityRegionMenu(id, mode) {
 		button.type = 'button';
 		button.className = 'city_region_option';
 		button.innerHTML = getRegionReferenceHTML(choice.anchor);
-		if(current && choice.anchor.id === current.id) {
+		if(current && choice.anchor.id === current.id)
 			button.setAttribute('aria-pressed', 'true');
-			if(cities) {
-				var status = document.createElement('span');
-				status.className = 'city_choice_status';
-				status.textContent = 'Current';
-				button.appendChild(status);
-			}
-		}
 		button.addEventListener('click', function(event) {
 			if(event && event.stopPropagation) event.stopPropagation();
 			useCityMenuRegion(choice.anchor, mode, point);
 		});
 		list.appendChild(button);
 	});
-	manual.open = !cities && choices.length === 0;
+	if(!cities) manual.open = choices.length === 0;
 	var select = panel.querySelector('.city_region_name');
 	var input = panel.querySelector('.city_region_index');
 	select.textContent = '';
@@ -80,14 +73,28 @@ function renderCityRegionMenu(id, mode) {
 	select.onchange = setLimit;
 	input.value = '';
 	setLimit();
-	panel.querySelector('.city_region_use').onclick = function(event) {
+	function applyManualRegion(event) {
+		if(cities) event.preventDefault();
 		if(event && event.stopPropagation) event.stopPropagation();
 		setLimit();
 		if(!input.reportValidity()) return;
 		var region = allWoloRegions().find(function(entry) { return entry.key === select.value; });
 		var anchor = region && regionAnchor(region, Number(input.value));
-		if(anchor) useCityMenuRegion(anchor, mode, null);
-	};
+		if(!anchor) return;
+		if(cities) manual.close();
+		useCityMenuRegion(anchor, mode, null);
+	}
+	if(cities) {
+		panel.querySelector('.city_region_manual_open').onclick = function() {
+			manual.showModal();
+		};
+		manual.querySelector('.city_region_manual_cancel').onclick = function() {
+			manual.close();
+		};
+		manual.querySelector('form').onsubmit = applyManualRegion;
+	} else {
+		panel.querySelector('.city_region_use').onclick = applyManualRegion;
+	}
 	(cities || panel).querySelector('.city_region_propose').onclick = function(event) {
 		if(event && event.stopPropagation) event.stopPropagation();
 		closeCityRegionMenu(mode);

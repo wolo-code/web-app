@@ -21,7 +21,8 @@ function showChooseCity_by_periphery_List() {
 	var choices = [];
 	var seen = new Set();
 	if(typeof code_city !== 'undefined' && code_city) {
-		choices.push({city: code_city, status: 'Current', select: hideChooseCity_by_periphery_Message});
+		if(!isRegionAnchor(code_city))
+			choices.push({city: code_city, status: 'Current', select: hideChooseCity_by_periphery_Message});
 		for(let key in chooseCity_by_periphery_gpid) {
 			var city = chooseCity_by_periphery_gpid[key].city;
 			seen.add(city.gp_id);

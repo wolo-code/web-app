@@ -27,8 +27,19 @@ function renderCityRegionMenu(id, mode) {
 	var panel = document.getElementById(id + '_region_menu');
 	if(!panel) return;
 	var point = mode === 'matching' ? null : cityRegionMenuPosition();
-	var current = typeof code_city !== 'undefined' && isRegionAnchor(code_city) && regionAnchorFromId(code_city.id);
+	var current = mode !== 'matching' && typeof code_city !== 'undefined' && isRegionAnchor(code_city) && regionAnchorFromId(code_city.id);
 	var choices = regionAnchorsForPosition(current && point ? current.center : point);
+	var cities = mode === 'nearby' ? panel.parentElement.querySelector('.city_region_cities') : null;
+	if(cities) {
+		panel.parentElement.insertBefore(current ? panel : cities, current ? cities : panel);
+		panel.querySelector('.city_region_choices').open = !!current;
+		cities.open = !current;
+		if(current) {
+			choices = [{anchor: current}].concat(choices.filter(function(choice) {
+				return choice.anchor.id !== current.id;
+			}));
+		}
+	}
 	var list = panel.querySelector('.city_region_list');
 	var manual = panel.querySelector('.city_region_manual');
 	list.textContent = '';
@@ -37,15 +48,22 @@ function renderCityRegionMenu(id, mode) {
 		button.type = 'button';
 		button.className = 'city_region_option';
 		button.innerHTML = getRegionReferenceHTML(choice.anchor);
-		if(typeof code_city !== 'undefined' && code_city && choice.anchor.id === code_city.id)
+		if(current && choice.anchor.id === current.id) {
 			button.setAttribute('aria-pressed', 'true');
+			if(cities) {
+				var status = document.createElement('span');
+				status.className = 'city_choice_status';
+				status.textContent = 'Current';
+				button.appendChild(status);
+			}
+		}
 		button.addEventListener('click', function(event) {
 			if(event && event.stopPropagation) event.stopPropagation();
 			useCityMenuRegion(choice.anchor, mode, point);
 		});
 		list.appendChild(button);
 	});
-	manual.open = choices.length === 0;
+	manual.open = !cities && choices.length === 0;
 	var select = panel.querySelector('.city_region_name');
 	var input = panel.querySelector('.city_region_index');
 	select.textContent = '';
@@ -70,7 +88,7 @@ function renderCityRegionMenu(id, mode) {
 		var anchor = region && regionAnchor(region, Number(input.value));
 		if(anchor) useCityMenuRegion(anchor, mode, null);
 	};
-	panel.querySelector('.city_region_propose').onclick = function(event) {
+	(cities || panel).querySelector('.city_region_propose').onclick = function(event) {
 		if(event && event.stopPropagation) event.stopPropagation();
 		closeCityRegionMenu(mode);
 		showCityProposal();

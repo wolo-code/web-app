@@ -14,11 +14,6 @@
 	padding-inline: 6px;
 }
 
-#choose_city_by_periphery_message_prompt > p {
-	margin-block: 0 8px;
-	padding-inline: 6px;
-}
-
 .choose_city_message_list div {
 	background-color: #69B7CF;
 	color: #ffffff;
@@ -129,8 +124,18 @@
 
 .city_choice_status {
 	flex-shrink: 0;
-	font-size: .8em;
-	opacity: .75;
+	margin-inline-start: auto;
+	padding: 2px 7px;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	font-size: .75em;
+	line-height: 1.2;
+	opacity: .8;
+}
+
+:is([aria-current='true'], [aria-pressed='true']) > .city_choice_status {
+	background: rgb(105 183 207 / 18%);
+	opacity: 1;
 }
 
 .choose_city_message_list .city_choice_button[aria-current='true'] {
@@ -248,3 +253,54 @@ html.dark-mode .city_region_menu .city_region_propose {
 .city_region_menu .city_region_use:hover { background: #85c7da; }
 .city_region_menu .city_region_propose:hover { background: rgb(105 183 207 / 12%); border-color: #69b7cf; }
 .city_region_menu :is(button, summary):focus-visible { outline: 2px solid #69b7cf; outline-offset: 2px; }
+
+#choose_city_by_periphery_message .city_region_menu {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+#choose_city_by_periphery_message_prompt > :not(:first-child) {
+	border-top: 1px solid #9995;
+	margin-block-start: 10px;
+	padding-block-start: 6px;
+}
+
+.city_region_cities > summary,
+#nearby_region_menu .city_region_choices > summary {
+	padding: 10px 6px;
+	font-weight: 600;
+	color: inherit;
+	cursor: pointer;
+}
+
+.city_region_cities > summary:focus-visible,
+.city_region_cities .city_region_propose:focus-visible {
+	outline: 2px solid #69b7cf;
+	outline-offset: 2px;
+}
+
+.city_region_cities .city_region_propose,
+#nearby_region_menu .city_region_manual > summary {
+	margin: 4px 0 0 6px;
+	padding: 6px;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+
+#nearby_region_menu .city_region_manual > summary {
+	display: list-item;
+	list-style: none;
+	min-height: 32px;
+}
+
+#nearby_region_menu .city_region_manual > summary::-webkit-details-marker {
+	display: none;
+}
+
+#nearby_region_menu .city_region_manual[open] > summary span {
+	display: inline-block;
+	transform: rotate(45deg);
+}

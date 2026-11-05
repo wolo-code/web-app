@@ -23,8 +23,17 @@ function runtime() {
 	const panels = new Map(), nodes = new Map(), events = [];
 	for(const id of ['nearby', 'matching', 'history']) {
 		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
-		panels.set(id + '_region_menu', { querySelector: key => children.get(key), children });
+		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
+		const panel = { querySelector: key => children.get(key), children };
+		if(id === 'nearby') {
+			const cities = { querySelector: key => children.get(key) };
+			panel.parentElement = {
+				sections: [cities, panel],
+				querySelector: key => key === '.city_region_cities' ? cities : null,
+				insertBefore(first, second) { this.sections = [first, second]; }
+			};
+		}
+		panels.set(id + '_region_menu', panel);
 	}
 	const api = { document: { createElement: node, getElementById(id) { return panels.get(id) || nodes.get(id) || null; } },
 		code_postition: { lat: 28.21, lng: 83.99 }, code_city: null,
@@ -100,4 +109,30 @@ test('empty previous-city menus remain enabled and still expose region/proposal 
 	r.api.showOverlay = () => { opened = true; };
 	r.api.showDecodeCityHistoryMessage();
 	assert(rendered && opened);
+});
+
+test('nearby picker opens the active reference section and pins the current region first', () => {
+	const { api, panels } = runtime();
+	const panel = panels.get('nearby_region_menu');
+	const cities = panel.parentElement.querySelector('.city_region_cities');
+	const regionDetails = panel.children.get('.city_region_choices');
+	const list = panel.children.get('.city_region_list');
+	const active = api.regionAnchorFromId('region:v1:country-npl:1');
+
+	api.code_city = active;
+	api.code_postition = null;
+	api.renderCityRegionMenu('nearby', 'nearby');
+	assert.equal(panel.parentElement.sections[0], panel);
+	assert.equal(regionDetails.open, true);
+	assert.equal(cities.open, false);
+	assert.equal(list.children[0].attributes['aria-pressed'], 'true');
+	assert.match(list.children[0].html, /wolo_region_index/);
+	assert.equal(list.children[0].children[0].textContent, 'Current');
+	assert.equal(list.children.filter(button => button.attributes['aria-pressed'] === 'true').length, 1);
+
+	api.code_city = { id: 'city' };
+	api.renderCityRegionMenu('nearby', 'nearby');
+	assert.equal(panel.parentElement.sections[0], cities);
+	assert.equal(regionDetails.open, false);
+	assert.equal(cities.open, true);
 });

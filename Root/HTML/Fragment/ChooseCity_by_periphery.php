@@ -7,11 +7,7 @@
 	</div>
 	<div id='choose_city_by_periphery_message_prompt' class='message_dialog_body'>
 		<p>
-			Current reference:
-		</p>
-		<div id='choose_city_by_periphery_message_current_city'></div>
-		<p>
-			Nearby cities:
+			City or region reference
 		</p>
 		<div id='choose_city_by_periphery_message_list' class='choose_city_message_list'></div>
 		<?php $cityRegionMenuId = 'nearby'; require __DIR__ . '/CityRegionOptions.php'; ?>

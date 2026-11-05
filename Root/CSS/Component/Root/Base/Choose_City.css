@@ -10,22 +10,13 @@
 	background-color: #FFFFFF;
 }
 
-.choose_city_message_list, #choose_city_by_periphery_message_current_city {
-	padding-left: 6px;
+.choose_city_message_list {
+	padding-inline: 6px;
 }
 
-#choose_city_by_periphery_message_current_city div {
-	background-color: #ffffff;
-	color: #69B7CF;
-	font-size: larger;
-	border-radius: 5px;
-	padding: 2px 0 2px 8px;
-	border: 1px solid #eeeeee;
-}
-
-html.dark-mode #choose_city_by_periphery_message_current_city div {
-	background: transparent;
-	border-color: rgb(105 183 207 / 35%);
+#choose_city_by_periphery_message_prompt > p {
+	margin-block: 0 8px;
+	padding-inline: 6px;
 }
 
 .choose_city_message_list div {
@@ -44,7 +35,7 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 	opacity: .75;
 }
 
-.choose_city_message_list div:hover, #choose_city_by_periphery_message_current_city div:hover {
+.choose_city_message_list div:hover {
 	cursor: pointer;
 }
 
@@ -72,7 +63,8 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 	box-sizing: border-box;
 	min-height: 44px;
 	padding: 10px 8px;
-	font-weight: 600;
+	font-size: .9em;
+	font-weight: 400;
 	overflow-wrap: anywhere;
 }
 
@@ -89,7 +81,7 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 	content: '';
 	position: absolute;
 	inset-inline-start: 0;
-	border-color: #69b7cf;
+	border-color: rgb(105 183 207 / 65%);
 	border-style: dotted;
 	border-width: 0;
 	pointer-events: none;
@@ -97,7 +89,7 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 
 .city_choice_list .city_choice_list > li::before {
 	inset-block: 0;
-	border-inline-start-width: 2px;
+	border-inline-start-width: 1px;
 }
 
 .city_choice_list .city_choice_list > li:last-child::before {
@@ -108,11 +100,13 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 .city_choice_list .city_choice_list > li::after {
 	inset-block-start: 21px;
 	width: 14px;
-	border-block-start-width: 2px;
+	border-block-start-width: 1px;
 }
 
 .choose_city_message_list .city_choice_button {
-	display: block;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	box-sizing: border-box;
 	width: 100%;
 	min-height: 44px;
@@ -126,6 +120,32 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 	text-align: start;
 	overflow-wrap: anywhere;
 	cursor: pointer;
+}
+
+.city_choice_name {
+	min-width: 0;
+	flex: 1;
+}
+
+.city_choice_status {
+	flex-shrink: 0;
+	font-size: .8em;
+	opacity: .75;
+}
+
+.choose_city_message_list .city_choice_button[aria-current='true'] {
+	background: rgb(105 183 207 / 18%);
+}
+
+.city_choice_button[aria-current='true'] .city_choice_name::before {
+	content: '';
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-inline-end: 8px;
+	border-radius: 50%;
+	background: #69b7cf;
+	vertical-align: .12em;
 }
 
 .choose_city_message_list .city_choice_button:hover {

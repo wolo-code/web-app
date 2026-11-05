@@ -1006,7 +1006,7 @@ function tryDefaultCity() {
 		infoWindow.close();
 }
 
-function getFullCity(city) {
+function getFullCity(city, groupLocality) {
 	if(!city) {
 		return '';
 	}
@@ -1017,7 +1017,7 @@ function getFullCity(city) {
 	if(!cityGroupName || (!locality && cityGroupName == properCityAccent))
 		return city.country + ' \\ ' + properCityAccent;
 	else {
-		if(locality)
+		if(locality && !groupLocality)
 			return city.country + ' \\ ' + cityGroupName + ' : ' + properCityAccent;
 		else
 			return city.country + ' \\ ' + cityGroupName + ' \\ ' + properCityAccent;
@@ -1028,7 +1028,7 @@ function renderCityChoices(container, choices) {
 	container.textContent = '';
 	var entries = choices.map(function(choice) {
 		var regional = typeof isRegionAnchor === 'function' && isRegionAnchor(choice.city);
-		var label = getFullCity(choice.city);
+		var label = getFullCity(choice.city, true);
 		return {choice: choice, regional: regional, path: regional ? [label] : label.split(' \\ ')};
 	});
 	if(entries.length)
@@ -1055,13 +1055,25 @@ function buildCityChoiceList(entries, depth) {
 			var button = document.createElement('button');
 			button.type = 'button';
 			button.className = 'city_choice_button';
+			var label = document.createElement('span');
+			label.className = 'city_choice_name';
 			if(entry.regional)
-				button.innerHTML = entry.path[0];
-			else {
-				button.textContent = entry.path.slice(depth).join(' \\ ');
-				if(depth)
-					button.setAttribute('aria-label', entry.path.join(' \\ '));
+				label.innerHTML = entry.path[0];
+			else
+				label.textContent = entry.path.slice(depth).join(' \\ ');
+			button.appendChild(label);
+
+			var status = entry.choice.status;
+			if(status) {
+				var badge = document.createElement('span');
+				badge.className = 'city_choice_status';
+				badge.textContent = status;
+				button.appendChild(badge);
+				if(status === 'Current')
+					button.setAttribute('aria-current', 'true');
 			}
+			if(depth)
+				button.setAttribute('aria-label', entry.path.join(' \\ ') + (status ? ', ' + status : ''));
 			button.data_id = entry.choice.key;
 			button.addEventListener('click', entry.choice.select);
 			item.appendChild(button);

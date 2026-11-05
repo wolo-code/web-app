@@ -108,6 +108,7 @@ button.gm-ui-hover-effect {
 
 #infowindow_actions > :first-child {
 	margin-left: 0;
+	margin-bottom: 2px;
 }
 
 #infowindow_actions > :last-child {

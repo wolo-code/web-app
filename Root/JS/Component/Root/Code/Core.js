@@ -19,37 +19,30 @@ function encode(position, locating_encode) {
 		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) return;
 	}
 	getAddress(position, session_id, function(address_components) {
-	
-			var city_gp_id = getCityGpId(address_components);
-			if(city_gp_id != null) {
-				
-				getCityFromCityGp_id( city_gp_id, session_id, function(city) {
-					if(typeof locating_encode != 'undefined' && locating_encode == true) {
-						current_city_gp_id = city_gp_id;
-						setCurrentCity_status(true);
-					}
-					else if(current_city_gp_id == city_gp_id)
-						setCurrentCity_status(true);
-					else
-						setCurrentCity_status(false);
-					getCityCenterFromId_session(city, session_id, function(city) {
-						if(city != null)
-							encode_continue(city, position);
-						else
-							encode_continue(null, position);
-					});
-				}, function() {
-				encode_continue(null, position)
-				} );
-				
-				getCity_by_perifery_list(position, session_id, false);
-				
-			}
-			else {
-				getCity_by_perifery_list(position, session_id, true);
-			}
-			
-		});
+		var city_gp_id = getCityGpId(address_components);
+		function tryNearbyCities() {
+			getCity_by_perifery_list(position, session_id, true);
+		}
+
+		if(city_gp_id == null) {
+			tryNearbyCities();
+			return;
+		}
+
+		getCityFromCityGp_id(city_gp_id, session_id, function(city) {
+			getCityCenterFromId_session(city, session_id, function(city) {
+				if(!cityCoversPosition(city, position)) {
+					tryNearbyCities();
+					return;
+				}
+				if(locating_encode === true)
+					current_city_gp_id = city_gp_id;
+				setCurrentCity_status(current_city_gp_id == city_gp_id);
+				encode_continue(city, position);
+				getCity_by_perifery_list(position, encode_session_id, false);
+			});
+		}, tryNearbyCities);
+	});
 }
 
 function setCurrentCity_status(status) {
@@ -83,24 +76,19 @@ function encode_continue(city, position) {
 }
 
 function getCityGpId(address_components) {
-	var found_city_i;
-	for(var i = address_components.length-1; i >= 0; i--) {
-		if ( address_components[i].types.includes('administrative_area_level_1') || address_components[i].types.includes('administrative_area_level_2') ) {
-			found_city_i = i;
-		} else if(address_components[i].types.includes('locality')) {
-			found_city_i = i;
-			break;
-		} else if ( found_city_i == null && (address_components[i].types.includes('sublocality') || address_components[i].types.includes('sublocality_level_1')) ) {
-			found_city_i = i;
-			break;
-		}
+	var fallback = null;
+	for(var i = 0; i < address_components.length; i++) {
+		var result = address_components[i];
+		if(!result.place_id)
+			continue;
+		if(result.types.includes('locality'))
+			return result.place_id;
+		if(fallback == null && (result.types.includes('administrative_area_level_1') ||
+			result.types.includes('administrative_area_level_2') || result.types.includes('sublocality') ||
+			result.types.includes('sublocality_level_1')))
+			fallback = result.place_id;
 	}
-
-	if(found_city_i != null)
-		return address_components[found_city_i].place_id;
-	else {
-		return null;
-	}
+	return fallback;
 }
 
 function decode(words) {

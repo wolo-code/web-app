@@ -50,6 +50,11 @@ function isValidWoloIndexCode(code) {
 	return true;
 }
 
+function cityCoversPosition(city, position) {
+	var begin = city && getCityBegin(city.center);
+	return !!begin && isValidWoloIndexCode(encode__(begin, position));
+}
+
 function encode_(city, position) {
 	if(!city || !city.center) {
 		areaNotCovered(position);

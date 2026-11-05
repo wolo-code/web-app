@@ -428,15 +428,16 @@ function getCity_by_perifery_list_fs(latLng, session_id) {
 	}
 	var geoQuery = geoFire.query({
 		center: [latLng.lat, latLng.lng],
-		radius: CITY_RANGE_RADIUS
+		// Include the corners of the square city grid when choosing an encoding reference.
+		radius: pending_encode_latLng ? CITY_RANGE_RADIUS * Math.SQRT2 : CITY_RANGE_RADIUS
 	});
 
 	pushLoader();
 	geoQuery.on('ready', function() {
 		geoQuery.cancel();
+		popLoader();
 		sessionForwarder(session_id, function() {
 			geoQuery_completed = true;
-			popLoader();
 			
 			if(Object.keys(nearCityList_coord).length == Object.keys(nearCityList_detail).length)
 				syncNearCityList(nearCityList_coord, nearCityList_detail);
@@ -463,11 +464,13 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 	else {
 		var nearCityList = [];
 		chooseCity_by_periphery_List_gpids = [];
-		var nearCity_distance;
+		var coveringCity = null;
 		nearCity = null;
 		for(aCity in nearCityList_coord) {
 			var xCity = new Object;
 			xCity = nearCityList_coord[aCity];
+			if(!nearCityList_detail[aCity].city)
+				continue;
 			xCity.city.country = nearCityList_detail[aCity].city.country;
 			xCity.city.gp_id = nearCityList_detail[aCity].city.gp_id;
 			if(typeof nearCityList_detail[aCity].city.administrative_level_2 != 'undefined')
@@ -477,6 +480,9 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 			xCity.city.name = nearCityList_detail[aCity].city.name;
 			xCity.city.name_id = nearCityList_detail[aCity].city.name_id;
 			nearCityList.push(xCity);
+			if(pending_encode_latLng && (!coveringCity || xCity.distance < coveringCity.distance) &&
+				cityCoversPosition(xCity.city, pending_encode_latLng))
+				coveringCity = xCity;
 			if(nearCity == null || nearCityList_coord[aCity].distance < nearCity.distance) {
 				nearCity = xCity;
 				nearCity.distance = nearCityList_coord[aCity].distance;
@@ -486,7 +492,7 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 			encode_continue(city, resolveLatLng(marker.getPosition()));
 		});
 		if(pending_encode_latLng != null)
-			encode_continue(nearCity.city, pending_encode_latLng);
+			encode_continue(coveringCity ? coveringCity.city : null, pending_encode_latLng);
 	}
 }
 

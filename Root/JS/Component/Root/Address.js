@@ -25,14 +25,15 @@ function getAddress(latLng, session_id, callback) {
 				if(typeof callback != 'undefined') {
 					sessionForwarder(session_id, callback, [address_components]);
 				}
+			} else if(typeof callback === 'function') {
+				sessionForwarder(session_id, callback, [[]]);
 			} else {
 				console.log('No geoCoding results found');
 			}
-		} else {
-			if(typeof callback === 'function' && typeof encodeRegionFallback === 'function')
-				encodeRegionFallback(latLng);
-			else if(status !== 'ZERO_RESULTS')
-				console.log('Geocoder failed due to: ' + status);
+		} else if(typeof callback === 'function') {
+			sessionForwarder(session_id, callback, [[]]);
+		} else if(status !== 'ZERO_RESULTS') {
+			console.log('Geocoder failed due to: ' + status);
 		}
 		if(keepAddressPanelOpen) {
 			showAddress();

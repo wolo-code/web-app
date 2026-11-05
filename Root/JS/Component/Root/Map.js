@@ -331,6 +331,7 @@ function onMapSearchGlobalKeydown(event) {
 
 function initMap() {
 	initOsmMapType();
+	initMapFocusCancellation();
 
 	var input = document.getElementById('pac-input');
 	var searchCluster = document.getElementById('map_search_cluster');
@@ -799,6 +800,7 @@ function clearMap() {
 }
 
 function cleanUp(full = false) {
+	stopZoom();
 	document.getElementById('map_input_suggestion_result').innerText = '';
 	document.getElementById('decode_input_suggestion_result').innerText = '';
 	clearNotificationTimer();
@@ -891,6 +893,7 @@ function toggleDecodeView() {
 	}
 	else {
 		clearMapViewClasses();
+		cancelMapFocus();
 		document.body.classList.add('decode');
 		if(typeof setGoogleMapTypeId === 'function' && typeof google === 'object' && google.maps && google.maps.MapTypeId)
 			setGoogleMapTypeId(google.maps.MapTypeId.ROADMAP);

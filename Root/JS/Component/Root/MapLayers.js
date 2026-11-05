@@ -775,6 +775,8 @@ function setGoogleMapTypeId(typeId) {
 }
 
 function setMapLayer(layer) {
+	if(typeof cancelMapFocus === 'function')
+		cancelMapFocus();
 	if(!isMapLayerEnabled(layer)) {
 		layer = getDefaultMapLayer();
 	}

@@ -1,5 +1,11 @@
 # App Features
 
+## Map camera navigation
+
+- Bounds-based zoom uses the full projected area, the map canvas size, and the same padding as the final fit, preventing a zoom-in overshoot followed by a zoom-out correction. Dateline-crossing bounds and the viewport minimum zoom are respected.
+- Manual wheel, touch, drag, double-click, and camera-key input cancel pending focus timers and pan callbacks. A newer location selection, map-source change, or return to Wolo Code Input View also cancels obsolete camera work.
+- Focusing the current map center starts zoom without waiting for a no-op pan. Provider zoom clamps end the animation without repeated steps.
+
 ## Country regions and city menu actions
 
 - Country-level regions extend the registry with 257 country/territory namespaces, for 578 active named regions. Existing physical-region indices remain unchanged. Conflicting names gain a Region qualifier (e.g. Australia Region); unambiguous admin-0 three-letter codes are accepted as aliases.

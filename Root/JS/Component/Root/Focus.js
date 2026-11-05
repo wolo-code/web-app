@@ -14,7 +14,9 @@ function focus___(pos, bounds, skipFinalBoundsFit) {
 const ZOOM_ANIMATION_SPEED = 250;
 var firstFocus = true;
 function beginProgrammaticMapFocus() {
+	stopZoom();
 	programmaticMapFocus = true;
+	selfBoundsChangedCount = 1;
 }
 
 function endProgrammaticMapFocus() {
@@ -65,12 +67,9 @@ function animateMapToCityScope(pos) {
 		return;
 
 	beginProgrammaticMapFocus();
-	stopZoom();
 
 	function zoomIn() {
-		map.panTo(pos);
-		var idleListenerPan = map.addListener('idle', function() {
-			idleListenerPan.remove();
+		panMapForFocus(pos, function() {
 			smoothZoomToBounds(undefined, map, getCityScopeZoom(pos), map.getZoom());
 		});
 	}
@@ -106,9 +105,7 @@ function getFocusTargetZoom(bounds) {
 }
 
 function panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit) {
-	map.panTo(pos);
-	var idleListenerPan = map.addListener('idle', function() {
-		idleListenerPan.remove();
+	panMapForFocus(pos, function() {
 		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds), map.getZoom(), skipFinalBoundsFit);
 	});
 }
@@ -117,7 +114,6 @@ function focus_(pos, bounds, skipFinalBoundsFit) {
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
-	stopZoom();
 
 	var zoomOutFirst = pendingTryCityZoomOut;
 	pendingTryCityZoomOut = false;
@@ -162,39 +158,87 @@ function showMarker(pos) {
 	showInfoWindow();
 }
 
-function incMapInteractionCounter() {
-	if (selfBoundsChangedCount == 0)
-		stopZoom();
-	else
-		selfBoundsChangedCount--;
-}
-
-function decMapInteractionCounter() {
-	if(selfBoundsChangedCount == 0) {
-		stopZoom();
-		return false;
-	}
-	else {
-		selfBoundsChangedCount++;
-		return true;
-	}
-}
-
 function stopZoom() {
+	mapFocusGeneration++;
 	if(zoomChangedListener != null)
 		google.maps.event.removeListener(zoomChangedListener);
 	zoomChangedListener = null;
 	if(nextZoomTimer != null)
 		clearTimeout(nextZoomTimer);
 	nextZoomTimer = null;
+	if(mapFocusIdleListener != null)
+		google.maps.event.removeListener(mapFocusIdleListener);
+	mapFocusIdleListener = null;
+	pendingFocusPos = null;
+	endProgrammaticMapFocus();
+}
+
+function cancelMapFocus() {
+	selfBoundsChangedCount = 0;
+	stopZoom();
+	pendingTryCityZoomOut = false;
+	if(holdInfoWindowForTryCityZoomOut)
+		revealHeldTryCityInfoWindow();
+}
+
+// Capture user intent before the SDK changes the camera, including its controls.
+function initMapFocusCancellation() {
+	var canvas = document.getElementById('map');
+	if(!canvas || canvas._woloFocusCancellation)
+		return;
+	canvas._woloFocusCancellation = true;
+	['pointerdown', 'touchstart', 'wheel', 'click', 'dblclick'].forEach(function(name) {
+		canvas.addEventListener(name, cancelMapFocus, {capture: true, passive: true});
+	});
+	canvas.addEventListener('keydown', function(event) {
+		if(typeof isMapSearchTypingTarget === 'function' && isMapSearchTypingTarget(event.target))
+			return;
+		if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', '+', '-', '=', 'PageUp', 'PageDown'].indexOf(event.key) >= 0)
+			cancelMapFocus();
+	}, true);
+	map.addListener('dragstart', cancelMapFocus);
+}
+
+function onMapFocusIdle(action, callback) {
+	var generation = mapFocusGeneration;
+	var listener = map.addListener('idle', function() {
+		google.maps.event.removeListener(listener);
+		if(mapFocusIdleListener === listener)
+			mapFocusIdleListener = null;
+		if(generation === mapFocusGeneration)
+			callback();
+	});
+	mapFocusIdleListener = listener;
+	action();
+}
+
+function panMapForFocus(pos, callback) {
+	var center = map.getCenter();
+	var lat = typeof pos.lat === 'function' ? pos.lat() : pos.lat;
+	var lng = typeof pos.lng === 'function' ? pos.lng() : pos.lng;
+	// A pan to the current center need not emit idle.
+	if(center && center.lat() === lat && center.lng() === lng) {
+		callback();
+		return;
+	}
+	onMapFocusIdle(function() { map.panTo(pos); }, callback);
 }
 
 const ZOOM_ANIMATION_INCREMENT = 1;
 const ZOOM_BOUND_PADDING = 36;
 var zoomChangedListener;
 var nextZoomTimer;
+var mapFocusIdleListener;
+var mapFocusGeneration = 0;
 function finishSmoothZoomToBounds(bounds, map, skipFinalBoundsFit) {
-	setTimeout(function() {
+	var generation = mapFocusGeneration;
+	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', cancelMapFocus);
+	nextZoomTimer = setTimeout(function() {
+		nextZoomTimer = null;
+		if(generation !== mapFocusGeneration)
+			return;
+		google.maps.event.removeListener(zoomChangedListener);
+		zoomChangedListener = null;
 		if(skipFinalBoundsFit) {
 			if(pendingFocusPos && map) {
 				map.panTo(pendingFocusPos);
@@ -210,9 +254,7 @@ function finishSmoothZoomToBounds(bounds, map, skipFinalBoundsFit) {
 			focus___(temPos);
 		}
 		else if(typeof bounds !== 'undefined') {
-			map.fitBounds(bounds, ZOOM_BOUND_PADDING);
-			var idleListenerPanBy = map.addListener('idle', function() {
-				idleListenerPanBy.remove();
+			onMapFocusIdle(function() { map.fitBounds(bounds, ZOOM_BOUND_PADDING); }, function() {
 				applyMapChromePan();
 				endProgrammaticMapFocus();
 			});
@@ -224,6 +266,8 @@ function finishSmoothZoomToBounds(bounds, map, skipFinalBoundsFit) {
 }
 
 function smoothZoomOut(map, current, min, onDone) {
+	if(typeof getMinZoomToFillMapHeight === 'function')
+		min = Math.max(min, getMinZoomToFillMapHeight());
 	if (current <= min) {
 		if(typeof onDone === 'function')
 			onDone();
@@ -232,17 +276,9 @@ function smoothZoomOut(map, current, min, onDone) {
 	var nextZoom = current - ZOOM_ANIMATION_INCREMENT;
 	if(nextZoom < min)
 		nextZoom = min;
-	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
-		google.maps.event.removeListener(zoomChangedListener);
-		zoomChangedListener = null;
-		incMapInteractionCounter();
-		smoothZoomOut(map, nextZoom, min, onDone);
+	scheduleSmoothZoomStep(map, current, nextZoom, function(actual) {
+		smoothZoomOut(map, actual, min, onDone);
 	});
-	nextZoomTimer = setTimeout(function() {
-		if(decMapInteractionCounter()) {
-			map.setZoom(nextZoom);
-		}
-	}, ZOOM_ANIMATION_SPEED);
 }
 
 function smoothZoomToBounds(bounds, map, max, current, skipFinalBoundsFit) {
@@ -251,6 +287,8 @@ function smoothZoomToBounds(bounds, map, max, current, skipFinalBoundsFit) {
 		if (typeof typeMax === 'number' && max > typeMax)
 			max = typeMax;
 	}
+	if(typeof getMinZoomToFillMapHeight === 'function')
+		max = Math.max(max, getMinZoomToFillMapHeight());
 	if (current >= max) {
 		if(current > max)
 			map.setZoom(max);
@@ -260,16 +298,39 @@ function smoothZoomToBounds(bounds, map, max, current, skipFinalBoundsFit) {
 	var nextZoom = current + ZOOM_ANIMATION_INCREMENT;
 	if(nextZoom > max)
 		nextZoom = max;
-	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function(event) {
-		google.maps.event.removeListener(zoomChangedListener);
-		zoomChangedListener = null;
-		incMapInteractionCounter();
-		smoothZoomToBounds(bounds, map, max, nextZoom, skipFinalBoundsFit);
+	scheduleSmoothZoomStep(map, current, nextZoom, function(actual) {
+		smoothZoomToBounds(bounds, map, max, actual, skipFinalBoundsFit);
+	});
+}
+
+function scheduleSmoothZoomStep(map, current, nextZoom, callback) {
+	var generation = mapFocusGeneration;
+	var applying = false;
+	zoomChangedListener = google.maps.event.addListener(map, 'zoom_changed', function() {
+		if(!applying)
+			cancelMapFocus();
 	});
 	nextZoomTimer = setTimeout(function() {
-		if(decMapInteractionCounter()) {
-			map.setZoom(nextZoom);
+		nextZoomTimer = null;
+		if(generation !== mapFocusGeneration)
+			return;
+		if(map.getZoom() !== current) {
+			cancelMapFocus();
+			return;
 		}
+		applying = true;
+		map.setZoom(nextZoom);
+		var actual = map.getZoom();
+		google.maps.event.removeListener(zoomChangedListener);
+		zoomChangedListener = null;
+		if(generation !== mapFocusGeneration)
+			return;
+		// Stop on an SDK/provider clamp; never recurse using an assumed zoom.
+		if(actual !== nextZoom) {
+			stopZoom();
+			return;
+		}
+		callback(actual);
 	}, ZOOM_ANIMATION_SPEED);
 }
 
@@ -293,15 +354,18 @@ function getZoomByBounds(map, bounds) {
 	var ne = projection.fromLatLngToPoint( bounds.getNorthEast() );
 	var sw = projection.fromLatLngToPoint( bounds.getSouthWest() );
 
-	var worldCoordWidth = Math.abs(ne.x-sw.x)/2;
-	var worldCoordHeight = Math.abs(ne.y-sw.y)/2;
-
-	var FIT_PAD = 10;
+	var worldCoordWidth = ne.x - sw.x;
+	if(worldCoordWidth < 0)
+		worldCoordWidth += 256;
+	var worldCoordHeight = Math.abs(ne.y-sw.y);
+	var canvas = typeof map.getDiv === 'function' ? map.getDiv() : document.body;
+	var width = Math.max(1, canvas.clientWidth - 2 * ZOOM_BOUND_PADDING);
+	var height = Math.max(1, canvas.clientHeight - 2 * ZOOM_BOUND_PADDING);
 
 	for(var zoom = MAX_ZOOM; zoom >= MIN_ZOOM; --zoom) {
-		if( worldCoordWidth*(1<<zoom)+2*FIT_PAD < document.body.scrollWidth &&
-				worldCoordHeight*(1<<zoom)+2*FIT_PAD < document.body.scrollHeight )
+		if( worldCoordWidth*Math.pow(2, zoom) <= width &&
+				worldCoordHeight*Math.pow(2, zoom) <= height )
 			return zoom;
 	}
-	return 0;
+	return MIN_ZOOM;
 }

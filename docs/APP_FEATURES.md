@@ -81,6 +81,7 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 ## Sharing, QR, And Export
 
 Opening a QR label safely skips closing a missing copy-code dialog, including when no overlay is visible.
+The QR label opens with the resolved Google address when the location has no saved or edited address.
 
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |

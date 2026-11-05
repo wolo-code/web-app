@@ -142,7 +142,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | QR brand area | QR Label Brand | `#logo_qr`, `#logo_wolo_qr`, `#logo_codes_qr` | Top of QR Label Surface | Identifies the label as Wolo Code. |
 | QR title inputs | QR Label Title Fields | `#qr_title_main`, `#qr_title_segment` | Below QR brand area | Lets the user edit title and segment text, with `Title – e.g. Home` and `Segment – e.g. Main gate` hints. |
 | QR code text | QR Label Wolo Code | `#qr_wcode`, `#qr_wcode_city`, `#qr_wcode_code` | Middle of QR Label Surface | Shows the encoded city above the three-word code; when space permits, the horizontal midline of the words aligns with the horizontal midline of the bordered region. |
-| QR address field | QR Label Address | `#qr_address` | Below QR code text | Lets the user edit the displayed address and refreshes bookmark status on activation and input. Empty or placeholder text uses the resolved address for status and saving. |
+| QR address field | QR Label Address | `#qr_address` | Below QR code text | Prefills the saved or edited address when available, otherwise the resolved Google address. The user can edit the address, and bookmark status refreshes on activation and input. |
 | QR app URL | QR Label App URL | `#qr_webapp_url` | Bottom of QR Label Surface | Shows the app URL for the label. |
 | QR controls | QR Label Controls | `#qr_controls` | Bottom of QR Label View | Hosts preview, download, and print actions. |
 | QR preview action | QR Preview Button | `#qr_preview` | Left control in QR Label Controls | Toggles the printable preview state with an eye-only icon. |

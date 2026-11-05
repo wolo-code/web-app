@@ -137,6 +137,26 @@ test('offline enqueue and local-to-cloud sync retain structured address lines', 
  assert.equal(c.readLocalBookmarks().local_test, undefined);
 });
 
+test('opening the label prefills the resolved address and preserves saved address lines', () => {
+ const { context: c, fields } = harness();
+ fields.qr_wcode_city = {};
+ fields.qr_wcode_code = {};
+ c.current_title = c.current_segment = '';
+ c.code_city = c.getCodeCity();
+ c.code_wcode = c.getCodeWCode();
+ c.getProperCityAccent = city => city.name;
+ c.hideOverlay = c.showOverlay = () => {};
+ c.address = '12 MG Road, Bengaluru';
+
+ c.showQR();
+ assert.equal(fields.qr_address.innerText, c.address);
+ assert.equal(fields.qr_address_line_2.hidden, true);
+
+ c.current_address_lines = lines;
+ c.showQR();
+ assert.deepEqual(plain(c.getQRDialogAddressLines()), lines);
+});
+
 test('QR fields preserve address boundaries and compare formatted bookmarks', () => {
  const { context: c } = harness();
  c.current_address_lines = { address_line_1: '', address_line_2: 'Second only' };

@@ -9,7 +9,7 @@ function showQR() {
 	else
 		document.getElementById('qr_title_segment').value = '';
 		
-	setQRAddressFields(current_address_lines || { address_line_1: current_address || '', address_line_2: '' });
+	setQRAddressFields(current_address_lines || { address: current_address || address || '' });
 	
 	var city_accent = getProperCityAccent(code_city);
 	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))

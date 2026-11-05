@@ -1,12 +1,10 @@
 var chooseCity_by_periphery_Callback;
 var chooseCity_by_periphery_List;
 var chooseCity_by_periphery_gpid;
-var chooseCity_by_periphery_List_gpids = [];
 
 function showChooseCity_by_periphery_Message() {
-	chooseCity_by_periphery_List_gpids = [];
 	clearChooseCity_by_periphery_List();
-	showChooseCity_by_periphery_gpid();
+	showChooseCityCurrentReference();
 	showChooseCity_by_periphery_List();
 	if(typeof renderCityRegionMenu === 'function') renderCityRegionMenu('nearby', 'nearby');
 	showOverlay(document.getElementById('choose_city_by_periphery_message'));
@@ -21,21 +19,27 @@ function isChooseCityCurrentCodeCity(city) {
 
 function showChooseCity_by_periphery_List() {
 	var container = document.getElementById('choose_city_by_periphery_message_list');
-	var chooseCity_by_periphery_List_gpids_ = [];
-	for(let key in chooseCity_by_periphery_List) {
-		var city = chooseCity_by_periphery_List[key] && chooseCity_by_periphery_List[key].city;
-		if(!city) {
-			continue;
-		}
-		if(!chooseCity_by_periphery_List_gpids_.includes(city.gp_id) && !chooseCity_by_periphery_List_gpids.includes(city.gp_id) && !isChooseCityCurrentCodeCity(city)) {
-			var row = document.createElement('div');
-			row.innerHTML = getFullCity(city);
-			container.appendChild(row);
-			row.addEventListener('click', chooseCity_by_periphery_Continue);
-			row.data_id = key;
-			chooseCity_by_periphery_List_gpids_.push(city.gp_id);
+	var choices = [];
+	var seen = new Set();
+	if(typeof code_city !== 'undefined' && code_city) {
+		for(let key in chooseCity_by_periphery_gpid) {
+			var city = chooseCity_by_periphery_gpid[key].city;
+			seen.add(city.gp_id);
+			if(city.gp_id == code_city.gp_id ||
+				(city.administrative_level_2 == null && city.administrative_level_1 != null))
+				continue;
+			choices.push({city: city, key: key, select: chooseCity_by_periphery_gpid_Continue});
 		}
 	}
+	for(let key in chooseCity_by_periphery_List) {
+		var city = chooseCity_by_periphery_List[key] && chooseCity_by_periphery_List[key].city;
+		if(!city || seen.has(city.gp_id) || isChooseCityCurrentCodeCity(city))
+			continue;
+		choices.push({city: city, key: key, select: chooseCity_by_periphery_Continue});
+		if(city.gp_id)
+			seen.add(city.gp_id);
+	}
+	renderCityChoices(container, choices);
 }
 
 function hideChooseCity_by_periphery_Message() {
@@ -52,10 +56,8 @@ function chooseCity_by_periphery(list, callback) {
 	chooseCity_by_periphery_List = list;
 	chooseCity_by_periphery_Callback = callback;
 	var peripheryMessage = document.getElementById('choose_city_by_periphery_message');
-	var peripheryList = document.getElementById('choose_city_by_periphery_message_list');
-	if(peripheryMessage && peripheryMessage.classList && !peripheryMessage.classList.contains('hide')
-	 && peripheryList && peripheryList.innerHTML.length == 0)
-		showChooseCity_by_periphery_List()
+	if(peripheryMessage && peripheryMessage.classList && !peripheryMessage.classList.contains('hide'))
+		showChooseCity_by_periphery_List();
 }
 
 function chooseCity_by_periphery_Continue(e) {
@@ -66,7 +68,7 @@ function chooseCity_by_periphery_Continue(e) {
 	chooseCity_by_periphery_Callback(city);
 }
 
-function showChooseCity_by_periphery_gpid() {
+function showChooseCityCurrentReference() {
 	if(typeof code_city == 'undefined' || !code_city) {
 		return;
 	}
@@ -75,22 +77,6 @@ function showChooseCity_by_periphery_gpid() {
 	row.innerHTML = getFullCity(code_city);
 	row.addEventListener('click', hideChooseCity_by_periphery_Message);
 	container.appendChild(row);
-	
-	for(let key in chooseCity_by_periphery_gpid) {
-		chooseCity_by_periphery_List_gpids.push(chooseCity_by_periphery_gpid[key].city.gp_id);
-		if(chooseCity_by_periphery_gpid[key].city.gp_id == code_city.gp_id)
-			continue;
-		else {
-			if(chooseCity_by_periphery_gpid[key].city.administrative_level_2 == null && chooseCity_by_periphery_gpid[key].city.administrative_level_1 != null)
-				continue;
-			var container = document.getElementById('choose_city_by_periphery_message_list');
-			var row = document.createElement('div');
-			row.innerHTML = getFullCity(chooseCity_by_periphery_gpid[key].city);
-			row.data_id = key;
-			row.addEventListener('click', chooseCity_by_periphery_gpid_Continue);
-			container.appendChild(row);
-		}
-	}
 }
 
 function chooseCity_by_periphery_gpid_Continue(e) {

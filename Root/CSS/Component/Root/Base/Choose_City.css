@@ -52,6 +52,91 @@ html.dark-mode #choose_city_by_periphery_message_current_city div {
 	margin-bottom: 10px;
 }
 
+.city_choice_list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.city_choice_list > li {
+	position: relative;
+	padding-block-end: 6px;
+}
+
+.city_choice_list > li:last-child {
+	padding-block-end: 0;
+}
+
+.city_choice_heading {
+	display: block;
+	box-sizing: border-box;
+	min-height: 44px;
+	padding: 10px 8px;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.city_choice_list .city_choice_list {
+	margin-inline-start: 12px;
+}
+
+.city_choice_list .city_choice_list > li {
+	padding-inline-start: 14px;
+}
+
+.city_choice_list .city_choice_list > li::before,
+.city_choice_list .city_choice_list > li::after {
+	content: '';
+	position: absolute;
+	inset-inline-start: 0;
+	border-color: #69b7cf;
+	border-style: dotted;
+	border-width: 0;
+	pointer-events: none;
+}
+
+.city_choice_list .city_choice_list > li::before {
+	inset-block: 0;
+	border-inline-start-width: 2px;
+}
+
+.city_choice_list .city_choice_list > li:last-child::before {
+	inset-block-end: auto;
+	height: 22px;
+}
+
+.city_choice_list .city_choice_list > li::after {
+	inset-block-start: 21px;
+	width: 14px;
+	border-block-start-width: 2px;
+}
+
+.choose_city_message_list .city_choice_button {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 44px;
+	padding: 8px 10px;
+	border: 1px solid rgb(105 183 207 / 60%);
+	border-radius: 5px;
+	background: rgb(105 183 207 / 10%);
+	color: inherit;
+	font: inherit;
+	font-size: 1.1em;
+	text-align: start;
+	overflow-wrap: anywhere;
+	cursor: pointer;
+}
+
+.choose_city_message_list .city_choice_button:hover {
+	background: rgb(105 183 207 / 22%);
+}
+
+.choose_city_message_list .city_choice_button:focus-visible {
+	outline: 2px solid #69b7cf;
+	outline-offset: 1px;
+}
+
 .choose_city_message > .message_dialog_body {
 	min-height: 0;
 	overflow-y: auto;

@@ -463,7 +463,6 @@ function syncNearCityList(nearCityList_coord, nearCityList_detail) {
 	}
 	else {
 		var nearCityList = [];
-		chooseCity_by_periphery_List_gpids = [];
 		var coveringCity = null;
 		nearCity = null;
 		for(aCity in nearCityList_coord) {
@@ -1012,10 +1011,10 @@ function getFullCity(city) {
 		return '';
 	}
 	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) return getRegionReferenceHTML(city);
-	locality = typeof city.locality != 'undefined'? city.locality : null; 
-	cityGroupName = getCityGroupName(city, ' \\ ');
-	properCityAccent = getProperCityAccent(city);
-	if(cityGroupName == null || (!locality && (cityGroupName == properCityAccent) ) )
+	var locality = city.locality;
+	var cityGroupName = getCityGroupName(city, ' \\ ');
+	var properCityAccent = getProperCityAccent(city);
+	if(!cityGroupName || (!locality && cityGroupName == properCityAccent))
 		return city.country + ' \\ ' + properCityAccent;
 	else {
 		if(locality)
@@ -1023,6 +1022,65 @@ function getFullCity(city) {
 		else
 			return city.country + ' \\ ' + cityGroupName + ' \\ ' + properCityAccent;
 	}
+}
+
+function renderCityChoices(container, choices) {
+	container.textContent = '';
+	var entries = choices.map(function(choice) {
+		var regional = typeof isRegionAnchor === 'function' && isRegionAnchor(choice.city);
+		var label = getFullCity(choice.city);
+		return {choice: choice, regional: regional, path: regional ? [label] : label.split(' \\ ')};
+	});
+	if(entries.length)
+		container.appendChild(buildCityChoiceList(entries, 0));
+}
+
+function buildCityChoiceList(entries, depth) {
+	var list = document.createElement('ul');
+	list.className = 'city_choice_list';
+	var groups = new Map();
+	entries.forEach(function(entry) {
+		// A city that ends here is a selectable leaf, even when it shares a group name.
+		var key = entry.path.length > depth + 1 ? entry.path[depth] : entry;
+		if(!groups.has(key))
+			groups.set(key, []);
+		groups.get(key).push(entry);
+	});
+
+	groups.forEach(function(group) {
+		var item = document.createElement('li');
+		list.appendChild(item);
+		if(group.length === 1) {
+			var entry = group[0];
+			var button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'city_choice_button';
+			if(entry.regional)
+				button.innerHTML = entry.path[0];
+			else {
+				button.textContent = entry.path.slice(depth).join(' \\ ');
+				if(depth)
+					button.setAttribute('aria-label', entry.path.join(' \\ '));
+			}
+			button.data_id = entry.choice.key;
+			button.addEventListener('click', entry.choice.select);
+			item.appendChild(button);
+			return;
+		}
+
+		var path = group[0].path;
+		var end = depth + 1;
+		while(group.every(function(entry) {
+			return entry.path.length > end + 1 && entry.path[end] === path[end];
+		}))
+			end++;
+		var heading = document.createElement('span');
+		heading.className = 'city_choice_heading';
+		heading.textContent = path.slice(depth, end).join(' \\ ');
+		item.appendChild(heading);
+		item.appendChild(buildCityChoiceList(group, end));
+	});
+	return list;
 }
 
 function getCity_by_address_list(address_components) {

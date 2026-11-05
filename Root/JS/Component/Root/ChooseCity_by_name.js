@@ -6,13 +6,10 @@ function showChooseCityMessage() {
 	if(typeof renderCityRegionMenu === 'function') renderCityRegionMenu('matching', 'matching');
 	showOverlay(document.getElementById('choose_city_by_name_message'));
 	var container = document.getElementById('choose_city_by_name_message_list');
-	for(let key in chooseCityList) {
-		var row = document.createElement('div');
-		row.innerHTML = getFullCity(chooseCityList[key]);
-		container.appendChild(row);
-		row.addEventListener('click', chooseCityContinue);
-		row.data_id = key;
-	}
+	var choices = Object.keys(chooseCityList).map(function(key) {
+		return {city: chooseCityList[key], key: key, select: chooseCityContinue};
+	});
+	renderCityChoices(container, choices);
 }
 
 function hideChooseCityMessage() {

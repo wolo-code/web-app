@@ -187,9 +187,10 @@ function initMapFocusCancellation() {
 	if(!canvas || canvas._woloFocusCancellation)
 		return;
 	canvas._woloFocusCancellation = true;
-	['pointerdown', 'touchstart', 'wheel', 'click', 'dblclick'].forEach(function(name) {
+	['pointerdown', 'touchstart', 'click', 'dblclick'].forEach(function(name) {
 		canvas.addEventListener(name, cancelMapFocus, {capture: true, passive: true});
 	});
+	initMapPinchWheel(canvas);
 	canvas.addEventListener('keydown', function(event) {
 		if(typeof isMapSearchTypingTarget === 'function' && isMapSearchTypingTarget(event.target))
 			return;
@@ -197,6 +198,43 @@ function initMapFocusCancellation() {
 			cancelMapFocus();
 	}, true);
 	map.addListener('dragstart', cancelMapFocus);
+}
+
+const MAP_PINCH_WHEEL_GAP_MS = 180;
+const MAP_PINCH_REVERSE_THRESHOLD_PX = 12;
+
+function initMapPinchWheel(canvas) {
+	var lastPinchTime = -Infinity;
+	var direction = 0;
+	var reverseDistance = 0;
+	canvas.addEventListener('wheel', function(event) {
+		cancelMapFocus();
+		if(!event.ctrlKey || event.deltaMode !== 0) {
+			lastPinchTime = -Infinity;
+			return;
+		}
+		if(!event.deltaY)
+			return;
+
+		var nextDirection = Math.sign(event.deltaY);
+		var newPinch = event.timeStamp - lastPinchTime >= MAP_PINCH_WHEEL_GAP_MS;
+		lastPinchTime = event.timeStamp;
+		if(newPinch || nextDirection === direction) {
+			direction = nextDirection;
+			reverseDistance = 0;
+			return;
+		}
+
+		// Suppress small reversals before Maps can turn them into a full zoom step.
+		reverseDistance += Math.abs(event.deltaY);
+		if(reverseDistance < MAP_PINCH_REVERSE_THRESHOLD_PX) {
+			event.preventDefault();
+			event.stopPropagation();
+			return;
+		}
+		direction = nextDirection;
+		reverseDistance = 0;
+	}, {capture: true, passive: false});
 }
 
 function onMapFocusIdle(action, callback) {

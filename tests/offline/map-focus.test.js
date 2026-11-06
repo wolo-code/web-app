@@ -141,6 +141,33 @@ test('wheel, touch, camera keys, and drag cancel all pending focus phases', () =
 	}
 });
 
+test('trackpad pinch ignores small reversals while allowing deliberate direction changes', () => {
+	const c = camera();
+	c.api.initMapFocusCancellation();
+	c.api.focus_({lat: 1, lng: 2});
+	function wheel(deltaY, timeStamp, ctrlKey = true, deltaMode = 0) {
+		let prevented = false;
+		let stopped = false;
+		c.inputs.get('wheel')({
+			deltaY, timeStamp, ctrlKey, deltaMode,
+			preventDefault() { prevented = true; },
+			stopPropagation() { stopped = true; }
+		});
+		assert.equal(prevented, stopped);
+		return stopped;
+	}
+	assert.equal(wheel(20, 0), false);
+	assert.equal(c.api.programmaticMapFocus, false);
+	assert.equal(wheel(-2, 15), true);
+	assert.equal(wheel(3, 30), false);
+	assert.equal(wheel(-7, 45), true);
+	assert.equal(wheel(-5, 60), false);
+	assert.equal(wheel(-2, 75), false);
+	assert.equal(wheel(2, 275), false);
+	assert.equal(wheel(-1, 290, false), false);
+	assert.equal(wheel(1, 305, true, 1), false);
+});
+
 test('provider zoom clamps and viewport minimums terminate without repeated steps', () => {
 	const c = camera({zoom: 5, max: 6});
 	c.api.getActiveMapTypeMaxZoom = () => 22; // SDK has a tighter limit than metadata.

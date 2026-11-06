@@ -7,12 +7,12 @@
 	</div>
 	<div class='info_format_panels'>
 		<div id='info_city_format' role='tabpanel' aria-labelledby='info_city_tab' tabindex='0'>
-			<div class='center blue'>\ City Word 1 Word 2 Word 3 /</div>
+			<div class='center blue'>\ City Word#1 Word#2 Word#3 /</div>
 			<div class='info_format_example blue'><span>e.g.</span> \ Bengaluru cat apple tomato /</div>
 			<p><strong>City</strong> names the city. You can omit it when using the current city.</p>
 		</div>
 		<div id='info_region_format' role='tabpanel' aria-labelledby='info_region_tab' tabindex='0' hidden>
-			<div class='center blue'>\ Region Index Word 1 Word 2 Word 3 /</div>
+			<div class='center blue'>\ Region Index Word#1 Word#2 Word#3 /</div>
 			<div class='info_format_example blue'>
 				<span>e.g.</span>&nbsp;\&nbsp;Nepal 35 tower silk cobra /
 				<div class='info_format_example_caption'>Mt. Everest</div>

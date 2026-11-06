@@ -325,7 +325,7 @@ html.dark-mode #info_format_tabs > button[aria-selected='true'] {
 }
 
 .info_format_example_caption {
-	max-width: 240px;
+	max-width: 440px;
 	margin-inline: auto;
 	text-align: right;
 	color: #767676;

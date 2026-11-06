@@ -172,8 +172,15 @@ function getCityGpId(address_components) {
 	return fallback;
 }
 
-function decode(words) {
+function decode(words, decodeMarker, selectionVersion) {
 	pushLoader();
+	function finish(city, wcode) {
+		if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
+			popLoader();
+			return;
+		}
+		decode_continue(city, wcode);
+	}
 	var city_words_length = words.length-3;
 
 	var valid;
@@ -197,34 +204,36 @@ function decode(words) {
 				var ipCity = words.slice(city_words_length-1, city_words_length)[0];
 				getCityFromName(ipGroup, ipCity, function(city) {
 					if(city == null)
-						decode_continue(null, words.slice(city_words_length, words.length));
+						finish(null, words.slice(city_words_length, words.length));
 					else
-						getCityCenterFromId(city, function(city) { decode_continue(city, words.slice(city_words_length, words.length)); });
+						getCityCenterFromId(city, function(city) { finish(city, words.slice(city_words_length, words.length)); });
 				});
 			}
 			else if (words.length == 3) {
 				
 				if(selected_decode_city && selected_decode_city_source == 'ip') {
-					decodeWithIpCity(words);
+					decodeWithIpCity(words, selectionVersion);
 				}
 				else if(selected_decode_city && selected_decode_city.center) {
-					decode_continue(selected_decode_city, words);
+					finish(selected_decode_city, words);
 				}
 				else if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
-					getCityFromCityGp_idThenDecode(current_city_gp_id, words);
+					getCityFromCityGp_idThenDecode(current_city_gp_id, words, finish);
 				else {
 					
 					if(!locationAccessCheck()) {
 						if(geoIp_city_name && geoIp_city_name != '')
-							decodeWithIpCity(words);
+							decodeWithIpCity(words, selectionVersion);
 					}
 					else {
 						
 						var position;
 						if(myLocDot == null) {
-							if(marker != null && marker.position != null) {
-								position = marker.position;
-								focus___(position);
+							var cityMarker = marker || decodeMarker;
+							if(cityMarker != null && cityMarker.position != null) {
+								position = cityMarker.position;
+								if(marker)
+									focus___(position);
 								showNotification(PURE_WCODE_CITY_PICKED);
 							}
 							else {
@@ -232,7 +241,7 @@ function decode(words) {
 									getCoarseLocation(function(position) {
 										getCityFromPositionViaGMap(position, function(city) {
 											getCityCenterFromId(city, function() {
-												decode_continue(city, words);
+												finish(city, words);
 											} );
 										}, handleLocationError) }, handleLocationError);
 									return;
@@ -244,10 +253,10 @@ function decode(words) {
 						}
 					
 						if(position != null)
-							getCityFromPositionThenDecode(resolveLatLng(position), words);
+							getCityFromPositionThenDecode(resolveLatLng(position), words, finish);
 						else {
 							if(!geoIp_city_name && geoIp_city_name != '')
-								decodeWithIpCity(words);
+								decodeWithIpCity(words, selectionVersion);
 							else
 								showNotification(PURE_WCODE_CITY_FAILED);
 						}
@@ -276,15 +285,22 @@ function decode_continue(city, wcode) {
 	}
 }
 
-function decodeWithIpCity(words) {
+var pendingIpDecodeSelection;
+function decodeWithIpCity(words, selectionVersion) {
+	if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
+		popLoader();
+		return;
+	}
 	if(geoIp_city_name) {
 		popLoader();
 		if(geoIP_city)
 			decode_(geoIP_city, words);
 		else
-			decode([geoIp_city_name.toLowerCase()].concat(words));
+			decode([geoIp_city_name.toLowerCase()].concat(words), null, selectionVersion);
 		showNotification(IP_CITY_DECODE);
 	}
-	else
+	else {
 		pendingWords_geo = words;
+		pendingIpDecodeSelection = selectionVersion;
+	}
 }

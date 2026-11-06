@@ -3,6 +3,8 @@ var infoWindow;
 var accuCircle;
 var myLocDot;
 var poiPlace;
+var mapPlaces = [];
+var mapSelectionVersion = 0;
 var APP_MODE_BACKGROUND = {
 	wcode: '#efefef',
 	map: '#60d0e5',
@@ -163,7 +165,7 @@ function isMapChromeClick(event) {
 		mapEventPathHasSelector(event, '#map_type_button') ||
 		mapEventPathHasSelector(event, '#location_button') ||
 		mapEventPathHasSelector(event, '.action_menu_item, #saved_button, #decode_scan_area') ||
-		mapEventPathHasSelector(event, '.map_attribution');
+		mapEventPathHasSelector(event, '.map_attribution, #map_places_toggle, #map_places_panel');
 }
 
 function isIgnorableMapClick(event) {
@@ -363,7 +365,20 @@ function initMap() {
 		});
 	}
 	
-	var markers = [];
+	var placesToggle = document.getElementById('map_places_toggle');
+	var placesPanel = document.getElementById('map_places_panel');
+	if(placesToggle && placesPanel) {
+		placesToggle.addEventListener('click', function() {
+			placesPanel.hidden = !placesPanel.hidden;
+			placesToggle.setAttribute('aria-expanded', String(!placesPanel.hidden));
+		});
+		placesPanel.addEventListener('keydown', function(event) {
+			if(event.key === 'Escape') {
+				placesToggle.click();
+				placesToggle.focus();
+			}
+		});
+	}
 	if(searchBox) {
 		searchBox.addListener('places_changed', function() {
 		var places = typeof getSearchBoxPlaceList == 'function' ? getSearchBoxPlaceList(searchBox) : searchBox.getPlaces();
@@ -371,12 +386,23 @@ function initMap() {
 		if (!places || !places.length) {
 			return;
 		}
+		places = places.filter(function(place) {
+			return place.geometry && place.geometry.location;
+		});
+		if(!places.length)
+			return;
 
 		cleanUp();
-		markers.forEach(function(marker) {
-			marker.setMap(null);
+		mapPlaces = mapPlaces.filter(function(entry) {
+			if(entry.card) {
+				entry.result = false;
+				return true;
+			}
+			if(!entry.result)
+				return true;
+			entry.marker.setMap(null);
+			return false;
 		});
-		markers = [];
 
 		var bounds = new google.maps.LatLngBounds();
 		if(places.length == 1) {
@@ -389,10 +415,6 @@ function initMap() {
 		}
 		else {
 			places.forEach(function(place) {
-				if (!place.geometry) {
-					console.log("Returned place contains no geometry");
-					return;
-				}
 				var icon = {
 					url: place.icon,
 					size: new google.maps.Size(71, 71),
@@ -407,10 +429,11 @@ function initMap() {
 					title: place.name,
 					position: place.geometry.location
 				});
-				resultMarker.addListener('click', function() {
-					load(this);
+				var entry = {marker: resultMarker, name: place.name, result: true};
+				resultMarker.addListener('click', function(event) {
+					loadMapPlace(entry, !!(event && event.domEvent && event.domEvent.shiftKey));
 				});
-				markers.push(resultMarker);
+				mapPlaces.push(entry);
 
 				if (place.geometry.viewport) {
 					bounds.union(place.geometry.viewport);
@@ -420,6 +443,7 @@ function initMap() {
 			});
 			map.fitBounds(bounds);
 		}
+		renderMapPlaces();
 	});
 	}
 
@@ -430,7 +454,7 @@ function initMap() {
 		if(isIgnorableMapClick(event)) {
 			return;
 		}
-		cleanUp(true);
+		cleanUp(true, !!(event.domEvent && event.domEvent.shiftKey));
 		infoWindow_setContent(MESSAGE_LOADING);
 		var pos = resolveLatLng(event.latLng);
 		encode(pos);
@@ -461,7 +485,33 @@ function initMap() {
 	if(typeof syncProceedButtons == 'function') {
 		document.getElementById('pac-input').addEventListener('input', syncProceedButtons);
 	}
-	document.getElementById('pac-input').addEventListener('keyup', enterHandler);
+	var shiftEnterDown = false;
+	input.addEventListener('keydown', function(event) {
+		if(event.key !== 'Enter' || event.isComposing)
+			return;
+		if(!event.repeat)
+			shiftEnterDown = event.shiftKey;
+		if(!shiftEnterDown)
+			return;
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		if(!event.repeat)
+			decode_input_from_map(event);
+	}, true);
+	input.addEventListener('keyup', function(event) {
+		if(event.key === 'Enter' && shiftEnterDown) {
+			shiftEnterDown = false;
+			return;
+		}
+		if(!event.shiftKey && !event.isComposing)
+			enterHandler(event);
+	});
+	document.getElementById('decode_button').addEventListener('keydown', function(event) {
+		if(event.key === 'Enter' && event.shiftKey && !event.repeat) {
+			event.preventDefault();
+			decode_input_from_map(event);
+		}
+	});
 	document.addEventListener('keydown', onMapSearchGlobalKeydown);
 	document.getElementById('decode_input').addEventListener('input', suggestWrapper);
 	if(typeof syncProceedButtons == 'function') {
@@ -509,12 +559,21 @@ function initMap() {
 
 }
 
-function decode_input_from_map() {
+function decode_input_from_map(event) {
+	var keepMapCard = !!(event && event.shiftKey);
+	if(keepMapCard) {
+		initWCode_jumpToMap = false;
+		initWCode_jump_ask = false;
+	}
 	document.activeElement.blur();
-	beginDecode(document.getElementById('pac-input').value);
+	beginDecode(document.getElementById('pac-input').value, null, {keepMapCard: keepMapCard});
 }
 
-function decode_input_from_map_external() {
+function decode_input_from_map_external(event) {
+	if(event && event.shiftKey) {
+		decode_input_from_map(event);
+		return;
+	}
 	initWCode_jumpToMap = true;
 	decode_input_from_map();
 }
@@ -530,7 +589,8 @@ function decode_input_from_form_external() {
 }
 
 function beginDecode(code, scannedMetadata, options) {
-	cleanUp();
+	var decodeMarker = marker;
+	cleanUp(false, options && options.keepMapCard);
 	if(scannedMetadata) {
 		current_title = scannedMetadata.title || '';
 		current_segment = scannedMetadata.segment || '';
@@ -542,7 +602,7 @@ function beginDecode(code, scannedMetadata, options) {
 	keepAddressPanelOpen = !!(options && options.showAddress);
 	if(keepAddressPanelOpen) address = current_address || '';
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
-	execDecode(code);
+	execDecode(code, decodeMarker);
 }
 
 function resolveLatLng(latLng) {
@@ -564,7 +624,7 @@ function hideDecodeInputAltTip() {
 	}
 }
 
-function execDecode(code) {
+function execDecode(code, decodeMarker) {
 	var trimmed = code.replace(/(\\|\/)/gm, '').trim();
 	if(trimmed.length === 0) {
 		showNotification(INCORRECT_WCODE);
@@ -592,7 +652,7 @@ function execDecode(code) {
 	if(words.length < 3)
 		valid = false;
 	else
-		decode(words);
+		decode(words, decodeMarker, mapSelectionVersion);
 
 	if(!valid)
 		showInvalidCodeDialog(trimmed);
@@ -604,7 +664,10 @@ function execDecodePlusCode(code) {
 		return;
 	}
 	var geocoder = new google.maps.Geocoder;
+	var session = encode_session_id;
 	geocoder.geocode({'address': code}, function(results, status) {
+		if(session !== encode_session_id)
+			return;
 		if(status === 'OK' && results && results[0] && results[0].geometry) {
 			var loc = results[0].geometry.location;
 			var pos = {lat: loc.lat(), lng: loc.lng()};
@@ -701,6 +764,7 @@ function searchMapWithQuery(query) {
 		return;
 	}
 	var service = new placesLib.PlacesService(map);
+	var session = encode_session_id;
 	var applyResult = function(place) {
 		if(!place || !place.geometry || !place.geometry.location) {
 			return false;
@@ -716,10 +780,14 @@ function searchMapWithQuery(query) {
 		return true;
 	};
 	service.findPlaceFromQuery({query: query, fields: ['name', 'geometry']}, function(results, status) {
+		if(session !== encode_session_id)
+			return;
 		if(status === 'OK' && results && results[0] && applyResult(results[0])) {
 			return;
 		}
 		service.textSearch({query: query}, function(textResults, textStatus) {
+			if(session !== encode_session_id)
+				return;
 			if(textStatus === 'OK' && textResults && textResults[0] && applyResult(textResults[0])) {
 				return;
 			}
@@ -728,15 +796,117 @@ function searchMapWithQuery(query) {
 	});
 }
 
-var lastMarker;
-function load(marker) {
-	focus___(marker.position);
-	window.marker.title = marker.title;
-	infoWindow.open(map, window.marker);
-	marker.setVisible(false);
-	lastMarker = marker;
+function getMapPlace(placeMarker) {
+	return mapPlaces.find(function(entry) { return entry.marker === placeMarker; });
+}
+
+function trackActiveMapPlace() {
+	if(!getMapPlace(marker)) {
+		mapPlaces.push({marker: marker});
+		renderMapPlaces();
+	}
+}
+
+function toggleActiveMapCard() {
+	if(isInfoWindowOpen())
+		infoWindow.close();
+	else
+		showInfoWindow();
+}
+
+function loadMapPlace(entry, keepMapCard) {
+	if(entry.card) {
+		activateMapCard(entry.card);
+		focus_(entry.marker.getPosition());
+		return;
+	}
+	if(entry.marker === marker) {
+		toggleActiveMapCard();
+		return;
+	}
+	cleanUp(false, keepMapCard);
+	marker = entry.marker;
 	infoWindow_setContent(MESSAGE_LOADING);
-	encode(resolveLatLng(marker.position));
+	var position = resolveLatLng(marker.getPosition());
+	focus___(position);
+	encode(position);
+}
+
+function renderMapPlaces() {
+	var toggle = document.getElementById('map_places_toggle');
+	if(!toggle)
+		return;
+	var panel = document.getElementById('map_places_panel');
+	var list = document.getElementById('map_places_list');
+	var directions = document.getElementById('map_places_directions');
+	document.getElementById('map').classList.toggle('map_has_retained_cards', mapPlaces.some(function(entry) {
+		return !!entry.card;
+	}));
+	toggle.hidden = mapPlaces.length < 2;
+	if(toggle.hidden) {
+		panel.hidden = true;
+		toggle.setAttribute('aria-expanded', 'false');
+	}
+	list.replaceChildren();
+	directions.replaceChildren();
+	if(toggle.hidden)
+		return;
+
+	mapPlaces.forEach(function(entry, index) {
+		var row = document.createElement('li');
+		var name = entry.name || entry.marker.getTitle();
+		var placeButton = document.createElement('button');
+		placeButton.type = 'button';
+		placeButton.textContent = name;
+		placeButton.addEventListener('click', function() {
+			if(entry.card)
+				activateMapCard(entry.card);
+			if(entry.marker === marker)
+				showInfoWindow();
+			focus_(entry.marker.getPosition());
+		});
+		row.append(placeButton);
+		[-1, 1].forEach(function(offset) {
+			var move = document.createElement('button');
+			var target = index + offset;
+			move.type = 'button';
+			move.textContent = offset < 0 ? '↑' : '↓';
+			move.setAttribute('aria-label', 'Move ' + name + (offset < 0 ? ' up' : ' down'));
+			move.disabled = target < 0 || target >= mapPlaces.length;
+			move.addEventListener('click', function() {
+				mapPlaces.splice(index, 1);
+				mapPlaces.splice(target, 0, entry);
+				renderMapPlaces();
+				var nextRow = list.children[target];
+				var nextMove = nextRow.children[offset < 0 ? 1 : 2];
+				(nextMove.disabled ? nextRow.firstElementChild : nextMove).focus();
+			});
+			row.append(move);
+		});
+		list.append(row);
+	});
+
+	var coordinates = mapPlaces.map(function(entry) {
+		var pos = entry.marker.getPosition();
+		return pos.lat() + ',' + pos.lng();
+	});
+	// Mobile browsers support three intermediate stops per Google Maps URL.
+	for(var start = 0; start < coordinates.length - 1; start += 4) {
+		var stops = coordinates.slice(start, start + 5);
+		var params = new URLSearchParams({
+			api: '1',
+			origin: stops[0],
+			destination: stops[stops.length - 1]
+		});
+		if(stops.length > 2)
+			params.set('waypoints', stops.slice(1, -1).join('|'));
+		var link = document.createElement('a');
+		link.href = 'https://www.google.com/maps/dir/?' + params.toString();
+		link.target = '_blank';
+		link.rel = 'noopener noreferrer';
+		link.textContent = coordinates.length > 5 ? 'Directions ' + (start + 1) + '–' + (start + stops.length) : 'Directions';
+		directions.append(link);
+	}
 }
 
 function getBottomStackHeight() {
@@ -801,11 +971,23 @@ function getIntentURL(latLng, code_string) {
 }
 
 function clearMap() {
-	if(marker)
+	if(!marker)
+		return;
+	var entry = getMapPlace(marker);
+	if(!entry || !entry.result) {
 		marker.setMap(null);
+		mapPlaces = mapPlaces.filter(function(place) { return place !== entry; });
+	}
+	else
+		marker = null;
+	renderMapPlaces();
 }
 
-function cleanUp(full = false) {
+function cleanUp(full = false, keepMapCard = false) {
+	if(keepMapCard)
+		retainActiveMapCard();
+	mapSelectionVersion++;
+	encode_session_id = Symbol();
 	stopZoom();
 	document.getElementById('map_input_suggestion_result').innerText = '';
 	document.getElementById('decode_input_suggestion_result').innerText = '';

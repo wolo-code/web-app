@@ -470,11 +470,11 @@ function getCityFromIdThenEncode(city_id, city_center, latLng) {
 	});
 }
 
-function getCityFromPositionThenDecode(latLng, wcode) {
+function getCityFromPositionThenDecode(latLng, wcode, finish) {
 	var nearCity = null;
 
 	if(!geoFireInit()) {
-		decode_continue(null, wcode);
+		finish(null, wcode);
 		return;
 	}
 	var geoQuery = geoFire.query({
@@ -487,15 +487,15 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 		popLoader();
 		geoQuery.cancel();
 		if(!nearCity || nearCity.id == null)
-			decode_continue(null, wcode);
+			finish(null, wcode);
 		else
 			getCityFromId(nearCity.id, function(city) {
 				if(!city) {
-					decode_continue(null, wcode);
+					finish(null, wcode);
 					return;
 				}
 				city.center = nearCity.center;
-				decode_continue(city, wcode);
+				finish(city, wcode);
 			});
 	});
 
@@ -514,14 +514,14 @@ function getCityFromPositionThenDecode(latLng, wcode) {
 
 }
 
-function getCityFromCityGp_idThenDecode(city_gp_id, wcode) {
+function getCityFromCityGp_idThenDecode(city_gp_id, wcode, finish) {
 	function callback_success(city) {
 		getCityCenterFromId(city, function() {
-			decode_continue(city, wcode);
+			finish(city, wcode);
 		} );
 	};
 	function callback_failure() {
-		decode_continue(null, wcode);
+		finish(null, wcode);
 	};
 	var session_id;
 	session_id = dencode_session_id = Date.now();

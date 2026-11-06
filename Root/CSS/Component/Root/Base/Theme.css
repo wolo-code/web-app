@@ -381,13 +381,13 @@ html.dark-mode .gm-style .gm-style-iw-t::after {
 	background: #222244;
 }
 
-html.dark-mode #infowindow_code,
-html.dark-mode #infowindow_code .infowindow_code,
-html.dark-mode #infowindow_code_right_code {
+html.dark-mode .map_card_code,
+html.dark-mode .map_card_code .infowindow_code,
+html.dark-mode .map_card_words {
 	color: #f2f2f2;
 }
 
-html.dark-mode #infowindow_code .slash {
+html.dark-mode .map_card_code .slash {
 	color: #8a8aaa;
 }
 

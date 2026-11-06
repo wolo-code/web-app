@@ -32,12 +32,12 @@ ClickEventHandler.prototype.handleClick = function(event) {
 };
 
 ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
-	var me = this;
 	if(!this.placesService) {
 		return;
 	}
+	var selectionVersion = typeof mapSelectionVersion === 'number' ? mapSelectionVersion : null;
 	this.placesService.getDetails({placeId: placeId}, function(place, status) {
-		if (status === 'OK') {
+		if(status === 'OK' && (selectionVersion === null || selectionVersion === mapSelectionVersion)) {
 			poiPlace = place;
 			address = place.formatted_address;
 			refreshAddress();

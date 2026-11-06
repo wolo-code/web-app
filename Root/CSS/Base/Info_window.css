@@ -14,26 +14,26 @@
 	color: #666666;
 }
 
-#infowindow_code,
-#infowindow_code .infowindow_code {
+.map_card_code,
+.map_card_code .infowindow_code {
 	color: #444;
 }
 
-#infowindow_code {
+.map_card_code {
 	text-align: left;
 }
 
-#infowindow_code_left {
+.map_card_code_left {
 	padding-top: 4px;
 }
 
-#infowindow_code_right {
+.map_card_code_right {
 	padding-top: 10px;
 	padding-bottom: 10px;
 	padding-left: 14px;
 }
 
-#infowindow_code_right_code {
+.map_card_words {
 	font-size: x-large;
 	cursor: pointer;
 }
@@ -61,7 +61,11 @@ button.gm-ui-hover-effect {
 	display: none !important;
 }
 
-#show_address_button {
+#map.map_has_retained_cards button.gm-ui-hover-effect {
+	display: block !important;
+}
+
+.map_card_address {
 	width: 26px;
 	vertical-align: bottom
 }
@@ -75,7 +79,7 @@ button.gm-ui-hover-effect {
 	z-index: 1;
 }
 
-#share_qr_button {
+.map_card_label {
 	position: relative;
 	width: 24px;
 	display: inline-block;
@@ -89,39 +93,39 @@ button.gm-ui-hover-effect {
 	border-radius: 5px
 }
 
-#external_launch_button {
+.map_card_launch {
 	width: 26px;
 	display: inline-block;
 }
 
-#external_launch_button > img {
+.map_card_launch > img {
 	margin-bottom: -2px;
 }
 
-#infowindow_actions {
+.map_card_actions {
 	padding-left: 4px;
 }
 
-#infowindow_actions > * {
+.map_card_actions > * {
 	margin: 0 20px;
 }
 
-#infowindow_actions > :first-child {
+.map_card_actions > :first-child {
 	margin-left: 0;
 	margin-bottom: 2px;
 }
 
-#infowindow_actions > :last-child {
+.map_card_actions > :last-child {
 	margin-right: 0;
 	padding-left: 2px;
 }
 
-.different_city #infowindow_code_left_code > span {
+.different_city .map_card_city > span {
 	font-weight: bold;
 	text-transform: uppercase;
 	color: rgb(255,64,129);
 }
 
-.city_tally_false #infowindow_code_left_code > span {
+.city_tally_false .map_card_city > span {
 	text-decoration: line-through;
 }

@@ -229,6 +229,86 @@ body > #pac-input,
 	position: relative;
 }
 
+#map_places_toggle {
+	flex: 0 0 auto;
+	margin-left: 4px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: 5px;
+	background: rgb(255 255 255 / 50%);
+	backdrop-filter: blur(4px);
+	color: #333;
+	font: inherit;
+	cursor: pointer;
+}
+
+#map_places_panel {
+	position: absolute;
+	inset: calc(100% + 6px) 0 auto auto;
+	box-sizing: border-box;
+	width: min(320px, 100%);
+	max-height: 45vh;
+	overflow: auto;
+	padding: 10px;
+	border-radius: 8px;
+	background: #fff;
+	color: #333;
+	box-shadow: 0 2px 10px rgb(0 0 0 / 25%);
+}
+
+html.dark-mode #map_places_toggle {
+	background: rgb(34 34 68 / 50%);
+	color: #eee;
+}
+
+html.dark-mode #map_places_panel {
+	background: #224;
+	color: #eee;
+}
+
+#map_places_list {
+	margin: 0;
+	padding-left: 24px;
+}
+
+#map_places_list li + li {
+	margin-top: 4px;
+}
+
+#map_places_list button,
+#map_places_directions a {
+	padding: 4px 7px;
+	border: 1px solid rgb(128 128 128 / 45%);
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+#map_places_list button:first-child {
+	width: calc(100% - 64px);
+	text-align: left;
+	overflow-wrap: anywhere;
+}
+
+#map_places_list button:not(:first-child) {
+	width: 28px;
+	margin-left: 4px;
+}
+
+#map_places_list button:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+#map_places_directions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: 8px;
+}
+
 #pac-input {
 	box-sizing: content-box;
 	height: 26px;

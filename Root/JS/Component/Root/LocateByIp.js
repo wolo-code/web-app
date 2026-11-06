@@ -50,7 +50,7 @@ function getCityByIp(retry_count, callback, loader_held) {
 							if(pendingWords_geo) {
 								var pending_words = pendingWords_geo;
 								pendingWords_geo = null;
-								decodeWithIpCity(pending_words);
+								decodeWithIpCity(pending_words, pendingIpDecodeSelection);
 							}
 					}
 				}

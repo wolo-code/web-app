@@ -136,23 +136,27 @@ function focus_(pos, bounds, skipFinalBoundsFit) {
 }
 
 function showMarker(pos) {
+	var coordinate = typeof pos.lat === 'function' ? resolveLatLng(pos) : pos;
 	if(!marker) {
-		marker = new google.maps.Marker({
+		var placeMarker = new google.maps.Marker({
 			position: pos,
 			map: map,
-			title: pos.lat + " / " + pos.lng
+			title: coordinate.lat + " / " + coordinate.lng
 		});
-		marker.addListener('click', function() {
-			if(!isInfoWindowOpen())
-				infoWindow.open(map, marker);
-			else
-				infoWindow.close();
+		marker = placeMarker;
+		placeMarker.addListener('click', function() {
+			var entry = getMapPlace(placeMarker);
+			if(entry)
+				loadMapPlace(entry, false);
 		});
 	}
 	else {
 		if(marker.getMap() == null)
 			marker.setMap(map);
 		marker.setPosition(pos);
+		var entry = getMapPlace(marker);
+		if(!entry || !entry.result)
+			marker.setTitle(coordinate.lat + " / " + coordinate.lng);
 	}
 
 	showInfoWindow();

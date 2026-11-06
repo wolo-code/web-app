@@ -1,6 +1,79 @@
 function initInfoWindow() {
-	if(typeof infoWindow == 'undefined')
-		infoWindow = new google.maps.InfoWindow({'map': map});
+	if(infoWindow)
+		return;
+	var card = new google.maps.InfoWindow();
+	card.addListener('close', function() {
+		var entry = mapPlaces.find(function(place) { return place.card === card; });
+		if(!entry)
+			return;
+		entry.card = null;
+		entry.details = null;
+		if(!entry.result) {
+			entry.marker.setMap(null);
+			mapPlaces = mapPlaces.filter(function(place) { return place !== entry; });
+		}
+		renderMapPlaces();
+	});
+	infoWindow = card;
+}
+
+function retainActiveMapCard() {
+	var entry = getMapPlace(marker);
+	if(!entry || !isInfoWindowOpen())
+		return;
+	entry.card = infoWindow;
+	entry.details = {
+		city: code_city,
+		words: code_wcode,
+		position: code_postition,
+		address: address,
+		plusCode: code_plus_code,
+		title: current_title,
+		segment: current_segment,
+		savedAddress: current_address,
+		addressLines: current_address_lines,
+		nearby: chooseCity_by_periphery_List,
+		addressCities: chooseCity_by_periphery_gpid,
+		chooseCity: chooseCity_by_periphery_Callback
+	};
+	if(infoWindow.getContent() === MESSAGE_LOADING) {
+		var content = document.createElement('div');
+		content.textContent = entry.name || marker.getTitle();
+		infoWindow.setContent(content);
+	}
+	marker = null;
+	infoWindow = null;
+	renderMapPlaces();
+}
+
+function activateMapCard(card) {
+	if(card === infoWindow)
+		return true;
+	var entry = mapPlaces.find(function(place) { return place.card === card; });
+	if(!entry)
+		return false;
+	cleanUp(false, true);
+	var details = entry.details;
+	entry.card = null;
+	entry.details = null;
+	marker = entry.marker;
+	infoWindow = card;
+	code_city = details.city;
+	code_wcode = details.words;
+	code_postition = details.position;
+	latLng_p = resolveLatLng(marker.getPosition());
+	code_digipin = getDigipinForPosition(latLng_p);
+	code_plus_code = details.plusCode;
+	address = details.address;
+	current_title = details.title;
+	current_segment = details.segment;
+	current_address = details.savedAddress;
+	current_address_lines = details.addressLines;
+	chooseCity_by_periphery_List = details.nearby;
+	chooseCity_by_periphery_gpid = details.addressCities;
+	chooseCity_by_periphery_Callback = details.chooseCity;
+	renderMapPlaces();
+	return true;
 }
 
 function infoWindow_setContent(string) {
@@ -56,31 +129,42 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	}
 	code_digipin = getDigipinForPosition(latLng);
 	code_plus_code = getPlusCodeForPosition(latLng);
-	var infoWindow_share_longpress_handle = google.maps.event.addListener(infoWindow, 'domready', function() {
-		google.maps.event.removeListener(infoWindow_share_longpress_handle);
-		if(document.getElementById('share_qr_button') != null) {
-			addLongpressListener(document.getElementById('infowindow_code_right_code'), copyWcodeFull, copyWcodeCode);
-			addLongpressListener(document.getElementById('show_address_button'), toggleAddress, handleShareWCode);
-			addLongpressListener(document.getElementById('external_launch_button'), gotoCoordinate, copyWcodeJumpLink);
-			addLongpressListener(document.getElementById('share_qr_button'), showQR, downloadQR_minimal);
-		}
-	});
-	infoWindow_setContent("<div id='infowindow_code'><div id='infowindow_code_left'><span class='slash'>\\</span> <span class='infowindow_code' id='infowindow_code_left_code'><span class='control' onclick='showChooseCity_by_periphery_Message();'>" + city_accent + "</span></span></div><div id='infowindow_code_right'>" + "<span class='infowindow_code' id='infowindow_code_right_code'>" + code_string + "</span> <span class='slash'>/</span></div></div><div id='infowindow_actions' class='center'><img id='show_address_button' class='control' src=" + svg_address + " ><div id='external_launch_button' class='control'><img src=" + svg_launch + " ></div><div id='share_qr_button' class='control'><div class='shield'></div><img src=" + svg_label + " ></div></div>");
+	var card = infoWindow;
+	var content = document.createElement('div');
+	content.innerHTML = "<div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'>" + city_accent + "</span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
+	function forThisCard(action) {
+		return function() {
+			if(activateMapCard(card))
+				action();
+		};
+	}
+	content.querySelector('.map_card_city > .control').addEventListener('click', forThisCard(showChooseCity_by_periphery_Message));
+	addLongpressListener(content.querySelector('.map_card_words'), forThisCard(copyWcodeFull), forThisCard(copyWcodeCode));
+	addLongpressListener(content.querySelector('.map_card_address'), forThisCard(toggleAddress), forThisCard(handleShareWCode));
+	addLongpressListener(content.querySelector('.map_card_launch'), forThisCard(gotoCoordinate), forThisCard(copyWcodeJumpLink));
+	addLongpressListener(content.querySelector('.map_card_label'), forThisCard(showQR), forThisCard(downloadQR_minimal));
+	infoWindow_setContent(content);
+	var entry = getMapPlace(marker);
+	if(entry && !entry.result) {
+		entry.name = city_name + ' ' + code_string;
+		renderMapPlaces();
+	}
 	showInfoWindow();
 }
 
 function isInfoWindowOpen() {
-	if(infoWindow) {
-		var map = infoWindow.getMap();
-		return (map !== null && typeof map !== "undefined");
-	}
-	else
+	if(!infoWindow)
 		return false;
+	if(typeof infoWindow.isOpen === 'boolean')
+		return infoWindow.isOpen;
+	return !!infoWindow.get('map');
 }
 
 function showInfoWindow() {
 	initInfoWindow();
 	if(typeof holdInfoWindowForTryCityZoomOut !== 'undefined' && holdInfoWindowForTryCityZoomOut)
 		return;
-	infoWindow.open(map, marker);
+	infoWindow.open({map: map, anchor: marker, shouldFocus: false});
+	if(marker)
+		trackActiveMapPlace();
 }

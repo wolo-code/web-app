@@ -37,6 +37,11 @@
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			<span class='decode_icon_caption decode_chrome_caption' data-guide-id='go' aria-hidden='true'>Go</span>
 		</div>
+		<button id='map_places_toggle' type='button' aria-expanded='false' aria-controls='map_places_panel' hidden>Places</button>
+	</div>
+	<div id='map_places_panel' hidden>
+		<ol id='map_places_list' aria-label='Places on the map'></ol>
+		<div id='map_places_directions'></div>
 	</div>
 </div>
 <div id='decode_interface_overlay'>

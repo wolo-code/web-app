@@ -44,12 +44,13 @@
 	padding: 0;
 }
 
-.city_choice_list > li {
+.choose_city_message .city_choice_list > li {
 	position: relative;
-	padding-block-end: 6px;
+	margin: 0;
+	padding-block-end: 8px;
 }
 
-.city_choice_list > li:last-child {
+.choose_city_message .city_choice_list > li:last-child {
 	padding-block-end: 0;
 }
 
@@ -104,20 +105,19 @@ html.dark-mode .city_choice_heading {
 	border-block-start-width: 1px;
 }
 
-.choose_city_message_list .city_choice_button {
+.choose_city_message :is(.city_choice_button, .city_region_option) {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 12px;
 	box-sizing: border-box;
 	width: 100%;
 	min-height: 44px;
 	padding: 8px 10px;
-	border: 1px solid rgb(105 183 207 / 60%);
-	border-radius: 5px;
-	background: rgb(105 183 207 / 10%);
+	border: 1px solid rgb(105 183 207 / 45%);
+	border-radius: 8px;
+	background: transparent;
 	color: inherit;
 	font: inherit;
-	font-size: 1.1em;
 	text-align: start;
 	overflow-wrap: anywhere;
 	cursor: pointer;
@@ -139,36 +139,16 @@ html.dark-mode .city_choice_heading {
 	opacity: .8;
 }
 
-.choose_city_message_list .city_choice_button[aria-current='true'] {
-	background: rgb(105 183 207 / 18%);
+.choose_city_message :is(.city_choice_button, .city_region_option):hover {
+	background: rgb(105 183 207 / 12%);
 }
 
-.city_choice_button[aria-current='true'] .city_choice_name::before,
-#nearby_region_menu .city_region_option[aria-pressed='true']::before {
-	content: '';
-	display: inline-block;
-	width: 7px;
-	height: 7px;
-	flex-shrink: 0;
-	border-radius: 50%;
-	background: #269b53;
-	vertical-align: .12em;
+.choose_city_message :is(.city_choice_button[aria-current='true'], .city_region_option[aria-pressed='true']) {
+	background: rgb(105 183 207 / 26%);
+	border-color: #69b7cf;
 }
 
-.city_choice_button[aria-current='true'] .city_choice_name::before {
-	margin-inline-end: 8px;
-}
-
-html.dark-mode .city_choice_button[aria-current='true'] .city_choice_name::before,
-html.dark-mode #nearby_region_menu .city_region_option[aria-pressed='true']::before {
-	background: #65d890;
-}
-
-.choose_city_message_list .city_choice_button:hover {
-	background: rgb(105 183 207 / 22%);
-}
-
-.choose_city_message_list .city_choice_button:focus-visible {
+.choose_city_message :is(.city_choice_button, .city_region_option):focus-visible {
 	outline: 2px solid #69b7cf;
 	outline-offset: 1px;
 }
@@ -182,29 +162,8 @@ html.dark-mode #nearby_region_menu .city_region_option[aria-pressed='true']::bef
 .city_region_menu { border-top: 1px solid #9995; margin-top: 18px; padding-top: 12px; }
 .city_region_choices summary { cursor: pointer; color: #69b7cf; padding: 10px 0; }
 .city_region_list { display: grid; gap: 8px; margin: 10px 0 16px; }
-.city_region_option,
-html.dark-mode .city_region_option {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 12px;
-	box-sizing: border-box;
-	width: 100%;
-	min-height: 44px;
-	text-align: left;
-	font: inherit;
-	border: 1px solid rgb(105 183 207 / 45%);
-	border-radius: 8px;
-	background: transparent;
-	padding: 10px 12px;
-	color: #69b7cf;
-	cursor: pointer;
-}
 .city_region_option .wolo_region_index { flex-shrink: 0; }
 .city_region_option .wolo_region_name { min-width: 0; overflow-wrap: anywhere; }
-.city_region_option:hover { background: rgb(105 183 207 / 10%); }
-.city_region_option[aria-pressed='true'],
-html.dark-mode .city_region_option[aria-pressed='true'] { background: rgb(105 183 207 / 18%); border-color: #69b7cf; }
 .choose_city_message .wolo_region_index {
 	display: inline-block;
 	padding: .18em .45em;

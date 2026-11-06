@@ -127,7 +127,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Wolo label popup | Location Wolo Label View | `infoWindow`, `#infowindow_code` | Above Location Wolo Marker | Shows the city and Wolo Code for the selected location; scrollbars do not appear unless the screen size can barely fit it on extremely tiny screens. DIGIPIN and plus code are shown on the Address Panel instead. |
 | Wolo label actions | Location Wolo Label Actions | `#infowindow_actions` | Bottom of Location Wolo Label View | Hosts address, external-map launch, and QR label actions. |
 | Address action | Wolo Label Address Action | `#show_address_button` | Left action in Location Wolo Label View | Opens or shares the selected address details. |
-| External map action | Wolo Label External Action | `#external_launch_button` | Center action in Location Wolo Label View | Opens the location in the platform map app. |
+| External map action | Wolo Label External Action | `#external_launch_button` | Center action in Location Wolo Label View | Opens the location in the platform map app. For web maps, browser Back returns to the selected Wolo location. |
 | QR label action | Wolo Label QR Action | `#share_qr_button` | Right action in Location Wolo Label View | Opens QR Label View; long press downloads a minimal QR label. |
 
 ## QR Label View

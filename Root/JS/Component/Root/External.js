@@ -6,7 +6,7 @@ function external_close() {
 }
 
 function external_proceed_external() {
-	window.location.replace(getIntentURL(external_latLng, external_wolo_code_string));
+	window.location.assign(getIntentURL(external_latLng, external_wolo_code_string));
 }
 
 function external_proceed_internal() {

@@ -112,5 +112,11 @@ function shareWCodeLink() {
 }
 
 function gotoCoordinate() {
-	window.location.assign(getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' ')));
+	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' '));
+	if(mapUrl.startsWith('https:')) {
+		// Restore the selected location even when Back reloads the page.
+		var codePath = '/' + getCodeComplete().join('.').toLowerCase().replace(/ /g, '_');
+		window.history.replaceState(window.history.state, '', codePath);
+	}
+	window.location.assign(mapUrl);
 }

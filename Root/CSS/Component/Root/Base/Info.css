@@ -242,9 +242,9 @@
 
 #info_format_tabs {
 	position: relative;
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
-	justify-content: center;
 	gap: 4px;
 	padding-bottom: 5px;
 	margin-bottom: 12px;
@@ -273,6 +273,14 @@
 	color: #767676;
 	font-weight: bold;
 	cursor: pointer;
+}
+
+#info_city_tab {
+	justify-self: end;
+}
+
+#info_region_tab {
+	justify-self: start;
 }
 
 #info_format_tabs > button[aria-selected='true'] {
@@ -310,6 +318,14 @@ html.dark-mode #info_format_tabs > button[aria-selected='true'] {
 .info_format_example > span {
 	margin-right: 4px;
 	color: gray;
+}
+
+.info_format_example_caption {
+	color: #767676;
+}
+
+html.dark-mode .info_format_example_caption {
+	color: #a0a0a0;
 }
 
 .download > a {

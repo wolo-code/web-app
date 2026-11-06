@@ -89,7 +89,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
 | Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right corner when shown | Cycles to the next enabled map layer. The icon and tooltip both show that next layer (Google Satellite view after Google Maps). |
-| Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. |
+| Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. For a new point selected online, the default Wolo Code uses the containing city identified by Google when its Wolo grid covers the point. |
 | Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions. |
 
 ## Google Satellite View

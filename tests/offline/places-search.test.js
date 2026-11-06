@@ -41,39 +41,70 @@ test('map SearchBox listeners guard undefined getPlaces results', () => {
 	assert.match(consoleMap, /if\s*\(\s*!places\s*\|\|\s*!places\.length\s*\)/);
 });
 
-test('encoding prefers a covering city over regional fallback', () => {
+const point = { lat: 12.85, lng: 77.63 };
+const parent = {
+	id: 'bengaluru', gp_id: 'parent', name: 'Bengaluru', country: 'India',
+	administrative_level_1: 'Karnataka', center: { lat: 12.97, lng: 77.59 }
+};
+const suburb = { id: 'vittasandra', gp_id: 'suburb', name: 'Vittasandra', center: point };
+const farCity = { ...parent, id: 'far', gp_id: 'far', center: { lat: 14, lng: 78 } };
+const locality = place_id => ({ types: ['locality'], place_id });
+const sublocality = { types: ['sublocality'], place_id: 'suburb' };
+const nestedLocality = {
+	types: ['street_address'],
+	address_components: [
+		{ types: ['locality'], long_name: ' BENGALURU ' },
+		{ types: ['administrative_area_level_1'], long_name: 'Karnataka' },
+		{ types: ['country'], long_name: 'India' }
+	]
+};
+
+function loadEncoder({ results, nearby = [suburb, parent], catalog = [parent, suburb, farCity], deferCities = false }) {
 	const vm = require('node:vm');
-	const position = { lat: 27.7, lng: 85.3 };
-	const locality = { id: 'city', center: position };
-	const results = [
-		{ types: ['sublocality'], place_id: 'suburb' },
-		{ types: ['administrative_area_level_2'], place_id: 'district' },
-		{ types: ['locality'], place_id: 'locality' },
-		{ types: ['country'], place_id: 'country' }
-	];
-	const nearby = {
-		outside: { city: { id: 'outside', center: { lat: 28.0, lng: 85.3 } }, distance: 33 },
-		inside: { city: { id: 'nearby', center: { lat: 27.95, lng: 85.55 } }, distance: 37 }
-	};
-	const details = { outside: { city: {} }, inside: { city: {} } };
 	const encoded = [];
-	let geocodedCity = locality;
-	let nearbyCities = nearby;
+	const lookedUp = [];
+	const pending = [];
 	const context = vm.createContext();
-	for (const file of ['Code/Core.js', 'Code/Code.js', 'City.js']) {
+	for (const file of ['Code/Core.js', 'Code/Code.js', 'City.js', 'Util.js']) {
 		vm.runInContext(read('Root/JS/Component/Root/' + file), context);
 	}
 	Object.assign(context, {
 		clearCode() {},
-		getAddress(_position, _session, callback) { callback(results); },
-		getCityFromCityGp_id(id, _session, success, failure) {
-			assert.equal(id, 'locality');
-			if (geocodedCity) success(geocodedCity);
-			else failure();
+		getAddress(_position, session, callback) { context.sessionForwarder(session, callback, [results]); },
+		getCityFromCityGp_id(id, session, success, failure) {
+			lookedUp.push(id);
+			const city = catalog.find(candidate => candidate.gp_id === id);
+			const complete = () => context.sessionForwarder(session, city ? success : failure, city ? [city] : []);
+			if (deferCities) pending.push(complete);
+			else complete();
 		},
-		getCityCenterFromId_session(city, _session, callback) { callback(city); },
-		getCity_by_perifery_list_fs() { context.syncNearCityList(nearbyCities, details); },
-		chooseCity_by_periphery() {},
+		getCityCenterFromId(city, callback) { callback(city); },
+		getCityFromId(id, callback) { callback(nearby.find(city => city.id === id)); },
+		geoFireInit() { return true; },
+		CITY_RANGE_RADIUS: 32.767,
+		geoFire: {
+			query() {
+				const listeners = {};
+				return {
+					cancel() {},
+					on(event, callback) {
+						listeners[event] = callback;
+						if (event === 'key_entered') {
+							nearby.forEach((city, index) => callback(city.id, [city.center.lat, city.center.lng], index));
+							listeners.ready();
+						}
+					}
+				};
+			}
+		},
+		pushLoader() {},
+		popLoader() {},
+		chooseCity_by_periphery(choices, select) {
+			context.choices = Array.from(choices, entry => entry.city);
+			context.select = select;
+		},
+		marker: { getPosition: () => point },
+		resolveLatLng: position => position,
 		document: { getElementById() {} },
 		addClassIfPresent() {},
 		removeClassIfPresent() {},
@@ -82,12 +113,56 @@ test('encoding prefers a covering city over regional fallback', () => {
 		current_city_gp_id: null
 	});
 	context.encode_ = city => encoded.push(city.id);
+	return { context, encoded, lookedUp, pending };
+}
 
-	context.encode(position);
-	geocodedCity = null;
-	context.encode(position);
-	nearbyCities = { outside: nearby.outside };
-	context.encode(position);
+test('encoding tries locality IDs in order and keeps the closer sublocality selectable', () => {
+	const { context, encoded, lookedUp } = loadEncoder({
+		results: [sublocality, locality('unknown'), locality('far'), locality('parent')]
+	});
+	context.encode(point);
+	assert.deepEqual(lookedUp, ['unknown', 'far', 'parent']);
+	assert.deepEqual(encoded, ['bengaluru']);
+	context.select(context.choices.find(city => city.id === suburb.id));
+	assert.deepEqual(encoded, ['bengaluru', 'vittasandra']);
+});
 
-	assert.deepEqual(encoded, ['city', 'nearby', 'region']);
+test('encoding matches a nested locality by name and geographic context', () => {
+	const wrongState = { ...parent, id: 'other', administrative_level_1: 'Goa' };
+	const { context, encoded, lookedUp } = loadEncoder({
+		results: [sublocality, nestedLocality], nearby: [suburb, wrongState, parent]
+	});
+	context.encode(point);
+	assert.deepEqual(encoded, ['bengaluru']);
+	assert.deepEqual(lookedUp, []);
+});
+
+test('ambiguous, missing, or non-covering parent evidence preserves the address-derived fallback', () => {
+	const cases = [
+		{ results: [sublocality, nestedLocality], nearby: [suburb, parent, { ...parent, id: 'duplicate' }] },
+		{ results: [sublocality], nearby: [parent, suburb] },
+		{ results: [sublocality, nestedLocality], nearby: [suburb, farCity] }
+	];
+	for (const options of cases) {
+		const { context, encoded } = loadEncoder(options);
+		context.encode(point);
+		assert.deepEqual(encoded, ['vittasandra']);
+	}
+});
+
+test('encoding tries the nearest covering city before falling back to a region', () => {
+	for (const [nearby, expected] of [[[farCity, suburb], 'vittasandra'], [[farCity], 'region']]) {
+		const { context, encoded } = loadEncoder({ results: [], nearby });
+		context.encode(point);
+		assert.deepEqual(encoded, [expected]);
+	}
+});
+
+test('an older city lookup cannot overwrite a later click, even in the same clock tick', () => {
+	const { context, encoded, pending } = loadEncoder({ results: [locality('parent')], deferCities: true });
+	context.encode({ lat: 12.9, lng: 77.6 });
+	context.encode(point);
+	pending[1]();
+	pending[0]();
+	assert.deepEqual(encoded, ['bengaluru']);
 });

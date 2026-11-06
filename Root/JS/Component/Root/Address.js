@@ -5,6 +5,8 @@
 function getAddress(latLng, session_id, callback) {
 	var geocoder = new google.maps.Geocoder;
 	geocoder.geocode({'location': latLng}, function(address_components, status) {
+		if(session_id != null && session_id !== encode_session_id)
+			return;
 		latLng_p = latLng;
 		code_plus_code = extractPlusCodeFromGeocode(address_components) || getPlusCodeForPosition(latLng);
 		if (status === 'OK') {

@@ -8,8 +8,7 @@
 // var encode_session_id
 
 function encode(position, locating_encode) {
-	var session_id;
-	session_id = encode_session_id = Date.now();
+	var session_id = encode_session_id = Symbol();
 	clearCode();
 	if(typeof isOfflineMode === 'function' && isOfflineMode()) {
 		if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.center && !isRegionAnchor(selected_decode_city)) {
@@ -19,30 +18,112 @@ function encode(position, locating_encode) {
 		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) return;
 	}
 	getAddress(position, session_id, function(address_components) {
-		var city_gp_id = getCityGpId(address_components);
-		function tryNearbyCities() {
-			getCity_by_perifery_list(position, session_id, true);
-		}
+		var localityIds = [...new Set(address_components
+			.filter(result => result.place_id && result.types.includes('locality'))
+			.map(result => result.place_id))];
+		var fallbackId = getCityGpId(address_components.filter(result => !result.types.includes('locality')));
+		var localityHints = getNestedLocalityHints(address_components);
 
-		if(city_gp_id == null) {
-			tryNearbyCities();
-			return;
-		}
-
-		getCityFromCityGp_id(city_gp_id, session_id, function(city) {
-			getCityCenterFromId_session(city, session_id, function(city) {
-				if(!cityCoversPosition(city, position)) {
-					tryNearbyCities();
-					return;
-				}
+		function finish(city) {
+			if(city && city.gp_id) {
 				if(locating_encode === true)
-					current_city_gp_id = city_gp_id;
-				setCurrentCity_status(current_city_gp_id == city_gp_id);
-				encode_continue(city, position);
-				getCity_by_perifery_list(position, encode_session_id, false);
-			});
-		}, tryNearbyCities);
+					current_city_gp_id = city.gp_id;
+				setCurrentCity_status(current_city_gp_id == city.gp_id);
+			}
+			encode_continue(city, position);
+		}
+
+		function lookupCoveringCity(id, found, next) {
+			getCityFromCityGp_id(id, session_id, function(city) {
+				getCityCenterFromId_session(city, session_id, function(city) {
+					if(cityCoversPosition(city, position))
+						found(city);
+					else
+						next();
+				});
+			}, next);
+		}
+
+		function finishWithChoices(city) {
+			finish(city);
+			getCity_by_perifery_list(position, encode_session_id);
+		}
+
+		function finishNearby(choices, tryAddressFallback) {
+			var covering = choices.filter(entry => cityCoversPosition(entry.city, position));
+			var parents = covering.filter(entry => localityHints.some(hint => matchesLocalityHint(entry.city, hint)));
+			if(parents.length === 1) {
+				finish(parents[0].city);
+				return;
+			}
+
+			var closest = covering.reduce((best, entry) => !best || entry.distance < best.distance ? entry : best, null);
+			function finishClosest() {
+				finish(closest ? closest.city : null);
+			}
+			if(tryAddressFallback && fallbackId)
+				lookupCoveringCity(fallbackId, finish, finishClosest);
+			else
+				finishClosest();
+		}
+
+		function queryNearby() {
+			getCity_by_perifery_list(position, session_id, finishNearby);
+		}
+
+		function tryLocality(index) {
+			if(index < localityIds.length)
+				lookupCoveringCity(localityIds[index], finishWithChoices, () => tryLocality(index + 1));
+			else if(localityHints.length)
+				getCity_by_perifery_list(position, session_id, choices => finishNearby(choices, true));
+			else if(fallbackId)
+				lookupCoveringCity(fallbackId, finishWithChoices, queryNearby);
+			else
+				queryNearby();
+		}
+
+		tryLocality(0);
 	});
+}
+
+var localityContextFields = {
+	country: 'country',
+	administrative_level_1: 'administrative_area_level_1',
+	administrative_level_2: 'administrative_area_level_2',
+	administrative_level_3: 'administrative_area_level_3'
+};
+
+function normalizeLocalityName(name) {
+	return (name || '').normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function getNestedLocalityHints(results) {
+	var localityNames = new Set();
+	var hints = [];
+	for(var result of results) {
+		var components = result.address_components || [];
+		var locality = components.find(component => component.types.includes('locality'));
+		if(!locality || !locality.long_name)
+			continue;
+		var name = normalizeLocalityName(locality.long_name);
+		if(result.place_id && result.types.includes('locality')) {
+			localityNames.add(name);
+			continue;
+		}
+		var hint = {name: name};
+		for(var field in localityContextFields) {
+			var component = components.find(item => item.types.includes(localityContextFields[field]));
+			if(component && component.long_name)
+				hint[field] = normalizeLocalityName(component.long_name);
+		}
+		hints.push(hint);
+	}
+	return hints.filter(hint => !localityNames.has(hint.name));
+}
+
+function matchesLocalityHint(city, hint) {
+	return [city.name, city.accent, city.name_id].some(name => normalizeLocalityName(name) === hint.name) &&
+		Object.keys(localityContextFields).every(field => !hint[field] || normalizeLocalityName(city[field]) === hint[field]);
 }
 
 function setCurrentCity_status(status) {
@@ -58,7 +139,7 @@ function setCurrentCity_status(status) {
 }
 
 function encode_continue(city, position) {
-	encode_session_id = Date.now();
+	encode_session_id = Symbol();
 	var session_id = encode_session_id;
 	if(city == null) {
 		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position))

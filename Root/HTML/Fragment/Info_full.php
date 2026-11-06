@@ -2,7 +2,7 @@
 
 	<div id='info_format_tabs' class='center' role='tablist' aria-label='Wolo Code format'>
 		<button id='info_city_tab' type='button' role='tab' aria-selected='true' aria-controls='info_city_format'>City</button>
-		<span aria-hidden='true'></span>
+		<span aria-hidden='true'>|</span>
 		<button id='info_region_tab' type='button' role='tab' aria-selected='false' aria-controls='info_region_format' tabindex='-1'>Region</button>
 	</div>
 	<div class='info_format_panels'>
@@ -13,9 +13,8 @@
 		</div>
 		<div id='info_region_format' role='tabpanel' aria-labelledby='info_region_tab' tabindex='0' hidden>
 			<div class='center blue'>\ Region Index Word 1 Word 2 Word 3 /</div>
-			<div class='info_format_example info_region_example center blue'>
-				<span>e.g.</span>
-				<div>\ Nepal 35 tower silk cobra /</div>
+			<div class='info_format_example center blue'>
+				<span>e.g.</span>&nbsp;\&nbsp;Nepal 35 tower silk cobra /
 				<div class='info_format_example_caption'>Mt. Everest</div>
 			</div>
 			<p><strong>Region</strong> names a region or country. The numeric <strong>index</strong> identifies the reference point within it.</p>

@@ -262,9 +262,8 @@
 }
 
 #info_format_tabs > span {
-	flex: 0 0 1px;
-	height: 0.85em;
-	background: #888;
+	flex: 0 0 auto;
+	color: #767676;
 }
 
 #info_format_tabs > button {
@@ -290,7 +289,8 @@
 	color: #28768e;
 }
 
-html.dark-mode #info_format_tabs > button {
+html.dark-mode #info_format_tabs > button,
+html.dark-mode #info_format_tabs > span {
 	color: #a0a0a0;
 }
 
@@ -323,19 +323,8 @@ html.dark-mode #info_format_tabs > button[aria-selected='true'] {
 	color: gray;
 }
 
-.info_region_example {
-	display: grid;
-	grid-template-columns: minmax(1.75em, 1fr) minmax(0, auto) minmax(1.75em, 1fr);
-	width: 100%;
-}
-
-.info_region_example > span {
-	justify-self: end;
-}
-
 .info_format_example_caption {
-	grid-column: 2;
-	justify-self: end;
+	text-align: right;
 	color: #767676;
 }
 

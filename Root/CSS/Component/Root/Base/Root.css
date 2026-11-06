@@ -269,6 +269,11 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 	width: 39px;
 }
 
+body:not(.decode) #footer-content .link-gray {
+	color: #fff !important;
+	text-shadow: 0 1px 2px #000;
+}
+
 .map_attribution {
 	border-radius: 5px;
 	bottom: 2px;

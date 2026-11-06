@@ -17,7 +17,7 @@ The Address Panel omits the Code reference selector and Propose a city button.
 
 | Section | Controls | Behavior |
 | --- | --- | --- |
-| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Open from full Info view or city selectors. Name is required; country and selected location are optional. |
+| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Open from city selectors. Name is required; country and selected location are optional. |
 | City proposal confirmation | `#no_city_request_id`, `#no_city_email_details` | Displays an acknowledged request ID, opens an editable email draft, and retains a fallback email link. Closing does not cancel an already submitted request. |
 
 
@@ -200,7 +200,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Intro view | Info Intro View | `#info_intro` | Main body when intro is active | Shows cookie/privacy notice and the intro proceed control. |
 | Intro policy link | Info Intro Policy Link | `/policy` link inside `#info_intro` | Inside Info Intro View copy | Opens cookie and privacy policies. |
 | Intro proceed control | Info Intro Proceed Button | `#info_intro_close_button` | Bottom of Info Intro View | Closes the intro prompt and continues into the app. First-run Input Icon Guide starts only after this click. |
-| Full explanation view | Info Full View | `#info_full` | Main body when full info is active | Explains Wolo Code structure and app usage steps. |
+| Full explanation view | Info Full View | `#info_full` | Main body when full info is active | Shows plain-text city and regional formats, explains the regional anchor index, and lists app usage steps. |
 | Icon labels control | Info Icon Labels Button | `#info_show_icon_labels`, `showInfoIconGuide()` | Bottom-left of Info Modal View | **show guide** closes Info Modal View and shows Input Icon Guide overlay labels on the current view (Wolo Code Input View or Map View). Hover and keyboard focus do not underline the label. Hidden during Info Intro View and Info Links View; shown on Info Full View. |
 | Version indicator | Info Version Indicator | `#info_version_indicator`, `.info_version_under`, `toggleInfoVersionDisplay()` | Bottom-right of Info Modal View | Shows `v` plus the three-part `version` from `Vars.tsv` on the same bottom line as **show guide**. Hover or keyboard focus expands the label to `version.build` and shows elapsed time since the bake under the version. Hovering that stamp shows the UTC timestamp. A tap keeps the full version visible and shows local time under the version; hovering that stamp shows UTC. Times overlay below that line so the version stays put. Hidden on Info Links View. |
 | Wolo Code format line | Info Wolo Code Format | `#wcode_format` | Top of Info Full View | Shows `\ City Word 1 Word 2 Word 3 /`. |

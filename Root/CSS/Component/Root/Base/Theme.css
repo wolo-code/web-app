@@ -713,17 +713,6 @@ html.dark-mode #exception_message_title .exception_warning_icon svg {
 	color: #f0b429;
 }
 
-html.dark-mode #wcode_format > span {
-	background: #2a2a4a;
-}
-
-html.dark-mode #wcode_format > span:first-child,
-html.dark-mode #wcode_format > span:last-child,
-html.dark-mode #wcode_example > span:nth-child(2),
-html.dark-mode #wcode_example > span:last-child {
-	background: none;
-}
-
 html.dark-mode .link-gray {
 	color: #666 !important;
 }

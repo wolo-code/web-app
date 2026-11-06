@@ -1,17 +1,20 @@
 <div id='info_full' class='hide'>
 
-	<div id='wcode_format' class="center blue"><span>\</span> <span>City</span> <span>Word 1</span> <span>Word 2</span> <span>Word 3</span> <span>/</span></div>
+	<div id='wcode_format' class="center blue">
+		<div>\ City Word 1 Word 2 Word 3 /</div>
+		<div>\ Region Index Word 1 Word 2 Word 3 /</div>
+	</div>
 	<div id='wcode_example' class="center blue"><span>e.g.</span> <span>\</span> <span>Bengaluru</span> <span>cat</span> <span>apple</span> <span>tomato</span> <span>/</span></div>
 	<p>
 		An address in this system consists of two parts:
 	</p>
 	<ol>
 		<li>
-			<strong>City</strong> specifies the distinct city.<br>
-			Within the same city - it can be omitted.
+			<strong>City</strong> names the city. You can omit it when using the current city.<br>
+			<strong>Region Index</strong> uses a region or country name followed by a number that identifies the reference point within it.
 		</li>
 		<li>
-			The last <strong>three words</strong> specify exactly 'where' in that city.<br>
+			The last <strong>three words</strong> pinpoint the location in either format.<br>
 			They are from a limited <a class='link' href='https://wcodes.org/wordlist'>list</a> of 1,024 easy common words.
 		</li>
 	</ol>
@@ -39,7 +42,6 @@
 	</div>
 	
 	<div id='wolo_about'>
-		<p><button id='info_propose_city' type='button' class='border'>Propose a city</button></p>
 		<a class='link' href='https://wolo.codes/about'>wolo.codes/about</a>
 	</div>
 	

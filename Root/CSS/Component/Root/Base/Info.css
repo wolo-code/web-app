@@ -241,31 +241,71 @@
 }
 
 #info_format_tabs {
+	position: relative;
 	display: flex;
+	align-items: center;
 	justify-content: center;
-	gap: 8px;
+	gap: 4px;
+	padding-top: 5px;
 	margin-bottom: 12px;
 }
 
+#info_format_tabs::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	width: 100%;
+	max-width: 240px;
+	height: 1px;
+	background: linear-gradient(to right, transparent, #69b7cf, transparent);
+}
+
+#info_format_tabs > span {
+	color: #888;
+}
+
 #info_format_tabs > button {
-	padding: 4px 12px;
+	padding: 4px 8px;
 	border: 0;
-	border-bottom: 2px solid transparent;
 	background: transparent;
-	color: inherit;
+	color: #767676;
+	font-weight: bold;
 	cursor: pointer;
 }
 
 #info_format_tabs > button[aria-selected='true'] {
-	border-bottom-color: currentColor;
-	font-weight: bold;
+	color: #28768e;
 }
 
-#wcode_example {
+html.dark-mode #info_format_tabs > button {
+	color: #a0a0a0;
+}
+
+html.dark-mode #info_format_tabs > button[aria-selected='true'] {
+	color: #69b7cf;
+}
+
+.info_format_panels {
+	display: grid;
+	grid-template-rows: repeat(3, auto);
+}
+
+.info_format_panels > [role='tabpanel'] {
+	grid-area: 1 / 1 / span 3 / 2;
+	display: grid;
+	grid-template-rows: subgrid;
+}
+
+/* Keep both panels in the grid so their shared rows retain their height. */
+.info_format_panels > [hidden] {
+	visibility: hidden;
+}
+
+.info_format_example {
 	margin-top: 8px;
 }
 
-#wcode_example > span:first-child {
+.info_format_example > span {
 	margin-right: 4px;
 	color: gray;
 }

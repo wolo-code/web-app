@@ -13,7 +13,7 @@
 		</div>
 		<div id='info_region_format' role='tabpanel' aria-labelledby='info_region_tab' tabindex='0' hidden>
 			<div class='center blue'>\ Region Index Word 1 Word 2 Word 3 /</div>
-			<div class='info_format_example center blue'><span>Mount Everest</span> \ Nepal 35 tower silk cobra /</div>
+			<div class='info_format_example center blue'><span>e.g. Mt. Everest:</span> \ Nepal 35 tower silk cobra /</div>
 			<p><strong>Region</strong> names a region or country. The numeric <strong>index</strong> identifies the reference point within it.</p>
 		</div>
 	</div>

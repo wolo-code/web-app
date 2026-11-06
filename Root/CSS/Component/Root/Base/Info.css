@@ -316,6 +316,7 @@ html.dark-mode #info_format_tabs > button[aria-selected='true'] {
 
 .info_format_example {
 	margin-top: 8px;
+	text-align: center;
 }
 
 .info_format_example > span {
@@ -324,6 +325,8 @@ html.dark-mode #info_format_tabs > button[aria-selected='true'] {
 }
 
 .info_format_example_caption {
+	max-width: 240px;
+	margin-inline: auto;
 	text-align: right;
 	color: #767676;
 }

@@ -196,6 +196,7 @@ function setupControls() {
 	bindControl('info_message_close', 'click', closeInfo);
 	bindControl('info_intro_close_button', 'click', closeInfo);
 	bindControl('info_full_close_button', 'click', closeInfo);
+	bindInfoFormatTabs();
 	bindControl('info_version_indicator', 'click', toggleInfoVersionDisplay);
 	bindControl('info_version_indicator', 'mouseenter', fillInfoVersionStamps);
 	bindControl('info_version_indicator', 'focus', fillInfoVersionStamps);

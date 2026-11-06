@@ -240,16 +240,29 @@
 	margin-bottom: 2em;
 }
 
-#info_full > p:first-of-type {
-	padding-left: 40px;
+#info_format_tabs {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+#info_format_tabs > button {
+	padding: 4px 12px;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+
+#info_format_tabs > button[aria-selected='true'] {
+	border-bottom-color: currentColor;
+	font-weight: bold;
 }
 
 #wcode_example {
 	margin-top: 8px;
-}
-
-#wcode_example > span {
-	padding: 2px 2px;
 }
 
 #wcode_example > span:first-child {

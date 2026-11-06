@@ -1,23 +1,19 @@
 <div id='info_full' class='hide'>
 
-	<div id='wcode_format' class="center blue">
-		<div>\ City Word 1 Word 2 Word 3 /</div>
-		<div>\ Region Index Word 1 Word 2 Word 3 /</div>
+	<div id='info_format_tabs' class='center' role='tablist' aria-label='Wolo Code format'>
+		<button id='info_city_tab' type='button' role='tab' aria-selected='true' aria-controls='info_city_format'>City</button>
+		<button id='info_region_tab' type='button' role='tab' aria-selected='false' aria-controls='info_region_format' tabindex='-1'>Region</button>
 	</div>
-	<div id='wcode_example' class="center blue"><span>e.g.</span> <span>\</span> <span>Bengaluru</span> <span>cat</span> <span>apple</span> <span>tomato</span> <span>/</span></div>
-	<p>
-		An address in this system consists of two parts:
-	</p>
-	<ol>
-		<li>
-			<strong>City</strong> names the city. You can omit it when using the current city.<br>
-			<strong>Region Index</strong> uses a region or country name followed by a number that identifies the reference point within it.
-		</li>
-		<li>
-			The last <strong>three words</strong> pinpoint the location in either format.<br>
-			They are from a limited <a class='link' href='https://wcodes.org/wordlist'>list</a> of 1,024 easy common words.
-		</li>
-	</ol>
+	<div id='info_city_format' role='tabpanel' aria-labelledby='info_city_tab' tabindex='0'>
+		<div class='center blue'>\ City Word 1 Word 2 Word 3 /</div>
+		<div id='wcode_example' class='center blue'><span>e.g.</span> \ Bengaluru cat apple tomato /</div>
+		<p><strong>City</strong> names the city. You can omit it when using the current city.</p>
+	</div>
+	<div id='info_region_format' role='tabpanel' aria-labelledby='info_region_tab' tabindex='0' hidden>
+		<div class='center blue'>\ Region Index Word 1 Word 2 Word 3 /</div>
+		<p><strong>Region</strong> names a region or country. The numeric <strong>index</strong> identifies the reference point within it.</p>
+	</div>
+	<p>The last <strong>three words</strong> pinpoint the location. They come from a <a class='link' href='https://wcodes.org/wordlist'>list</a> of 1,024 common words.</p>
 
 	<h2>
 		Steps

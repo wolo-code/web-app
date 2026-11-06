@@ -467,7 +467,13 @@ function initMap() {
 	if(typeof syncProceedButtons == 'function') {
 		document.getElementById('decode_input').addEventListener('input', syncProceedButtons);
 	}
-	document.getElementById('decode_input').addEventListener('keyup', enterHandler);
+	document.getElementById('decode_input').addEventListener('keydown', function(event) {
+		if(event.key !== 'Enter' || event.shiftKey || event.isComposing)
+			return;
+		event.preventDefault();
+		if(!event.repeat)
+			decode_input_from_form_external();
+	});
 	document.getElementById('decode_input').addEventListener('focus', showDecodeInputAltTip);
 	document.getElementById('decode_input').addEventListener('blur', hideDecodeInputAltTip);
 	if(typeof syncProceedButtons == 'function') {

@@ -76,8 +76,6 @@ function looksLikePlusCode(value) {
 }
 
 function enterHandler(event) {
-	if (event.target.id === 'decode_input' && !event.ctrlKey && !event.metaKey)
-		return;
 	if (event.keyCode === 13) {
 		event.preventDefault();
 		document.getElementById(event.target.getAttribute('data-handler')).click();

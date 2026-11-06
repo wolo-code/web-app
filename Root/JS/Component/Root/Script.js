@@ -339,7 +339,7 @@ function resizeInput() {
 
 function showAndCopy(message) {
 	showNotification(message);
-	copyNodeText(notification_bottom);
+	copyPlainText(message);
 }
 
 function copyPlainText(text) {

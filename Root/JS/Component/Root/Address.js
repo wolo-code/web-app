@@ -78,6 +78,7 @@ function setAddressPanelHeading(title, segment) {
 }
 
 function showAddress() {
+	if(typeof syncMapPlaceIndices === 'function') syncMapPlaceIndices();
 	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 	var panel = getAddressPanel();
 	if(!current_title && !current_segment)

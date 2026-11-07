@@ -1,4 +1,5 @@
 <div id='address_text' class='hide'>
+	<span id='address_text_place_index' class='map_place_letter' hidden></span>
 	<div id='address_text_label'>
 		<div id='address_text_caption'>
 			Address

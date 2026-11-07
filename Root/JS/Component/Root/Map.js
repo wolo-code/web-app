@@ -866,6 +866,7 @@ function renderMapPlaces() {
 			color: '#222', fontWeight: '600', fontSize: '13px'
 		} : null);
 	});
+	syncMapPlaceIndices();
 	list.replaceChildren();
 	directions.replaceChildren();
 	if(toggle.hidden)
@@ -901,7 +902,7 @@ function renderMapPlaces() {
 		var drag = document.createElement('button');
 		drag.type = 'button';
 		drag.className = 'map_place_drag';
-		drag.textContent = '\u283f';
+		drag.textContent = '=';
 		drag.title = 'Drag to rearrange; use arrow keys to move';
 		drag.setAttribute('aria-label', 'Rearrange ' + name);
 		drag.addEventListener('keydown', function(event) {
@@ -921,17 +922,21 @@ function renderMapPlaces() {
 				var hit = document.elementFromPoint(e.clientX, e.clientY);
 				var next = hit && hit.closest('#map_places_list li');
 				if(!next) return;
-				if(dropRow) dropRow.classList.remove('map_place_drop');
+				if(dropRow) dropRow.classList.remove('map_place_drop_before', 'map_place_drop_after');
 				dropRow = next;
-				target = mapPlaces.indexOf(next.mapPlace);
-				next.classList.add('map_place_drop');
+				var rect = next.getBoundingClientRect();
+				var after = e.clientY >= rect.top + rect.height / 2;
+				var insertion = mapPlaces.indexOf(next.mapPlace) + (after ? 1 : 0);
+				target = insertion - (mapPlaces.indexOf(entry) < insertion ? 1 : 0);
+				if(target !== mapPlaces.indexOf(entry))
+					next.classList.add(after ? 'map_place_drop_after' : 'map_place_drop_before');
 			}
 			function finish(e) {
 				drag.removeEventListener('pointermove', move);
 				drag.removeEventListener('pointerup', finish);
 				drag.removeEventListener('pointercancel', finish);
 				row.classList.remove('map_place_dragging');
-				if(dropRow) dropRow.classList.remove('map_place_drop');
+				if(dropRow) dropRow.classList.remove('map_place_drop_before', 'map_place_drop_after');
 				if(drag.hasPointerCapture(e.pointerId)) drag.releasePointerCapture(e.pointerId);
 				if(e.type !== 'pointercancel') moveMapPlace(entry, target);
 			}

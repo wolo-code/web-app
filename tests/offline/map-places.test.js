@@ -11,7 +11,12 @@ function loadMap() {
 	function element() {
 		return {
 			children: [],
-			classList: { toggle() {}, add() {}, remove() {} },
+			classList: {
+				values: new Set(), toggle() {},
+				add(...names) { names.forEach(name => this.values.add(name)); },
+				remove(...names) { names.forEach(name => this.values.delete(name)); }
+			},
+			getBoundingClientRect() { return {top: 0, height: 20}; },
 			append(child) { this.children.push(child); },
 			replaceChildren() { this.children = []; },
 			get firstElementChild() { return this.children[0]; },
@@ -126,7 +131,8 @@ test('pointer dragging rearranges places and cancellation preserves order', () =
 		const handle = list.children[0].children[2];
 		document.elementFromPoint = () => ({closest: () => list.children[2]});
 		handle.pointerdown({button: 0, pointerId: 1, preventDefault() {}});
-		handle.pointermove({clientX: 0, clientY: 0});
+		handle.pointermove({clientX: 0, clientY: 20});
+		assert(list.children[2].classList.values.has('map_place_drop_after'));
 		handle[type]({type, pointerId: 1});
 	}
 	drag('pointercancel');
@@ -306,4 +312,47 @@ test('Wolo route restoration waits for the word list and adds no partial route f
 	await new Promise(setImmediate);
 	assert.equal(context.mapPlaces.length, 0);
 	assert.match(notification, /Could not open this route/);
+});
+
+
+test('the drop line chooses the boundary before or after a row', () => {
+	for(const [y, expected, indicator] of [[1, [3,1,2], 'map_place_drop_before'], [19, [1,3,2], 'map_place_drop_after']]) {
+		const {context, document, place} = loadMap();
+		context.mapPlaces = [1,2,3].map(lat => ({marker:place(lat)}));
+		context.renderMapPlaces();
+		const list = document.getElementById('map_places_list');
+		const row = list.children[0];
+		document.elementFromPoint = () => ({closest: () => row});
+		const handle = list.children[2].children[2];
+		assert.equal(handle.textContent, '=');
+		handle.pointerdown({button:0, pointerId:1, preventDefault() {}});
+		handle.pointermove({clientX:0, clientY:y});
+		assert(row.classList.values.has(indicator));
+		handle.pointerup({type:'pointerup', pointerId:1});
+		assert.deepEqual(Array.from(context.mapPlaces, entry => Number(entry.marker.getPosition().lat())), expected);
+	}
+});
+
+test('info cards and the address box track alphabetic indices through reorder and removal', () => {
+	const {context, document, show} = loadMap();
+	const first = show(1);
+	const firstBadge = {setAttribute() {}};
+	first.setContent({querySelector: () => firstBadge});
+	context.retainActiveMapCard();
+	const second = show(2);
+	const secondBadge = {setAttribute() {}};
+	second.setContent({querySelector: () => secondBadge});
+	context.syncMapPlaceIndices();
+	assert.equal(firstBadge.textContent, 'A');
+	assert.equal(secondBadge.textContent, 'B');
+	assert.equal(firstBadge.hidden, false);
+	assert.equal(document.getElementById('address_text_place_index').textContent, 'B');
+	const active = context.getMapPlace(context.marker);
+	context.moveMapPlace(active, 0);
+	assert.equal(firstBadge.textContent, 'B');
+	assert.equal(secondBadge.textContent, 'A');
+	assert.equal(document.getElementById('address_text_place_index').textContent, 'A');
+	context.removeMapPlace(active);
+	assert.equal(firstBadge.hidden, true);
+	assert.equal(document.getElementById('address_text_place_index').hidden, true);
 });

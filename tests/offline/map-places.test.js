@@ -105,7 +105,7 @@ test('the reordered Places list focuses the correct marker and updates direction
 	context.renderMapPlaces();
 
 	const list = document.getElementById('map_places_list');
-	list.children[2].children[1].keydown({key: 'ArrowUp', preventDefault() {}, stopPropagation() {}});
+	list.children[2].children[2].keydown({key: 'ArrowUp', preventDefault() {}, stopPropagation() {}});
 	list.children[1].firstElementChild.click();
 	assert.equal(focused, 3);
 	const [link] = document.getElementById('map_places_directions').children;
@@ -123,7 +123,7 @@ test('pointer dragging rearranges places and cancellation preserves order', () =
 	context.renderMapPlaces();
 	const list = document.getElementById('map_places_list');
 	function drag(type) {
-		const handle = list.children[0].children[1];
+		const handle = list.children[0].children[2];
 		document.elementFromPoint = () => ({closest: () => list.children[2]});
 		handle.pointerdown({button: 0, pointerId: 1, preventDefault() {}});
 		handle.pointermove({clientX: 0, clientY: 0});
@@ -212,12 +212,15 @@ test('place labels continue from Z to AA, AZ, BA, ZZ and AAA', () => {
 
 test('row remove control removes its marker and refreshes letters and route order', () => {
 	const {context, document, place} = loadMap();
-	context.mapPlaces = [1, 2, 3].map(lat => ({marker: place(lat)}));
+	context.mapPlaces = [1, 2, 3].map(lat => ({marker: place(lat), name: 'nepal words ' + lat}));
 	const removed = context.mapPlaces[1].marker;
 	context.renderMapPlaces();
 	const list = document.getElementById('map_places_list');
 	assert.equal(list.children[2].children[0].children[0].textContent, 'C');
-	list.children[1].children[2].click();
+	assert.equal(list.children[0].children[0].children[1].textContent, 'Nepal words 1');
+	assert.equal(list.children[0].children[1].className, 'map_place_remove');
+	assert.equal(list.children[0].children[2].className, 'map_place_drag');
+	list.children[1].children[1].click();
 	assert.equal(removed.map, null);
 	assert.equal(context.mapPlaces.length, 2);
 	assert.equal(list.children[1].children[0].children[0].textContent, 'B');

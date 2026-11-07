@@ -252,7 +252,9 @@ body > #pac-input,
 	padding: 12px;
 	border: 1px solid rgb(128 128 128 / 18%);
 	border-radius: 16px;
-	background: #fff;
+	background: rgb(255 255 255 / 50%);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
 	color: #333;
 	box-shadow: 0 8px 28px rgb(0 0 0 / 20%);
 }
@@ -263,7 +265,7 @@ html.dark-mode #map_places_toggle {
 }
 
 html.dark-mode #map_places_panel {
-	background: #224;
+	background: rgb(34 34 68 / 50%);
 	color: #eee;
 }
 
@@ -354,7 +356,10 @@ html.dark-mode .map_place_letter { color: #9ed8e9; }
 }
 #map_places_directions a:hover, #map_places_share:hover { background: rgb(105 183 207 / 12%); }
 #map_places_directions img, #map_places_share svg { width: 22px; height: 22px; pointer-events: none; }
-#map_places_toggle svg { vertical-align: middle; }
+#map_places_toggle svg { vertical-align: middle; color: #69b7cf; }
+.map_place_marker_letter {
+	text-shadow: 0 0 2px rgb(255 255 255 / 95%), 0 0 5px rgb(255 255 255 / 65%);
+}
 
 #pac-input {
 	box-sizing: content-box;

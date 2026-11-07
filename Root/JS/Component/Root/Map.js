@@ -861,7 +861,10 @@ function renderMapPlaces() {
 		toggle.setAttribute('aria-expanded', 'false');
 	}
 	mapPlaces.forEach(function(entry, index) {
-		if(entry.marker.setLabel) entry.marker.setLabel(mapPlaces.length > 1 ? getMapPlaceLabel(index) : null);
+		if(entry.marker.setLabel) entry.marker.setLabel(mapPlaces.length > 1 ? {
+			text: getMapPlaceLabel(index), className: 'map_place_marker_letter',
+			color: '#222', fontWeight: '600', fontSize: '13px'
+		} : null);
 	});
 	list.replaceChildren();
 	directions.replaceChildren();
@@ -870,7 +873,8 @@ function renderMapPlaces() {
 
 	mapPlaces.forEach(function(entry, index) {
 		var row = document.createElement('li');
-		var name = entry.name || entry.marker.getTitle();
+		var name = String(entry.name || entry.marker.getTitle() || '');
+		name = name.charAt(0).toLocaleUpperCase() + name.slice(1);
 		var placeButton = document.createElement('button');
 		placeButton.type = 'button';
 		placeButton.className = 'map_place_name';
@@ -935,7 +939,6 @@ function renderMapPlaces() {
 			drag.addEventListener('pointerup', finish);
 			drag.addEventListener('pointercancel', finish);
 		});
-		row.append(drag);
 		var remove = document.createElement('button');
 		remove.type = 'button';
 		remove.className = 'map_place_remove';
@@ -949,6 +952,7 @@ function renderMapPlaces() {
 			else toggle.focus();
 		});
 		row.append(remove);
+		row.append(drag);
 		list.append(row);
 	});
 
@@ -1193,7 +1197,7 @@ function moveMapPlace(entry, target) {
 	mapPlaces.splice(index, 1);
 	mapPlaces.splice(target, 0, entry);
 	renderMapPlaces();
-	document.getElementById('map_places_list').children[target].children[1].focus();
+	document.getElementById('map_places_list').children[target].children[2].focus();
 }
 
 function getMapPlaceLabel(index) {

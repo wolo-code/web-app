@@ -16,6 +16,8 @@ function setCode(city, wcode, latLng) {
 	code_postition = latLng;
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng, city);
+	var entry = typeof getMapPlace === 'function' ? getMapPlace(marker) : null;
+	if(entry) entry.routeCode = getCodeComplete().filter(Boolean).join('.').toLowerCase().replace(/ /g, '_');
 	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 }
 

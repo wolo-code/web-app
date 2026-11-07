@@ -375,7 +375,7 @@ function initMap() {
 	}
 	
 	var shareRoute = document.getElementById('map_places_share');
-	if(shareRoute) shareRoute.addEventListener('click', shareMapRoute);
+	if(shareRoute) addLongpressListener(shareRoute, function() { shareMapRoute(false); }, function() { shareMapRoute(true); });
 	var placesToggle = document.getElementById('map_places_toggle');
 	var placesPanel = document.getElementById('map_places_panel');
 	if(placesToggle && placesPanel) {
@@ -860,6 +860,9 @@ function renderMapPlaces() {
 		panel.hidden = true;
 		toggle.setAttribute('aria-expanded', 'false');
 	}
+	mapPlaces.forEach(function(entry, index) {
+		if(entry.marker.setLabel) entry.marker.setLabel(mapPlaces.length > 1 ? getMapPlaceLabel(index) : null);
+	});
 	list.replaceChildren();
 	directions.replaceChildren();
 	if(toggle.hidden)
@@ -870,7 +873,16 @@ function renderMapPlaces() {
 		var name = entry.name || entry.marker.getTitle();
 		var placeButton = document.createElement('button');
 		placeButton.type = 'button';
-		placeButton.textContent = name;
+		placeButton.className = 'map_place_name';
+		placeButton.title = name;
+		var badge = document.createElement('span');
+		badge.className = 'map_place_letter';
+		badge.textContent = getMapPlaceLabel(index);
+		var label = document.createElement('span');
+		label.className = 'map_place_text';
+		label.textContent = name;
+		placeButton.append(badge);
+		placeButton.append(label);
 		placeButton.addEventListener('click', function() {
 			if(entry.card)
 				activateMapCard(entry.card);
@@ -924,6 +936,19 @@ function renderMapPlaces() {
 			drag.addEventListener('pointercancel', finish);
 		});
 		row.append(drag);
+		var remove = document.createElement('button');
+		remove.type = 'button';
+		remove.className = 'map_place_remove';
+		remove.textContent = '\u00d7';
+		remove.title = 'Remove place';
+		remove.setAttribute('aria-label', 'Remove ' + name);
+		remove.addEventListener('click', function() {
+			removeMapPlace(entry);
+			var next = list.children[Math.min(index, mapPlaces.length - 1)];
+			if(!panel.hidden && next) next.firstElementChild.focus();
+			else toggle.focus();
+		});
+		row.append(remove);
 		list.append(row);
 	});
 
@@ -945,7 +970,13 @@ function renderMapPlaces() {
 		link.href = 'https://www.google.com/maps/dir/?' + params.toString();
 		link.target = '_blank';
 		link.rel = 'noopener noreferrer';
-		link.textContent = coordinates.length > 5 ? 'Directions ' + (start + 1) + '–' + (start + stops.length) : 'Directions';
+		var title = coordinates.length > 5 ? 'Directions ' + getMapPlaceLabel(start) + '–' + getMapPlaceLabel(start + stops.length - 1) : 'Directions';
+		link.title = title;
+		link.setAttribute('aria-label', title);
+		var icon = document.createElement('img');
+		icon.src = svg_launch;
+		icon.alt = '';
+		link.append(icon);
 		directions.append(link);
 	}
 }
@@ -1165,12 +1196,33 @@ function moveMapPlace(entry, target) {
 	document.getElementById('map_places_list').children[target].children[1].focus();
 }
 
-function getMapRouteURL() {
+function getMapPlaceLabel(index) {
+	var label = '';
+	for(var value = index + 1; value > 0; value = Math.floor((value - 1) / 26))
+		label = String.fromCharCode(65 + (value - 1) % 26) + label;
+	return label;
+}
+
+function getMapPlaceWoloCode(entry) {
+	if(entry.routeCode) return entry.routeCode;
+	// Search results without an opened card still have a globally resolvable regional code.
+	var position = resolveLatLng(entry.marker.getPosition());
+	var choices = regionAnchorsForPosition(position);
+	if(!choices.length || typeof wordList === 'undefined') return null;
+	var city = choices[0].anchor;
+	var data = encode__(getWoloAnchorBegin(city), regionGridPosition(city, position));
+	if(!isValidWoloIndexCode(data)) return null;
+	return [city.name_id].concat(data.map(function(index) { return wordList.getWord(index); })).join('.').toLowerCase().replace(/ /g, '_');
+}
+
+function getMapRouteURL(coordinateBased) {
 	if(mapPlaces.length < 2) return null;
 	var coordinates = mapPlaces.map(function(entry) {
+		if(!coordinateBased) return getMapPlaceWoloCode(entry);
 		var pos = entry.marker.getPosition();
 		return pos.lat() + ',' + pos.lng();
 	});
+	if(coordinates.some(function(value) { return !value; })) return null;
 	var params = new URLSearchParams();
 	params.set('from', coordinates[0]);
 	coordinates.slice(1, -1).forEach(function(position) { params.append('via', position); });
@@ -1178,9 +1230,9 @@ function getMapRouteURL() {
 	return window.location.origin + '/?' + params.toString();
 }
 
-function shareMapRoute() {
-	var url = getMapRouteURL();
-	if(!url) return;
+function shareMapRoute(coordinateBased) {
+	var url = getMapRouteURL(coordinateBased);
+	if(!url) { showNotification('Route codes are still loading. Please try again.'); return; }
 	function copy() { copyPlainText(url); showNotification('Route link copied'); }
 	if(navigator.share)
 		navigator.share({title: 'Wolo route', url: url}).catch(function(error) {
@@ -1189,30 +1241,72 @@ function shareMapRoute() {
 	else copy();
 }
 
+function mapRouteCoordinate(value) {
+	if(!/^-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?$/.test(value)) return null;
+	var parts = value.split(',').map(Number);
+	return Math.abs(parts[0]) <= 90 && Math.abs(parts[1]) <= 180 ? {lat: parts[0], lng: parts[1]} : null;
+}
+
+function resolveMapRouteCode(value) {
+	return new Promise(function(resolve, reject) {
+		var words = value.toLowerCase().replace(/_/g, ' ').split('.');
+		var code = words.slice(-3);
+		if(words.length < 4 || typeof wordList === 'undefined') { reject(new Error('Invalid route code')); return; }
+		var data = code.map(function(word) { return wordList.indexOf(word); });
+		if(!isValidWoloIndexCode(data)) { reject(new Error('Invalid route code')); return; }
+		var reference = words.slice(0, -3);
+		getCityFromName(reference.slice(0, -1), reference[reference.length - 1], function(city) {
+			getCityCenterFromId(city, function(city) {
+				var begin = city && getWoloAnchorBegin(city);
+				if(!begin) { reject(new Error('Unknown route reference')); return; }
+				var position = decode__(begin, data);
+				if(isRegionAnchor(city)) position = positionFromRegionGrid(city, position);
+				if(!position || !Number.isFinite(position.lat) || !Number.isFinite(position.lng) || Math.abs(position.lat) > 90 || Math.abs(position.lng) > 180) {
+					reject(new Error('Invalid route position')); return;
+				}
+				resolve({position: position, routeCode: value, name: reference.join(' ') + ' ' + code.join(' ')});
+			});
+		}, function() { reject(new Error('Unknown route reference')); });
+	});
+}
+
 function restoreMapRoute() {
 	var params = new URLSearchParams(window.location.search);
 	if(!params.has('from') || !params.has('to')) return false;
-	var positions = [params.get('from')].concat(params.getAll('via'), [params.get('to')]).map(function(value) {
-		if(!/^-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?$/.test(value)) return null;
-		var parts = value.split(',').map(Number);
-		return Math.abs(parts[0]) <= 90 && Math.abs(parts[1]) <= 180 ? {lat: parts[0], lng: parts[1]} : null;
-	});
-	if(positions.some(function(position) { return !position; })) {
+	var values = [params.get('from')].concat(params.getAll('via'), [params.get('to')]);
+	var version = mapSelectionVersion;
+	function restore(stops) {
+		if(version !== mapSelectionVersion) return;
+		activateMapType();
+		var bounds = new google.maps.LatLngBounds();
+		stops.forEach(function(stop, index) {
+			var name = stop.name || (index === 0 ? 'From' : index === stops.length - 1 ? 'To' : 'Via ' + getMapPlaceLabel(index));
+			var routeMarker = new google.maps.Marker({map: map, position: stop.position, title: name});
+			var entry = {marker: routeMarker, name: name, result: true, routeCode: stop.routeCode};
+			routeMarker.addListener('click', function() { loadMapPlace(entry, true); });
+			mapPlaces.push(entry);
+			bounds.extend(stop.position);
+		});
+		map.fitBounds(bounds);
+		renderMapPlaces();
+	}
+	var positions = values.map(mapRouteCoordinate);
+	if(positions.every(Boolean)) {
+		restore(positions.map(function(position) { return {position: position}; }));
+		return true;
+	}
+	// A comma denotes a coordinate; reject invalid coordinates before resolving any codes.
+	if(values.some(function(value, index) { return value.includes(',') && !positions[index]; })) {
 		showNotification('Invalid route link');
 		return false;
 	}
-	activateMapType();
-	var bounds = new google.maps.LatLngBounds();
-	positions.forEach(function(position, index) {
-		var name = index === 0 ? 'From' : index === positions.length - 1 ? 'To' : 'Via ' + index;
-		var routeMarker = new google.maps.Marker({map: map, position: position, title: name});
-		var entry = {marker: routeMarker, name: name, result: true};
-		routeMarker.addListener('click', function() { loadMapPlace(entry, true); });
-		mapPlaces.push(entry);
-		bounds.extend(position);
+	Promise.resolve(typeof offlineWordListReady !== 'undefined' ? offlineWordListReady : null).then(function() {
+		return Promise.all(values.map(function(value, index) {
+			return positions[index] ? Promise.resolve({position: positions[index]}) : resolveMapRouteCode(value);
+		}));
+	}).then(restore).catch(function() {
+		if(version === mapSelectionVersion) showNotification('Could not open this route. Check the Wolo Codes and try again.');
 	});
-	map.fitBounds(bounds);
-	renderMapPlaces();
 	return true;
 }
 

@@ -1,5 +1,7 @@
+var offlineWordListReady;
+
 function dbInit() {
-	initOfflineWordList();
+	offlineWordListReady = initOfflineWordList();
 }
 
 function initData() {

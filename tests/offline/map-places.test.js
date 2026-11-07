@@ -41,7 +41,7 @@ function loadMap() {
 	const noop = () => {};
 	const context = vm.createContext({
 		document, URLSearchParams, window: {location: {origin: 'https://wolo.local', search: ''}}, google: { maps: { InfoWindow } },
-		map: {}, MESSAGE_LOADING: 'Loading',
+		map: {}, MESSAGE_LOADING: 'Loading', svg_launch: '/launch.svg',
 		code_city: null, code_wcode: null, code_postition: null,
 		code_plus_code: null, current_title: null, current_segment: null,
 		current_address: null, current_address_lines: null, address: null,
@@ -162,7 +162,7 @@ test('Delete and Backspace remove the selected card but preserve typed text and 
 test('route URLs round trip every stop in list order and reject invalid coordinates', () => {
 	const {context, place} = loadMap();
 	context.mapPlaces = [1, 3, 2, 4].map(lat => ({marker: place(lat)}));
-	const url = new URL(context.getMapRouteURL());
+	const url = new URL(context.getMapRouteURL(true));
 	assert.equal(url.searchParams.get('from'), '1,2');
 	assert.deepEqual(url.searchParams.getAll('via'), ['3,2', '2,2']);
 	assert.equal(url.searchParams.get('to'), '4,2');
@@ -189,7 +189,7 @@ test('route URLs round trip every stop in list order and reject invalid coordina
 
 test('route sharing uses native share or copies the complete link', async () => {
 	const {context, place} = loadMap();
-	context.mapPlaces = [1, 2].map(lat => ({marker: place(lat)}));
+	context.mapPlaces = [1, 2].map(lat => ({marker: place(lat), routeCode: 'test_city.word' + lat + '.two.three'}));
 	let copied, shared;
 	context.copyPlainText = value => { copied = value; };
 	context.showNotification = () => {};
@@ -198,4 +198,109 @@ test('route sharing uses native share or copies the complete link', async () => 
 	context.navigator.share = data => { shared = data; return Promise.resolve(); };
 	context.shareMapRoute();
 	assert.equal(shared.url, copied);
+	context.shareMapRoute(true);
+	assert.equal(shared.url, context.getMapRouteURL(true));
+	assert.notEqual(shared.url, copied);
+});
+
+
+test('place labels continue from Z to AA, AZ, BA, ZZ and AAA', () => {
+	const {context} = loadMap();
+	for(const [index, label] of [[0,'A'], [25,'Z'], [26,'AA'], [51,'AZ'], [52,'BA'], [701,'ZZ'], [702,'AAA']])
+		assert.equal(context.getMapPlaceLabel(index), label);
+});
+
+test('row remove control removes its marker and refreshes letters and route order', () => {
+	const {context, document, place} = loadMap();
+	context.mapPlaces = [1, 2, 3].map(lat => ({marker: place(lat)}));
+	const removed = context.mapPlaces[1].marker;
+	context.renderMapPlaces();
+	const list = document.getElementById('map_places_list');
+	assert.equal(list.children[2].children[0].children[0].textContent, 'C');
+	list.children[1].children[2].click();
+	assert.equal(removed.map, null);
+	assert.equal(context.mapPlaces.length, 2);
+	assert.equal(list.children[1].children[0].children[0].textContent, 'B');
+	assert.equal(new URL(context.getMapRouteURL(true)).searchParams.get('to'), '3,2');
+});
+
+function loadRouteCodec(context) {
+	for(const file of ['RegionRegistry.js', 'RegionAnchors.js', 'Code/Code.js', 'Code/WordList.js'])
+		vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root', file), 'utf8'), context);
+	const words = JSON.parse(fs.readFileSync(path.join(__dirname, '../../Root/Files/offline-data/WordList.json'), 'utf8'));
+	context.wordList = new context.WordList(words);
+	context.getCityFromName = (groups, name, callback, failure) => {
+		const anchor = context.regionAnchorFromName(groups.concat(name).join(' '));
+		anchor ? callback(anchor) : failure();
+	};
+	context.getCityCenterFromId = (city, callback) => callback(city);
+}
+
+test('regional Wolo route URLs preserve all stops within codec precision without changing active card', async () => {
+	const {context, place, show} = loadMap();
+	loadRouteCodec(context);
+	show(1);
+	const active = context.infoWindow;
+	context.mapPlaces = [1, 3, 2].map(lat => ({marker: place(lat)}));
+	const url = new URL(context.getMapRouteURL());
+	assert(!url.searchParams.get('from').includes(','));
+	const restored = await Promise.all(['from','via','to'].map(key => context.resolveMapRouteCode(url.searchParams.get(key))));
+	for(const [index, lat] of [1,3,2].entries()) {
+		assert(Math.abs(restored[index].position.lat - lat) < .00002);
+		assert(Math.abs(restored[index].position.lng - 2) < .00002);
+	}
+	assert.equal(context.infoWindow, active);
+	await assert.rejects(context.resolveMapRouteCode('unknown.bad.bad.bad'));
+});
+
+test('city Wolo route codes keep the full reference when sharing and resolving', async () => {
+	const {context, place} = loadMap();
+	loadRouteCodec(context);
+	const city = {country:'Nepal', name_id:'kathmandu', center:{lat:27.7172,lng:85.324}};
+	const data = context.encode__(context.getWoloAnchorBegin(city), city.center);
+	const code = ['nepal', 'bagmati', 'kathmandu'].concat(Array.from(data, i => context.wordList.getWord(i))).join('.');
+	context.mapPlaces = [1,2].map(lat => ({marker:place(lat), routeCode:code}));
+	assert.equal(new URL(context.getMapRouteURL()).searchParams.get('from'), code);
+	context.getCityFromName = (groups, name, callback) => {
+		assert.deepEqual(Array.from(groups), ['nepal','bagmati']);
+		assert.equal(name, 'kathmandu');
+		callback(city);
+	};
+	const result = await context.resolveMapRouteCode(code);
+	assert(Math.abs(result.position.lat - city.center.lat) < .00002);
+	assert(Math.abs(result.position.lng - city.center.lng) < .00002);
+});
+
+
+test('Wolo route restoration waits for the word list and adds no partial route for a bad stop', async () => {
+	const {context, place} = loadMap();
+	loadRouteCodec(context);
+	context.mapPlaces = [1,2].map(lat => ({marker:place(lat)}));
+	const url = new URL(context.getMapRouteURL());
+	context.mapPlaces = [];
+	context.window.location.search = url.search;
+	context.activateMapType = () => {};
+	context.map.fitBounds = () => {};
+	context.google.maps.LatLngBounds = class { extend() {} };
+	context.google.maps.Marker = class {
+		constructor(options) { this.options = options; }
+		addListener() {}
+		getPosition() { return {lat: () => this.options.position.lat, lng: () => this.options.position.lng}; }
+	};
+	let ready;
+	context.offlineWordListReady = new Promise(resolve => {ready = resolve;});
+	assert.equal(context.restoreMapRoute(), true);
+	assert.equal(context.mapPlaces.length, 0);
+	ready();
+	await new Promise(setImmediate);
+	assert.equal(context.mapPlaces.length, 2);
+	assert.equal(context.getMapRouteURL(), url.href);
+	context.mapPlaces = [];
+	context.window.location.search = url.search + '&via=bad.unknown.words.code';
+	let notification;
+	context.showNotification = value => {notification = value;};
+	context.restoreMapRoute();
+	await new Promise(setImmediate);
+	assert.equal(context.mapPlaces.length, 0);
+	assert.match(notification, /Could not open this route/);
 });

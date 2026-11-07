@@ -41,8 +41,10 @@
 	</div>
 	<div id='map_places_panel' hidden>
 		<ol id='map_places_list' aria-label='Places on the map'></ol>
-		<div id='map_places_directions'></div>
-		<button id='map_places_share' type='button' title='Share route' aria-label='Share route'>Share route</button>
+		<div class='map_places_actions'>
+			<div id='map_places_directions'></div>
+			<button id='map_places_share' type='button' title='Route — hold to share coordinates' aria-label='Share Wolo Code route; hold to share coordinates'><?php includeSVG('', 'Share'); ?></button>
+		</div>
 	</div>
 </div>
 <div id='decode_interface_overlay'>

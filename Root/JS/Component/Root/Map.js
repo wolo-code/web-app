@@ -321,6 +321,15 @@ function onMapSearchGlobalKeydown(event) {
 		return;
 	if(event.ctrlKey || event.metaKey || event.altKey)
 		return;
+	if(event.key === 'Backspace' || event.key === 'Delete') {
+		var target = document.activeElement;
+		var search = document.getElementById('pac-input');
+		if(shouldKeepMapSearchFocused() && (!isMapSearchTypingTarget(target) || (target === search && !search.value))) {
+			var row = target && target.closest ? target.closest('#map_places_list li') : null;
+			var entry = row ? row.mapPlace : getMapPlace(marker);
+			if(entry) { event.preventDefault(); removeMapPlace(entry); return; }
+		}
+	}
 	if(event.key && event.key.length !== 1 && event.key !== 'Backspace')
 		return;
 	if(!shouldKeepMapSearchFocused())
@@ -365,13 +374,17 @@ function initMap() {
 		});
 	}
 	
+	var shareRoute = document.getElementById('map_places_share');
+	if(shareRoute) shareRoute.addEventListener('click', shareMapRoute);
 	var placesToggle = document.getElementById('map_places_toggle');
 	var placesPanel = document.getElementById('map_places_panel');
 	if(placesToggle && placesPanel) {
 		placesToggle.addEventListener('click', function() {
 			placesPanel.hidden = !placesPanel.hidden;
 			placesToggle.setAttribute('aria-expanded', String(!placesPanel.hidden));
+			positionMapPlacesPanel();
 		});
+		window.addEventListener('resize', positionMapPlacesPanel);
 		placesPanel.addEventListener('keydown', function(event) {
 			if(event.key === 'Escape') {
 				placesToggle.click();
@@ -861,28 +874,56 @@ function renderMapPlaces() {
 		placeButton.addEventListener('click', function() {
 			if(entry.card)
 				activateMapCard(entry.card);
-			if(entry.marker === marker)
+			if(entry.marker !== marker)
+				loadMapPlace(entry, true);
+			else
 				showInfoWindow();
 			focus_(entry.marker.getPosition());
 		});
 		row.append(placeButton);
-		[-1, 1].forEach(function(offset) {
-			var move = document.createElement('button');
-			var target = index + offset;
-			move.type = 'button';
-			move.textContent = offset < 0 ? '↑' : '↓';
-			move.setAttribute('aria-label', 'Move ' + name + (offset < 0 ? ' up' : ' down'));
-			move.disabled = target < 0 || target >= mapPlaces.length;
-			move.addEventListener('click', function() {
-				mapPlaces.splice(index, 1);
-				mapPlaces.splice(target, 0, entry);
-				renderMapPlaces();
-				var nextRow = list.children[target];
-				var nextMove = nextRow.children[offset < 0 ? 1 : 2];
-				(nextMove.disabled ? nextRow.firstElementChild : nextMove).focus();
-			});
-			row.append(move);
+		row.mapPlace = entry;
+		var drag = document.createElement('button');
+		drag.type = 'button';
+		drag.className = 'map_place_drag';
+		drag.textContent = '\u283f';
+		drag.title = 'Drag to rearrange; use arrow keys to move';
+		drag.setAttribute('aria-label', 'Rearrange ' + name);
+		drag.addEventListener('keydown', function(event) {
+			if(event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+			event.preventDefault();
+			event.stopPropagation();
+			moveMapPlace(entry, index + (event.key === 'ArrowUp' ? -1 : 1));
 		});
+		drag.addEventListener('pointerdown', function(event) {
+			if(event.button !== 0) return;
+			event.preventDefault();
+			drag.setPointerCapture(event.pointerId);
+			row.classList.add('map_place_dragging');
+			var target = index;
+			var dropRow;
+			function move(e) {
+				var hit = document.elementFromPoint(e.clientX, e.clientY);
+				var next = hit && hit.closest('#map_places_list li');
+				if(!next) return;
+				if(dropRow) dropRow.classList.remove('map_place_drop');
+				dropRow = next;
+				target = mapPlaces.indexOf(next.mapPlace);
+				next.classList.add('map_place_drop');
+			}
+			function finish(e) {
+				drag.removeEventListener('pointermove', move);
+				drag.removeEventListener('pointerup', finish);
+				drag.removeEventListener('pointercancel', finish);
+				row.classList.remove('map_place_dragging');
+				if(dropRow) dropRow.classList.remove('map_place_drop');
+				if(drag.hasPointerCapture(e.pointerId)) drag.releasePointerCapture(e.pointerId);
+				if(e.type !== 'pointercancel') moveMapPlace(entry, target);
+			}
+			drag.addEventListener('pointermove', move);
+			drag.addEventListener('pointerup', finish);
+			drag.addEventListener('pointercancel', finish);
+		});
+		row.append(drag);
 		list.append(row);
 	});
 
@@ -1095,4 +1136,91 @@ function toggleDecodeView() {
 		}
 		blurMapSearchInput();
 	}
+}
+
+function removeMapPlace(entry) {
+	mapPlaces = mapPlaces.filter(function(place) { return place !== entry; });
+	if(entry.marker === marker) {
+		mapSelectionVersion++;
+		encode_session_id = Symbol();
+		stopZoom();
+		if(infoWindow) infoWindow.close();
+		infoWindow = null;
+		marker = null;
+		clearAddress();
+		hideAddress();
+		clearURL();
+	}
+	else if(entry.card) entry.card.close();
+	entry.marker.setMap(null);
+	renderMapPlaces();
+}
+
+function moveMapPlace(entry, target) {
+	var index = mapPlaces.indexOf(entry);
+	if(index < 0 || target < 0 || target >= mapPlaces.length) return;
+	mapPlaces.splice(index, 1);
+	mapPlaces.splice(target, 0, entry);
+	renderMapPlaces();
+	document.getElementById('map_places_list').children[target].children[1].focus();
+}
+
+function getMapRouteURL() {
+	if(mapPlaces.length < 2) return null;
+	var coordinates = mapPlaces.map(function(entry) {
+		var pos = entry.marker.getPosition();
+		return pos.lat() + ',' + pos.lng();
+	});
+	var params = new URLSearchParams();
+	params.set('from', coordinates[0]);
+	coordinates.slice(1, -1).forEach(function(position) { params.append('via', position); });
+	params.set('to', coordinates[coordinates.length - 1]);
+	return window.location.origin + '/?' + params.toString();
+}
+
+function shareMapRoute() {
+	var url = getMapRouteURL();
+	if(!url) return;
+	function copy() { copyPlainText(url); showNotification('Route link copied'); }
+	if(navigator.share)
+		navigator.share({title: 'Wolo route', url: url}).catch(function(error) {
+			if(error.name !== 'AbortError') copy();
+		});
+	else copy();
+}
+
+function restoreMapRoute() {
+	var params = new URLSearchParams(window.location.search);
+	if(!params.has('from') || !params.has('to')) return false;
+	var positions = [params.get('from')].concat(params.getAll('via'), [params.get('to')]).map(function(value) {
+		if(!/^-?\d+(?:\.\d+)?,\s*-?\d+(?:\.\d+)?$/.test(value)) return null;
+		var parts = value.split(',').map(Number);
+		return Math.abs(parts[0]) <= 90 && Math.abs(parts[1]) <= 180 ? {lat: parts[0], lng: parts[1]} : null;
+	});
+	if(positions.some(function(position) { return !position; })) {
+		showNotification('Invalid route link');
+		return false;
+	}
+	activateMapType();
+	var bounds = new google.maps.LatLngBounds();
+	positions.forEach(function(position, index) {
+		var name = index === 0 ? 'From' : index === positions.length - 1 ? 'To' : 'Via ' + index;
+		var routeMarker = new google.maps.Marker({map: map, position: position, title: name});
+		var entry = {marker: routeMarker, name: name, result: true};
+		routeMarker.addListener('click', function() { loadMapPlace(entry, true); });
+		mapPlaces.push(entry);
+		bounds.extend(position);
+	});
+	map.fitBounds(bounds);
+	renderMapPlaces();
+	return true;
+}
+
+function positionMapPlacesPanel() {
+	var panel = document.getElementById('map_places_panel');
+	var toggle = document.getElementById('map_places_toggle');
+	if(!panel || panel.hidden || !toggle) return;
+	var above = toggle.getBoundingClientRect().top > window.innerHeight / 2;
+	panel.style.top = above ? 'auto' : 'calc(100% + 6px)';
+	panel.style.bottom = above ? 'calc(100% + 6px)' : 'auto';
 }

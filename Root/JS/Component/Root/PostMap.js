@@ -1,4 +1,5 @@
 function postMap() {
+	if(restoreMapRoute()) return;
 	if(pendingLocate)
 		syncLocate();
 	if(pendingPosition) {

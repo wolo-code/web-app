@@ -61,10 +61,6 @@ button.gm-ui-hover-effect {
 	display: none !important;
 }
 
-#map.map_has_retained_cards button.gm-ui-hover-effect {
-	display: block !important;
-}
-
 .map_card_address {
 	width: 26px;
 	vertical-align: bottom

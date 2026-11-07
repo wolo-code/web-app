@@ -37,11 +37,12 @@
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			<span class='decode_icon_caption decode_chrome_caption' data-guide-id='go' aria-hidden='true'>Go</span>
 		</div>
-		<button id='map_places_toggle' type='button' aria-expanded='false' aria-controls='map_places_panel' hidden>Places</button>
+		<button id='map_places_toggle' type='button' aria-expanded='false' aria-controls='map_places_panel' title='Places' aria-label='Places' hidden><svg viewBox='0 0 24 24' width='24' height='24' aria-hidden='true' fill='none' stroke='currentColor' stroke-width='2'><path d='M9 5h12M9 12h12M9 19h12'/><circle cx='3' cy='5' r='1'/><circle cx='3' cy='12' r='1'/><circle cx='3' cy='19' r='1'/></svg></button>
 	</div>
 	<div id='map_places_panel' hidden>
 		<ol id='map_places_list' aria-label='Places on the map'></ol>
 		<div id='map_places_directions'></div>
+		<button id='map_places_share' type='button' title='Share route' aria-label='Share route'>Share route</button>
 	</div>
 </div>
 <div id='decode_interface_overlay'>

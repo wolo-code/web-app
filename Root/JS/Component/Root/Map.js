@@ -169,7 +169,67 @@ function isMapChromeClick(event) {
 }
 
 function isIgnorableMapClick(event) {
-	return mapDragClickGuard || isMapChromeClick(event);
+	return Date.now() < mapHoldClickUntil || mapDragClickGuard || isMapChromeClick(event);
+}
+
+// A touch hold adds a point using the same retained-card flow as Shift-click.
+var mapHoldClickUntil = 0;
+function setupMapTouchHold() {
+	var surface = map.getDiv();
+	var overlay = new google.maps.OverlayView();
+	overlay.onAdd = function() {};
+	overlay.draw = function() {};
+	overlay.onRemove = function() {};
+	overlay.setMap(map);
+	var timer = null;
+	var origin = null;
+	var held = false;
+	function cancelHold() {
+		clearTimeout(timer);
+		timer = null;
+		origin = null;
+	}
+	surface.addEventListener('touchstart', function(event) {
+		cancelHold();
+		held = false;
+		if(event.touches.length !== 1 || isMapChromeClick({domEvent: event}) ||
+			mapEventPathHasSelector({domEvent: event}, 'button, input, a, .gm-style-iw, [role="button"]')) return;
+		var touch = event.touches[0];
+		origin = {x: touch.clientX, y: touch.clientY};
+		timer = setTimeout(function() {
+			var projection = overlay.getProjection();
+			if(!projection || !origin) return;
+			var rect = surface.getBoundingClientRect();
+			var latLng = projection.fromContainerPixelToLatLng(new google.maps.Point(origin.x - rect.left, origin.y - rect.top));
+			cancelHold();
+			held = true;
+			mapHoldClickUntil = Date.now() + 1000;
+			cleanUp(true, true);
+			infoWindow_setContent(MESSAGE_LOADING);
+			var pos = resolveLatLng(latLng);
+			encode(pos);
+			focus___(pos);
+			getAddress(pos);
+		}, 500);
+	}, {passive: true});
+	surface.addEventListener('touchmove', function(event) {
+		if(!origin) return;
+		var touch = event.touches[0];
+		if(event.touches.length !== 1 || Math.hypot(touch.clientX - origin.x, touch.clientY - origin.y) > 10) cancelHold();
+	}, {passive: true});
+	surface.addEventListener('touchend', function(event) {
+		cancelHold();
+		if(held) {
+			mapHoldClickUntil = Date.now() + 1000;
+			if(event.cancelable) event.preventDefault();
+		}
+	}, {passive: false});
+	surface.addEventListener('touchcancel', cancelHold, {passive: true});
+	surface.addEventListener('contextmenu', function(event) {
+		if(timer !== null || held) event.preventDefault();
+	});
+	map.addListener('dragstart', cancelHold);
+	map.addListener('zoom_changed', cancelHold);
 }
 
 function getMapViewportSize() {
@@ -460,6 +520,7 @@ function initMap() {
 	});
 	}
 
+	setupMapTouchHold();
 	map.addListener('dragstart', markMapDragClickGuard);
 	map.addListener('drag', markMapDragClickGuard);
 	map.addListener('idle', clearMapDragClickGuard);

@@ -346,3 +346,37 @@ test('the address box tracks alphabetic indices through reorder and removal', ()
 	context.removeMapPlace(active);
 	assert.equal(document.getElementById('address_text_place_index').hidden, true);
 });
+
+test('map touch hold keeps the previous card and cancels on movement', () => {
+ const {context, show} = loadMap();
+ const listeners = {};
+ let timer;
+ context.setTimeout = fn => { timer = fn; return 1; };
+ context.clearTimeout = () => { timer = null; };
+ context.map = {getDiv: () => ({addEventListener: (name, fn) => {listeners[name] = fn;}, getBoundingClientRect: () => ({left: 10, top: 20})}), addListener() {}};
+ context.google.maps.Point = function(x, y) {this.x = x; this.y = y;};
+ context.google.maps.OverlayView = function() {this.setMap = () => {}; this.getProjection = () => ({fromContainerPixelToLatLng: p => p});};
+ context.resolveLatLng = p => p;
+ context.focus___ = context.getAddress = () => {};
+ let position;
+ context.encode = p => {position = p; show(2);};
+ const first = show(1);
+ context.setupMapTouchHold();
+ const touch = x => ({touches: [{clientX: x, clientY: 220}]});
+ listeners.touchstart(touch(110));
+ timer();
+ assert.equal(position.x, 100);
+ assert.equal(position.y, 200);
+ assert.equal(first.isOpen, true);
+ assert.notEqual(context.infoWindow, first);
+ assert.equal(context.isIgnorableMapClick({}), true);
+ listeners.touchstart(touch(110));
+ listeners.touchmove(touch(140));
+ assert.equal(timer, null);
+ listeners.touchstart(touch(110));
+ listeners.touchstart({touches: [{}, {}]});
+ assert.equal(timer, null);
+ listeners.touchstart(touch(110));
+ listeners.touchcancel();
+ assert.equal(timer, null);
+});

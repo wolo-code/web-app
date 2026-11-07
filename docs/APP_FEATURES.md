@@ -257,3 +257,5 @@ Scanner review reads the full-resolution captured image again to recover small t
 - Completed or superseded geolocation watches ignore queued results and errors. Timeout/unavailable errors do not revoke location permission; only permission denial does.
 - Switching away from Apple Maps hides its stage and cancels its follow frame; delayed MapKit loading cannot reveal an inactive layer.
 - Google POI clicks are used only on Google terrain/satellite. Other map sources resolve the clicked coordinate instead of a hidden Google place.
+
+Map touch hold: press and hold a map point for 500ms to add a marker there while retaining existing markers and cards, matching Shift-click on the map and Shift-click Go. Repeat to add more points. Moving more than 10px, panning, pinching, or cancelling the touch cancels the pending hold. Controls and cards do not add markers; releasing a completed hold does not trigger a replacement tap.

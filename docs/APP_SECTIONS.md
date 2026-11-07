@@ -365,3 +365,5 @@ Scanner review reads the full-resolution captured image again to recover small t
 ## Map and location lifecycle
 
 Location Wolo Label View remains open across background service-worker updates. New page assets apply on the next navigation or manual refresh. Completed/superseded Location Accuracy Indicator sessions ignore queued geolocation callbacks. Entering Wolo Code Input View or another map source hides the Apple Maps stage, including when MapKit finishes loading later. Hidden Google POIs do not replace coordinate-selected results on non-Google maps.
+
+Map touch hold: press and hold a map point for 500ms to add a marker there while retaining existing markers and cards, matching Shift-click on the map and Shift-click Go. Repeat to add more points. Moving more than 10px, panning, pinching, or cancelling the touch cancels the pending hold. Controls and cards do not add markers; releasing a completed hold does not trigger a replacement tap.

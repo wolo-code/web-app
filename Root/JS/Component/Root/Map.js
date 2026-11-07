@@ -5,6 +5,7 @@ var myLocDot;
 var poiPlace;
 var mapPlaces = [];
 var mapSelectionVersion = 0;
+var mapFitPlacesSelectionVersion = null;
 var APP_MODE_BACKGROUND = {
 	wcode: '#efefef',
 	map: '#60d0e5',
@@ -661,6 +662,7 @@ function decode_input_from_form_external() {
 function beginDecode(code, scannedMetadata, options) {
 	var decodeMarker = marker;
 	cleanUp(false, options && options.keepMapCard);
+	if(options && options.keepMapCard) mapFitPlacesSelectionVersion = mapSelectionVersion;
 	if(scannedMetadata) {
 		current_title = scannedMetadata.title || '';
 		current_segment = scannedMetadata.segment || '';
@@ -1125,6 +1127,7 @@ function cleanUp(full = false, keepMapCard = false) {
 	if(keepMapCard)
 		retainActiveMapCard();
 	mapSelectionVersion++;
+	mapFitPlacesSelectionVersion = null;
 	encode_session_id = Symbol();
 	stopZoom();
 	document.getElementById('map_input_suggestion_result').innerText = '';
@@ -1239,6 +1242,7 @@ function removeMapPlace(entry) {
 	mapPlaces = mapPlaces.filter(function(place) { return place !== entry; });
 	if(entry.marker === marker) {
 		mapSelectionVersion++;
+	mapFitPlacesSelectionVersion = null;
 		encode_session_id = Symbol();
 		stopZoom();
 		if(infoWindow) infoWindow.close();

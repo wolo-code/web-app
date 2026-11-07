@@ -8,7 +8,21 @@ function focus__(city, pos, code) {
 
 function focus___(pos, bounds, skipFinalBoundsFit) {
 	showMarker(pos);
+	if(fitInputMapPlaces()) return;
 	focus_(pos, bounds, skipFinalBoundsFit);
+}
+
+// Retained input results should frame the whole list instead of zooming to one point.
+function fitInputMapPlaces() {
+	if(typeof mapFitPlacesSelectionVersion === 'undefined' ||
+		mapFitPlacesSelectionVersion === null || mapFitPlacesSelectionVersion !== mapSelectionVersion ||
+		mapPlaces.length < 2) return false;
+	var bounds = new google.maps.LatLngBounds();
+	mapPlaces.forEach(function(entry) { bounds.extend(entry.marker.getPosition()); });
+	beginProgrammaticMapFocus();
+	map.fitBounds(bounds, 80);
+	endProgrammaticMapFocus();
+	return true;
 }
 
 const ZOOM_ANIMATION_SPEED = 250;

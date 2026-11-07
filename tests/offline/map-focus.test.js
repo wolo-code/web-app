@@ -200,3 +200,27 @@ test('bounds zoom uses full projected extents, actual canvas size, and final-fit
 	const world = {getNorthEast: () => ({x: 256, y: 0}), getSouthWest: () => ({x: 0, y: 256})};
 	assert.equal(tiny.api.getZoomByBounds(tiny.map, world), 3);
 });
+
+test('retained input additions fit every marker instead of zooming to the newest point', () => {
+ const c = camera({zoom: 18});
+ const positions = [{lat: 27, lng: 85}, {lat: 28, lng: 84}, {lat: 29, lng: 83}];
+ c.api.mapSelectionVersion = 4;
+ c.api.mapFitPlacesSelectionVersion = 4;
+ c.api.mapPlaces = positions.slice(0, 2).map(position => ({marker: {getPosition: () => position}}));
+ c.api.google.maps.LatLngBounds = function() {this.points = []; this.extend = p => {this.points.push(p);};};
+ c.api.showMarker = p => c.api.mapPlaces.push({marker: {getPosition: () => p}});
+ let fitted;
+ c.map.fitBounds = (bounds, padding) => {fitted = {bounds, padding};};
+ c.api.focus___(positions[2]);
+ assert.deepEqual(fitted.bounds.points, positions);
+ assert.equal(fitted.padding, 80);
+ assert.equal(c.timers.size, 0);
+ assert.equal(c.changes.includes(18), false);
+ c.api.mapFitPlacesSelectionVersion = 3;
+ assert.equal(c.api.fitInputMapPlaces(), false);
+ c.api.mapFitPlacesSelectionVersion = null;
+ assert.equal(c.api.fitInputMapPlaces(), false);
+ c.api.mapFitPlacesSelectionVersion = 4;
+ c.api.mapPlaces = c.api.mapPlaces.slice(0, 1);
+ assert.equal(c.api.fitInputMapPlaces(), false);
+});

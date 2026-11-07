@@ -132,7 +132,7 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	var card = infoWindow;
 	var content = document.createElement('div');
 	content.className = 'map_card_content';
-	content.innerHTML = "<span class='map_card_index' hidden></span><div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'>" + city_accent + "</span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
+	content.innerHTML = "<div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'>" + city_accent + "</span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
 	content.addEventListener('pointerdown', function() { activateMapCard(card); });
 	function forThisCard(action) {
 		return function() {
@@ -174,16 +174,6 @@ function showInfoWindow() {
 
 function syncMapPlaceIndices() {
 	var multiple = mapPlaces.length > 1;
-	mapPlaces.forEach(function(entry, index) {
-		var card = entry.marker === marker ? infoWindow : entry.card;
-		var content = card && card.getContent();
-		var badge = content && content.querySelector && content.querySelector('.map_card_index');
-		if(badge) {
-			badge.hidden = !multiple;
-			badge.textContent = multiple ? getMapPlaceLabel(index) : '';
-			badge.setAttribute('aria-label', 'Place ' + getMapPlaceLabel(index));
-		}
-	});
 	var addressBadge = document.getElementById('address_text_place_index');
 	if(addressBadge) {
 		var index = mapPlaces.indexOf(getMapPlace(marker));

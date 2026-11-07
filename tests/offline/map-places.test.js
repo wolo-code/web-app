@@ -333,26 +333,16 @@ test('the drop line chooses the boundary before or after a row', () => {
 	}
 });
 
-test('info cards and the address box track alphabetic indices through reorder and removal', () => {
+test('the address box tracks alphabetic indices through reorder and removal', () => {
 	const {context, document, show} = loadMap();
 	const first = show(1);
-	const firstBadge = {setAttribute() {}};
-	first.setContent({querySelector: () => firstBadge});
 	context.retainActiveMapCard();
 	const second = show(2);
-	const secondBadge = {setAttribute() {}};
-	second.setContent({querySelector: () => secondBadge});
 	context.syncMapPlaceIndices();
-	assert.equal(firstBadge.textContent, 'A');
-	assert.equal(secondBadge.textContent, 'B');
-	assert.equal(firstBadge.hidden, false);
 	assert.equal(document.getElementById('address_text_place_index').textContent, 'B');
 	const active = context.getMapPlace(context.marker);
 	context.moveMapPlace(active, 0);
-	assert.equal(firstBadge.textContent, 'B');
-	assert.equal(secondBadge.textContent, 'A');
 	assert.equal(document.getElementById('address_text_place_index').textContent, 'A');
 	context.removeMapPlace(active);
-	assert.equal(firstBadge.hidden, true);
 	assert.equal(document.getElementById('address_text_place_index').hidden, true);
 });

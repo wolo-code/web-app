@@ -339,11 +339,15 @@ html.dark-mode #map_places_list .map_place_remove { color: #bdcbd3; background: 
 #map_places_list .map_place_drag:hover { background: rgb(105 183 207 / 20%); }
 #map_places_list .map_place_drag { cursor: grab; touch-action: none; user-select: none; }
 #map_places_list .map_place_drag:active { cursor: grabbing; }
-#map_places_list .map_place_remove { opacity: 0; transition: opacity 120ms; }
+#map_places_list .map_place_remove, #map_places_list .map_place_drag { opacity: 0; transition: opacity 120ms; }
 #map_places_list li:hover .map_place_remove,
-#map_places_list li:focus-within .map_place_remove { opacity: 1; }
+#map_places_list li:focus-within .map_place_remove,
+#map_places_list li:hover .map_place_drag,
+#map_places_list li:focus-within .map_place_drag { opacity: 1; }
 #map_places_list .map_place_remove:hover { color: #d95462; background: rgb(217 84 98 / 10%); }
-@media (hover: none) { #map_places_list .map_place_remove { opacity: 1; } }
+@media (hover: none) {
+	#map_places_list .map_place_remove, #map_places_list .map_place_drag { opacity: 1; }
+}
 #map_places_list button:focus-visible, #map_places_directions a:focus-visible, #map_places_share:focus-visible {
 	outline: 2px solid #69b7cf;
 	outline-offset: 1px;

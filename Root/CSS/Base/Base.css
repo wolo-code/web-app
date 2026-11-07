@@ -372,8 +372,6 @@ html.dark-mode #map_places_list .map_place_remove { color: #bdcbd3; background: 
 	justify-content: flex-end;
 	gap: 4px;
 	margin-top: 10px;
-	padding-top: 8px;
-	border-top: 1px solid rgb(128 128 128 / 18%);
 }
 #map_places_directions { display: flex; flex-wrap: wrap; gap: 4px; }
 #map_places_directions a, #map_places_share {

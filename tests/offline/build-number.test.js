@@ -77,5 +77,5 @@ test('Info corner version is restored and credits modal omits version details', 
 	assert.match(infoCss, /#info_message:has\(#info_links:not\(\.hide\)\)\s*#info_version_indicator/);
 	assert.match(infoCss, /#info_message\s*\{[^}]*border-radius:\s*25px;/);
 	const themeCss = fs.readFileSync(path.join(repoRoot, 'Root', 'CSS', 'Component', 'Root', 'Base', 'Theme.css'), 'utf8');
-	assert.match(themeCss, /html\.dark-mode\s+#wcode_format\s*>\s*span:first-child,\s*html\.dark-mode\s+#wcode_format\s*>\s*span:last-child/);
+	assert.doesNotMatch(themeCss, /#wcode_format/);
 });

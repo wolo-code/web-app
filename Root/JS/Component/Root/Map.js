@@ -161,7 +161,8 @@ function mapEventPathHasSelector(event, selector) {
 }
 
 function isMapChromeClick(event) {
-	return mapEventPathHasSelector(event, 'gmp-internal-camera-control') ||
+	return mapEventPathHasSelector(event, '#map_search_cluster, #map_input_suggestion_result, .control') ||
+		mapEventPathHasSelector(event, 'gmp-internal-camera-control') ||
 		mapEventPathHasSelector(event, '#map_type_button') ||
 		mapEventPathHasSelector(event, '#location_button') ||
 		mapEventPathHasSelector(event, '.action_menu_item, #saved_button, #decode_scan_area') ||

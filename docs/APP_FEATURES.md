@@ -259,3 +259,5 @@ Scanner review reads the full-resolution captured image again to recover small t
 - Google POI clicks are used only on Google terrain/satellite. Other map sources resolve the clicked coordinate instead of a hidden Google place.
 
 Map touch hold: press and hold a map point for 500ms to add a marker there while retaining existing markers and cards, matching Shift-click on the map and Shift-click Go. Repeat to add more points. Moving more than 10px, panning, pinching, or cancelling the touch cancels the pending hold. Controls and cards do not add markers; releasing a completed hold does not trigger a replacement tap.
+
+Map gesture isolation: Go, its icon and caption, the entire map search cluster, suggestions, and custom controls are excluded from map taps and touch holds so their actions cannot place a marker underneath.

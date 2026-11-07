@@ -362,6 +362,15 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
  context.encode = p => {position = p; show(2);};
  const first = show(1);
  context.setupMapTouchHold();
+ // Go is a custom div, and touches can target its nested SVG or caption.
+ for (const blocked of ['#map_search_cluster', '.control']) {
+  const control = {matches: selector => selector.split(', ').includes(blocked)};
+  const event = {touches: [{clientX: 110, clientY: 220}], composedPath: () => [{matches: () => false}, control]};
+  listeners.touchstart(event);
+  assert.equal(timer, null, blocked + ' must not start a map hold');
+  assert.equal(context.isIgnorableMapClick({domEvent: event}), true);
+  assert.equal(context.infoWindow, first);
+ }
  const touch = x => ({touches: [{clientX: x, clientY: 220}]});
  listeners.touchstart(touch(110));
  timer();

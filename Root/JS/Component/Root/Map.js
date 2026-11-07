@@ -546,7 +546,7 @@ function initMap() {
 		}
 	});
 
-	addLongpressListener(document.getElementById('decode_button'), decode_input_from_map, decode_input_from_map_external);
+	addLongpressListener(document.getElementById('decode_button'), decode_input_from_map, decode_input_from_map_add);
 	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form);
 
 	map_type_button.addEventListener('click', function() {
@@ -644,13 +644,8 @@ function decode_input_from_map(event) {
 	beginDecode(document.getElementById('pac-input').value, null, {keepMapCard: keepMapCard});
 }
 
-function decode_input_from_map_external(event) {
-	if(event && event.shiftKey) {
-		decode_input_from_map(event);
-		return;
-	}
-	initWCode_jumpToMap = true;
-	decode_input_from_map();
+function decode_input_from_map_add() {
+	decode_input_from_map({shiftKey: true});
 }
 
 function decode_input_from_form() {

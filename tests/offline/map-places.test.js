@@ -389,3 +389,31 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
  listeners.touchcancel();
  assert.equal(timer, null);
 });
+
+test('holding Go adds a card and the release click does not replace either marker', () => {
+ const {context, document, show} = loadMap();
+ const source = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/Map.js'), 'utf8');
+ assert.match(source, /addLongpressListener\(document.getElementById\('decode_button'\), decode_input_from_map, decode_input_from_map_add\)/);
+ vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Base/LongPress.js'), 'utf8'), context);
+ let hold;
+ context.setTimeout = fn => {hold = fn; return 1;};
+ const go = document.getElementById('decode_button');
+ context.addLongpressListener(go, context.decode_input_from_map, context.decode_input_from_map_add);
+ const first = show(1);
+ document.getElementById('pac-input').value = 'one two three';
+ let decodes = 0;
+ context.decode = () => {decodes++; show(2);};
+ go.touchstart({type: 'touchstart'});
+ hold();
+ const second = context.infoWindow;
+ go.touchend({type: 'touchend'});
+ go.click({type: 'click'});
+ assert.equal(decodes, 1);
+ assert.notEqual(first, second);
+ assert.equal(first.isOpen, true);
+ assert.equal(first.anchor.getTitle(), 'Place 1');
+ assert.equal(second.isOpen, true);
+ assert.equal(second.anchor.getTitle(), 'Place 2');
+ assert.equal(context.initWCode_jumpToMap, false);
+ assert.equal(document.getElementById('map_places_toggle').hidden, false);
+});

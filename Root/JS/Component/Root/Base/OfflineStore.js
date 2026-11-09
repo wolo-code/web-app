@@ -280,6 +280,27 @@ function applyWordListSnapshot(list) {
 	return true;
 }
 
+var CANONICAL_WORDLIST_BASE = 'https://wordlist.wcodes.org/';
+
+function getWordListVersion() {
+	return offlineStoreGet('wordList', 'version')
+		.then(function(version) { return Number.isInteger(version) ? version : 0; })
+		.catch(function() { return 0; });
+}
+
+function saveWordListVersion(version) {
+	return offlineStorePut('wordList', 'version', version);
+}
+
+function fetchCanonicalJson(name) {
+	return fetch(CANONICAL_WORDLIST_BASE + name, { cache: 'no-cache' })
+		.then(function(response) {
+			return response.ok ? response.json() : null;
+		});
+}
+
+// wordlist.json is a plain array (v3) or { version, words } (v4+); retired words come from aliases.json.
+// A version change (or any content change) replaces the snapshot; an older version never replaces a newer one.
 function syncCanonicalWordListInBackground() {
 	if (typeof fetch !== 'function') {
 		return Promise.resolve(false);
@@ -287,32 +308,36 @@ function syncCanonicalWordListInBackground() {
 	if (typeof navigator !== 'undefined' && navigator.onLine === false) {
 		return Promise.resolve(false);
 	}
-	return fetch('https://wordlist.wcodes.org/wordlist.json', { cache: 'no-cache' })
-		.then(function(response) {
-			if (!response.ok) {
-				return null;
-			}
-			return response.json();
-		})
-		.then(function(rawWords) {
-			if (!Array.isArray(rawWords) || rawWords.length !== 1024) {
+	return fetchCanonicalJson('wordlist.json')
+		.then(function(raw) {
+			var canon = normalizeCanonicalWordList(raw);
+			if (!canon) {
 				return false;
 			}
-			var existing = (wordList && wordList.wordList) ? wordList.wordList : [];
-			var formatted = rawWords.map(function(item, idx) {
-				var clean = typeof item === 'string' ? item.trim().toLowerCase() : item[0];
-				var existingEntry = existing[idx];
-				if (Array.isArray(existingEntry) && existingEntry.length > 1) {
-					var aliases = existingEntry.slice(1).filter(function(a) { return a !== clean; });
-					return [clean].concat(aliases);
+			var aliasesRequest = canon.version >= 4
+				? fetchCanonicalJson('aliases.json').catch(function() { return null; })
+				: Promise.resolve(null);
+			return Promise.all([aliasesRequest, getWordListVersion()]).then(function(results) {
+				var aliases = results[0];
+				var storedVersion = results[1];
+				if (canon.version < storedVersion) {
+					return false;
 				}
-				return [clean];
+				if (canon.version >= 4 && (!aliases || aliases.version !== canon.version)) {
+					return false;
+				}
+				var existing = (wordList && wordList.wordList) ? wordList.wordList : [];
+				var formatted = mergeCanonicalWordList(canon, aliases, existing);
+				if (!formatted) {
+					return false;
+				}
+				if (JSON.stringify(formatted) !== JSON.stringify(existing) || canon.version !== storedVersion) {
+					applyWordListSnapshot(formatted);
+					saveWordListSnapshot(formatted);
+					saveWordListVersion(canon.version);
+				}
+				return true;
 			});
-			if (JSON.stringify(formatted) !== JSON.stringify(existing)) {
-				applyWordListSnapshot(formatted);
-				saveWordListSnapshot(formatted);
-			}
-			return true;
 		})
 		.catch(function() {
 			return false;

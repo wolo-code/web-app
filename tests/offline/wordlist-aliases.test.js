@@ -74,3 +74,12 @@ test('mergeCanonicalWordList keeps retired words as aliases and never promotes t
 	assert.deepEqual(legacy, fromV3Snapshot);
 	assert.equal(new WordList(legacy).getWord(235), 'comet');
 });
+
+test('bundled word list has the final v4 words; unpublished drafts are not aliases', () => {
+	const wordList = new WordList(loadJson('Database/WordList.json'));
+	for (const [old, word, i] of [['lead', 'crystal', 468], ['prison', 'burger', 685], ['rifle', 'puzzle', 720], ['trouser', 'microphone', 934], ['wind', 'sunrise', 1000], ['wound', 'sticker', 1014]]) {
+		assert.equal(wordList.getWord(i), word);
+		assert.equal(wordList.indexOf(old), i);
+	}
+	for (const draft of ['capsule', 'diagram', 'textile', 'emblem']) assert.equal(wordList.indexOf(draft), -1, draft);
+});

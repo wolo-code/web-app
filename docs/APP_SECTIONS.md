@@ -373,3 +373,5 @@ Map gesture isolation: Go, its icon and caption, the entire map search cluster, 
 Go touch hold: holding Go on Map View adds the entered location as another marker and keeps all existing markers and cards, just like Shift-click Go. A normal Go tap keeps its existing replacement behavior.
 
 Multi-marker input framing: adding a location with Go hold, Shift-click Go, or Shift+Enter fits all retained markers with map padding instead of zooming in to the newest marker. Ordinary single-location input and map taps retain their normal focus behavior.
+
+Label logos use compact sizing and white borders; the info modal retains its original logo sizing and border color.

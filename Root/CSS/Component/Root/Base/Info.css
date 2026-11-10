@@ -95,6 +95,20 @@
 	font-size: large;
 }
 
+
+#logo_qr > a {
+	border-color: #ffffff;
+}
+
+#logo_wolo_qr > .image > svg {
+	height: 30px;
+}
+
+#logo_codes_qr > .image > svg {
+	height: 8px;
+	padding-bottom: 4px;
+}
+
 #info_show_icon_labels {
 	position: absolute;
 	bottom: 8px;

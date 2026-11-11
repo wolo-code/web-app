@@ -138,7 +138,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | QR overlay dialog | QR Label View | `#qr_container` | Center overlay | Shows the printable/shareable Wolo Code label editor. Clicking the dimmed overlay outside the dialog closes it. |
 | Direct-link address preview | Address Preview | `#external_message`, `#external_close` | Center overlay | Shows the decoded address with a faint translucent Close button overlapping the upper-right edge. |
 | QR title | QR Label Title | `#qr_container h2` | Top of QR Label View | Labels the dialog as `Label`. |
-| QR save control | QR Label Save Button | `#qr_save` | Along the upper-left edge of QR Label View | White circular bookmark button that saves the current title, segment, and address for the signed-in user and confirms with `Address saved` above the overlay. |
+| QR save control | QR Label Save Button | `#qr_save` | Along the upper-left edge of QR Label View | Faint translucent circular bookmark button that saves the current title, segment, and address for the signed-in user and confirms with `Address saved` above the overlay. |
 | QR close control | QR Label Close Button | `#qr_close` | Along the upper-right edge of QR Label View | Faint translucent circular button that closes the QR label overlay. |
 | QR label surface | QR Label Surface | `#qr_label` | Main body of QR Label View | Contains the composed label preview. |
 | QR brand area | QR Label Brand | `#logo_qr`, `#logo_wolo_qr`, `#logo_codes_qr` | Top of QR Label Surface | Identifies the label as Wolo Code. |
@@ -336,7 +336,7 @@ Scanner spatial recognition: detect the printed rectangle or rounded rectangle b
 
 Label and city chooser sizing: the bordered Wolo Code region in QR Label View uses a golden width-to-height ratio (1.618:1) with vertically centered content. Its Save action uses a bookmark icon. Choose City dialogs, including previous cities and scanner choices, expand naturally up to 80% of the viewport height before scrolling.
 
-QR Label View: city and code are vertically centered as one group within the golden-ratio rectangle. The save bookmark fills for a saved city/code and shows an asterisk when its address differs from every matching bookmark; editing and bookmark updates refresh the status. The brand lockup has no text caret or extra tab stop. Preview, Download and Print use circular backgrounds.
+QR Label View: city and code are vertically centered as one group within the golden-ratio rectangle. The save bookmark fills for a saved city/code and shows an asterisk when its address differs from every matching bookmark; editing and bookmark updates refresh the status. The brand lockup has no text caret or extra tab stop. Preview, Download and Print use the same faint translucent circular backgrounds as Close at rest.
 
 QR Label View layout: the code rectangle has an explicit 172px height at its 278px width so the code group centers consistently in the modal and raster export. The three circular footer actions have 44px gaps. The code container and footer controls use their own horizontal centering instead of the framework center class, whose important block display overrides flex. The column flex layout vertically centers the city/code group, and the footer flex layout applies the button gaps.
 

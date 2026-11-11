@@ -770,6 +770,8 @@ function setGoogleMapTypeId(typeId) {
 	if(!isGoogleMapReady()) {
 		return false;
 	}
+	// Set a camera limit as well as a tile limit so automatic fits respect it.
+	map.set('maxZoom', typeId === MAP_LAYER_OSM ? OSM_NATIVE_MAX_ZOOM : undefined);
 	map.setMapTypeId(typeId);
 	return true;
 }

@@ -33,6 +33,34 @@
 	margin: 0;
 }
 
+.message_dialog_close.message_dialog_toolbar_button {
+	background: #fff;
+	border: 0;
+	border-radius: 50%;
+	box-sizing: border-box;
+	bottom: calc(100% + 8px);
+	color: #555;
+	cursor: pointer;
+	height: 44px;
+	padding: 0;
+	top: auto;
+	width: 44px;
+}
+
+.message_dialog_toolbar_button:focus-visible {
+	outline: 2px solid #69b7cf;
+	outline-offset: 2px;
+}
+
+.message_dialog_toolbar_button:not(.message_dialog_leading_action) svg path[fill="#CECECE"] {
+	fill: currentColor;
+}
+
+.overlay > div:has(> #external_message:not(.hide), > #qr_container:not(.hide)) {
+	max-height: none;
+	padding-top: 56px;
+}
+
 .message_dialog_label {
 	color: #c2c2c2;
 	text-align: center;

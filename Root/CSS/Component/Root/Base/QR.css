@@ -171,16 +171,6 @@
 	fill: white;
 }
 
-#qr_save {
-	align-items: center;
-	cursor: pointer;
-	display: flex;
-	height: auto;
-	left: 20px;
-	right: auto;
-	top: 10px;
-}
-
 #qr_save .image,
 #qr_save svg {
 	display: block;

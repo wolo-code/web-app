@@ -1,5 +1,5 @@
 <div id='external_message' class="message_dialog hide">
-	<button id='external_close' class="message_dialog_close control" type='button' aria-label='Close'>
+	<button id='external_close' class="message_dialog_close message_dialog_toolbar_button control" type='button' aria-label='Close'>
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</button>
 	<div class='message_dialog_body'>

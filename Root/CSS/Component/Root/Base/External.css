@@ -1,15 +1,5 @@
 #external_wcode {
-	padding-top: 42px;
-}
-
-#external_close {
-	background: transparent;
-	border: 0;
-	padding: 4px;
-}
-
-#external_close:focus-visible {
-	outline: 2px solid currentColor;
+	padding-top: 20px;
 }
 
 #external_sticker_title {

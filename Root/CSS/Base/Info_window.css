@@ -14,6 +14,12 @@
 	color: #666666;
 }
 
+.map_card_content {
+	/* Keep the trailing inset when Google Maps' content scrollbars are hidden. */
+	padding-right: 12px;
+	padding-bottom: 12px;
+}
+
 .map_card_code,
 .map_card_code .infowindow_code {
 	color: #444;

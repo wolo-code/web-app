@@ -91,7 +91,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
 | Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right corner when shown | Cycles to the next enabled map layer. The icon and tooltip both show that next layer (Google Satellite view after Google Maps). |
 | Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. For a new point selected online, the default Wolo Code uses the containing city identified by Google when its Wolo grid covers the point. |
-| Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions. |
+| Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions with consistent right and bottom padding. |
 
 ## Google Satellite View
 
@@ -105,7 +105,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Location control | Locate Button | `#location_button` | Bottom-center | Starts or retries user location detection. |
 | Map type control | Map Type Button | `#map_type_button`, `toggleMapViewType()` | Bottom-right corner when shown | Cycles from Google Satellite View to the next enabled map layer. |
 | Result marker | Location Marker | `marker`, `focus___()`, `encode()` | On selected map point | Marks the selected or decoded location. |
-| Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions. |
+| Code result popup | Wolo Code Info Window | `infoWindow`, `setInfoWindowText()` | Above Location Marker | Shows the generated Wolo Code and result actions with consistent right and bottom padding. |
 
 ## Location Flow Views
 

@@ -33,24 +33,21 @@
 	margin: 0;
 }
 
-.message_dialog_close.message_dialog_toolbar_button,
-#qr_controls > button {
-	background: rgb(255 255 255 / 18%);
-}
-
 .message_dialog_close.message_dialog_toolbar_button {
+	background: #fff;
 	border: 0;
 	border-radius: 50%;
 	box-sizing: border-box;
-	bottom: calc(100% - 14px);
+	bottom: calc(100% + 2px);
 	cursor: pointer;
-	min-height: 44px;
+	height: 44px;
 	padding: 0;
 	top: auto;
 	width: 44px;
 }
 
 .message_dialog_close.message_dialog_toolbar_button:not(.message_dialog_leading_action) {
+	background: rgb(255 255 255 / 18%);
 	color: #f4f4f4;
 }
 
@@ -65,7 +62,7 @@
 
 .overlay > div:has(> #external_message:not(.hide), > #qr_container:not(.hide)) {
 	max-height: none;
-	padding-top: 34px;
+	padding-top: 50px;
 }
 
 .message_dialog_label {

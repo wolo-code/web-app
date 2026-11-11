@@ -20,7 +20,7 @@ function initData() {
 	}
 	else if(pendingWords != null) {
 		initWCode_jump_ask = true;
-		decode(pendingWords);
+		decode(pendingWords, null, null, true);
 	}
 }
 

@@ -774,10 +774,16 @@ function execDecodeDigipin(code) {
 }
 
 var pendingInvalidQuery = '';
-function showInvalidCodeDialog(query) {
+function showInvalidCodeDialog(query, title, detail) {
 	pendingInvalidQuery = query || '';
+	var heading = document.getElementById('invalid_code_title');
+	var description = document.getElementById('invalid_code_detail');
 	var wrap = document.getElementById('invalid_code_query_wrap');
 	var quoted = document.getElementById('invalid_code_query');
+	if(heading)
+		heading.textContent = title || 'Unrecognized code';
+	if(description)
+		description.textContent = detail || 'Invalid Wolo Code, DIGIPIN, or Plus Code';
 	if(quoted) {
 		quoted.textContent = pendingInvalidQuery;
 	}

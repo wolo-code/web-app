@@ -1,12 +1,12 @@
 <div id='invalid_code_message' class="message_dialog hide">
-	<h2 class='message_dialog_label'>
+	<h2 id='invalid_code_title' class='message_dialog_label'>
 		Unrecognized code
 	</h2>
 	<div id='invalid_code_message_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div class='message_dialog_body'>
-		<p>
+		<p id='invalid_code_detail'>
 			Invalid Wolo Code, DIGIPIN, or Plus Code
 		</p>
 		<p id='invalid_code_query_wrap' class='hide'>

@@ -172,11 +172,22 @@ function getCityGpId(address_components) {
 	return fallback;
 }
 
-function decode(words, decodeMarker, selectionVersion) {
+function decode(words, decodeMarker, selectionVersion, fromUrl) {
 	pushLoader();
 	function finish(city, wcode) {
 		if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
 			popLoader();
+			return;
+		}
+		if(fromUrl && !getWoloAnchorBegin(city)) {
+			popLoader();
+			var reference = words.slice(0, -3).join(' ');
+			var indexed = /(?:^|[\s-])\d+$/.test(reference);
+			showInvalidCodeDialog(
+				reference,
+				indexed ? 'Region not found' : 'City not found',
+				indexed ? 'Check the region name and index in the link.' : 'Check the city name in the link.'
+			);
 			return;
 		}
 		decode_continue(city, wcode);
@@ -202,12 +213,13 @@ function decode(words, decodeMarker, selectionVersion) {
 			if(city_words_length > 0) {
 				var ipGroup = words.slice(0, city_words_length-1);
 				var ipCity = words.slice(city_words_length-1, city_words_length)[0];
+				var codeWords = words.slice(city_words_length);
 				getCityFromName(ipGroup, ipCity, function(city) {
 					if(city == null)
-						finish(null, words.slice(city_words_length, words.length));
+						finish(null, codeWords);
 					else
-						getCityCenterFromId(city, function(city) { finish(city, words.slice(city_words_length, words.length)); });
-				});
+						getCityCenterFromId(city, function(city) { finish(city, codeWords); });
+				}, fromUrl ? function() { finish(null, codeWords); } : undefined);
 			}
 			else if (words.length == 3) {
 				

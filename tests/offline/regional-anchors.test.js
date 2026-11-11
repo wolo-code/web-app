@@ -105,6 +105,48 @@ test('malformed indices, unknown registry versions, and invalid coordinates fail
 		assert.equal(api.regionAnchorsForPosition(point).length, 0);
 });
 
+test('direct links distinguish missing cities and indexed regions from invalid code words', () => {
+	const dialogs = [];
+	let loaderDepth = 0;
+	const api = runtime({
+		map: {},
+		google: { maps: {} },
+		pendingPosition: null,
+		pushLoader() { loaderDepth++; },
+		popLoader() { loaderDepth--; },
+		isOfflineMode() { return false; },
+		database: {
+			ref() {
+				return {
+					orderByChild() { return this; },
+					equalTo() { return this; },
+					once(_, success) {
+						success({ val() { return null; } });
+						return Promise.resolve();
+					}
+				};
+			}
+		},
+		wordList: ['tub', 'plate', 'chain'],
+		showInvalidCodeDialog(query, title) { dialogs.push({ query, title }); }
+	});
+	for(const file of ['Component/Root/City.js', 'Component/Root/Code/Core.js', 'Component/Root/Database.js', 'Base/Base.js'])
+		vm.runInContext(read(file), api);
+
+	for(const path of ['austin.tub.plate.chain', 'usa-999999.tub.plate.chain',
+		'unknown-1.tub.plate.chain', 'austin.tub.plate.invalid']) {
+		api.pendingWords = api.parseWoloPathWords(path);
+		api.initData();
+		assert.equal(loaderDepth, 0);
+	}
+	assert.deepEqual(dialogs, [
+		{ query: 'austin', title: 'City not found' },
+		{ query: 'usa-999999', title: 'Region not found' },
+		{ query: 'unknown-1', title: 'Region not found' },
+		{ query: 'austin tub plate invalid', title: undefined }
+	]);
+});
+
 test('regional full codes do not inherit country/group disambiguation from a previous city', () => {
 	const api = runtime({ multiple_country: true, multiple_group: true, multiple_city: true });
 	vm.runInContext(read('Component/Root/Code/Model.js'), api);

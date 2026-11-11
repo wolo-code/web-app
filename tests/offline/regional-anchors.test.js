@@ -144,3 +144,29 @@ test('multiword regional shared URLs resolve through the full decode flow withou
 	api.decode(('North Atlantic 1 ' + words.join(' ')).toLowerCase().split(' '));
 	assert.equal(decoded.city.id, anchor.id);
 });
+
+test('country and marine regional links decode to expected coordinates', () => {
+	let decoded;
+	const api = runtime({ window: { location: { pathname: '/', search: '' } }, pushLoader() {}, popLoader() {},
+		rememberCity() {}, addClassIfPresent() {}, selected_decode_city_source: null,
+		isOfflineMode() { return true; }, findCachedCitiesByNameId() { return Promise.resolve([]); },
+		database: { ref() { throw new Error('Unexpected database access'); } } });
+	vm.runInContext(read('Component/Root/CountryRegistry.js'), api);
+	for(const file of ['Component/Root/City.js', 'Component/Root/Code/Core.js', 'Component/Root/Code/WordList.js', 'Base/Base.js'])
+		vm.runInContext(read(file), api);
+	vm.runInContext('wordList = new WordList(' + read('../offline-data/WordList.json') + ');', api);
+	api.setDecodeCity = () => {};
+	api.setCodeCoord = (city, point, words) => { decoded = { city, point, words }; };
+	for(const entry of [
+		{ path: '/usa_40.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/north_pacific_13165.tunnel.dark.mail', lat: 25.4993, lng: -155.4275, tolerance: 0.0008 }
+	]) {
+		decoded = null;
+		api.window.location.pathname = entry.path;
+		assert.equal(api.urlDecode(), true, entry.path);
+		api.decode(api.pendingWords);
+		assert(decoded, entry.path);
+		assert(Math.abs(decoded.point.lat - entry.lat) < entry.tolerance, JSON.stringify(decoded.point));
+		assert(Math.abs(decoded.point.lng - entry.lng) < entry.tolerance, JSON.stringify(decoded.point));
+	}
+});

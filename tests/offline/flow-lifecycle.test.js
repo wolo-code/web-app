@@ -139,3 +139,29 @@ test('non-Google layers resolve coordinates instead of underlying Google POIs', 
 		assert.equal(stops, 1, layer);
 	}
 });
+
+test('initial URL decode waits for map readiness and resumes once map is available', () => {
+	let decodeCalls = 0;
+	const api = {
+		pendingPosition: null,
+		pendingWords: ['usa 40', 'tub', 'plate', 'chain'],
+		initWCode_jump_ask: false,
+		decode(words) {
+			decodeCalls++;
+			assert.deepEqual(Array.from(words), ['usa 40', 'tub', 'plate', 'chain']);
+		},
+		encode() {
+			assert.fail('encode should not run in this scenario');
+		}
+	};
+	vm.createContext(api);
+	vm.runInContext(read('JS/Component/Root/Database.js'), api);
+	api.initData();
+	assert.equal(decodeCalls, 0);
+	assert.equal(api.pendingInitDataRun, true);
+	api.google = { maps: {} };
+	api.map = {};
+	api.flushPendingInitData();
+	assert.equal(decodeCalls, 1);
+	assert.equal(api.pendingInitDataRun, false);
+});

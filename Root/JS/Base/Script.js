@@ -39,6 +39,8 @@ function syncInitMap() {
 			initMap();
 
 			initDecodeCityContext();
+			if(typeof flushPendingInitData == 'function')
+				flushPendingInitData();
 			finishInitialLoader();
 
 			pendingInitMap = false;

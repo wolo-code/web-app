@@ -2,6 +2,7 @@
 // var initWCode;
 // var initWCode_jumpToMap;
 // var initWCode_jump_ask;
+var pendingWoloLinkZoom;
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {
@@ -143,6 +144,9 @@ function urlDecode() {
 			}
 			pushLoader();
 			pendingWords = parsedWords;
+			var zoomParam = window.location.search && new URLSearchParams(window.location.search).get('zoom');
+			pendingWoloLinkZoom = zoomParam && /^\d+(\.\d+)?$/.test(zoomParam) && Number.isFinite(Number(zoomParam))
+				? Number(zoomParam) : null;
 			var canonicalPath = getCanonicalWoloPathFromWords(parsedWords, suffix);
 			if(window.location.pathname !== canonicalPath && window.history && typeof window.history.replaceState == 'function')
 				window.history.replaceState(window.history.state, '', canonicalPath + window.location.search);

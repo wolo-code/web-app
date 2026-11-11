@@ -1,15 +1,15 @@
-function focus__(city, pos, code) {
+function focus__(city, pos, code, linkZoom) {
 	if(typeof ensureMapViewForLocation == 'function') {
 		ensureMapViewForLocation();
 	}
-	focus___(pos);
+	focus___(pos, undefined, false, linkZoom);
 	setCode(city, code, pos);
 }
 
-function focus___(pos, bounds, skipFinalBoundsFit) {
+function focus___(pos, bounds, skipFinalBoundsFit, linkZoom) {
 	showMarker(pos);
 	if(fitInputMapPlaces()) return;
-	focus_(pos, bounds, skipFinalBoundsFit);
+	focus_(pos, bounds, skipFinalBoundsFit, linkZoom);
 }
 
 // Retained input results should frame the whole list instead of zooming to one point.
@@ -96,7 +96,11 @@ function animateMapToCityScope(pos) {
 		zoomIn();
 }
 
-function getFocusTargetZoom(bounds) {
+function getFocusTargetZoom(bounds, linkZoom) {
+	if(typeof linkZoom !== 'undefined') {
+		var maxZoom = getActiveMapTypeMaxZoom();
+		return Math.min(linkZoom === null ? maxZoom - 2 : linkZoom, maxZoom);
+	}
 	var newZoom;
 	if(typeof bounds !== 'undefined')
 		newZoom = getZoomByBounds(map, bounds);
@@ -118,13 +122,13 @@ function getFocusTargetZoom(bounds) {
 	return newZoom;
 }
 
-function panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit) {
+function panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit, linkZoom) {
 	panMapForFocus(pos, function() {
-		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds), map.getZoom(), skipFinalBoundsFit);
+		smoothZoomToBounds(bounds, map, getFocusTargetZoom(bounds, linkZoom), map.getZoom(), skipFinalBoundsFit);
 	});
 }
 
-function focus_(pos, bounds, skipFinalBoundsFit) {
+function focus_(pos, bounds, skipFinalBoundsFit, linkZoom) {
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
@@ -138,14 +142,14 @@ function focus_(pos, bounds, skipFinalBoundsFit) {
 			infoWindow.close();
 		smoothZoomOut(map, currentZoom, overviewZoom, function() {
 			revealHeldTryCityInfoWindow();
-			panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit);
+			panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit, linkZoom);
 		});
 		return;
 	}
 
 	if(holdInfoWindowForTryCityZoomOut)
 		revealHeldTryCityInfoWindow();
-	panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit);
+	panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit, linkZoom);
 
 }
 

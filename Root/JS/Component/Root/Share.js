@@ -76,8 +76,14 @@ function copyWcodeCode() {
 	hideCopyCodeMessage();
 }
 
+function getWoloMapLinkPath() {
+	var codePath = getCanonicalWoloPathFromWords(getCodeComplete());
+	var zoom = typeof map !== 'undefined' && map ? map.getZoom() : undefined;
+	return Number.isFinite(zoom) ? codePath + '?zoom=' + zoom : codePath;
+}
+
 function copyWcodeLink() {
-	var code_url = location.hostname + getCanonicalWoloPathFromWords(getCodeComplete());
+	var code_url = location.hostname + getWoloMapLinkPath();
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
@@ -115,8 +121,7 @@ function gotoCoordinate() {
 	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' '));
 	if(mapUrl.startsWith('https:')) {
 		// Restore the selected location even when Back reloads the page.
-		var codePath = getCanonicalWoloPathFromWords(getCodeComplete());
-		window.history.replaceState(window.history.state, '', codePath);
+		window.history.replaceState(window.history.state, '', getWoloMapLinkPath());
 	}
 	window.location.assign(mapUrl);
 }

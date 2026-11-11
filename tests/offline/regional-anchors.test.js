@@ -204,3 +204,21 @@ test('legacy links are rewritten to canonical hyphen paths in browser history', 
 	assert.deepEqual(history, ['/usa-40.tub.plate.chain']);
 	assert.equal(api.getCanonicalWoloPathFromWords(['North Pacific 13165', 'Tunnel', 'Dark', 'Mail']), '/north-pacific-13165.tunnel.dark.mail');
 });
+
+test('Wolo links use their zoom once and default to two levels below the map maximum', () => {
+	const location = { pathname: '/usa-40.tub.plate.chain', search: '' };
+	const zooms = [];
+	const api = runtime({ URLSearchParams, window: { location }, pushLoader() {},
+		initWCode_jump_ask: false, getAddress() {}, keepAddressPanelOpen: false,
+		getActiveMapTypeMaxZoom() { return 19; } });
+	vm.runInContext(read('Base/Base.js'), api);
+	vm.runInContext(read('Component/Root/Focus.js'), api);
+	api.focus__ = (_city, _position, _code, zoom) => zooms.push(api.getFocusTargetZoom(undefined, zoom));
+	for(const search of ['?zoom=13.5', '?zoom=24', '?zoom=bad', '']) {
+		location.search = search;
+		assert.equal(api.urlDecode(), true);
+		api.setCodeCoord({}, {}, []);
+		assert.equal(api.pendingWoloLinkZoom, undefined);
+	}
+	assert.deepEqual(zooms, [13.5, 19, 17, 17]);
+});

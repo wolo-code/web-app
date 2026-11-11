@@ -1124,6 +1124,7 @@ function clearMap() {
 }
 
 function cleanUp(full = false, keepMapCard = false) {
+	pendingWoloLinkZoom = undefined;
 	if(keepMapCard)
 		retainActiveMapCard();
 	mapSelectionVersion++;

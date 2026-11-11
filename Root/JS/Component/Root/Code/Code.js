@@ -148,6 +148,9 @@ function decode__(city_begin, code) {
 }
 
 function setCodeCoord(city, position, code) {
+	var linkZoom = typeof pendingWoloLinkZoom === 'undefined' ? undefined : pendingWoloLinkZoom;
+	if(linkZoom !== undefined)
+		pendingWoloLinkZoom = undefined;
 	if(initWCode_jumpToMap) {
 		initWCode_jumpToMap = false;
 		window.location.replace(getIntentURL(position, city.name + ' ' + code.join(' ')));
@@ -158,7 +161,7 @@ function setCodeCoord(city, position, code) {
 			external_show(position, city.name, code.join(' '));
 		}
 		getAddress(position);
-		focus__(city, position, code);
+		focus__(city, position, code, linkZoom);
 		if(keepAddressPanelOpen) {
 			latLng_p = position;
 			showAddress();

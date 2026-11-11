@@ -84,7 +84,7 @@
 	</button>
 </div>
 <button id='decode_map_view_button' class='control' type='button' aria-label='Terrain map view' title='Terrain map view' tabindex='6'>
-	<span class='image'><?php includeSVG('', 'Map-terrain'); ?></span>
+	<span class='image'><?php includeSVG('', 'Map-view'); ?></span>
 	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Map</span>
 </button>
 <div id='overlay' class="overlay hide">
@@ -189,7 +189,7 @@
 </button>
 <button id='action_menu_decode' class='control action_menu_item' type='button' tabindex='-1' aria-label='Wolo Code input' title='Wolo Code input'>
 	<span class='image view_toggle_icon'>
-		<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='view_toggle_icon_map'><?php includeSVG('', 'Map-view'); ?></span>
 		<span class='view_toggle_icon_code'><?php includeSVG('', 'Wolo-code'); ?></span>
 	</span>
 	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Wolo Code</span>

@@ -1282,7 +1282,12 @@ function getMapPlaceWoloCode(entry) {
 	var city = choices[0].anchor;
 	var data = encode__(getWoloAnchorBegin(city), regionGridPosition(city, position));
 	if(!isValidWoloIndexCode(data)) return null;
-	return [city.name_id].concat(data.map(function(index) { return wordList.getWord(index); })).join('.').toLowerCase().replace(/ /g, '_');
+	var parts = [city.name_id].concat(data.map(function(index) { return wordList.getWord(index); }));
+	if(typeof getCanonicalWoloPathFromWords === 'function')
+		return getCanonicalWoloPathFromWords(parts).slice(1);
+	return parts.map(function(part) {
+		return String(part || '').toLowerCase().replace(/_/g, ' ').replace(/\s+/g, '-');
+	}).join('.');
 }
 
 function getMapRouteURL(coordinateBased) {
@@ -1319,9 +1324,11 @@ function mapRouteCoordinate(value) {
 
 function resolveMapRouteCode(value) {
 	return new Promise(function(resolve, reject) {
-		var words = value.toLowerCase().replace(/_/g, ' ').split('.');
+		var words = typeof parseWoloPathWords === 'function'
+			? parseWoloPathWords(value)
+			: String(value || '').toLowerCase().replace(/\+/g, ' ').replace(/_/g, ' ').split('.');
+		if(!words || words.length < 4 || typeof wordList === 'undefined') { reject(new Error('Invalid route code')); return; }
 		var code = words.slice(-3);
-		if(words.length < 4 || typeof wordList === 'undefined') { reject(new Error('Invalid route code')); return; }
 		var data = code.map(function(word) { return wordList.indexOf(word); });
 		if(!isValidWoloIndexCode(data)) { reject(new Error('Invalid route code')); return; }
 		var reference = words.slice(0, -3);

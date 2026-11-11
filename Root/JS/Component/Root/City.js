@@ -642,10 +642,38 @@ function getCityFromId(id, callback, options) {
 	});
 }
 
+function normalizeCityLookupToken(token) {
+	if(typeof normalizeWoloPathToken === 'function')
+		return normalizeWoloPathToken(token);
+	return String(token || '').toLowerCase().replace(/\+/g, ' ').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function getCityFromNameVariants(city_name_part) {
+	var primary = city_name_part.map(function(part) { return normalizeCityLookupToken(part); });
+	var variants = [primary];
+	var withSpaces = primary.map(function(part) { return part.replace(/-/g, ' '); });
+	if(withSpaces.join('\u0001') !== primary.join('\u0001'))
+		variants.push(withSpaces);
+	return variants;
+}
+
+function buildCityNameQueryList(city_name_part) {
+	var query_list = [];
+	for(var i = 0; i < city_name_part.length; i++) {
+		query_list.push({
+			group: city_name_part.slice(0, i),
+			name: city_name_part.slice(i).join(' ')
+		});
+	}
+	return query_list;
+}
+
 function getCityFromName(group, name, callback, onFailure) {
-	var city_name_part = group.concat([name]);
+	var city_name_part = group.concat([name]).map(function(part) { return normalizeCityLookupToken(part); });
 	if(typeof regionAnchorFromName === 'function') {
 		var regional = regionAnchorFromName(city_name_part.join(' '));
+		if(!regional)
+			regional = regionAnchorFromName(city_name_part.join(' ').replace(/-/g, ' '));
 		if(regional) {
 			callback(regional);
 			return;
@@ -657,24 +685,30 @@ function getCityFromName(group, name, callback, onFailure) {
 			return;
 		}
 	}
-	var query_list = [];
-	for(var i = 0; i < city_name_part.length; i++) {
-		query_list.push({
-			group: city_name_part.slice(0, i),
-			name: city_name_part.slice(i).join(' ')
-		});
-	}
-
-	getCityFromNameQuery(query_list, 0, callback, onFailure);
+	var variants = getCityFromNameVariants(city_name_part).map(buildCityNameQueryList);
+	getCityFromNameVariantsQuery(variants, 0, callback, onFailure);
 }
 
-function getCityFromNameQuery(query_list, index, callback, onFailure) {
-	if(index >= query_list.length) {
+function getCityFromNameVariantsQuery(variants, variantIndex, callback, onFailure) {
+	if(variantIndex >= variants.length) {
 		if (isOfflineMode()) {
 			showNotification('City not available offline. Open this city once while online.');
 		}
 		if(typeof onFailure === 'function') onFailure();
 		else decode_continue();
+		return;
+	}
+	getCityFromNameQuery(variants[variantIndex], 0, callback, function() {
+		getCityFromNameVariantsQuery(variants, variantIndex + 1, callback, onFailure);
+	});
+}
+
+function getCityFromNameQuery(query_list, index, callback, onFailure) {
+	if(index >= query_list.length) {
+		if(typeof onFailure === 'function')
+			onFailure();
+		else
+			decode_continue();
 		return;
 	}
 

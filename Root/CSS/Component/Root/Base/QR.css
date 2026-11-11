@@ -19,12 +19,6 @@
 
 #qr_label {
 	padding-top: 20px;
-	padding-bottom: 12px;
-}
-
-
-#qr_title_container {
-	margin-top: 6px;
 }
 
 #qr_title_main, #qr_title_segment, #qr_address {
@@ -79,7 +73,8 @@
 }
 
 #qr_wcode {
-	padding-top: 15px;
+	padding-top: 28px;
+	padding-inline: clamp(0px, calc((100% - 278px) / 2), 40px);
 }
 
 #qr_sticker_title {
@@ -125,6 +120,7 @@
 }
 
 #qr_wcode_left {
+	color: #3e3e3e;
 	text-align: left;
 	margin-bottom: 4px;
 }
@@ -132,6 +128,7 @@
 #qr_wcode_code {
 	font-size: xx-large;
 	font-weight: bold;
+	color: #1a1a1a;
 }
 
 #qr_address {
@@ -145,7 +142,7 @@
 #qr_webapp_url {
 	color: #ffffff;
 	background-color: #69B7CF;
-	font-size: large;
+	font-size: medium;
 	padding-top: 7px;
 	padding-bottom: 10px;
 }
@@ -167,7 +164,7 @@
 }
 
 .qr_minimal #qr_wcode {
-	padding-top: unset;
+	padding: 0;
 }
 
 #qr_preview.button_active > span > svg > path {

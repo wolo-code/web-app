@@ -49,7 +49,7 @@
 			<div id='qr_address_preview' hidden></div>
 		</div>
 		<div id='qr_webapp_url' class='center'>
-			<div>www.wolo.codes</div>
+			<div>scan or enter at www.wolo.codes</div>
 		</div>
 	</div>
 	<div id='qr_controls' class="message_dialog_control section-to-not-print">

@@ -234,7 +234,7 @@ QR Label View brand placement shares the Info modal logo styles: bottom-aligned 
 
 Map View places Scan inside the right end of the search field, before Go, with text padding reserved for its camera icon. On wide screens, Bookmarks is a 42px by 42px button joined without a gap to the left edge of the search bar; on narrow screens it remains in the top-left corner above the search bar. Bottom controls are Info and Wolo Code at left, Locate in the center, and Switch map at right, with the map D-pad beside it. Wolo Code Input View keeps Camera and Bookmarks at bottom right. Both Scan controls open the same scanner.
 
-Guide captions: the decode scanner and its parent stay above the guide overlay. Scan and Saved captions appear above their decode buttons; the map Saved caption appears below its bookmark button. Previous stays enabled during the guide even when city history is empty; its normal availability returns after dismissal. Static copyright footer text hides the browser caret without affecting input cursors. Over the map, the license year uses muted gray text with a close shadow for contrast across tiles and themes.
+Guide captions: the decode scanner and its parent stay above the guide overlay. Scan and Saved captions appear above their decode buttons; the map Saved caption appears below its bookmark button. Previous stays enabled during the guide even when city history is empty; its normal availability returns after dismissal. Static copyright footer text hides the browser caret without affecting input cursors. Over the map, the license year uses muted gray text on the shared, theme-aware footer background for contrast across map tiles.
 
 The Map View scanner and search artwork use the primary accent (#69B7CF).
 

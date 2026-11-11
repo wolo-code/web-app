@@ -269,13 +269,25 @@ body:not(.decode):not(.map-source-single) #map_type_button {
 	width: 39px;
 }
 
-body:not(.decode) #footer-content .link-gray {
-	color: #bbb !important;
-	text-shadow: 0 0 2px #000, 0 1px 2px #000;
+/* Keep tile brightness from overwhelming the text on the shared footer surface. */
+body:not(.decode) #footer-content {
+	background-color: rgb(251 251 251 / 85%) !important;
 }
 
-body:not(.decode) #footer-content .link-gray:is(:hover, :focus-visible) {
-	color: #eee !important;
+body:not(.decode) #footer-content .link-gray {
+	color: #6e6e6e !important;
+}
+
+html.dark-mode body:not(.decode) #footer-content {
+	background-color: rgb(26 26 46 / 85%) !important;
+}
+
+html.dark-mode body:not(.decode) #footer-content .link-gray {
+	color: #a0a0ac !important;
+}
+
+html body:not(.decode) #footer-content .link-gray:is(:hover, :focus-visible) {
+	text-decoration: underline;
 }
 
 .map_attribution {

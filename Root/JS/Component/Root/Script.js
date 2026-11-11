@@ -9,12 +9,14 @@ function initLoad () {
 		initApp();
 		dbInit();
 		initOfflineStatus();
-		syncLocate_engage = versionCheck();
-		if(!urlDecode()) {
-			//if(syncLocate_engage)
-				//syncLocate();
+		directWoloLinkEntry = isDirectWoloLinkEntry(window.location);
+		if(directWoloLinkEntry) {
+			activateOverlayInfo_full();
+			syncLocate_engage = true;
 		}
 		else
+			syncLocate_engage = versionCheck();
+		if(urlDecode())
 			syncLocate_engage = true;
 			
 		syncInitMap();

@@ -3,6 +3,15 @@
 // var initWCode_jumpToMap;
 // var initWCode_jump_ask;
 var pendingWoloLinkZoom;
+var directWoloLinkEntry = false;
+
+function isDirectWoloLinkEntry(location) {
+	if(location.pathname !== '/')
+		return true;
+
+	var params = new URLSearchParams(location.search);
+	return !!params.get('q') || (params.has('from') && params.has('to'));
+}
 
 function setLocationAccess(status) {
 	if (typeof(Storage) !== 'undefined') {

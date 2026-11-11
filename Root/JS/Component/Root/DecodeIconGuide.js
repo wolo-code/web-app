@@ -820,9 +820,9 @@ function syncDecodeIconGuide() {
 		mapIconGuideVisitRecorded = false;
 		mapIconGuideConsumed = false;
 	}
-	else
+	else if(!directWoloLinkEntry)
 		recordMapIconGuideVisit();
-	autoShow = decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide();
+	autoShow = !directWoloLinkEntry && (decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide());
 	allow = (decodeIconGuideForced || autoShow) && !shouldHoldDecodeIconGuide();
 	if(allow && !isDecodeIconGuideConsumed() && !decodeIconGuideVisible)
 		startDecodeIconGuide();
@@ -833,7 +833,8 @@ function syncDecodeIconGuide() {
 }
 
 function initDecodeIconGuide() {
-	recordDecodeIconGuideLaunch();
+	if(!directWoloLinkEntry)
+		recordDecodeIconGuideLaunch();
 	syncDecodeIconGuide();
 	window.addEventListener('resize', layoutDecodeIconGuide);
 }

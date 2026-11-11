@@ -40,7 +40,7 @@
 	<link rel='icon' type='image/svg+xml' href='/favicon.svg' >
 	<link rel="alternate icon" type='image/x-icon' href='/favicon.ico' >
 	<link rel='apple-touch-icon' type='image/png' href='/apple-touch-icon.png' >
-	<link href='<?php echo $config['base_url']; ?>' rel='canonical' >
+	<link href='<?php echo $config['base_url'].getComponentURLtrimmed($id); ?>' rel='canonical' >
 	<title><?php echo $config['project_title'] ?></title>
 <?php
 	$component = $id;

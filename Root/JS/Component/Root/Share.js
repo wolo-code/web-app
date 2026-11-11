@@ -17,7 +17,7 @@ function shareWCode() {
 	navigator.share( {
 		title: "Wolo",
 		text: "Wolo Code for: " + ' ' + share_address + ' ' + '|',
-		url: '/' + getCodeComplete().join('.').toLowerCase().replace(/ /g, '_') + '/'
+		url: getCanonicalWoloPathFromWords(getCodeComplete(), '/')
 	} )
 	.catch((error) => console.log('Error sharing', error));
 }
@@ -77,14 +77,14 @@ function copyWcodeCode() {
 }
 
 function copyWcodeLink() {
-	var code_url = location.hostname + '/' + getCodeComplete().join('.').toLowerCase().replace(/ /g, '_');
+	var code_url = location.hostname + getCanonicalWoloPathFromWords(getCodeComplete());
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
 }
 
 function copyWcodeJumpLink() {
-	var code_url = location.hostname + '/' + getCodeComplete().join('.').toLowerCase().replace(/ /g, '_') + '/';
+	var code_url = location.hostname + getCanonicalWoloPathFromWords(getCodeComplete(), '/');
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
@@ -115,7 +115,7 @@ function gotoCoordinate() {
 	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' '));
 	if(mapUrl.startsWith('https:')) {
 		// Restore the selected location even when Back reloads the page.
-		var codePath = '/' + getCodeComplete().join('.').toLowerCase().replace(/ /g, '_');
+		var codePath = getCanonicalWoloPathFromWords(getCodeComplete());
 		window.history.replaceState(window.history.state, '', codePath);
 	}
 	window.location.assign(mapUrl);

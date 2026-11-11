@@ -239,7 +239,8 @@ function loadRouteCodec(context) {
 	const words = JSON.parse(fs.readFileSync(path.join(__dirname, '../../Root/Files/offline-data/WordList.json'), 'utf8'));
 	context.wordList = new context.WordList(words);
 	context.getCityFromName = (groups, name, callback, failure) => {
-		const anchor = context.regionAnchorFromName(groups.concat(name).join(' '));
+		const joined = groups.concat(name).join(' ');
+		const anchor = context.regionAnchorFromName(joined) || context.regionAnchorFromName(joined.replace(/-/g, ' '));
 		anchor ? callback(anchor) : failure();
 	};
 	context.getCityCenterFromId = (city, callback) => callback(city);

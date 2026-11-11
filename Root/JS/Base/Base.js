@@ -81,33 +81,71 @@ function activateOverlayInfo_links() {
 	removeClassIfPresent(document.getElementById('info_agency'), 'hide');
 }
 
+function normalizeWoloPathToken(token) {
+	return String(token || '').toLowerCase().replace(/\+/g, ' ').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function toCanonicalWoloPathToken(token) {
+	return normalizeWoloPathToken(token).replace(/ /g, '-');
+}
+
+function getCanonicalWoloPathFromWords(words, suffix) {
+	var list = Array.isArray(words) ? words : [];
+	var canonical = list.map(toCanonicalWoloPathToken).filter(function(entry) { return entry.length > 0; }).join('.');
+	return '/' + canonical + (suffix || '');
+}
+
+function parseWoloPathWords(rawCodeString) {
+	var decoded = String(rawCodeString || '');
+	try {
+		decoded = decodeURIComponent(decoded);
+	}
+	catch(error) {
+		return null;
+	}
+	var words = decoded.split('.').map(normalizeWoloPathToken);
+	if(words.length < 4 || words.some(function(entry) { return entry.length === 0; }))
+		return null;
+	return words;
+}
+
 function urlDecode() {
 	if(window.location.pathname.substr(1) != '') {
 		var code_string;
+		var suffix = '';
 		var end_flag_char = window.location.pathname.substr(-1);
 		if(end_flag_char == '/') {
 			redirect_showLoader();
 			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
 			initWCode_jumpToMap = true;
+			suffix = '/';
 		}
 		else if (end_flag_char == '_') {
 			init_map_mode = 'satellite';
 			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
 			initWCode_jumpToMap = false;
+			suffix = '_';
 		} 
 		else {
 			code_string = window.location.pathname.substr(1);
 			initWCode_jumpToMap = false;
 		}
 		
-		if(!code_string.match(/^[A-Za-z0-9._-]+$/)) {
+		if(!code_string.match(/^[A-Za-z0-9._%+-]+$/)) {
 			window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
 			return false;
 		}
 		else {
+			var parsedWords = parseWoloPathWords(code_string);
+			if(!parsedWords) {
+				window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
+				return false;
+			}
 			pushLoader();
-			var code = code_string.toLowerCase().replace(/_/g, ' ');
-			pendingWords = code.split('.');
+			pendingWords = parsedWords;
+			var canonicalPath = getCanonicalWoloPathFromWords(parsedWords, suffix);
+			if(window.location.pathname !== canonicalPath && window.history && typeof window.history.replaceState == 'function')
+				window.history.replaceState(window.history.state, '', canonicalPath + window.location.search);
 			initWCode = true;
 			return true;
 		}

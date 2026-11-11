@@ -159,6 +159,11 @@ test('country and marine regional links decode to expected coordinates', () => {
 	api.setCodeCoord = (city, point, words) => { decoded = { city, point, words }; };
 	for(const entry of [
 		{ path: '/usa_40.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/usa-40.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/united-states-of-america-40.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/USA-40.TUB.PLATE.CHAIN', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/usa%2040.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
+		{ path: '/usa+40.tub.plate.chain', lat: 25.996772, lng: -97.157990, tolerance: 0.0006 },
 		{ path: '/north_pacific_13165.tunnel.dark.mail', lat: 25.4993, lng: -155.4275, tolerance: 0.0008 }
 	]) {
 		decoded = null;
@@ -169,4 +174,33 @@ test('country and marine regional links decode to expected coordinates', () => {
 		assert(Math.abs(decoded.point.lat - entry.lat) < entry.tolerance, JSON.stringify(decoded.point));
 		assert(Math.abs(decoded.point.lng - entry.lng) < entry.tolerance, JSON.stringify(decoded.point));
 	}
+});
+
+test('suffix markers keep map and satellite behaviors with both old and canonical regional links', () => {
+	const api = runtime({ window: { location: { pathname: '/', search: '' } }, pushLoader() {}, popLoader() {},
+		redirect_showLoader() {}, addClassIfPresent() {} });
+	vm.runInContext(read('Base/Base.js'), api);
+
+	api.window.location.pathname = '/usa_40.tub.plate.chain_';
+	assert.equal(api.urlDecode(), true);
+	assert.equal(api.init_map_mode, 'satellite');
+	assert.equal(api.initWCode_jumpToMap, false);
+	assert.deepEqual(Array.from(api.pendingWords), ['usa 40', 'tub', 'plate', 'chain']);
+
+	api.window.location.pathname = '/usa-40.tub.plate.chain/';
+	api.init_map_mode = false;
+	assert.equal(api.urlDecode(), true);
+	assert.equal(api.initWCode_jumpToMap, true);
+	assert.equal(api.init_map_mode, false);
+	assert.deepEqual(Array.from(api.pendingWords), ['usa-40', 'tub', 'plate', 'chain']);
+});
+
+test('legacy links are rewritten to canonical hyphen paths in browser history', () => {
+	const history = [];
+	const api = runtime({ window: { location: { pathname: '/usa_40.tub.plate.chain', search: '' },
+		history: { state: null, replaceState(_state, _title, next) { history.push(next); } } }, pushLoader() {}, popLoader() {} });
+	vm.runInContext(read('Base/Base.js'), api);
+	assert.equal(api.urlDecode(), true);
+	assert.deepEqual(history, ['/usa-40.tub.plate.chain']);
+	assert.equal(api.getCanonicalWoloPathFromWords(['North Pacific 13165', 'Tunnel', 'Dark', 'Mail']), '/north-pacific-13165.tunnel.dark.mail');
 });

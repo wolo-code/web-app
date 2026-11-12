@@ -96,6 +96,38 @@ test('fuzzyMatchWord corrects common OCR typos against the word list', () => {
 	assert.equal(ocrMatch.fuzzyMatchWord('xyzzy', vocab.includes, vocab.canonical), null);
 });
 
+test('ambiguous corrections are rejected independently of dictionary order', () => {
+	for(const canonical of [['cat', 'bat'], ['bat', 'cat'], ['cat', 'cat', 'bat']]) {
+		const includes = word => canonical.includes(word);
+		assert.equal(ocrMatch.fuzzyMatchWord('hat', includes, canonical), null);
+		assert.equal(ocrMatch.fuzzyMatchWord('cat', includes, canonical), 'cat');
+	}
+	assert.equal(ocrMatch.fuzzyMatchWord('appl', word => word === 'apple', ['apple', 'apple']), 'apple');
+});
+
+test('compatibility letters normalize before matching and excessive tokens are bounded', () => {
+	assert.equal(ocrMatch.normalizeOcrText('ＣＡＴ  ａｐｐｌｅ  ﬂower'), 'cat apple flower');
+	assert.equal(ocrMatch.fuzzyMatchWord('x'.repeat(10000), () => false, ['cat']), null);
+});
+
+test('malformed geometry, result arrays and confidence never produce a code', () => {
+	const vocab = buildIncludes();
+	const match = result => ocrMatch.matchOcrRegionsToWoloCode(result, vocab.includes, vocab.canonical);
+	for(const data of [{ words: {}, labelContainers: [] }, { words: [], labelContainers: {} }, null])
+		assert.equal(match({ data }), null);
+	for(const confidence of [undefined, NaN, Infinity, -1, 54, 101, '95']) {
+		const words = [regionWord('cat', 100, 180, 210, 220), regionWord('apple', 230, 180, 330, 220), regionWord('tomato', 350, 180, 440, 220)];
+		words[0].confidence = confidence;
+		assert.equal(match(labelResult(words)), null);
+	}
+	for(const badBox of [null, { x0: NaN, y0: 180, x1: 210, y1: 220 }, { x0: 210, y0: 180, x1: 100, y1: 220 }]) {
+		const words = [regionWord('cat', 100, 180, 210, 220), regionWord('apple', 230, 180, 330, 220), regionWord('tomato', 350, 180, 440, 220)];
+		words[0].bbox = badBox;
+		assert.equal(match(labelResult(words)), null);
+	}
+	assert.equal(match({ data: { words: [], labelContainers: [null, {}, { x0: 0, y0: 0, x1: Infinity, y1: 10 }] } }), null);
+});
+
 test('matchOcrTextToWoloCode finds city plus three words', () => {
 	const vocab = buildIncludes();
 	const match = ocrMatch.matchOcrTextToWoloCode('bengaluru cat apple tomato', vocab.includes, vocab.canonical);

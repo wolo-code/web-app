@@ -45,6 +45,29 @@ test('blank images and borders with an entire side missing are rejected', () => 
 	assert.deepEqual(matcher.detectLabelRectangles(raster(400, 300, [{ x0: 40, y0: 35, x1: 300, y1: 160, missing: 'right' }]), 400, 300), []);
 });
 
+test('four printed corner brackets form a container at different image scales', () => {
+	for(const scale of [0.5, 1, 2]) {
+		const width = 600 * scale, height = 400 * scale;
+		const rect = { x0: 50 * scale, y0: 50 * scale, x1: 550 * scale, y1: 350 * scale };
+		for(const missing of [-1, 0, 1, 2, 3]) {
+			const pixels = raster(width, height);
+			let index = 0;
+			for(const [x, dx] of [[rect.x0, 1], [rect.x1 - 1, -1]]) {
+				for(const [y, dy] of [[rect.y0, 1], [rect.y1 - 1, -1]]) {
+					if(index++ === missing) continue;
+					for(let along = 0; along < 28 * scale; along++) for(let thickness = 0; thickness < Math.max(1, 2 * scale); thickness++) {
+						pixels.data.set([105, 183, 207, 255], ((y + dy * thickness) * width + x + dx * along) * 4);
+						pixels.data.set([105, 183, 207, 255], ((y + dy * along) * width + x + dx * thickness) * 4);
+					}
+				}
+			}
+			const detected = matcher.detectLabelRectangles(pixels, width, height);
+			if(missing < 0) assert.ok(detected.some(box => matcher.bboxIoU(rect, box) > 0.95), JSON.stringify({ scale, detected }));
+			else assert.equal(detected.length, 0, 'incomplete corner frame');
+		}
+	}
+});
+
 test('supplied screenshot detects the inner printed box and excludes Ram and Main door', () => {
 	const fixture = path.join(__dirname, '../fixtures/scanner-label');
 	const { width, height } = JSON.parse(fs.readFileSync(fixture + '.json', 'utf8'));

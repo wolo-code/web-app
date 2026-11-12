@@ -8,6 +8,12 @@ var codeScanState = {
 	hasCaptured: false,
 	stream: null,
 	worker: null,
+	workerPromise: null,
+	workerQueue: Promise.resolve(),
+	workerEpoch: 0,
+	workerJobs: [],
+	session: 0,
+	cameraRequest: 0,
 	scanTimer: null,
 	processing: false,
 	lastMatchCode: '',
@@ -58,6 +64,9 @@ var CODE_SCAN_STABLE_MATCHES = 3;
 var CODE_SCAN_BBOX_IOU_MIN = 0.55;
 var CODE_SCAN_MIN_CONFIDENCE = 55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
+var CODE_SCAN_LOAD_TIMEOUT_MS = 45000;
+var CODE_SCAN_OCR_TIMEOUT_MS = 60000;
+var CODE_SCAN_MAX_PHOTO_PIXELS = 24000000;
 var CODE_SCAN_FIXED_ASPECT = 3;
 var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
 var codeScanInitialStatus = '';
@@ -166,6 +175,7 @@ function openCodeScan(event) {
 		showNotification('Word list is still loading. Try again in a moment.');
 		return;
 	}
+	invalidateCodeScanSession();
 	codeScanState.source = document.body.classList.contains('decode') ? 'decode' : 'map';
 	codeScanState.hasCaptured = false;
 	resetCodeScanUi();
@@ -202,6 +212,7 @@ function closeCodeScan(event) {
 }
 
 function stopCodeScan() {
+	invalidateCodeScanSession();
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = null;
 	codeScanState.cropRevision += 1;
@@ -220,6 +231,21 @@ function stopCodeScan() {
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput)
 		photoInput.value = '';
+}
+
+function invalidateCodeScanSession() {
+	codeScanState.session += 1;
+	codeScanState.cropRevision += 1;
+	codeScanState.processing = false;
+	clearTimeout(codeScanState.cropScanTimer);
+	codeScanState.cropScanTimer = null;
+	clearCodeScanTimer();
+	stopCodeScanCamera();
+	terminateCodeScanWorker();
+}
+
+function isCurrentCodeScanSession(session) {
+	return codeScanState.active && session === codeScanState.session;
 }
 
 function resetCodeScanUi() {
@@ -314,6 +340,11 @@ function getCodeScanCanvas() {
 
 function startCodeScanCamera() {
 	var video = getCodeScanVideo();
+	var session = codeScanState.session;
+	var request = ++codeScanState.cameraRequest;
+	function current() {
+		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !codeScanState.hasCaptured;
+	}
 	if(!video)
 		return;
 	navigator.mediaDevices.getUserMedia({
@@ -324,7 +355,7 @@ function startCodeScanCamera() {
 		},
 		audio: false
 	}).then(function(stream) {
-		if(!codeScanState.active) {
+		if(!current()) {
 			stream.getTracks().forEach(function(track) {
 				track.stop();
 			});
@@ -334,7 +365,7 @@ function startCodeScanCamera() {
 		video.srcObject = stream;
 		return video.play();
 	}).then(function() {
-		if(!codeScanState.active)
+		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
 		setCodeScanViewportVisible(true);
@@ -342,13 +373,14 @@ function startCodeScanCamera() {
 		setCodeScanFrozenPreview(false);
 		setCodeScanStatus(getCodeScanInitialStatus());
 		prepareCodeScanWorker().then(function() {
-			if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
+			if(current() && codeScanState.phase === 'live')
 				scheduleCodeScanFrame();
-		}).catch(handleCodeScanWorkerError);
-	}).catch(handleCodeScanCameraError);
+		}).catch(function(error) { if(current()) handleCodeScanWorkerError(error); });
+	}).catch(function(error) { if(current()) handleCodeScanCameraError(error); });
 }
 
 function stopCodeScanCamera() {
+	codeScanState.cameraRequest += 1;
 	var video = getCodeScanVideo();
 	if(codeScanState.stream) {
 		codeScanState.stream.getTracks().forEach(function(track) {
@@ -367,50 +399,129 @@ function loadCodeScanTesseractScript() {
 		return Promise.resolve(window.Tesseract);
 	if(codeScanState.tesseractPromise)
 		return codeScanState.tesseractPromise;
-	codeScanState.tesseractPromise = new Promise(function(resolve, reject) {
+	var loading = new Promise(function(resolve, reject) {
 		var script = document.createElement('script');
+		var timer = setTimeout(function() { finish(new Error('Scanner download timed out')); }, CODE_SCAN_LOAD_TIMEOUT_MS);
+		function finish(error) {
+			clearTimeout(timer);
+			script.onload = script.onerror = null;
+			if(error) {
+				if(script.parentNode) script.parentNode.removeChild(script);
+				reject(error);
+			} else resolve(window.Tesseract);
+		}
 		script.src = CODE_SCAN_TESSERACT_BASE + '/tesseract.min.js';
 		script.async = true;
 		script.onload = function() {
-			if(window.Tesseract)
-				resolve(window.Tesseract);
-			else
-				reject(new Error('Tesseract failed to load'));
+			finish(window.Tesseract ? null : new Error('Tesseract failed to load'));
 		};
 		script.onerror = function() {
-			reject(new Error('Tesseract failed to load'));
+			finish(new Error('Tesseract failed to load'));
 		};
 		document.head.appendChild(script);
 	});
+	codeScanState.tesseractPromise = loading.catch(function(error) {
+		codeScanState.tesseractPromise = null;
+		throw error;
+	});
 	return codeScanState.tesseractPromise;
+}
+
+function codeScanCancelledError() {
+	var error = new Error('Scan cancelled');
+	error.name = 'AbortError';
+	return error;
+}
+
+// Termination must settle callers too: Tesseract can leave its promises pending.
+function waitForCodeScanWorker(promise, timeout) {
+	return new Promise(function(resolve, reject) {
+		var timer = setTimeout(function() { finish(new Error('Scanner timed out')); }, timeout);
+		var settled = false;
+		function cancel(error) { finish(error || codeScanCancelledError()); }
+		function finish(error, value) {
+			if(settled) return;
+			settled = true;
+			clearTimeout(timer);
+			var index = codeScanState.workerJobs.indexOf(cancel);
+			if(index >= 0) codeScanState.workerJobs.splice(index, 1);
+			if(error) reject(error); else resolve(value);
+		}
+		codeScanState.workerJobs.push(cancel);
+		Promise.resolve(promise).then(function(value) { finish(null, value); }, cancel);
+	});
+}
+
+function disposeCodeScanWorker(worker) {
+	if(!worker || typeof worker.terminate !== 'function') return;
+	try { Promise.resolve(worker.terminate()).catch(function() {}); } catch(error) {}
 }
 
 function prepareCodeScanWorker() {
 	if(codeScanState.worker)
 		return Promise.resolve(codeScanState.worker);
+	if(codeScanState.workerPromise) return codeScanState.workerPromise;
+	var epoch = codeScanState.workerEpoch;
+	var pendingWorker;
 	setCodeScanStatus('Loading on-device scanner...');
-	return loadCodeScanTesseractScript().then(function(Tesseract) {
+	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
+		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		return Tesseract.createWorker('eng', 1, {
 			workerPath: CODE_SCAN_TESSERACT_BASE + '/worker.min.js',
 			langPath: CODE_SCAN_TESSERACT_BASE + '/lang',
 			corePath: CODE_SCAN_TESSERACT_BASE + '/tesseract-core.wasm.min.js',
-			logger: function() {}
+			logger: function() {},
+			errorHandler: function(error) {
+				if(epoch === codeScanState.workerEpoch) terminateCodeScanWorker(error instanceof Error ? error : new Error(String(error)));
+			}
 		});
 	}).then(function(worker) {
+		if(epoch !== codeScanState.workerEpoch) {
+			disposeCodeScanWorker(worker);
+			throw codeScanCancelledError();
+		}
+		pendingWorker = worker;
 		return worker.setParameters({
 			tessedit_pageseg_mode: '11'
 		}).then(function() {
+			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 			codeScanState.worker = worker;
 			return worker;
 		});
 	});
+	codeScanState.workerPromise = waitForCodeScanWorker(loading, CODE_SCAN_LOAD_TIMEOUT_MS).catch(function(error) {
+		if(pendingWorker && pendingWorker !== codeScanState.worker) disposeCodeScanWorker(pendingWorker);
+		if(epoch === codeScanState.workerEpoch) terminateCodeScanWorker();
+		throw error;
+	});
+	return codeScanState.workerPromise;
 }
 
-function terminateCodeScanWorker() {
-	if(!codeScanState.worker)
-		return;
-	codeScanState.worker.terminate();
+function terminateCodeScanWorker(error) {
+	var worker = codeScanState.worker;
+	codeScanState.workerEpoch += 1;
 	codeScanState.worker = null;
+	codeScanState.workerPromise = null;
+	codeScanState.workerQueue = Promise.resolve();
+	codeScanState.workerJobs.slice().forEach(function(cancel) { cancel(error); });
+	disposeCodeScanWorker(worker);
+}
+
+// Keep segmentation changes and recognition atomic on the single OCR worker.
+function runCodeScanWorkerTask(work) {
+	var epoch = codeScanState.workerEpoch;
+	var task = codeScanState.workerQueue.then(function() {
+		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+		return prepareCodeScanWorker();
+	}).then(function(worker) {
+		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+		return waitForCodeScanWorker(Promise.resolve().then(function() { return work(worker); }), CODE_SCAN_OCR_TIMEOUT_MS);
+	}).catch(function(error) {
+		if(epoch === codeScanState.workerEpoch) terminateCodeScanWorker();
+		throw error;
+	});
+	codeScanState.workerQueue = task.catch(function() {});
+	return task;
 }
 
 function handleCodeScanCameraError(error) {
@@ -436,6 +547,7 @@ function handleCodeScanWorkerError() {
 
 function runCodeScanFrame() {
 	var revision = codeScanState.cropRevision;
+	var session = codeScanState.session;
 	if(!codeScanState.active || codeScanState.processing || codeScanState.phase !== 'live' || codeScanState.hasCaptured) {
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
@@ -444,15 +556,19 @@ function runCodeScanFrame() {
 	var video = getCodeScanVideo();
 	var canvas = getCodeScanCanvas();
 	var ocrCanvas;
-	if(!video || !canvas || !codeScanState.worker || video.readyState < 2) {
+	if(!video || !canvas || video.readyState < 2) {
 		scheduleCodeScanFrame();
 		return;
 	}
 	codeScanState.processing = true;
-	captureCodeScanFrame(video, canvas);
 	// The dashed frame is a guide; both the code box and whole card may extend beyond it.
 	ocrCanvas = canvas;
-	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
+	Promise.resolve().then(function() {
+		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
+		captureCodeScanFrame(video, canvas);
+		return recognizeCodeScanCanvas(ocrCanvas);
+	}).then(function(result) {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
 			return;
@@ -463,7 +579,9 @@ function runCodeScanFrame() {
 		handleCodeScanLiveOcrResult(result, ocrCanvas);
 		scheduleCodeScanFrame();
 	}).catch(function() {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
+		resetCodeScanMatchState();
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 	});
@@ -668,12 +786,16 @@ function detectCodeScanContainers(canvas) {
 }
 
 function recognizeCodeScanCanvas(canvas, focus) {
-	var containers = detectCodeScanContainers(canvas);
-	return codeScanState.worker.recognize(canvas).then(function(result) {
+	return runCodeScanWorkerTask(function(worker) {
+		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
+		var containers = detectCodeScanContainers(canvas);
+		return worker.recognize(canvas).then(function(result) {
+		if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
 		result.data = result.data || {};
 		result.data.labelContainers = containers;
 		result.data.scanFocus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
 		return result;
+		});
 	});
 }
 
@@ -685,7 +807,8 @@ function detailBandScale(height) {
 	return height < 100 ? 4 : 3;
 }
 
-function ocrCodeScanBand(canvas, band) {
+function ocrCodeScanBand(canvas, band, worker) {
+	worker = worker || codeScanState.worker;
 	var x0 = Math.max(0, Math.round(band.x0));
 	var y0 = Math.max(0, Math.round(band.y0));
 	var x1 = Math.min(canvas.width || 0, Math.round(band.x1));
@@ -695,8 +818,8 @@ function ocrCodeScanBand(canvas, band) {
 	var scale;
 	var target;
 	var ctx;
-	if(width < 20 || height < 12 || !codeScanState.worker) return Promise.resolve([]);
-	scale = detailBandScale(height);
+	if(!Number.isFinite(width) || !Number.isFinite(height) || width < 20 || height < 12 || !worker) return Promise.resolve([]);
+	scale = Math.min(detailBandScale(height), 4096 / Math.max(width, height), Math.sqrt(4000000 / (width * height)));
 	target = document.createElement('canvas');
 	target.width = Math.round(width * scale);
 	target.height = Math.round(height * scale);
@@ -707,7 +830,7 @@ function ocrCodeScanBand(canvas, band) {
 	ctx.imageSmoothingEnabled = true;
 	ctx.imageSmoothingQuality = 'high';
 	ctx.drawImage(canvas, x0, y0, width, height, 0, 0, target.width, target.height);
-	return codeScanState.worker.recognize(target).then(function(result) {
+	return worker.recognize(target).then(function(result) {
 		var words = result && result.data && result.data.words || [];
 		return words.map(function(word) {
 			var box = word && word.bbox;
@@ -737,12 +860,13 @@ function addressLineCount(words, match) {
 }
 
 function withCodeScanDetailSegmentation(work) {
-	var worker = codeScanState.worker;
-	if(!worker || typeof worker.setParameters !== 'function') return Promise.resolve([]);
-	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(work).then(function(value) {
+	return runCodeScanWorkerTask(function(worker) {
+	if(typeof worker.setParameters !== 'function') return [];
+	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(function() { return work(worker); }).then(function(value) {
 		return worker.setParameters({ tessedit_pageseg_mode: '11' }).then(function() { return value; });
 	}, function(error) {
 		return worker.setParameters({ tessedit_pageseg_mode: '11' }).then(function() { throw error; });
+	});
 	});
 }
 
@@ -776,13 +900,15 @@ function enrichCodeScanMetadata(canvas, match) {
 	extra = [];
 	headingRows = 0;
 	addressRows = 0;
-	return withCodeScanDetailSegmentation(function() {
+	var epoch = codeScanState.workerEpoch;
+	return withCodeScanDetailSegmentation(function(worker) {
 		var chain = Promise.resolve();
 		bands.forEach(function(band) {
 			chain = chain.then(function() {
+				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 				if(band.role === 'above' && headingRows >= 2) return;
 				if(band.role === 'below' && addressRows >= 2) return;
-				return ocrCodeScanBand(canvas, band).then(function(words) {
+				return ocrCodeScanBand(canvas, band, worker).then(function(words) {
 					extra = extra.concat(words);
 					if(band.role === 'above') headingRows = headingRowCount(extra, match);
 					if(band.role === 'below') addressRows = addressLineCount(extra, match);
@@ -925,10 +1051,11 @@ function beginCodeScanCapture(detectedMatch) {
 }
 
 function processCodeScanCapture(detectedMatch) {
+	var session = codeScanState.session;
 	var canvas = getCodeScanCanvas();
 	var rawCanvas = codeScanState.originalSourceCanvas || canvas;
 	var ocrCanvas;
-	if(!codeScanState.worker || !canvas) {
+	if(!canvas) {
 		codeScanState.processing = false;
 		if(codeScanState.active)
 			showCodeScanReview(detectedMatch || null);
@@ -936,7 +1063,7 @@ function processCodeScanCapture(detectedMatch) {
 	}
 	ocrCanvas = canvas;
 	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
-		if(!codeScanState.active)
+		if(!isCurrentCodeScanSession(session))
 			return null;
 		var match = extractMatchFromOcrResult(result);
 		if(detectedMatch && (!match || match.code !== detectedMatch.code)) match = detectedMatch;
@@ -948,12 +1075,14 @@ function processCodeScanCapture(detectedMatch) {
 		}
 		return enrichCodeScanMetadata(ocrCanvas, match);
 	}).then(function(match) {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		if(!codeScanState.active)
 			return;
 		showCodeScanReview(match);
-		if(!match) setCodeScanStatus('');
+		if(!match) setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 	}).catch(function() {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		if(codeScanState.active)
 			showCodeScanReview(detectedMatch || null);
@@ -1280,6 +1409,7 @@ function rescanCodeScan(event) {
 		event.preventDefault();
 	if(!codeScanState.active)
 		return;
+	invalidateCodeScanSession();
 	codeScanState.hasCaptured = false;
 	codeScanState.originalSourceCanvas = null;
 	codeScanState.sourceCanvas = null;
@@ -1344,6 +1474,12 @@ function handleCodeScanPhotoInput(event) {
 	var file = event && event.target && event.target.files && event.target.files[0];
 	if(!file)
 		return;
+	if((file.type && file.type.indexOf('image/') !== 0) || file.size > 40000000) {
+		setCodeScanStatus('Choose an image smaller than 40 MB.');
+		return;
+	}
+	invalidateCodeScanSession();
+	var session = codeScanState.session;
 	codeScanState.reviewMatch = null;
 	resetCodeScanDetails();
 	if(!codeScanState.active) {
@@ -1363,9 +1499,10 @@ function handleCodeScanPhotoInput(event) {
 	stopCodeScanCamera();
 	setCodeScanStatus('Reading photo on your device...');
 	prepareCodeScanWorker().then(function() {
+		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 		return recognizeCodeScanPhoto(file);
 	}).then(function(result) {
-		if(!codeScanState.active)
+		if(!isCurrentCodeScanSession(session))
 			return;
 		setCodeScanFrozenPreview(true);
 		setCodeScanCropControlsVisible(true);
@@ -1373,18 +1510,22 @@ function handleCodeScanPhotoInput(event) {
 		var match = extractMatchFromOcrResult(result);
 		return enrichCodeScanMetadata(photoCanvas, match);
 	}).then(function(match) {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		if(!codeScanState.active || match === undefined)
 			return;
 		showCodeScanReview(match);
-		if(!match) setCodeScanStatus('');
+		if(!match) setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 	}).catch(function() {
+		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		codeScanState.hasCaptured = false;
 		if(codeScanState.active) {
 			setCodeScanFrozenPreview(false);
 			setCodeScanCropControlsVisible(false);
 			setCodeScanPhase('live');
+			setCodeScanLiveControlsVisible(true);
+			setCodeScanCaptureVisible(false);
 			setCodeScanPhotoFallbackVisible(true);
 			setCodeScanStatus('Could not read that photo. Try another shot or type the code.');
 		}
@@ -1392,11 +1533,18 @@ function handleCodeScanPhotoInput(event) {
 }
 
 function recognizeCodeScanPhoto(file) {
-	return new Promise(function(resolve, reject) {
-		var reader = new FileReader();
-		var image = new Image();
+	var session = codeScanState.session;
+	var finished = false;
+	var reader;
+	var image;
+	var reading = new Promise(function(resolve, reject) {
+		reader = new FileReader();
+		image = new Image();
 		reader.onload = function() {
+			if(finished || !isCurrentCodeScanSession(session)) { reject(codeScanCancelledError()); return; }
 			image.onload = function() {
+				try {
+				if(finished || !isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 				var canvas = getCodeScanCanvas();
 				var width;
 				var height;
@@ -1407,7 +1555,7 @@ function recognizeCodeScanPhoto(file) {
 				}
 				width = image.naturalWidth || image.width;
 				height = image.naturalHeight || image.height;
-				if(!width || !height) {
+				if(!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0 || width * height > CODE_SCAN_MAX_PHOTO_PIXELS || Math.max(width, height) > 16384) {
 					reject(new Error('Invalid photo dimensions'));
 					return;
 				}
@@ -1424,13 +1572,27 @@ function recognizeCodeScanPhoto(file) {
 					return;
 				}
 				recognizeCodeScanCanvas(ocrCanvas).then(resolve).catch(reject);
+				} catch(error) { reject(error); }
 			};
 			image.onerror = reject;
 			image.src = reader.result;
 		};
 		reader.onerror = reject;
+		reader.onabort = function() { reject(codeScanCancelledError()); };
 		reader.readAsDataURL(file);
 	});
+	function cleanup() {
+		finished = true;
+		if(reader) {
+			reader.onload = reader.onerror = reader.onabort = null;
+			if(reader.readyState === 1) reader.abort();
+		}
+		if(image) image.onload = image.onerror = null;
+	}
+	return waitForCodeScanWorker(reading, CODE_SCAN_LOAD_TIMEOUT_MS + CODE_SCAN_OCR_TIMEOUT_MS).then(function(result) {
+		cleanup();
+		return result;
+	}, function(error) { cleanup(); throw error; });
 }
 
 function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
@@ -1887,9 +2049,10 @@ function getCodeScanRenderedImageRect(canvas) {
 
 function applyCodeScanCrop() {
 	var revision = codeScanState.cropRevision;
+	var session = codeScanState.session;
 	var canvas = getCodeScanCanvas();
 	var source = codeScanState.originalSourceCanvas || codeScanState.sourceCanvas || canvas;
-	if(!canvas || !source || !codeScanState.worker || codeScanState.phase === 'processing') return;
+	if(!canvas || !source || codeScanState.phase === 'processing') return;
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = null;
 	var focus = { x: source.width / 2, y: source.height / 2 };
@@ -1906,11 +2069,12 @@ function applyCodeScanCrop() {
 	setCodeScanStatus('Reading label on your device...');
 	// Reframing changes candidate preference, never clips the card to the guide.
 	recognizeCodeScanCanvas(source, focus).then(function(result) {
-		if(!codeScanState.active) return;
+		if(!isCurrentCodeScanSession(session)) return;
 		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 		var match = extractMatchFromOcrResult(result);
 		return enrichCodeScanMetadata(source, match).then(function(detailed) {
-			if(!codeScanState.active || revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
+			if(!isCurrentCodeScanSession(session)) return;
+			if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 			if(detailed) {
 				showCodeScanReview(detailed);
 				setCodeScanStatus('Label recognized. Check the city and words.');
@@ -1921,7 +2085,7 @@ function applyCodeScanCrop() {
 			}
 		});
 	}).catch(function() {
-		if(!codeScanState.active) return;
+		if(!isCurrentCodeScanSession(session)) return;
 		setCodeScanPhase('review');
 		setCodeScanStatus('Recognition failed. Try again or edit the words.');
 	});

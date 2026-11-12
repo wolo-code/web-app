@@ -176,7 +176,7 @@ function locateExec(failure) {
 				accuCircle.setMap(null);
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
-			removeClassIfPresent(document.getElementById('proceed_container'), 'hide');
+			addClassIfPresent(document.getElementById('proceed_container'), 'hide');
 			removeClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 			document.getElementById('proceed_progress').style.transition = 'none';
 			document.getElementById('proceed_progress').style.width = "0%";
@@ -284,33 +284,28 @@ function locateExec(failure) {
 }
 
 function endWatchLocation() {
-	if(!locate_button_pressed) {
-		var pos;
-		if(myLocDot)
-			pos = resolveLatLng(myLocDot.getPosition());
-		if(pos != null)
-			processPosition(pos);
-		else
-			showNotification("Could not get your location.<br> Please move to a more open area and try again by pressing the location icon", NOTIFICATION_DURATION_LONG);
+	if(!locating)
+		return;
+	if(!lastWatchPos) {
+		clearLocating(true);
+		showNotification("Could not get your location.<br> Please move to a more open area and try again by pressing the location icon", NOTIFICATION_DURATION_LONG);
 	}
+	else if(!locate_button_pressed)
+		processPosition(lastWatchPos);
 }
 
 function proceedPosition() {
-	var pos;
-	if(myLocDot)
-		pos = resolveLatLng(myLocDot.getPosition());
-	if(pos != null) {
-		if(!selfBoundsChangedCount) {
-			map.panTo(pos);
-			var idleListenerPanBy = map.addListener('idle', function() {
-					idleListenerPanBy.remove();
-					applyMapChromePan();
-				});
-		}
-		processPosition(pos);
+	if(!locating || !lastWatchPos)
+		return;
+	var pos = lastWatchPos;
+	if(!selfBoundsChangedCount) {
+		map.panTo(pos);
+		var idleListenerPanBy = map.addListener('idle', function() {
+			idleListenerPanBy.remove();
+			applyMapChromePan();
+		});
 	}
-	else
-		handleLocationError(true);
+	processPosition(pos);
 }
 
 function processPosition(pos) {
@@ -319,22 +314,22 @@ function processPosition(pos) {
 		navigator.geolocation.clearWatch(watch_location_id);
 	clearTimeout(watch_location_timer);
 	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
+	if(initWCode) {
+		initWCode = false;
+		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
+		return;
+	}
 	addClassIfPresent(document.getElementById('accuracy_container'), 'highlight');
 	infoWindow_setContent(MESSAGE_LOADING);
 	showMarker(pos);
-	infoWindow.open(map, marker);
-	if(initWCode == false) {
-		encode(pos, true);
-		clearAddress();
-		getAddress(pos);
-	}
-	else {
-		initWCode = false;
-	}
-	
+	encode(pos, true);
+	clearAddress();
+	getAddress(pos);
 }
 
 function processPositionButtonDown() {
+	// A user-requested location supersedes the startup link.
+	initWCode = false;
 	armPositionButtonReleaseHandlers();
 	firstFocus = true;
 	if(typeof hideAddress == 'function') {
@@ -404,6 +399,7 @@ function clearLocating(hideAccuracyContainer) {
 	clearTimeout(watch_location_timer);
 	if(navigator.geolocation)
 		navigator.geolocation.clearWatch(watch_location_id);
+	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
 	if(hideAccuracyContainer)
 		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	locating = false;
@@ -448,7 +444,10 @@ function watch_location_notice() {
 	}
 	else
 		notification_duration = NOTIFICATION_DURATION_DEFAULT;
-	showNotification('Getting more accurate location <br> wait for a minute or choose "Proceed"', notification_duration);
+	var message = lastWatchPos
+		? 'Getting more accurate location <br> wait for a minute or choose "Proceed"'
+		: 'Waiting for your location';
+	showNotification(message, notification_duration);
 }
 
 function getCityFromPositionViaGMap(position, callback_success, callback_failure) {

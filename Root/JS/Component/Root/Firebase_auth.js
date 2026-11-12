@@ -14,6 +14,7 @@ function isFirebaseAuthAvailable() {
 		&& typeof firebase.auth === 'function'
 		&& firebase.auth.GoogleAuthProvider
 		&& firebase.auth.EmailAuthProvider
+		&& Array.isArray(firebase.apps)
 		&& firebase.apps.some(function(app) {
 			return app.name === '[DEFAULT]';
 		});

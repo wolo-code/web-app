@@ -165,3 +165,107 @@ test('initial URL decode waits for map readiness and resumes once map is availab
 	assert.equal(decodeCalls, 1);
 	assert.equal(api.pendingInitDataRun, false);
 });
+
+test('Proceed ignores missing and obsolete fixes and uses the current watch position once', () => {
+	const { api } = locateApi();
+	const positions = [];
+	api.myLocDot = { getPosition() { assert.fail('a previous marker is not a fresh fix'); } };
+	api.selfBoundsChangedCount = 1;
+	api.processPosition = position => {
+		positions.push(position);
+		api.clearLocating(true);
+	};
+	api.locating = true;
+	api.proceedPosition();
+	assert.equal(api.locating, true);
+	assert.deepEqual(positions, []);
+	const position = { lat: 12, lng: 34 };
+	api.noteWatchAccuracy(20, position);
+	api.proceedPosition();
+	api.proceedPosition();
+	assert.deepEqual(positions, [position]);
+});
+
+test('a locate watch that never gets a fix releases its loader and can be retried', () => {
+	const { api, watches } = locateApi();
+	let loaders = 0;
+	api.pushLoader = () => { loaders++; };
+	api.popLoader = () => { loaders--; };
+	api.NOTIFICATION_DURATION_LONG = 1000;
+	api.locateExec();
+	api.endWatchLocation();
+	assert.equal(api.locating, false);
+	assert.equal(loaders, 0);
+	api.locateExec();
+	assert.equal(watches.length, 2);
+	assert.equal(loaders, 1);
+});
+
+test('a failed or superseded city selection preserves the current card', () => {
+	const lookups = [];
+	const selections = [];
+	const notices = [];
+	const api = {
+		marker: {},
+		setTimeout() { return 1; },
+		clearTimeout() {},
+		document: { getElementById() { return { innerHTML: '' }; } },
+		hideOverlay() {},
+		infoWindow_setContent() { assert.fail('the existing card should stay visible'); },
+		getCityFromCityGp_id(_id, _session, success, failure) { lookups.push({ success, failure }); },
+		getCityCenterFromId(city, callback) { callback(city); },
+		addCity(_id, _success, failure) { failure(); },
+		showNotification(message) { notices.push(message); }
+	};
+	vm.runInNewContext(read('JS/Component/Root/ChooseCity_by_periphery.js'), api);
+	api.chooseCity_by_periphery_gpid = [{ city: { gp_id: 'a' } }, { city: { gp_id: 'b' } }];
+	api.chooseCity_by_periphery_Callback = city => selections.push(city);
+	api.chooseCity_by_periphery_gpid_Continue({ currentTarget: { data_id: 0 } });
+	lookups[0].failure();
+	assert.equal(notices.length, 1);
+	api.chooseCity_by_periphery_gpid_Continue({ currentTarget: { data_id: 0 } });
+	api.chooseCity_by_periphery_gpid_Continue({ currentTarget: { data_id: 1 } });
+	const city = { center: { lat: 12, lng: 34 } };
+	lookups[1].success(city);
+	lookups[2].success(city);
+	assert.deepEqual(selections, [city]);
+});
+
+test('city creation settles failed and superseded requests without leaking the loader', () => {
+	const requests = [];
+	const added = [];
+	let failures = 0;
+	let loaders = 0;
+	class FakeRequest {
+		constructor() { requests.push(this); }
+		open() {}
+		setRequestHeader() {}
+		send() {}
+		complete(status, responseText) {
+			this.status = status;
+			this.responseText = responseText;
+			this.onloadend();
+		}
+	}
+	const api = {
+		XMLHttpRequest: FakeRequest,
+		FUNCTIONS_BASE_URL: '',
+		curAddCityRequestId: 0,
+		isUsableCityId: id => Boolean(id),
+		pushLoader() { loaders++; },
+		popLoader() { loaders--; }
+	};
+	vm.runInNewContext(read('JS/Component/Root/Code/AddCity.js'), api);
+	const request = () => api.addCity('place-id', id => added.push(id), () => { failures++; });
+	request();
+	request();
+	requests[0].complete(200, '{"added":"obsolete"}');
+	requests[1].complete(0, '');
+	request();
+	requests[2].complete(200, 'malformed JSON');
+	request();
+	requests[3].complete(200, '{"added":"current"}');
+	assert.equal(loaders, 0);
+	assert.equal(failures, 2);
+	assert.deepEqual(added, ['current']);
+});

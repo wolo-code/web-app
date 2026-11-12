@@ -61,33 +61,51 @@ function chooseCity_by_periphery(list, callback) {
 }
 
 function chooseCity_by_periphery_Continue(e) {
-	infoWindow_setContent(MESSAGE_LOADING);
+	var entry = chooseCity_by_periphery_List[e.currentTarget.data_id];
 	hideChooseCity_by_periphery_Message();
-	var id = e.currentTarget.data_id;
-	var city = chooseCity_by_periphery_List[id].city;
-	chooseCity_by_periphery_Callback(city);
+	if(entry && marker && typeof chooseCity_by_periphery_Callback === 'function')
+		chooseCity_by_periphery_Callback(entry.city);
 }
 
 function chooseCity_by_periphery_gpid_Continue(e) {
-	infoWindow_setContent(MESSAGE_LOADING);
+	var entry = chooseCity_by_periphery_gpid[e.currentTarget.data_id];
+	var selectCity = chooseCity_by_periphery_Callback;
 	hideChooseCity_by_periphery_Message();
-	var id = e.currentTarget.data_id;
-	var gp_id = chooseCity_by_periphery_gpid[id].city.gp_id;
-	getCityFromCityGp_id (
-		gp_id,
-		function(city) {
-			getCityCenterFromId(city, function(city) {
-				chooseCity_by_periphery_Callback(city);
-			});
-		},
-		function() {
-			addCity(gp_id, function(city_id) {
-				getCityFromId(city_id, function(city) {
-					getCityCenterFromId(city, function(city) {
-						chooseCity_by_periphery_Callback(city);
-					})
-				})
-			})
+	if(!entry || !marker || typeof selectCity !== 'function')
+		return;
+
+	var gpId = entry.city.gp_id;
+	var selectedMarker = marker;
+	var session = encode_session_id = Symbol();
+	var timeout = setTimeout(function() { finish(null); }, 15000);
+
+	function isCurrent() {
+		return session === encode_session_id && selectedMarker === marker;
+	}
+
+	function finish(city) {
+		clearTimeout(timeout);
+		if(!isCurrent())
+			return;
+		if(city && city.center)
+			selectCity(city);
+		else {
+			encode_session_id = Symbol();
+			showNotification('Could not load that city. Choose it again to retry.');
 		}
-	);
+	}
+
+	function loadCenter(city) {
+		if(isCurrent())
+			getCityCenterFromId(city, finish);
+	}
+
+	getCityFromCityGp_id(gpId, session, loadCenter, function() {
+		if(!isCurrent())
+			return;
+		addCity(gpId, function(cityId) {
+			if(isCurrent())
+				getCityFromId(cityId, loadCenter, {notify: false});
+		}, function() { finish(null); });
+	});
 }

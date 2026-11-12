@@ -17,21 +17,27 @@ function encode(position, locating_encode) {
 		}
 		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) return;
 	}
+	// The regional code can be generated locally if city services stop responding.
+	var timeout = setTimeout(function() { finish(null); }, 20000);
+
+	function finish(city) {
+		clearTimeout(timeout);
+		if(session_id !== encode_session_id)
+			return;
+		if(city && city.gp_id) {
+			if(locating_encode === true)
+				current_city_gp_id = city.gp_id;
+			setCurrentCity_status(current_city_gp_id == city.gp_id);
+		}
+		encode_continue(city, position);
+	}
+
 	getAddress(position, session_id, function(address_components) {
 		var localityIds = [...new Set(address_components
 			.filter(result => result.place_id && result.types.includes('locality'))
 			.map(result => result.place_id))];
 		var fallbackId = getCityGpId(address_components.filter(result => !result.types.includes('locality')));
 		var localityHints = getNestedLocalityHints(address_components);
-
-		function finish(city) {
-			if(city && city.gp_id) {
-				if(locating_encode === true)
-					current_city_gp_id = city.gp_id;
-				setCurrentCity_status(current_city_gp_id == city.gp_id);
-			}
-			encode_continue(city, position);
-		}
 
 		function lookupCoveringCity(id, found, next) {
 			getCityFromCityGp_id(id, session_id, function(city) {

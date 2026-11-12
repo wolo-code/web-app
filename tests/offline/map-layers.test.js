@@ -806,6 +806,7 @@ test('FirebaseUI missing or deferred does not crash authInit or trigger crash pr
 	const context = {
 		console: { warn: () => {} },
 		firebase: {
+			apps: [{ name: '[DEFAULT]' }],
 			auth: () => ({}),
 		}
 	};

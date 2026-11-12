@@ -62,9 +62,9 @@
 
 @media (max-width: 662px) {
 	html:not(.dark-mode) .message_dialog_close.message_dialog_toolbar_button {
-		background: #e8f0f3;
-		border: 1px solid #7b919a;
-		color: #1f4e5f;
+		background: #f3f3f3;
+		border: 1px solid #e7e7e7;
+		color: #898888;
 	}
 }
 

@@ -64,11 +64,15 @@ function loadEncoder({ results, nearby = [suburb, parent], catalog = [parent, su
 	const encoded = [];
 	const lookedUp = [];
 	const pending = [];
+	const timers = new Map();
+	let timerId = 0;
 	const context = vm.createContext();
 	for (const file of ['Code/Core.js', 'Code/Code.js', 'City.js', 'Util.js']) {
 		vm.runInContext(read('Root/JS/Component/Root/' + file), context);
 	}
 	Object.assign(context, {
+		setTimeout(callback, delay) { timers.set(++timerId, { callback, delay }); return timerId; },
+		clearTimeout(id) { timers.delete(id); },
 		clearCode() {},
 		getAddress(_position, session, callback) { context.sessionForwarder(session, callback, [results]); },
 		getCityFromCityGp_id(id, session, success, failure) {
@@ -113,7 +117,7 @@ function loadEncoder({ results, nearby = [suburb, parent], catalog = [parent, su
 		current_city_gp_id: null
 	});
 	context.encode_ = city => encoded.push(city.id);
-	return { context, encoded, lookedUp, pending };
+	return { context, encoded, lookedUp, pending, timers };
 }
 
 test('encoding tries locality IDs in order and keeps the closer sublocality selectable', () => {
@@ -165,4 +169,47 @@ test('an older city lookup cannot overwrite a later click, even in the same cloc
 	pending[1]();
 	pending[0]();
 	assert.deepEqual(encoded, ['bengaluru']);
+});
+
+test('a nearby city without a detail record does not block regional encoding', () => {
+	const { context, encoded, timers } = loadEncoder({ results: [], nearby: [suburb] });
+	context.getCityFromId = (_id, callback, options) => {
+		if (options?.notify === false) callback(null);
+	};
+	context.encode(point);
+	assert.deepEqual(encoded, ['region']);
+	assert.equal(timers.size, 0);
+});
+
+test('a stalled nearby query is cancelled and falls back to a regional code', () => {
+	const { context, encoded, timers } = loadEncoder({ results: [] });
+	let ready;
+	let cancellations = 0;
+	let loaders = 0;
+	context.geoFire.query = () => ({
+		cancel() { cancellations++; },
+		on(event, callback) { if (event === 'ready') ready = callback; }
+	});
+	context.pushLoader = () => { loaders++; };
+	context.popLoader = () => { loaders--; };
+	context.encode(point);
+	[...timers.values()].find(timer => timer.delay === 10000).callback();
+	ready();
+	assert.equal(cancellations, 1);
+	assert.equal(loaders, 0);
+	assert.deepEqual(encoded, ['region']);
+	assert.equal(timers.size, 0);
+});
+
+test('a stalled address lookup falls back and a late reply cannot overwrite the code', () => {
+	const { context, encoded, timers } = loadEncoder({ results: [] });
+	let reply;
+	context.getAddress = (_position, session, callback) => {
+		reply = () => context.sessionForwarder(session, callback, [[locality('parent')]]);
+	};
+	context.encode(point);
+	[...timers.values()][0].callback();
+	reply();
+	assert.deepEqual(encoded, ['region']);
+	assert.equal(timers.size, 0);
 });

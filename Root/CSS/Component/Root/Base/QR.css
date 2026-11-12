@@ -4,13 +4,18 @@
 }
 
 #qr_body {
+	--qr-label-accent: #1F4E5F;
 	position: relative;
-	border-top: 6px solid #69b7cf;
+	border-top: 6px solid var(--qr-label-accent);
 	font-family: Abel;
 	margin: 0 auto;
 	text-align: left;
 	background-color: #FFFFFF;
 	color: #999999;
+}
+
+#qr_body.qr-preview {
+	--qr-label-accent: #333333;
 }
 
 .raster #qr_body {
@@ -105,7 +110,7 @@
 	justify-content: center;
 	margin-inline: auto;
 	text-align: center;
-	color: #69b7cf;
+	color: var(--qr-label-accent);
 	padding-left: 12px;
 	padding-top: 8px;
 	padding-bottom: 8px;
@@ -147,7 +152,7 @@
 
 #qr_webapp_url {
 	color: #ffffff;
-	background-color: #69B7CF;
+	background-color: var(--qr-label-accent);
 	font-size: medium;
 	padding-top: 7px;
 	padding-bottom: 10px;

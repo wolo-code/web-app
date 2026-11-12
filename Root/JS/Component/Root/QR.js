@@ -109,6 +109,7 @@ function toggleQRAddressSplit() {
 
 function previewQR_activate() {
 	mode_preview = true;
+	addClassIfPresent(document.getElementById('qr_body'), 'qr-preview');
 	hideEmptyElsePreview(document.getElementById('qr_title_main'));
 	hideEmptyElsePreview(document.getElementById('qr_title_segment'));
 	var text = qr_address_active_first ? '' : formatSavedAddress(getQRDialogAddressLines());
@@ -121,6 +122,7 @@ function previewQR_activate() {
 
 function previewQR_deactivate() {
 	mode_preview = false;
+	removeClassIfPresent(document.getElementById('qr_body'), 'qr-preview');
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_main'));
 	unHideEmptyAndRemovePreview(document.getElementById('qr_title_segment'));
 	document.getElementById('qr_address_preview').hidden = true;

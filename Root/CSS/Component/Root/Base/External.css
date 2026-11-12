@@ -1,17 +1,12 @@
+#external_message {
+	border-radius: 10px;
+}
+
 #external_close {
 	left: 50%;
 	right: auto;
-	bottom: auto;
-	/* The centered overlay wrapper reserves 50px above the modal. */
-	top: min(-26px, calc(25% - 25dvh - 14px));
-	translate: -50% -50%;
-}
-
-@media (max-width: 662px) {
-	#external_close {
-		/* The narrow overlay adds 20px of top padding. */
-		top: min(-36px, calc(25% - 25dvh - 14px));
-	}
+	bottom: calc(100% + 6px);
+	translate: -50% 0;
 }
 
 #external_wcode {
@@ -57,16 +52,32 @@
 	margin-top: 20px;
 }
 
+#external_address_container {
+	display: grid;
+	grid-template-rows: minmax(0, 1fr);
+	place-items: center;
+	width: min(100%, 244px);
+	/* Reserve four address lines, including the text padding. */
+	block-size: calc(5em + 4px);
+	margin: 6px auto 20px;
+}
+
 #external_address {
+	box-sizing: border-box;
+	width: 100%;
+	max-block-size: 100%;
+	overflow-y: auto;
+	overflow-wrap: anywhere;
+	line-height: 1.25;
 	text-align: center;
-	width: 240px;
-	margin-top: 6px;
-	margin-bottom: 20px;
-	padding: 2px 2px;
+	padding: 2px;
 }
 
 #external_address_loader {
-	margin: 6px auto 20px;
+	width: 36px;
+	height: 36px;
+	border-width: 4px;
+	margin: 0;
 }
 
 #external_webapp_url {

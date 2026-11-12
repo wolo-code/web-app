@@ -1,14 +1,14 @@
 
 <div id='qr_container' class='hide'>
-	<h2 class='message_dialog_label section-to-not-print'>
-		Label
-	</h2>
-	<button id='qr_save' class="message_dialog_close message_dialog_toolbar_button message_dialog_leading_action control section-to-not-print" type='button' title='Save to address book' aria-label='Save to address book'>
-		<span class='image'><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' aria-hidden='true'><path class='qr_bookmark_outline' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.55l5-2.86 5 2.86V5z'/><path class='qr_bookmark_filled' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z'/></svg></span><span id='qr_bookmark_changed' class='hide' aria-hidden='true'>*</span>
-	</button>
-	<button id='qr_close' class="message_dialog_close message_dialog_toolbar_button control section-to-not-print" type='button' aria-label='Close'>
-		<span class='image'><?php includeSVG('', 'Close'); ?></span>
-	</button>
+	<div class='qr-header section-to-not-print'>
+		<h2 class='message_dialog_label'>Label</h2>
+		<button id='qr_save' class="message_dialog_close message_dialog_toolbar_button message_dialog_leading_action control" type='button' title='Save to address book' aria-label='Save to address book'>
+			<span class='image'><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' aria-hidden='true'><path class='qr_bookmark_outline' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1zm1 2v12.55l5-2.86 5 2.86V5z'/><path class='qr_bookmark_filled' fill='#69b7cf' d='M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z'/></svg></span><span id='qr_bookmark_changed' class='hide' aria-hidden='true'>*</span>
+		</button>
+		<button id='qr_close' class="message_dialog_close message_dialog_toolbar_button control" type='button' aria-label='Close'>
+			<span class='image'><?php includeSVG('', 'Close'); ?></span>
+		</button>
+	</div>
 	<div id='qr_body'>
 		<div id='qr_label' class='center'>
 			<div id='logo_qr'>

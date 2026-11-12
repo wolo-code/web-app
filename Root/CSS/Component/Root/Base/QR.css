@@ -3,6 +3,30 @@
 	padding-inline: 5px;
 }
 
+.qr-header {
+	display: grid;
+	grid-template: "bookmark title close" / 44px minmax(0, 1fr) 44px;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.qr-header h2.message_dialog_label {
+	grid-area: title;
+	margin: 0;
+}
+
+.qr-header .message_dialog_close.message_dialog_toolbar_button {
+	position: static;
+}
+
+#qr_save {
+	grid-area: bookmark;
+}
+
+#qr_close {
+	grid-area: close;
+}
+
 #qr_body {
 	--qr-label-accent: #1F4E5F;
 	position: relative;

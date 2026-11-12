@@ -2,6 +2,16 @@
 	#overlay > div > #qr_container {
 		padding-inline: 15px;
 	}
+
+	html:not(.dark-mode) .qr-header .message_dialog_toolbar_button {
+		background: #e8f0f3;
+		border: 1px solid #7b919a;
+		color: #1f4e5f;
+	}
+
+	html:not(.dark-mode) .qr-header #qr_save svg path {
+		fill: currentColor;
+	}
 }
 
 @media (max-width: 480px) {

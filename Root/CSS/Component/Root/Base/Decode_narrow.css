@@ -10,24 +10,19 @@
 
 	#logo_surface {
 		box-sizing: border-box;
-		width: 100%;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(min-content, 1fr);
 		height: 66px;
-		align-items: flex-end;
-		flex-direction: row;
+		width: 100%;
 	}
 
-	#logo_codes {
-		padding-bottom: 6px;
-	}
-
-	#logo a {
-		flex: 1;
-		min-width: 0;
-	}
-
-	#logo :is(#logo_wolo, #logo_codes) > .image > svg {
+	#logo_wolo > .image > svg {
 		width: 100%;
 		height: auto;
+	}
+
+	#logo_surface > #logo_codes {
+		justify-self: start;
 	}
 
 	body:not(.decode) #saved_button {

@@ -70,6 +70,11 @@
 #logo_codes_info,
 #logo_codes_qr {
 	justify-self: start;
+}
+
+#logo_surface > #logo_codes,
+#logo_codes_info,
+#logo_codes_qr {
 	margin-bottom: 6px;
 }
 
@@ -78,13 +83,15 @@
 	height: 50px;
 }
 
+#logo_surface > #logo_codes > .image,
 #logo_codes_info > .image,
 #logo_codes_qr > .image {
 	display: block;
 	overflow: hidden;
-	width: 62px;
+	width: var(--app-logo-code-width);
 }
 
+#logo_surface > #logo_codes > .image > svg,
 #logo_codes_info > .image > svg,
 #logo_codes_qr > .image > svg {
 	display: block;
@@ -296,7 +303,7 @@
 #info_format_tabs > button {
 	flex: 1 1 0;
 	min-width: 0;
-	padding: 4px 8px;
+	padding: 4px 10px;
 	border: 0;
 	background: transparent;
 	color: #767676;

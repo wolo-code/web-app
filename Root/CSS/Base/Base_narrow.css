@@ -61,17 +61,6 @@
 			transform: translateX(calc(-50% + var(--app-logo-offset-x)));
 		}
 
-		#logo_surface {
-			align-items: flex-end;
-			flex-direction: row;
-			max-width: 100%;
-			vertical-align: top;
-		}
-
-		#logo_codes {
-			padding-bottom: 4px;
-		}
-		
 		#notification_top {
 			top: calc(168px + var(--app-safe-top)) !important;
 		}
@@ -90,15 +79,6 @@
 }
 
 @media (max-width: 316px) {
-	#logo_surface {
-		align-items: center;
-		flex-direction: column;
-	}
-
-	#logo_codes {
-		padding-bottom: 2px;
-	}
-
 	#map_search_bar {
 		margin-top: 116px;
 	}

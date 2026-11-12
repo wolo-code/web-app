@@ -73,8 +73,14 @@
 }
 
 #qr_wcode {
-	padding-top: 28px;
-	padding-inline: clamp(0px, calc((100% - 278px) / 2), 40px);
+	padding: 20px;
+}
+
+@media screen and (max-width: 480px) {
+	#qr_wcode {
+		padding: 28px 0 0;
+		padding-inline: clamp(0px, calc((100% - 278px) / 2), 40px);
+	}
 }
 
 #qr_sticker_title {

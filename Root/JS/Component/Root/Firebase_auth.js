@@ -13,7 +13,10 @@ function isFirebaseAuthAvailable() {
 		&& firebase
 		&& typeof firebase.auth === 'function'
 		&& firebase.auth.GoogleAuthProvider
-		&& firebase.auth.EmailAuthProvider;
+		&& firebase.auth.EmailAuthProvider
+		&& firebase.apps.some(function(app) {
+			return app.name === '[DEFAULT]';
+		});
 }
 
 function authInit() {

@@ -153,6 +153,42 @@ test('a failed Database SDK retry does not open the crash dialog', () => {
 	assert.match(api.notifications[0] || '', /cached data while Firebase is unavailable/);
 });
 
+test('authInit waits for the default Firebase app and FirebaseUI in either load order', () => {
+	for (const uiLoadsFirst of [true, false]) {
+		const api = loadFirebaseApi({
+			firebase: {
+				apps: [{ name: 'named-app' }],
+				auth: Object.assign(function() {
+					assert.ok(api.firebase.apps.some(app => app.name === '[DEFAULT]'));
+					return {};
+				}, { GoogleAuthProvider: {}, EmailAuthProvider: {} }),
+				database: function() {
+					return { ref: function() { return {}; } };
+				},
+				initializeApp: function() {
+					api.firebase.apps.push({ name: '[DEFAULT]' });
+				}
+			}
+		});
+		api.console = { warn: assert.fail };
+		vm.runInContext(read('Root/JS/Component/Root/Firebase_auth.js'), api);
+		const firebaseui = { auth: { AuthUI: function(auth) { this.auth = auth; } } };
+
+		if (uiLoadsFirst) {
+			api.firebaseui = firebaseui;
+			assert.equal(api.authInit(), false);
+			assert.equal(api.firebaseInit(), true);
+		} else {
+			assert.equal(api.firebaseInit(), true);
+			assert.equal(api.ui, undefined);
+			api.firebaseui = firebaseui;
+			assert.equal(api.authInit(), true);
+		}
+
+		assert.ok(api.ui instanceof firebaseui.auth.AuthUI);
+	}
+});
+
 test('isOfflineMode treats a missing Firebase client as offline data mode', () => {
 	const api = loadOfflineModeApi();
 	assert.equal(api.isOfflineMode(), false);

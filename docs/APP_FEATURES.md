@@ -99,6 +99,8 @@ The QR label opens with the resolved Google address when the location has no sav
 
 ## Account And Saved Data
 
+The sign-in widget starts once the default Firebase app and FirebaseUI are both ready.
+
 | Feature | Current implementation signal | Notes |
 | --- | --- | --- |
 | Firebase Auth | `firebase.auth()`, `signedIn()` | Handles redirect result, current user state, display name, email, and profile image. |

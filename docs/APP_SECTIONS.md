@@ -227,7 +227,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Brand lockup | App Logo | `#logo`, `#logo_surface`, `#logo_wolo`, `#logo_codes` | Top-right | Persistent brand link visible across the app views. `#logo_surface` draws an 8px padded frosted rectangle around the Wolo + CODE lockup on map views, Wolo Code Input View, and the World-map icon-guide overlay, in light and dark mode. |
-| Account entry | Account Button | `#account` | Wolo Code Input View: top-left; map views desktop: top-right beside App Logo; mobile: top-right | Opens sign-in, account, and saved-address flows. |
+| Account entry | Account Button | `#account` | Wolo Code Input View: top-left; map views desktop: top-right beside App Logo; mobile: top-right | Opens sign-in, account, and saved-address flows. The sign-in widget requires both the default Firebase app and FirebaseUI to be ready. |
 | Bottom-left chrome host | Action Menu | `#action_menu` | Bottom-left | Hosts the Info Action on Wolo Code Input View, and both Info Action and Wolo Code Input Action on map views (Info first). The expandable radial menu is withdrawn. |
 | About/help action | Info Action | `#action_menu_info`, `showInfo()` | Bottom-left on Wolo Code Input View; immediately before Wolo Code Input Action on map views | Opens app information and related links. |
 | View toggle action | Wolo Code Input Action | `#action_menu_decode`, `toggleDecodeView()` | Bottom-left on map views, after Info Action | Switches from map views to Wolo Code Input View. Hidden on Wolo Code Input View; use Terrain Map View Button instead. |

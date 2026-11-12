@@ -13,14 +13,6 @@
 		z-index: 10001;
 	}
 
-	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo #logo_surface {
-		align-items: flex-end;
-	}
-
-	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo #logo_codes {
-		padding-bottom: 6px;
-	}
-
 	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #footer-content-container {
 		bottom: calc(8px + env(safe-area-inset-bottom, 0px));
 		pointer-events: none;

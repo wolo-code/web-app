@@ -20,7 +20,7 @@ function external_show(latLng, city_string, wcode_string) {
 	showOverlay(document.getElementById('external_message'));
 	document.getElementById('external_wcode_city').innerText = city_string;
 	document.getElementById('external_wcode_code').innerText = wcode_string;
-	document.getElementById('external_address').innerText = '';
+	document.getElementById('external_address').textContent = '';
 	document.body.classList.add('external');
 }
 

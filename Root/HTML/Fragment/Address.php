@@ -14,6 +14,7 @@
 	</div>
 	<div id='address_text_main'>
 		<div id='address_text_body'>
+			<span id='address_text_loader' class='loader address_lookup_loader hide' role='status' aria-label='Loading address'></span>
 			<span id='address_text_content'></span>
 			<button type='button' id='address_text_address_qr' class='address_qr_button control hide' data-code-qr='address' title='Show address QR' aria-label='Show address QR'>
 				<span class='image'><?php includeSVG('', 'QR'); ?></span>

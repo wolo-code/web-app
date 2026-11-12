@@ -188,6 +188,83 @@ test('opening a saved address carries both lines to the map panel, reopened form
  assert.deepEqual(plain(c.getAccountDialogSaveAddressLines()), lines);
 });
 
+function addressLookupHarness() {
+ const { context: c, fields } = harness();
+ const requests = [];
+ const timers = new Map();
+ for (const id of ['address_text', 'address_text_content', 'address_text_loader', 'external_message', 'external_address', 'external_address_loader', 'external_wcode_city', 'external_wcode_code']) {
+  const classes = new Set();
+  fields[id] = {
+   textContent: '',
+   classList: {
+    contains: name => classes.has(name),
+    remove: name => classes.delete(name),
+    toggle: (name, enabled) => enabled ? classes.add(name) : classes.delete(name)
+   }
+  };
+ }
+ Object.assign(c, {
+  address: null, latLng_p: null, code_plus_code: null,
+  current_title: '', current_segment: '', keepAddressPanelOpen: false,
+  initWCode_jump_ask: true, initWCode_jumpToMap: false, mapSelectionVersion: 0,
+  google: { maps: { Geocoder: class { geocode(_query, callback) { requests.push(callback); } } } },
+  setTimeout: callback => { const id = Symbol(); timers.set(id, callback); return id; },
+  clearTimeout: id => timers.delete(id),
+  focus__() {}, showOverlay() {}, getCity_by_address_list() {}, getCityGpId() {},
+  setCurrentCity_status() {}, extractPlusCodeFromGeocode() {}, getPlusCodeForPosition() {}
+ });
+ c.document.body = { classList: { add() {} } };
+ for (const file of ['External.js', 'Code/Code.js'])
+  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/' + file, 'utf8'), c);
+ return { c, fields, requests, timers };
+}
+
+test('a direct decode shows the code and replaces the address loader when the lookup returns', () => {
+ const { c, fields, requests } = addressLookupHarness();
+ c.setCodeCoord({ name: 'Bengaluru' }, { lat: 12.97, lng: 77.59 }, ['diesel', 'hall', 'planet']);
+ c.showAddress();
+ assert.equal(fields.external_wcode_city.innerText, 'Bengaluru');
+ assert.equal(fields.external_wcode_code.innerText, 'diesel hall planet');
+ for (const id of ['external_address_loader', 'address_text_loader'])
+  assert.equal(fields[id].classList.contains('hide'), false);
+ assert.equal(fields.external_address.classList.contains('hide'), true);
+ assert.equal(fields.address_text_content.classList.contains('hide'), true);
+
+ requests[0]([{ formatted_address: '12 MG Road' }], 'OK');
+ for (const id of ['external_address_loader', 'address_text_loader'])
+  assert.equal(fields[id].classList.contains('hide'), true);
+ assert.equal(fields.external_address.textContent, '12 MG Road');
+ assert.equal(fields.address_text_content.textContent, '12 MG Road');
+ assert.equal(fields.external_address.classList.contains('hide'), false);
+ assert.equal(fields.address_text_content.classList.contains('hide'), false);
+});
+
+test('an address lookup clears its loader on no results, timeout, and selection change', () => {
+ const { c, fields, requests, timers } = addressLookupHarness();
+ const point = { lat: 12.97, lng: 77.59 };
+ const loader = fields.address_text_loader;
+ c.getAddress(point);
+ requests[0]([], 'ZERO_RESULTS');
+ assert.equal(loader.classList.contains('hide'), true);
+
+ c.getAddress(point);
+ timers.values().next().value();
+ assert.equal(loader.classList.contains('hide'), true);
+
+ c.getAddress(point);
+ c.mapSelectionVersion++;
+ c.clearAddress();
+ c.getAddress(point);
+ requests[2]([{ formatted_address: 'Stale address' }], 'OK');
+ assert.equal(loader.classList.contains('hide'), false);
+ assert.equal(fields.address_text_content.textContent, '');
+
+ c.current_address_lines = lines;
+ c.showAddress();
+ assert.equal(loader.classList.contains('hide'), true);
+ assert.equal(fields.address_text_content.textContent, '12 MG Road\nFlat 4B, second floor');
+});
+
 test('label split/merge remembers boundaries and merged save clears line 2', () => {
  const { context: c, fields, focused } = harness(); let saved;
  c.firebase = { auth: () => ({ currentUser: null }) };

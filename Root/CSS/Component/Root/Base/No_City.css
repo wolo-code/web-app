@@ -16,6 +16,18 @@
 	animation: spin 2s linear infinite;
 }
 
+.loader.address_lookup_loader {
+	box-sizing: border-box;
+	border-width: 3px;
+	width: 24px;
+	height: 24px;
+	margin: 18px auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.loader.address_lookup_loader { animation: none; }
+}
+
 @keyframes spin {
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }

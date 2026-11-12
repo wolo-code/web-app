@@ -256,6 +256,7 @@ test('reverse geocoding preserves the scanned address and open infocard', () => 
 	let finishGeocoding;
 	const context = {
 		google: { maps: { Geocoder: function() { this.geocode = (query, done) => finishGeocoding = done; } } },
+		document: { getElementById: () => null }, setTimeout, clearTimeout,
 		current_address_lines: candidate().metadata, current_title: 'Ram', keepAddressPanelOpen: true,
 		pendingCitySubmit: false, extractPlusCodeFromGeocode: () => null, getPlusCodeForPosition: () => null,
 		getCity_by_address_list() {}, getCityGpId: () => null, setCurrentCity_status() {}, refreshAddressCodes() {},

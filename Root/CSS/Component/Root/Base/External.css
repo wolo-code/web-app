@@ -49,6 +49,10 @@
 	padding: 2px 2px;
 }
 
+#external_address_loader {
+	margin: 6px auto 20px;
+}
+
 #external_webapp_url {
 	color: #ffffff;
 	background-color: #69B7CF;

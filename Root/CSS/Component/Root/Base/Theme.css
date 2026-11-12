@@ -470,7 +470,8 @@ html.dark-mode #no_city_message {
 	color: #b8b8b8;
 }
 
-html.dark-mode #no_city_message .loader {
+html.dark-mode #no_city_message .loader,
+html.dark-mode .address_lookup_loader {
 	border-color: #33335a;
 	border-top-color: #69B7CF;
 }

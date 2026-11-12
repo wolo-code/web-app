@@ -2,10 +2,38 @@
 // var address;
 // var gpId;
 
+var addressLookupTimer = null;
+
+function syncAddressLoaders() {
+	syncAddressLoader('address_text_loader', 'address_text_content');
+	syncAddressLoader('external_address_loader', 'external_address');
+}
+
+function syncAddressLoader(loaderId, contentId) {
+	var loader = document.getElementById(loaderId);
+	var content = document.getElementById(contentId);
+	if(!loader || !content)
+		return;
+	var loading = addressLookupTimer !== null && !content.textContent.trim();
+	loader.classList.toggle('hide', !loading);
+	content.classList.toggle('hide', loading);
+}
+
+function finishAddressLookup() {
+	clearTimeout(addressLookupTimer);
+	addressLookupTimer = null;
+	syncAddressLoaders();
+}
+
 function getAddress(latLng, session_id, callback) {
 	var geocoder = new google.maps.Geocoder;
 	var selectionVersion = typeof mapSelectionVersion === 'number' ? mapSelectionVersion : null;
+	clearTimeout(addressLookupTimer);
+	var lookupTimer = addressLookupTimer = setTimeout(finishAddressLookup, 20000);
+	syncAddressLoaders();
 	geocoder.geocode({'location': latLng}, function(address_components, status) {
+		if(lookupTimer === addressLookupTimer)
+			finishAddressLookup();
 		if((selectionVersion !== null && selectionVersion !== mapSelectionVersion) ||
 			(session_id != null && session_id !== encode_session_id))
 			return;
@@ -22,10 +50,7 @@ function getAddress(latLng, session_id, callback) {
 				else {
 					setCurrentCity_status(true);
 				}
-				if(!current_title)
-					refreshAddress();
-				else
-					refreshAddressCodes();
+				refreshAddress();
 				if(typeof callback != 'undefined') {
 					sessionForwarder(session_id, callback, [address_components]);
 				}
@@ -85,8 +110,10 @@ function showAddress() {
 		setAddressPanelHeading('', '');
 	else
 		setAddressPanelHeading(current_title, current_segment);
-	if(address_text_content)
-		address_text_content.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
+	var content = document.getElementById('address_text_content');
+	if(content)
+		content.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
+	syncAddressLoaders();
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -115,17 +142,21 @@ function clearAddress() {
 	code_plus_code = null;
 	if(content)
 		content.textContent = '';
+	finishAddressLookup();
 	clearAddressCodeRows();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
 }
 
 function refreshAddress() {
+	var text = current_address_lines ? formatSavedAddress(current_address_lines) : (address || '');
 	var content = document.getElementById('address_text_content');
+	var preview = document.getElementById('external_address');
 	if(content)
-		content.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : address;
-	if(typeof external_address != 'undefined' && external_address)
-		external_address.textContent = current_address_lines ? formatSavedAddress(current_address_lines) : address;
+		content.textContent = text;
+	if(preview)
+		preview.textContent = text;
+	syncAddressLoaders();
 	refreshAddressCodes();
 	if(typeof syncAddressQRButtons == 'function')
 		syncAddressQRButtons();
@@ -238,8 +269,9 @@ function copyAddress(event) {
 	if(panel && panel.classList && panel.classList.contains('hide')) {
 		showAddress();
 	}
-	if(content)
-		copyNodeText(content);
+	if(!content || !content.textContent.trim())
+		return;
+	copyNodeText(content);
 	showNotification(ADDRESS_COPIED_MESSAGE);
 }
 

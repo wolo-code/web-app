@@ -85,7 +85,7 @@
 	</button>
 </div>
 <button id='decode_map_view_button' class='control' type='button' aria-label='Terrain map view' title='Terrain map view' tabindex='6'>
-	<span class='image'><?php includeSVG('', 'Map-view'); ?></span>
+	<span class='image'><?php includeSVG('', 'Map-terrain'); ?></span>
 	<span class='decode_icon_caption decode_chrome_caption' aria-hidden='true'>Map</span>
 </button>
 <div id='overlay' class="overlay hide">
@@ -138,7 +138,7 @@
 </div>
 <div id='map_type_button' class='control' tabindex='-1' title='Switch map' aria-label='Switch map'>
 	<span class='image map_type_icon'>
-		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-google'); ?></span>
 		<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
 		<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
 		<span class='map_type_icon_apple'><?php includeSVG('', 'Map-apple'); ?></span>
@@ -197,7 +197,7 @@
 </button>
 <button id='action_menu_map' class='control action_menu_item' type='button' tabindex='-1' aria-label='Map view' title='Map view'>
 	<span class='image map_type_icon'>
-		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-terrain'); ?></span>
+		<span class='map_type_icon_terrain'><?php includeSVG('', 'Map-google'); ?></span>
 		<span class='map_type_icon_satellite'><?php includeSVG('', 'Map-satellite'); ?></span>
 		<span class='map_type_icon_osm'><?php includeSVG('', 'Map-osm'); ?></span>
 		<span class='map_type_icon_apple'><?php includeSVG('', 'Map-apple'); ?></span>

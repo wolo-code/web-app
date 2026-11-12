@@ -748,8 +748,9 @@ body.map-source-single #action_menu_map {
 	}
 }
 
-/* Decode destinations: Info + Map on the left, Camera + Saved on the right. */
-body.decode #decode_map_view_button { left: 62px; right: auto; }
+/* Decode destinations: Info + Saved on the left, Camera + Map on the right. */
+body.decode #decode_map_view_button { right: 6px; bottom: 31px; }
+body.decode #saved_button { left: 62px; right: auto; }
 #saved_button {
  display: block; position: absolute; right: 6px; bottom: 31px;
  background: transparent; border: 0; padding: 8px; margin: -8px;

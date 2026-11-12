@@ -439,8 +439,8 @@ test('root index exposes OSM, Apple, Esri, and Microsoft map icons and attributi
 	assert.match(index, /esri_attribution/);
 	assert.match(index, /microsoft_attribution/);
 	const decodeMapButton = index.match(/id='decode_map_view_button'[\s\S]*?<\/button>/)[0];
-	assert.match(decodeMapButton, /Map-view/);
-	assert.doesNotMatch(decodeMapButton, /Map-osm|Map-apple|Map-esri|Map-microsoft|Map-satellite/);
+	assert.match(decodeMapButton, /Map-terrain/);
+	assert.doesNotMatch(decodeMapButton, /Map-google|Map-osm|Map-apple|Map-esri|Map-microsoft|Map-satellite/);
 	assert.doesNotMatch(decodeCss, /#decode_map_view_button \.map_type_icon_/);
 });
 

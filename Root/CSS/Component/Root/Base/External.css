@@ -2,7 +2,7 @@
 	border-radius: 10px;
 }
 
-#external_close {
+#external_close.message_dialog_toolbar_button {
 	left: 50%;
 	right: auto;
 	bottom: calc(100% + 6px);
@@ -43,13 +43,13 @@
 }
 
 #external_wcode_code {
-	font-size: xx-large;
+	font-size: 2.125rem;
 	font-weight: bold;
 }
 
 #external_down_arrow {
 	width: 32px;
-	margin-top: 20px;
+	margin-top: 28px;
 }
 
 #external_address_container {
@@ -59,7 +59,7 @@
 	width: min(100%, 244px);
 	/* Reserve four address lines, including the text padding. */
 	block-size: calc(5em + 4px);
-	margin: 6px auto 20px;
+	margin: 12px auto 10px;
 }
 
 #external_address {
@@ -89,5 +89,5 @@
 }
 
 #external_controls_container {
-	margin-top: 22px;
+	margin-top: 0;
 }

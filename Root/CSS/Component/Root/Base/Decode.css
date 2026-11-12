@@ -824,19 +824,7 @@ body:not(.decode) #saved_button {
  line-height: 0;
 }
 @media (min-width: 663px) {
- body:not(.decode) #map_search_cluster {
-  margin-left: 48px;
-  /* Reserve the account's 58px tap target and an 8px gap. */
-  max-width: calc(100vw - 48px - var(--app-account-right) - 66px);
- }
- #map_search_field { min-width: 0; }
- #map_search_field #pac-input {
-  box-sizing: border-box;
-  height: 42px;
-  width: 484px;
-  max-width: 100%;
- }
- #decode_button { flex-shrink: 0; }
+ body:not(.decode) #map_search_cluster { margin-left: 48px; }
  body:not(.decode) #map_input_suggestion_result { left: 90px; }
  body:not(.decode) #saved_button {
   width: 42px; height: 42px; padding: 0; margin: 0;

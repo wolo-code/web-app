@@ -70,11 +70,6 @@
 #logo_codes_info,
 #logo_codes_qr {
 	justify-self: start;
-}
-
-#logo_surface > #logo_codes,
-#logo_codes_info,
-#logo_codes_qr {
 	margin-bottom: 6px;
 }
 
@@ -88,7 +83,7 @@
 #logo_codes_qr > .image {
 	display: block;
 	overflow: hidden;
-	width: var(--app-logo-code-width);
+	width: 62px;
 }
 
 #logo_surface > #logo_codes > .image > svg,

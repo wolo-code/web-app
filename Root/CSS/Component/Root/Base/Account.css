@@ -1,6 +1,6 @@
 #account {
 	position: absolute;
-	right: var(--app-account-right);
+	right: 194px;
 	top: calc(18px + var(--app-safe-top));
 	padding: 8px;
 	margin: 0px;

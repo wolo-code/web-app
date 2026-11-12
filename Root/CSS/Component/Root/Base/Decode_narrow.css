@@ -9,6 +9,7 @@
 	}
 
 	#logo_surface {
+		align-items: end;
 		box-sizing: border-box;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(min-content, 1fr);
@@ -22,7 +23,8 @@
 	}
 
 	#logo_surface > #logo_codes {
-		justify-self: start;
+		justify-self: center;
+		margin-bottom: 6px;
 	}
 
 	body:not(.decode) #saved_button {

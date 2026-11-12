@@ -1,9 +1,6 @@
 :root {
 	--app-safe-top: env(safe-area-inset-top, 0px);
 	--app-logo-offset-x: 12px;
-	--app-logo-code-width: 62px;
-	--app-logo-width: calc(153px + var(--app-logo-code-width) + 24px);
-	--app-account-right: calc(var(--app-logo-width) + 25px);
 	--app-background-wcode: #efefef;
 	--app-background-map: #60d0e5;
 	--app-background-satellite: #1b2f62;
@@ -174,10 +171,10 @@ body.satellite #map {
 }
 
 #logo_surface {
-	align-items: end;
+	align-items: center;
 	border-radius: 6px;
 	display: inline-flex;
-	gap: 8px;
+	flex-direction: column;
 	overflow: hidden;
 	padding: 8px;
 }

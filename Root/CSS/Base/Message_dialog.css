@@ -60,6 +60,14 @@
 	fill: currentColor;
 }
 
+@media (max-width: 662px) {
+	html:not(.dark-mode) .message_dialog_close.message_dialog_toolbar_button {
+		background: #e8f0f3;
+		border: 1px solid #7b919a;
+		color: #1f4e5f;
+	}
+}
+
 .overlay > div:has(> #external_message:not(.hide)) {
 	max-height: none;
 	/* Reserve the Close button's 44px height and 20px gap. */

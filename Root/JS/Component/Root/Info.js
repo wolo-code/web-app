@@ -8,6 +8,22 @@ function bindInfoFormatTabs() {
 	if (!tabList) return;
 
 	const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+	function updateTabPeak() {
+		const label = tabList.querySelector('[aria-selected="true"] > span');
+		const lineWidth = parseFloat(getComputedStyle(tabList, '::before').width);
+		if (!label || !(lineWidth > 0)) return;
+
+		const tabListRect = tabList.getBoundingClientRect();
+		if (!tabListRect.width) return;
+		const labelRect = label.getBoundingClientRect();
+		const lineLeft = tabListRect.left + (tabListRect.width - lineWidth) / 2;
+		const peak = (labelRect.left + labelRect.width / 2 - lineLeft) / lineWidth;
+		tabList.style.setProperty('--info-tab-peak', Math.max(0, Math.min(1, peak)) * 100 + '%');
+	}
+
+	const tabPeakObserver = new ResizeObserver(updateTabPeak);
+	tabPeakObserver.observe(tabList);
+
 	function selectTab(selectedTab) {
 		for (const tab of tabs) {
 			const selected = tab === selectedTab;
@@ -15,9 +31,11 @@ function bindInfoFormatTabs() {
 			tab.tabIndex = selected ? 0 : -1;
 			document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
 		}
+		updateTabPeak();
 	}
 
 	tabs.forEach((tab, index) => {
+		tabPeakObserver.observe(tab.querySelector('span'));
 		tab.addEventListener('click', () => selectTab(tab));
 		tab.addEventListener('keydown', event => {
 			let nextIndex;

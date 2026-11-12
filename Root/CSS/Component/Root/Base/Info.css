@@ -254,6 +254,12 @@
 	margin-bottom: 2em;
 }
 
+@property --info-tab-peak {
+	syntax: '<percentage>';
+	inherits: true;
+	initial-value: 50%;
+}
+
 #info_format_tabs {
 	position: relative;
 	display: flex;
@@ -272,7 +278,14 @@
 	width: 100%;
 	max-width: 240px;
 	height: 1px;
-	background: linear-gradient(to right, transparent, #69b7cf, transparent);
+	background: linear-gradient(to right, transparent, #69b7cf var(--info-tab-peak, 50%), transparent);
+	transition: --info-tab-peak 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#info_format_tabs::before {
+		transition: none;
+	}
 }
 
 #info_format_tabs > span {
@@ -293,6 +306,10 @@
 
 #info_city_tab {
 	text-align: right;
+}
+
+#info_format_tabs > button > span {
+	display: inline-block;
 }
 
 #info_region_tab {

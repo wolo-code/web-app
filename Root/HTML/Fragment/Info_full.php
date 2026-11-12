@@ -1,9 +1,9 @@
 <div id='info_full' class='hide'>
 
 	<div id='info_format_tabs' role='tablist' aria-label='Wolo Code format'>
-		<button id='info_city_tab' type='button' role='tab' aria-selected='true' aria-controls='info_city_format'>City</button>
+		<button id='info_city_tab' type='button' role='tab' aria-selected='true' aria-controls='info_city_format'><span>City</span></button>
 		<span aria-hidden='true'>|</span>
-		<button id='info_region_tab' type='button' role='tab' aria-selected='false' aria-controls='info_region_format' tabindex='-1'>Region</button>
+		<button id='info_region_tab' type='button' role='tab' aria-selected='false' aria-controls='info_region_format' tabindex='-1'><span>Region</span></button>
 	</div>
 	<div class='info_format_panels'>
 		<div id='info_city_format' role='tabpanel' aria-labelledby='info_city_tab' tabindex='0'>

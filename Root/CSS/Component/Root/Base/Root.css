@@ -7,7 +7,7 @@
 	position: absolute !important;
 	top: 0;
 	width: 100%;
-	z-index: 102;
+	z-index: 10001;
 }
 
 .suggestion_result > div {

@@ -13,17 +13,18 @@ function redirect_showLoader(words) {
 	var status = document.getElementById('external_redirect_status');
 	status.textContent = 'Opening ' + getExternalMapLabel() + '…';
 	dialog.classList.add('redirect-pending');
+	getWaitLoader().classList.add('redirect-loading');
 	external_show(null, words.slice(0, -3).join(' '), words.slice(-3).join(' '));
 	document.getElementById('redirect_cancel').focus();
 }
 
 function redirect_start(city, code, position, showLocation) {
 	var dialog = document.getElementById('external_message');
-	var progress = document.getElementById('external_redirect_progress');
+	var loader = getWaitLoader();
 	external_setCode(city, code);
 	redirectShowLocation = showLocation;
-	progress.style.animationDuration = REDIRECT_DELAY_MS + 'ms';
-	dialog.classList.add('redirect-countdown');
+	loader.style.setProperty('--redirect-duration', REDIRECT_DELAY_MS + 'ms');
+	loader.classList.add('redirect-countdown');
 	redirectTimer = setTimeout(function() {
 		if(getVisibleOverlayDialog() !== dialog) {
 			redirectCancel();
@@ -41,8 +42,10 @@ function redirect_reset() {
 	redirectActive = false;
 	initWCode_jumpToMap = false;
 	var dialog = document.getElementById('external_message');
-	dialog.classList.remove('redirect-pending', 'redirect-countdown');
-	document.getElementById('external_redirect_progress').style.animationDuration = '';
+	dialog.classList.remove('redirect-pending');
+	var loader = getWaitLoader();
+	loader.classList.remove('redirect-loading', 'redirect-countdown');
+	loader.style.removeProperty('--redirect-duration');
 	external_hide();
 }
 

@@ -2,9 +2,6 @@
 	<button id='external_close' class="message_dialog_close message_dialog_toolbar_button control" type='button' aria-label='Close'>
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</button>
-	<div class='external_redirect_track' aria-hidden='true'>
-		<div id='external_redirect_progress'></div>
-	</div>
 	<div class='message_dialog_body'>
 		<div id='external_redirect_status' role='status'></div>
 		<div id='external_wcode'>

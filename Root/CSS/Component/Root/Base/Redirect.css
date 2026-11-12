@@ -1,25 +1,14 @@
-#external_message:not(.redirect-pending) :is(.external_redirect_track, #external_redirect_status, #redirect_cancel),
+#external_message:not(.redirect-pending) :is(#external_redirect_status, #redirect_cancel),
 #external_message.redirect-pending #external_proceed {
 	display: none;
 }
 
-.external_redirect_track {
-	height: 4px;
-	background: #69b7cf33;
-	overflow: hidden;
+#wait_loader.redirect-loading.hide {
+	display: block !important;
 }
 
-#external_redirect_progress {
-	height: 100%;
-	width: 35%;
-	background: #69b7cf;
-	animation: external-redirect-loading 1.4s ease-in-out infinite;
-}
-
-.redirect-countdown #external_redirect_progress {
-	width: 100%;
-	transform-origin: left;
-	animation: external-redirect-countdown linear both;
+#wait_loader.redirect-countdown {
+	animation: redirect-countdown var(--redirect-duration) linear both;
 }
 
 #external_redirect_status {
@@ -27,19 +16,13 @@
 	text-align: center;
 }
 
-@keyframes external-redirect-loading {
-	from { transform: translateX(-100%); }
-	to { transform: translateX(286%); }
-}
-
-@keyframes external-redirect-countdown {
-	from { transform: scaleX(0); }
-	to { transform: scaleX(1); }
+@keyframes redirect-countdown {
+	from { clip-path: inset(0 100% 0 0); }
+	to { clip-path: inset(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-	#external_redirect_progress,
-	.redirect-countdown #external_redirect_progress {
-		animation-name: none;
+	#wait_loader.redirect-loading {
+		animation: none;
 	}
 }

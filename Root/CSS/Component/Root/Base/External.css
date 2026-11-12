@@ -6,10 +6,28 @@
 	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) {
 		/* Leave room for the 66px logo and a gap above the panel. */
 		padding-top: calc(86px + var(--app-safe-top));
+		padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
 	}
 
-	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo {
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ :is(#logo, #footer-content-container) {
 		z-index: 10001;
+	}
+
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo #logo_surface {
+		align-items: flex-end;
+	}
+
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo #logo_codes {
+		padding-bottom: 6px;
+	}
+
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #footer-content-container {
+		bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+		pointer-events: none;
+	}
+
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #footer-content-container #footer-content {
+		pointer-events: auto;
 	}
 }
 

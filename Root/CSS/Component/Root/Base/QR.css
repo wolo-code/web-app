@@ -28,7 +28,7 @@
 }
 
 #qr_body {
-	--qr-label-accent: #1F4E5F;
+	--qr-label-accent: #69B7CF;
 	position: relative;
 	border-top: 6px solid var(--qr-label-accent);
 	font-family: Abel;
@@ -36,10 +36,6 @@
 	text-align: left;
 	background-color: #FFFFFF;
 	color: #999999;
-}
-
-#qr_body.qr-preview {
-	--qr-label-accent: #333333;
 }
 
 .raster #qr_body {
@@ -163,7 +159,11 @@
 #qr_wcode_code {
 	font-size: xx-large;
 	font-weight: bold;
-	color: #1a1a1a;
+	color: #1F4E5F;
+}
+
+#qr_body.qr-preview #qr_wcode_code {
+	color: #333333;
 }
 
 #qr_address {

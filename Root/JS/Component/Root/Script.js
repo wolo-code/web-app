@@ -4,6 +4,7 @@ function initLoad () {
 	if(!initLoadDone && document.readyState !== 'loading') {
 		initTheme();
 		initMapSource();
+		initExternalMapPreference();
 		if(!firebaseInit())
 			return;
 		initApp();

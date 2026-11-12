@@ -3,6 +3,19 @@
 	text-align: left;
 }
 
+.external-map-setting {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin: 12px 0;
+}
+
+.external-map-select {
+	font: inherit;
+	color-scheme: inherit;
+}
+
 .theme-selector {
 	display: flex;
 	gap: 10px;

@@ -90,7 +90,6 @@
 <div id='overlay' class="overlay hide">
 	<div>
 	<?php
-		require '../../HTML/Fragment/Redirect.php';
 		require '../../HTML/Fragment/External.php';
 		require '../../HTML/Fragment/NoCity.php';
 		require '../../HTML/Fragment/DecodeCityHistory.php';

@@ -58,3 +58,11 @@
 		</div>
 	</div>
 </div>
+<label class='external-map-setting'>
+	<span class='dialog-sub-label'>External map</span>
+	<select class='external-map-select'>
+		<option value='auto'>Automatic</option>
+		<option value='google'>Google Maps</option>
+		<option value='apple'>Apple Maps</option>
+	</select>
+</label>

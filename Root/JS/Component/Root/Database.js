@@ -1,5 +1,6 @@
 var offlineWordListReady;
 var pendingInitDataRun = false;
+var pendingWoloLinkRedirect = false;
 
 function canRunInitDataNow() {
 	return typeof map !== 'undefined' && !!map && typeof google === 'object' && !!google && typeof google.maps === 'object';
@@ -19,7 +20,7 @@ function initData() {
 		encode(pendingPosition);
 	}
 	else if(pendingWords != null) {
-		initWCode_jump_ask = true;
+		initWCode_jump_ask = !pendingWoloLinkRedirect;
 		decode(pendingWords, null, null, true);
 	}
 }

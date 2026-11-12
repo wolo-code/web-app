@@ -136,6 +136,8 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | QR overlay dialog | QR Label View | `#qr_container` | Center overlay | Shows the printable/shareable Wolo Code label editor. Clicking the dimmed overlay outside the dialog closes it. |
+| External map preference | External Map Selector | `.external-map-select` | Account and sign-in settings | Saves Automatic, Google Maps, or Apple Maps for external navigation. |
+| Trailing-slash redirect | Address Preview | `#external_redirect_progress`, `#redirect_cancel` | Top and bottom of the center overlay | Shows the destination and progress toward opening it. Stop keeps the location open in Wolo. |
 | Direct-link address preview | Address Preview | `#external_message`, `#external_close`, `#external_address_loader` | Center overlay | Shows the Wolo Code and a circular loader in the address area until the address lookup finishes. A faint translucent Close button is centered horizontally and halfway between the top of the viewport and the top of the modal. |
 | QR title | QR Label Title | `#qr_container h2` | Top of QR Label View | Labels the dialog as `Label`. |
 | QR save control | QR Label Save Button | `#qr_save` | Just above the upper-left edge of QR Label View | White circular bookmark button that saves the current title, segment, and address for the signed-in user and confirms with `Address saved` above the overlay. |

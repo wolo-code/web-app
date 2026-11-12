@@ -775,6 +775,8 @@ function execDecodeDigipin(code) {
 
 var pendingInvalidQuery = '';
 function showInvalidCodeDialog(query, title, detail) {
+	if(typeof redirect_isActive === 'function' && redirect_isActive())
+		redirect_reset();
 	pendingInvalidQuery = query || '';
 	var heading = document.getElementById('invalid_code_title');
 	var description = document.getElementById('invalid_code_detail');
@@ -1107,13 +1109,62 @@ function initBottomStackMapPan() {
 	window.addEventListener('resize', syncBottomStackMapPan);
 }
 
+var EXTERNAL_MAP_STORAGE_KEY = 'wolo.externalMap';
+var externalMapPreference = 'auto';
+
+function initExternalMapPreference() {
+	try {
+		var saved = localStorage.getItem(EXTERNAL_MAP_STORAGE_KEY);
+		if(saved === 'google' || saved === 'apple')
+			externalMapPreference = saved;
+	}
+	catch(error) {
+		// Keep the default when storage is unavailable.
+	}
+	var selects = document.querySelectorAll('.external-map-select');
+	selects.forEach(function(select) {
+		select.value = externalMapPreference;
+		select.addEventListener('change', function() {
+			externalMapPreference = select.value;
+			selects.forEach(function(other) { other.value = externalMapPreference; });
+			try {
+				localStorage.setItem(EXTERNAL_MAP_STORAGE_KEY, externalMapPreference);
+			}
+			catch(error) {
+				// Keep the selection for the current page.
+			}
+		});
+	});
+}
+
+function getExternalMapProvider() {
+	if(externalMapPreference !== 'auto')
+		return externalMapPreference;
+	if(/android/i.test(navigator.userAgent))
+		return 'device';
+	if(/(iPad|iPhone|iPod)/i.test(navigator.userAgent))
+		return 'apple';
+	return 'google';
+}
+
+function getExternalMapLabel() {
+	var provider = getExternalMapProvider();
+	if(provider === 'apple')
+		return 'Apple Maps';
+	if(provider === 'google')
+		return 'Google Maps';
+	return 'your maps app';
+}
+
 function getIntentURL(latLng, code_string) {
-	if(navigator.userAgent.match(/android/i))
-		return 'geo:0,0?q='+latLng.lat+','+latLng.lng+'(\\ '+code_string+' /)';
-	else if(navigator.userAgent.match(/(iPad|iPhone|iPod)/i))
-		return 'https://maps.apple.com/?ll='+latLng.lat+','+latLng.lng+'&q='+'\\ '+code_string+' /';
-	else
-		return 'https://maps.google.com/maps?q=loc:'+latLng.lat+','+latLng.lng+'&t=h';
+	var provider = getExternalMapProvider();
+	var coordinates = latLng.lat + ',' + latLng.lng;
+	var label = encodeURIComponent('\\ ' + code_string + ' /');
+	if(provider === 'device')
+		return 'geo:0,0?q=' + coordinates + '(' + label + ')';
+	if(provider === 'apple')
+		return 'https://maps.apple.com/?ll=' + coordinates + '&q=' + label;
+	return 'https://maps.google.com/maps?q=loc:' + coordinates + '&t=h';
 }
 
 function clearMap() {

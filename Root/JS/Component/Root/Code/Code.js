@@ -151,20 +151,27 @@ function setCodeCoord(city, position, code) {
 	var linkZoom = typeof pendingWoloLinkZoom === 'undefined' ? undefined : pendingWoloLinkZoom;
 	if(linkZoom !== undefined)
 		pendingWoloLinkZoom = undefined;
-	if(initWCode_jumpToMap) {
-		initWCode_jumpToMap = false;
-		window.location.replace(getIntentURL(position, city.name + ' ' + code.join(' ')));
-	}
-	else {
-		if(initWCode_jump_ask) {
-			initWCode_jump_ask = false;
-			external_show(position, city.name, code.join(' '));
-		}
-		getAddress(position);
+	function showLocation() {
 		focus__(city, position, code, linkZoom);
 		if(keepAddressPanelOpen) {
 			latLng_p = position;
 			showAddress();
 		}
 	}
+	if(initWCode_jumpToMap) {
+		initWCode_jumpToMap = false;
+		if(redirect_isActive()) {
+			redirect_start(city.name, code.join(' '), position, showLocation);
+			getAddress(position);
+		}
+		else
+			window.location.replace(getIntentURL(position, city.name + ' ' + code.join(' ')));
+		return;
+	}
+	if(initWCode_jump_ask) {
+		initWCode_jump_ask = false;
+		external_show(position, city.name, code.join(' '));
+	}
+	getAddress(position);
+	showLocation();
 }

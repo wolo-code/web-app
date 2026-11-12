@@ -125,7 +125,6 @@ function urlDecode() {
 		var suffix = '';
 		var end_flag_char = window.location.pathname.substr(-1);
 		if(end_flag_char == '/') {
-			redirect_showLoader();
 			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
 			initWCode_jumpToMap = true;
 			suffix = '/';
@@ -153,6 +152,9 @@ function urlDecode() {
 			}
 			pushLoader();
 			pendingWords = parsedWords;
+			pendingWoloLinkRedirect = suffix === '/';
+			if(initWCode_jumpToMap)
+				redirect_showLoader(parsedWords);
 			var zoomParam = window.location.search && new URLSearchParams(window.location.search).get('zoom');
 			pendingWoloLinkZoom = zoomParam && /^\d+(\.\d+)?$/.test(zoomParam) && Number.isFinite(Number(zoomParam))
 				? Number(zoomParam) : null;

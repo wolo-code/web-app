@@ -2,7 +2,11 @@
 	<button id='external_close' class="message_dialog_close message_dialog_toolbar_button control" type='button' aria-label='Close'>
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</button>
+	<div class='external_redirect_track' aria-hidden='true'>
+		<div id='external_redirect_progress'></div>
+	</div>
 	<div class='message_dialog_body'>
+		<div id='external_redirect_status' role='status'></div>
 		<div id='external_wcode'>
 			<div id='external_wcode_container' class='center'>
 				<div id='external_wcode_left'>
@@ -23,6 +27,7 @@
 			<div id='external_address' class='initial' contentEditable>Address</div>
 		</div>
 		<div id='external_controls_container' class="center message_dialog_control">
+			<button id='redirect_cancel' class="border control" type='button'>Stop</button>
 			<button id='external_proceed' class="border button_active control" type='button'><span class="image front_arrow_white"> <?php includeSVG('', 'Front'); ?></span></button>
 		</div>
 	</div>

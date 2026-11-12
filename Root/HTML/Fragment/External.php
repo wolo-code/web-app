@@ -19,7 +19,7 @@
 		<div id='external_down_arrow' class='center'>
 			<span class="image front_arrow_white"><?php includeSVG('', 'Down_Arrow'); ?></span>
 		</div>
-		<div id='external_address_container' class='center'>
+		<div id='external_address_container'>
 			<div id='external_address_loader' class='loader address_lookup_loader hide' role='status' aria-label='Loading address'></div>
 			<div id='external_address' class='initial' contentEditable>Address</div>
 		</div>

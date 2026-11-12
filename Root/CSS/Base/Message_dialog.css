@@ -60,7 +60,13 @@
 	fill: currentColor;
 }
 
-.overlay > div:has(> #external_message:not(.hide), > #qr_container:not(.hide)) {
+.overlay > div:has(> #external_message:not(.hide)) {
+	max-height: none;
+	/* Reserve the Close button's 44px height and 20px gap. */
+	padding-bottom: 64px;
+}
+
+.overlay > div:has(> #qr_container:not(.hide)) {
 	max-height: none;
 	padding-top: 50px;
 }

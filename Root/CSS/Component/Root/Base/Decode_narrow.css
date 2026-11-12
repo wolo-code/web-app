@@ -31,10 +31,6 @@
 		top: calc(23.5px + var(--app-safe-top));
 	}
 
-	.external #logo {
-		z-index: 101;
-	}
-
 	.decode #account {
 		left: unset;
 		right: 4px;

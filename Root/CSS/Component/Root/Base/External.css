@@ -2,6 +2,17 @@
 	border-radius: 10px;
 }
 
+@media (max-width: 662px) {
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) {
+		/* Leave room for the 66px logo and a gap above the panel. */
+		padding-top: calc(86px + var(--app-safe-top));
+	}
+
+	#overlay.overlay:not(.hide):has(> div > #external_message:not(.hide)) ~ #logo {
+		z-index: 10001;
+	}
+}
+
 #external_close.message_dialog_toolbar_button {
 	left: 50%;
 	right: auto;

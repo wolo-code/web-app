@@ -1,3 +1,4 @@
+<script>var initialWoloLink = prepareInitialWoloLinkView();</script>
 <div id='wait_loader'></div>
 <div id='map_stage'>
 	<div id='apple_map' class='hide' aria-hidden='true'></div>
@@ -108,6 +109,7 @@
 	?>
 	</div>
 </div>
+<script>showInitialWoloLinkPreview(initialWoloLink);</script>
 <div id='notification_bottom' class="notification_bar hide"></div>
 <div id='logo' tabindex='1' title='Press and hold to clear cache and reload'>
 	<div id='logo_surface' class='blur_background'>

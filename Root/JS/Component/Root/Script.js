@@ -1,24 +1,27 @@
-// var syncLocate_engage;
+var startupLinkPrepared = false;
 
 function initLoad () {
 	if(!initLoadDone && document.readyState !== 'loading') {
-		initTheme();
-		initMapSource();
-		initExternalMapPreference();
+		if(!startupLinkPrepared) {
+			initTheme();
+			initMapSource();
+			initExternalMapPreference();
+			setupExternalPreviewControls();
+			directWoloLinkEntry = isDirectWoloLinkEntry(window.location);
+			if(directWoloLinkEntry) {
+				activateOverlayInfo_full();
+				syncLocate_engage = true;
+			}
+			urlDecode();
+			startupLinkPrepared = true;
+		}
 		if(!firebaseInit())
 			return;
 		initApp();
 		dbInit();
 		initOfflineStatus();
-		directWoloLinkEntry = isDirectWoloLinkEntry(window.location);
-		if(directWoloLinkEntry) {
-			activateOverlayInfo_full();
-			syncLocate_engage = true;
-		}
-		else
+		if(!directWoloLinkEntry)
 			syncLocate_engage = versionCheck();
-		if(urlDecode())
-			syncLocate_engage = true;
 			
 		syncInitMap();
 		setupControls();
@@ -162,9 +165,16 @@ function bindControl(id, type, handler) {
 	return node;
 }
 
+function setupExternalPreviewControls() {
+	bindControl('redirect_cancel', 'click', redirectCancel);
+	bindControl('external_close', 'click', external_close);
+	var externalProceed = document.getElementById('external_proceed');
+	if(externalProceed)
+		addLongpressListener(externalProceed, external_proceed_external, external_proceed_internal);
+}
+
 function setupControls() {
 	initBottomStackMapPan();
-	bindControl('redirect_cancel', 'click', redirectCancel);
 	bindControl('authentication_header_close', 'click', hideAuthenticationDialog);
 	bindControl('account_dialog_close', 'click', hideAccountDialog);
 	bindControl('account', 'click', onAccount);
@@ -264,10 +274,6 @@ function setupControls() {
 	bindControl('map_city_history_toggle', 'click', showDecodeCityHistoryMessage);
 	if(typeof initDecodeCityHistoryDeleteControls == 'function')
 		initDecodeCityHistoryDeleteControls();
-	bindControl('external_close', 'click', external_close);
-	var externalProceed = document.getElementById('external_proceed');
-	if(externalProceed)
-		addLongpressListener(externalProceed, external_proceed_external, external_proceed_internal);
 	var logo = document.getElementById('logo');
 	if(logo && typeof clearCacheAndReload == 'function') {
 		logo.setAttribute('title', 'Press and hold to clear cache and reload');

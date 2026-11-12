@@ -4,8 +4,13 @@
 function external_close() {
 	if(redirect_isActive())
 		redirectCancel();
-	else
+	else {
+		if(!external_latLng) {
+			initialWoloLinkPreviewDismissed = true;
+			initWCode_jump_ask = false;
+		}
 		external_hide();
+	}
 }
 
 function external_proceed_external() {
@@ -13,12 +18,15 @@ function external_proceed_external() {
 }
 
 function external_proceed_internal() {
-	toggleMapType();
+	ensureMapViewForLocation();
 	external_hide();
 }
 
 function external_show(latLng, city_string, wcode_string) {
 	external_latLng = latLng;
+	var proceed = document.getElementById('external_proceed');
+	if(proceed)
+		proceed.disabled = !latLng;
 	external_wolo_code_string = city_string + ' ' + wcode_string;
 	showOverlay(document.getElementById('external_message'));
 	external_setCode(city_string, wcode_string);

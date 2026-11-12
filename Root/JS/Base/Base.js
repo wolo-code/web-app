@@ -4,6 +4,7 @@
 // var initWCode_jump_ask;
 var pendingWoloLinkZoom;
 var directWoloLinkEntry = false;
+var initialWoloLinkPreviewDismissed = false;
 
 function isDirectWoloLinkEntry(location) {
 	if(location.pathname !== '/')
@@ -119,51 +120,65 @@ function parseWoloPathWords(rawCodeString) {
 	return words;
 }
 
+function parseWoloLinkPath(pathname) {
+	var suffix = /[/_]$/.test(pathname) ? pathname.slice(-1) : '';
+	var code = suffix ? pathname.slice(1, -1) : pathname.slice(1);
+	var words = /^[A-Za-z0-9._%+-]+$/.test(code) ? parseWoloPathWords(code) : null;
+	return words ? {words: words, suffix: suffix} : null;
+}
+
+function prepareInitialWoloLinkView() {
+	var link = parseWoloLinkPath(window.location.pathname);
+	if(link) {
+		document.body.classList.remove('decode');
+		document.body.classList.add(link.suffix === '_' ? 'satellite' : 'map');
+	}
+	return link;
+}
+
+function showInitialWoloLinkPreview(link) {
+	if(!link)
+		return;
+	var dialog = document.getElementById('external_message');
+	var redirect = link.suffix === '/';
+	document.getElementById('external_wcode_city').textContent = link.words.slice(0, -3).join(' ');
+	document.getElementById('external_wcode_code').textContent = link.words.slice(-3).join(' ');
+	addClassIfPresent(document.getElementById('external_address'), 'hide');
+	removeClassIfPresent(document.getElementById('external_address_loader'), 'hide');
+	document.getElementById('external_proceed').disabled = true;
+	if(redirect) {
+		dialog.classList.add('redirect-pending');
+		document.getElementById('external_redirect_status').textContent = 'Opening external map…';
+		getWaitLoader().classList.add('redirect-loading');
+	}
+	document.body.classList.add('external');
+	dialog.classList.remove('hide');
+	removeClassIfPresent(document.getElementById('overlay'), 'hide');
+}
+
 function urlDecode() {
-	if(window.location.pathname.substr(1) != '') {
-		var code_string;
-		var suffix = '';
-		var end_flag_char = window.location.pathname.substr(-1);
-		if(end_flag_char == '/') {
-			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
-			initWCode_jumpToMap = true;
-			suffix = '/';
-		}
-		else if (end_flag_char == '_') {
-			init_map_mode = 'satellite';
-			code_string = window.location.pathname.substr(1, window.location.pathname.length-2);
-			initWCode_jumpToMap = false;
-			suffix = '_';
-		} 
-		else {
-			code_string = window.location.pathname.substr(1);
-			initWCode_jumpToMap = false;
-		}
-		
-		if(!code_string.match(/^[A-Za-z0-9._%+-]+$/)) {
+	if(window.location.pathname !== '/') {
+		var link = parseWoloLinkPath(window.location.pathname);
+		if(!link) {
 			window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
 			return false;
 		}
-		else {
-			var parsedWords = parseWoloPathWords(code_string);
-			if(!parsedWords) {
-				window.location.replace('/404'+'?url='+window.location.host+window.location.pathname+window.location.search);
-				return false;
-			}
-			pushLoader();
-			pendingWords = parsedWords;
-			pendingWoloLinkRedirect = suffix === '/';
-			if(initWCode_jumpToMap)
-				redirect_showLoader(parsedWords);
-			var zoomParam = window.location.search && new URLSearchParams(window.location.search).get('zoom');
-			pendingWoloLinkZoom = zoomParam && /^\d+(\.\d+)?$/.test(zoomParam) && Number.isFinite(Number(zoomParam))
-				? Number(zoomParam) : null;
-			var canonicalPath = getCanonicalWoloPathFromWords(parsedWords, suffix);
-			if(window.location.pathname !== canonicalPath && window.history && typeof window.history.replaceState == 'function')
-				window.history.replaceState(window.history.state, '', canonicalPath + window.location.search);
-			initWCode = true;
-			return true;
-		}
+		if(link.suffix === '_')
+			init_map_mode = 'satellite';
+		pushLoader();
+		pendingWords = link.words;
+		pendingWoloLinkRedirect = link.suffix === '/';
+		initWCode_jumpToMap = pendingWoloLinkRedirect;
+		if(initWCode_jumpToMap)
+			redirect_showLoader(link.words);
+		var zoomParam = window.location.search && new URLSearchParams(window.location.search).get('zoom');
+		pendingWoloLinkZoom = zoomParam && /^\d+(\.\d+)?$/.test(zoomParam) && Number.isFinite(Number(zoomParam))
+			? Number(zoomParam) : null;
+		var canonicalPath = getCanonicalWoloPathFromWords(link.words, link.suffix);
+		if(window.location.pathname !== canonicalPath && window.history && typeof window.history.replaceState == 'function')
+			window.history.replaceState(window.history.state, '', canonicalPath + window.location.search);
+		initWCode = true;
+		return true;
 	}
 	else {
 		var urlParams = new URLSearchParams(window.location.search);

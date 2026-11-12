@@ -608,10 +608,12 @@ function initMap() {
 	
 	clickHandler = new ClickEventHandler(map);
 
-	if(typeof isMapViewActive == 'function' && isMapViewActive())
-		setMapLayer(getCurrentMapLayer() || getDefaultMapLayer());
-	else if(init_map_mode == 'satellite')
+	if(init_map_mode == 'satellite')
 		setMapLayer(MAP_LAYER_SATELLITE);
+	else if(initWCode)
+		setMapLayer(getDefaultMapLayer());
+	else if(typeof isMapViewActive == 'function' && isMapViewActive())
+		setMapLayer(getCurrentMapLayer() || getDefaultMapLayer());
 	else if(init_map_mode == 'osm')
 		setMapLayer(MAP_LAYER_OSM);
 	else if(init_map_mode == 'apple')
@@ -777,6 +779,8 @@ var pendingInvalidQuery = '';
 function showInvalidCodeDialog(query, title, detail) {
 	if(typeof redirect_isActive === 'function' && redirect_isActive())
 		redirect_reset();
+	else if(typeof external_hide === 'function' && getVisibleOverlayDialog() === document.getElementById('external_message'))
+		external_hide();
 	pendingInvalidQuery = query || '';
 	var heading = document.getElementById('invalid_code_title');
 	var description = document.getElementById('invalid_code_detail');

@@ -16,6 +16,8 @@ Use lowercase and hyphens for spaces within a token. The web app also accepts up
 | Satellite preview | `/usa-40.tub.plate.chain_` | Wolo requests its satellite layer at startup and shows the same code and address preview. |
 | External map redirect | `/usa-40.tub.plate.chain/` | Wolo shows the preview and names the destination. The page-wide loader above the overlay counts down three seconds once the code resolves, then the external map opens automatically. **Stop** cancels the redirect and opens the location in Wolo. |
 
+All three modes start on Map View with the Address Preview already open while the location resolves. The trailing-slash version is the External Map Redirect mode of the same modal.
+
 A suffix comes immediately after the last word, before any query string. The underscore inside a legacy reference such as `usa_40` is a space separator. An underscore after the last word selects satellite mode.
 
 ### Zoom

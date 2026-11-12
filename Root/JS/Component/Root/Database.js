@@ -20,7 +20,8 @@ function initData() {
 		encode(pendingPosition);
 	}
 	else if(pendingWords != null) {
-		initWCode_jump_ask = !pendingWoloLinkRedirect;
+		initWCode_jump_ask = !pendingWoloLinkRedirect &&
+			(typeof initialWoloLinkPreviewDismissed === 'undefined' || !initialWoloLinkPreviewDismissed);
 		decode(pendingWords, null, null, true);
 	}
 }

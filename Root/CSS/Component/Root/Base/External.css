@@ -1,3 +1,19 @@
+#external_close {
+	left: 50%;
+	right: auto;
+	bottom: auto;
+	/* The centered overlay wrapper reserves 50px above the modal. */
+	top: min(-26px, calc(25% - 25dvh - 14px));
+	translate: -50% -50%;
+}
+
+@media (max-width: 662px) {
+	#external_close {
+		/* The narrow overlay adds 20px of top padding. */
+		top: min(-36px, calc(25% - 25dvh - 14px));
+	}
+}
+
 #external_wcode {
 	padding-top: 20px;
 }

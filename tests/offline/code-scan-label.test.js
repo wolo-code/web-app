@@ -78,6 +78,29 @@ test('four printed corner brackets form a container at different image scales an
 	assert.equal(matcher.detectLabelRectangles(square, 400, 400).some(box => box.anchored), false);
 });
 
+test('estimates mild camera roll from the four printed corners in both directions', () => {
+	const width = 480, height = 360;
+	const rect = { x0: 85, y0: 110, x1: 395, y1: 250 };
+	const upright = cornerFrame(width, height, rect, 34, 3);
+	assert.equal(matcher.estimateLabelRoll(upright, width, height), 0);
+	for(const angle of [-7, -1.5, 2, 10]) {
+		const radians = angle * Math.PI / 180;
+		const cos = Math.cos(radians), sin = Math.sin(radians);
+		const tilted = raster(width, height);
+		for(let y = 0; y < height; y++) for(let x = 0; x < width; x++) {
+			const dx = x - width / 2, dy = y - height / 2;
+			const sx = Math.round(width / 2 + dx * cos + dy * sin);
+			const sy = Math.round(height / 2 - dx * sin + dy * cos);
+			if(sx < 0 || sy < 0 || sx >= width || sy >= height) continue;
+			const offset = (sy * width + sx) * 4;
+			tilted.data.set(upright.data.subarray(offset, offset + 4), (y * width + x) * 4);
+		}
+		assert.equal(matcher.detectLabelRectangles(tilted, width, height).length, 0);
+		const measured = matcher.estimateLabelRoll(tilted, width, height);
+		assert.ok(Math.abs(measured - angle) <= 0.35, `expected ${angle}°, estimated ${measured}°`);
+	}
+});
+
 test('supplied screenshot detects the inner printed box and excludes Ram and Main door', () => {
 	const fixture = path.join(__dirname, '../fixtures/scanner-label');
 	const { width, height } = JSON.parse(fs.readFileSync(fixture + '.json', 'utf8'));

@@ -675,9 +675,41 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_viewport.code_scan_viewport_frozen.code_scan_is_editing_crop .code_scan_fixed_guide {
  display: block; aspect-ratio: 1.618033989 / 1;
  width: min(94cqw, 152.095cqh); max-width: 94%; max-height: 94%;
- border: 2px dashed rgba(105, 183, 207, .9);
+ border: 2px var(--code-scan-frame-stroke, dashed rgba(105, 183, 207, .9));
  box-shadow: none;
 }
+
+.code_scan_inspecting {
+	--code-scan-frame-stroke: solid #d6f8ff;
+}
+
+.code_scan_inspecting .code_scan_fixed_guide {
+	filter: drop-shadow(0 0 2px #0d1117);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.code_scan_inspecting:not(.code_scan_viewport_frozen) {
+		--code-scan-frame-stroke: solid transparent;
+	}
+
+	.code_scan_inspecting:not(.code_scan_viewport_frozen) .code_scan_fixed_guide::after {
+		--code-scan-frame-dash: #d6f8ff 0 9px, transparent 9px 16px;
+		animation: code-scan-frame-dashes 600ms linear infinite;
+		background:
+			linear-gradient(90deg, var(--code-scan-frame-dash)) 0 0 / 16px 2px repeat-x,
+			linear-gradient(180deg, var(--code-scan-frame-dash)) 100% 0 / 2px 16px repeat-y,
+			linear-gradient(90deg, var(--code-scan-frame-dash)) 0 100% / 16px 2px repeat-x,
+			linear-gradient(180deg, var(--code-scan-frame-dash)) 0 0 / 2px 16px repeat-y;
+		content: '';
+		inset: -2px;
+		position: absolute;
+	}
+}
+
+@keyframes code-scan-frame-dashes {
+	to { background-position: 16px 0, 100% 16px, -16px 100%, 0 -16px; }
+}
+
 .code_scan_live_controls, .code_scan_crop_controls {
  min-height: 64px; margin: 0; flex: 1 0 64px; gap: 0;
  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);

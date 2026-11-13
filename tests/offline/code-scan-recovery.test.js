@@ -11,7 +11,7 @@ function deferred() {
 	const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
 	return { promise, resolve, reject };
 }
-function scanner() {
+function scanner({ useRecognition = false } = {}) {
 	const timers = new Map();
 	let nextTimer = 0;
 	const context = {
@@ -25,6 +25,9 @@ function scanner() {
 	vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
 	context.setCodeScanStatus = message => { context.status = message; };
 	context.detectCodeScanContainers = () => [];
+	context.getCodeScanLabelRoll = () => 0;
+	if(!useRecognition)
+		context.recognizeCodeScanImage = (canvas, _focus, _options, worker) => worker.recognize(canvas);
 	context.codeScanState.active = true;
 	context.expire = delay => {
 		const timer = [...timers.values()].find(item => item.delay === delay);
@@ -84,6 +87,25 @@ test('closing during worker creation rejects callers and disposes late workers',
 	assert.equal(old.terminated, true);
 	assert.equal(c.codeScanState.worker, fresh);
 	assert.equal(fresh.terminated, undefined);
+});
+
+test('closing during OCR image encoding prevents posting to the terminated worker', async () => {
+	const c = scanner();
+	const encoding = deferred();
+	const w = worker();
+	let reads = 0;
+	w.recognize = async () => { reads++; return { data: {} }; };
+	c.codeScanState.worker = w;
+	c.document.createElement = () => ({
+		getContext: () => ({ fillRect() {}, drawImage() {} }),
+		toBlob: resolve => { encoding.promise.then(resolve); }
+	});
+	const reading = c.ocrCodeScanBand({ width: 100, height: 50 }, { x0: 0, y0: 0, x1: 100, y1: 50 }, w);
+	c.terminateCodeScanWorker();
+	encoding.resolve({ arrayBuffer: async () => new ArrayBuffer(1) });
+	await assert.rejects(reading, { name: 'AbortError' });
+	assert.equal(reads, 0);
+	assert.equal(w.terminated, true);
 });
 
 test('worker initialization timeout and parameter failures release resources for retry', async () => {
@@ -293,12 +315,51 @@ test('delayed photo decoding after close never touches the preview', async () =>
 
 test('pixel-read failures and invalid OCR responses reject and reset the worker', async () => {
 	for(const pixels of [false, true]) {
-		const c = scanner(), w = worker();
+		const c = scanner({ useRecognition: true }), w = worker();
 		c.codeScanState.worker = w;
 		if(pixels) c.detectCodeScanContainers = () => { throw new Error('pixel read failed'); };
-		else w.recognize = async () => null;
-		await assert.rejects(c.recognizeCodeScanCanvas({ width: 20, height: 20 }), /pixel|Invalid scanner/);
+		else {
+			c.codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
+			c.detectCodeScanContainers = () => [{ x0: 10, y0: 10, x1: 90, y1: 40 }];
+			c.document.createElement = () => ({ getContext: () => ({ drawImage() {}, fillRect() {} }) });
+			w.recognize = async () => null;
+		}
+		await assert.rejects(c.recognizeCodeScanCanvas({ width: 100, height: 50 }), /pixel|Invalid scanner/);
 		assert.equal(w.terminated, true);
 		assert.equal(c.codeScanState.worker, null);
 	}
+});
+
+test('a small-roll retry reads the straightened box and restores source coordinates', async () => {
+	const c = scanner();
+	const source = { width: 600, height: 400 };
+	const straightenedBox = { x0: 110, y0: 140, x1: 500, y1: 300, anchored: true };
+	const straightenedMatch = { code: 'bengaluru mail nebula flower', regions: { container: straightenedBox, city: null } };
+	const reported = [];
+	const painted = [];
+	const context = { fillRect() {}, translate() {}, rotate: angle => painted.push(angle), drawImage: image => painted.push(image) };
+	c.document.createElement = () => ({ getContext: () => context });
+	c.getCodeScanLabelRoll = () => 6;
+	c.detectCodeScanContainers = canvas => canvas === source ? [] : [straightenedBox];
+	c.recognizeCodeScanImage = async (canvas, focus, options, _worker, containers) => {
+		if(canvas === source) return { data: { labelContainers: containers, debugBoxes: [] } };
+		assert.equal(canvas.width, 639);
+		assert.equal(canvas.height, 461);
+		assert.equal(focus.x, canvas.width / 2);
+		assert.equal(focus.y, canvas.height / 2);
+		assert.equal(options.cropOnly, true);
+		options.live.showBoxes(containers);
+		return { data: { scanMatch: straightenedMatch, labelContainers: containers, debugBoxes: containers } };
+	};
+	c.codeScanState.worker = worker();
+	const live = { isCurrent: () => true, showBoxes: boxes => reported.push(boxes) };
+	const { data } = await c.recognizeCodeScanCanvas(source, { x: 300, y: 200 }, { live });
+	assert.equal(data.scanMatch.code, straightenedMatch.code);
+	assert.deepEqual(data.scanMatch.regions.container, data.debugBoxes[0]);
+	assert.deepEqual(data.labelContainers, data.debugBoxes);
+	assert.deepEqual(reported, [data.debugBoxes]);
+	assert.ok(data.scanMatch.regions.container.x0 < 110 && data.scanMatch.regions.container.x1 > 480);
+	assert.ok(data.scanMatch.regions.container.y0 < 120 && data.scanMatch.regions.container.y1 > 280);
+	assert.equal(data.scanMatch.regions.city, null);
+	assert.deepEqual(painted, [-Math.PI / 30, source]);
 });

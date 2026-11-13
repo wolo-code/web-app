@@ -50,12 +50,12 @@ See [the scanner algorithm](CODE_SCAN.md) for the current implementation and the
 
 | Term | Meaning |
 | --- | --- |
-| **Scan Frame** | The dashed alignment guide; recognition uses the full image and can find both rectangles beyond it. It is distinct from the detected Label Region. |
+| **Scan Frame** | The alignment guide. It uses moving bright dashes during live Region Inspection and a bright solid outline on a frozen image or with reduced motion. Recognition can find both printed rectangles beyond the guide. |
 | **OCR Word Box** | The bounding box returned by OCR for an individual recognized word. |
 | **Region of Interest (ROI)** | An image area selected for processing, such as the area inside the Scan Frame. |
 | **Detection Padding** | Extra space added around a detected text bounding box. A 10% size increase adds 5% on each side before clipping at image edges. |
 | **Code Candidate** | A recognized city-and-three-word combination awaiting stability checks or review. |
-| **Stable Detection** | A code candidate that remains consistent across consecutive live OCR frames. |
+| **Stable Detection** | Two live OCR reads of the same three words in the same printed code box, with up to one missed frame between reads. |
 
 ## Implementation Vocabulary
 

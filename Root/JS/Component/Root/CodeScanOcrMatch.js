@@ -175,6 +175,64 @@
 		return Number.isFinite(word.confidence) && word.confidence >= 55 && word.confidence <= 100;
 	}
 
+	// Straight printed edges concentrate in fewer rows and columns when aligned.
+	// Estimate camera roll only; the rectangle detector still verifies the frame.
+	function estimateLabelRoll(imageData, width, height) {
+		var data = imageData.data;
+		var horizontal = [];
+		var vertical = [];
+		var rowStride = width * 4;
+		for(var y = 1; y < height - 1; y++) {
+			for(var x = 1; x < width - 1; x++) {
+				var pixel = (y * width + x) * 4;
+				var dx = 0;
+				var dy = 0;
+				for(var channel = 0; channel < 3; channel++) {
+					var i = pixel + channel;
+					dx += Math.abs(data[i + 4] - data[i - 4]);
+					dy += Math.abs(data[i + rowStride] - data[i - rowStride]);
+				}
+				if(dy >= 54 && dy >= dx * 2) horizontal.push(x, y);
+				if(dx >= 54 && dx >= dy * 2) vertical.push(x, y);
+			}
+		}
+		if(horizontal.length < 40 || vertical.length < 40) return 0;
+		var offset = Math.ceil(Math.max(width, height) / 4);
+		var rows = new Uint32Array(height + 2 * offset);
+		var columns = new Uint32Array(width + 2 * offset);
+		function score(angle) {
+			var slope = Math.tan(angle * Math.PI / 180);
+			var sum = 0;
+			rows.fill(0);
+			columns.fill(0);
+			for(var i = 0; i < horizontal.length; i += 2) {
+				sum += rows[Math.round(horizontal[i + 1] - slope * horizontal[i]) + offset]++;
+			}
+			for(var i = 0; i < vertical.length; i += 2) {
+				sum += columns[Math.round(vertical[i] + slope * vertical[i + 1]) + offset]++;
+			}
+			return sum;
+		}
+		var bestAngle = 0;
+		var originalScore = score(0);
+		var bestScore = originalScore;
+		function tryAngle(angle) {
+			var candidateScore = score(angle);
+			if(candidateScore > bestScore) {
+				bestScore = candidateScore;
+				bestAngle = angle;
+			}
+		}
+		for(var angle = -12; angle <= 12; angle += 0.5) {
+			if(angle) tryAngle(angle);
+		}
+		var coarseAngle = bestAngle;
+		for(var step = -4; step <= 4; step++) {
+			if(step) tryAngle(coarseAngle + step / 10);
+		}
+		return Math.abs(bestAngle) >= 0.3 && bestScore > originalScore * 1.08 ? bestAngle : 0;
+	}
+
 	// Locate four printed sides before interpreting text. Central side samples
 	// tolerate rounded corners; no text-derived or fixed-aspect box is invented.
 	function detectLabelRectangles(imageData, width, height) {
@@ -889,6 +947,7 @@
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		detectLabelRectangles: detectLabelRectangles,
+		estimateLabelRoll: estimateLabelRoll,
 		detailScanBands: detailScanBands,
 		readLabelMetadata: extractLabelMetadata,
 		fillLabelMetadata: fillLabelMetadata,

@@ -1,12 +1,31 @@
 # Wolo Code scanner algorithm
 
-The scanner reads printed Wolo Code labels locally in the browser. Camera frames and gallery photos follow the same algorithm; no images are sent to a server.
+The scanner reads printed Wolo Code labels locally in the browser. Camera frames and gallery photos use the same recognition path.
 
-## Required extraction order
+## Target algorithm for four-corner labels
 
-1. **Identify two independent physical rectangles:** the inner Wolo Code Region (city plus three words), and the outer Card Region separating the complete card from its background. Detect boundaries from pixels before interpreting OCR. The initial dashed scan frame is only an alignment guide: it neither clips the recognition image nor counts as either detected rectangle. Do not estimate borders from the words or impose a fixed aspect ratio. If the outer card cannot be detected, the inner code can still be reviewed.
+This sequence specifies the requested recognition behavior for labels printed with four L-shaped corner anchors. The current implementation is described below.
+
+1. **Find the four corner anchors before OCR.** Detect L-shaped marks from image pixels. Group one top-left, top-right, bottom-right, and bottom-left mark into a candidate Wolo Code Region using the orientation and intersection of each mark’s two arms. Accept only a convex, consistently ordered quadrilateral with four distinct, compatible marks. If several labels are visible, try the complete candidates nearest the viewfinder focus first and keep their text and geometry independent. If a corner is missing or the geometry is ambiguous, wait for a better frame or let the user reframe.
+2. **Straighten the label.** Compute a perspective transform from the four anchor intersections to the corners of a rectangle. Warp the image around that rectangle so the rectified image includes the code frame plus the title and address areas above and below it. Use the Card Region to bound those areas when its boundary is visible. Keep the original image for review and use the inverse transform to place detected regions back over it.
+3. **Read the three Wolo Code words.** OCR the interior of the straightened Wolo Code Region. Find a single row of exactly three words, in left-to-right order. Use the Wolo word list as the only source of accepted words. Prefer exact matches and accept an OCR correction only when it has one sufficiently confident dictionary match. Reject a candidate with an ambiguous, unreadable, or extra word.
+4. **Read the city above the words.** Search for the nearest readable row above the accepted words, within the same Wolo Code Region. Match the complete row against the city list, including multiword names, and return the canonical spelling from the matched city record. Prefer an exact normalized match. If OCR produces several plausible cities or no confident match, leave the city unresolved for review. Keep the three recognized words available.
+5. **Read Title and Segment above the frame.** In the rectified band above the top edge, read the first label row as Title and the second as Segment. A single readable row fills Title. Keep both fields optional and exclude branding and unrelated text.
+6. **Read Address line 1 and Address line 2 below the frame.** In the rectified band below the bottom edge, read the first address group as Address line 1 and the second as Address line 2. Use visible gaps between groups and keep wrapped rows together. A single address group fills line 1. When the outer card edge is unclear, limit both metadata bands to the immediate label area. Leave missing or uncertain fields blank.
+
+The recognition result contains the three canonical words, the matched city record when available, the four optional metadata fields, and their regions in source-image coordinates. Live capture can use this result for its stability checks. A completed Shutter Button hold uses the detection already shown, and a short tap reads a fresh frame.
+
+### Acceptance examples
+
+- An angled or perspective-skewed photo with four visible anchors produces the same code as a straight-on photo of the label.
+- The example below yields `mail nebula flower` and the canonical city `Bengaluru`. `Ram` and `Main door` populate Title and Segment. Address text below the frame stays in its own two fields.
+- Three visible anchors are insufficient for the four-corner transform. A complete frame with an unreadable city or address still yields its three valid Wolo words for review.
+
+## Current extraction order
+
+1. **Detect physical boundaries.** The pixel detector looks for approximately axis-aligned rectangular or rounded borders and groups of four L-shaped corner marks. It returns axis-aligned boxes for the inner Wolo Code Region and any enclosing Card Region. OCR runs in the original image orientation. The dashed scan frame serves as an alignment guide, and the inner code can still be reviewed when the outer card edge is missing.
 2. **Read exactly three Wolo Code words from inside that box.** Use a single horizontal row, in left-to-right order. All word boxes must be fully contained in the same detected rectangle. Normalize separators and case, and apply Wolo dictionary correction only to these three words. Reject incomplete rows, rows with extra words, and low-confidence code words.
-3. **Read the city above those three words, still inside the same rectangle.** Use the nearest OCR row above the word row. Preserve the city spelling rather than correcting it against the Wolo dictionary. Multiword cities and cities wider than the word row are supported. Never append the title, segment or street address to the city.
+3. **Read the city above those three words, still inside the same rectangle.** Use the nearest reliable OCR row above the word row. The scanner passes that spelling to review, and city lookup runs when the reviewed code is used or saved. Multiword cities and cities wider than the word row are supported.
 4. **Optionally read Title and Segment on separate rows above the inner box, and Address line 1 followed by Address line 2 below it.** All outside text must still lie inside the outer card. Address parts preferably form two paragraphs separated by an empty line; wrapped rows within a paragraph remain in that part. Their absence or low confidence must not prevent reviewing the three words.
 
 For the supplied example:

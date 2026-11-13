@@ -36,7 +36,7 @@ Label Region
 
 The City Region is optional when no city text is recognized. The Three-Word Region is required for a recognized code candidate.
 
-## Recognition Sequence
+## Current Recognition Sequence
 
 1. **Label border detection:** identify both the actual inner code rectangle and the outer card boundary in image pixels. The initial scan frame only guides alignment.
 2. **Three-word extraction:** read exactly three Wolo dictionary words on one row inside that detected box.
@@ -44,7 +44,7 @@ The City Region is optional when no city text is recognized. The Three-Word Regi
 4. **Optional metadata extraction:** read Title and Segment on separate rows above the inner box and two address paragraphs below it, all within the card, when readable, keeping them separate from the city and code.
 5. **Review:** populate editable city and word fields before the user applies the code; expose optional fields behind the Address icon, line 1 before line 2 with blank-line spacing, and retain edits for the same card.
 
-See [the scanner algorithm](CODE_SCAN.md) for rules, output fields and verification. The Label Region follows the detected physical border; it is not estimated from text geometry and has no enforced aspect ratio.
+See [the scanner algorithm](CODE_SCAN.md) for the current implementation and the target four-corner recognition sequence. The Label Region follows the detected physical border and has no enforced aspect ratio.
 
 ## Supporting Terms
 

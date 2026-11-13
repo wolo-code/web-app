@@ -129,6 +129,8 @@ function panThenSmoothZoomIn(pos, bounds, skipFinalBoundsFit, linkZoom) {
 }
 
 function focus_(pos, bounds, skipFinalBoundsFit, linkZoom) {
+	if(typeof mapPinAdjustment !== 'undefined' && mapPinAdjustment) finishMapPinAdjustment();
+	keepAdjustedPinCamera = false;
 
 	hideNoCityMessage();
 	beginProgrammaticMapFocus();
@@ -162,7 +164,7 @@ function showMarker(pos) {
 			title: coordinate.lat + " / " + coordinate.lng
 		});
 		marker = placeMarker;
-		placeMarker.addListener('click', function() {
+		bindMapPlaceMarker(placeMarker, function() {
 			var entry = getMapPlace(placeMarker);
 			if(entry)
 				loadMapPlace(entry, false);

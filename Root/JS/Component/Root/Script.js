@@ -125,7 +125,7 @@ function syncBottomStackMapPan() {
 	var next = getBottomStackHeight();
 	var delta = next - lastBottomStackPanY;
 	if(delta) {
-		if(!programmaticMapFocus)
+		if(!programmaticMapFocus && !mapPinAdjustment && !keepAdjustedPinCamera)
 			map.panBy(0, -delta);
 		lastBottomStackPanY = next;
 	}

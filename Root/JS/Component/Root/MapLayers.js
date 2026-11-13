@@ -758,6 +758,7 @@ function syncOsmAttribution() {
 }
 
 function clearMapViewClasses() {
+	if(typeof mapPinAdjustment !== 'undefined' && mapPinAdjustment) finishMapPinAdjustment();
 	hideAppleMapStage();
 	document.body.classList.remove.apply(document.body.classList, MAP_VIEW_CLASSES);
 }

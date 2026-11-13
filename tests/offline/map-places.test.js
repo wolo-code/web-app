@@ -32,6 +32,7 @@ function loadMap() {
 		addListener(name, listener) { this[name + 'Listener'] = listener; }
 		open({anchor}) { this.anchor = anchor; this.isOpen = true; }
 		close() { this.isOpen = false; this.closeListener(); }
+		setOptions(options) { this.options = options; }
 		setContent(content) { this.content = content; }
 		getContent() { return this.content; }
 	}
@@ -55,16 +56,22 @@ function loadMap() {
 		stopZoom: noop, clearNotificationTimer: noop, listPressTimer: [],
 		clearTimeout: noop, clearLocating: noop, watch_location_timer: null,
 		watch_location_id: null, navigator: { geolocation: { clearWatch: noop } },
-		addClassIfPresent: noop, clearAddress: noop, hideAddress: noop, clearURL: noop
+		addClassIfPresent: noop, clearAddress: noop, refreshAddress: noop, hideAddress: noop, clearURL: noop
 	});
-	for (const file of ['Map.js', 'InfoWindow.js']) {
+	for (const file of ['Map.js', 'InfoWindow.js', 'PinAdjustment.js']) {
 		const source = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root', file), 'utf8');
 		vm.runInContext(source, context);
 	}
 	function place(lat) {
 		return {
+			visible: true,
+			getVisible() { return this.visible; },
+			setVisible(visible) { this.visible = visible; },
+			getIcon: () => null,
 			getTitle: () => 'Place ' + lat,
 			getPosition: () => ({ lat: () => lat, lng: () => 2 }),
+			setPosition(pos) { this.getPosition = () => ({lat: () => pos.lat, lng: () => pos.lng}); },
+			setTitle(title) { this.getTitle = () => title; },
 			setMap(map) { this.map = map; }
 		};
 	}
@@ -356,7 +363,9 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
  context.clearTimeout = () => { timer = null; };
  context.map = {getDiv: () => ({addEventListener: (name, fn) => {listeners[name] = fn;}, getBoundingClientRect: () => ({left: 10, top: 20})}), addListener() {}};
  context.google.maps.Point = function(x, y) {this.x = x; this.y = y;};
- context.google.maps.OverlayView = function() {this.setMap = () => {}; this.getProjection = () => ({fromContainerPixelToLatLng: p => p});};
+ context.mapPinProjectionOverlay = {getProjection: () => ({
+  fromContainerPixelToLatLng: p => p, fromLatLngToContainerPixel: () => ({x: 0, y: 0})
+ })};
  context.resolveLatLng = p => p;
  context.focus___ = context.getAddress = () => {};
  let position;
@@ -389,6 +398,77 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
  listeners.touchstart(touch(110));
  listeners.touchcancel();
  assert.equal(timer, null);
+	const entry = context.getMapPlace(context.marker);
+	context.mapPinProjectionOverlay.getProjection = () => ({
+		fromLatLngToContainerPixel: position => ({x: position.lat() === 2 ? 100 : 0, y: 210})
+	});
+	context.startMapPinAdjustment = pin => {
+		assert.equal(pin, entry);
+		return true;
+	};
+	context.encode = () => assert.fail('holding a marker must not create a new location');
+	listeners.touchstart(touch(110));
+	timer();
+});
+
+test('pin adjustment preserves the camera, keeps the route order, and encodes only on Apply', () => {
+	const {context, document, show} = loadMap();
+	document.body = document.getElementById('body');
+	document.body.classList.contains = name => document.body.classList.values.has(name);
+	const crosshair = context.mapPinCrosshair = {style: {}};
+	const surface = document.getElementById('map');
+	Object.assign(surface, {clientWidth: 320, clientHeight: 480});
+	context.map.getDiv = () => surface;
+	context.google.maps.Point = function(x, y) { Object.assign(this, {x, y}); };
+	let panX = 0;
+	context.mapPinProjectionOverlay = {getProjection: () => ({
+		fromLatLngToContainerPixel: position => ({x: position.lng() * 50 + panX, y: position.lat() * 50}),
+		fromContainerPixelToLatLng: ({x, y}) => {
+			const lng = (x - panX) / 50;
+			return {lat: () => y / 50, lng: () => lng};
+		}
+	})};
+	const encoded = [];
+	context.encode = pos => encoded.push(pos);
+	const firstCard = show(1);
+	const first = context.getMapPlace(context.marker);
+	first.routeCode = 'old-code';
+	context.retainActiveMapCard();
+	const secondCard = show(2);
+	const second = context.getMapPlace(context.marker);
+
+	assert.equal(context.startMapPinAdjustment(first), true);
+	assert.equal(first.marker.getVisible(), false);
+	assert.equal(crosshair.style.left, '100px');
+	assert.equal(context.isIgnorableMapClick({}), true);
+	context.nudgeMapPin('ArrowRight');
+	assert.equal(crosshair.style.left, '101px');
+	panX = 20;
+	context.drawMapPinCrosshair();
+	assert.equal(crosshair.style.left, '121px');
+	context.finishMapPinAdjustment();
+	assert.equal(first.marker.getVisible(), true);
+	assert.equal(first.marker.getPosition().lng(), 2);
+	assert.equal(context.infoWindow, secondCard);
+	assert.equal(first.card, firstCard);
+	assert.equal(encoded.length, 0);
+
+	context.startMapPinAdjustment(first);
+	context.applyMapPinAdjustment();
+	assert.equal(encoded.length, 0);
+	context.startMapPinAdjustment(first);
+	context.nudgeMapPin('ArrowRight');
+	firstCard.setOptions = options => assert.equal(options.disableAutoPan, true);
+	context.applyMapPinAdjustment();
+	assert.equal(encoded.length, 1);
+	assert.equal(encoded[0].lng, 2.02);
+	assert.equal(context.mapPlaces[0], first);
+	assert.equal(context.mapPlaces[1], second);
+	assert.equal(context.infoWindow, firstCard);
+	assert.equal(second.card, secondCard);
+	assert.equal(second.marker.getPosition().lng(), 2);
+	assert.equal(first.routeCode, undefined);
+	assert.match(context.getMapRouteURL(true), /from=1%2C2\.02&to=2%2C2$/);
 });
 
 test('holding Go adds a card and the release click does not replace either marker', () => {

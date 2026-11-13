@@ -6,6 +6,8 @@ var poiPlace;
 var mapPlaces = [];
 var mapSelectionVersion = 0;
 var mapFitPlacesSelectionVersion = null;
+var mapPinAdjustment = null;
+var keepAdjustedPinCamera = false;
 var APP_MODE_BACKGROUND = {
 	wcode: '#efefef',
 	map: '#60d0e5',
@@ -171,18 +173,13 @@ function isMapChromeClick(event) {
 }
 
 function isIgnorableMapClick(event) {
-	return Date.now() < mapHoldClickUntil || mapDragClickGuard || isMapChromeClick(event);
+	return mapPinAdjustment !== null || Date.now() < mapHoldClickUntil || mapDragClickGuard || isMapChromeClick(event);
 }
 
 // A touch hold adds a point using the same retained-card flow as Shift-click.
 var mapHoldClickUntil = 0;
 function setupMapTouchHold() {
 	var surface = map.getDiv();
-	var overlay = new google.maps.OverlayView();
-	overlay.onAdd = function() {};
-	overlay.draw = function() {};
-	overlay.onRemove = function() {};
-	overlay.setMap(map);
 	var timer = null;
 	var origin = null;
 	var held = false;
@@ -194,18 +191,24 @@ function setupMapTouchHold() {
 	surface.addEventListener('touchstart', function(event) {
 		cancelHold();
 		held = false;
-		if(event.touches.length !== 1 || isMapChromeClick({domEvent: event}) ||
-			mapEventPathHasSelector({domEvent: event}, 'button, input, a, .gm-style-iw, [role="button"]')) return;
+		if(mapPinAdjustment || event.touches.length !== 1 || isMapChromeClick({domEvent: event})) return;
 		var touch = event.touches[0];
+		var projection = mapPinProjectionOverlay.getProjection();
+		if(!projection) return;
+		var rect = surface.getBoundingClientRect();
+		var pixel = new google.maps.Point(touch.clientX - rect.left, touch.clientY - rect.top);
+		var entry = getMapPlaceAtPixel(projection, pixel);
+		if(mapEventPathHasSelector({domEvent: event}, 'input, a, .gm-style-iw') ||
+			(!entry && mapEventPathHasSelector({domEvent: event}, 'button, [role="button"]'))) return;
 		origin = {x: touch.clientX, y: touch.clientY};
 		timer = setTimeout(function() {
-			var projection = overlay.getProjection();
-			if(!projection || !origin) return;
-			var rect = surface.getBoundingClientRect();
-			var latLng = projection.fromContainerPixelToLatLng(new google.maps.Point(origin.x - rect.left, origin.y - rect.top));
+			if(!origin || mapPinAdjustment) return;
 			cancelHold();
+			var latLng = entry ? null : projection.fromContainerPixelToLatLng(pixel);
+			if(entry ? !startMapPinAdjustment(entry) : !latLng) return;
 			held = true;
 			mapHoldClickUntil = Date.now() + 1000;
+			if(entry) return;
 			cleanUp(true, true);
 			infoWindow_setContent(MESSAGE_LOADING);
 			var pos = resolveLatLng(latLng);
@@ -213,20 +216,20 @@ function setupMapTouchHold() {
 			focus___(pos);
 			getAddress(pos);
 		}, 500);
-	}, {passive: true});
+	}, {capture: true, passive: true});
 	surface.addEventListener('touchmove', function(event) {
 		if(!origin) return;
 		var touch = event.touches[0];
 		if(event.touches.length !== 1 || Math.hypot(touch.clientX - origin.x, touch.clientY - origin.y) > 10) cancelHold();
-	}, {passive: true});
+	}, {capture: true, passive: true});
 	surface.addEventListener('touchend', function(event) {
 		cancelHold();
 		if(held) {
 			mapHoldClickUntil = Date.now() + 1000;
 			if(event.cancelable) event.preventDefault();
 		}
-	}, {passive: false});
-	surface.addEventListener('touchcancel', cancelHold, {passive: true});
+	}, {capture: true, passive: false});
+	surface.addEventListener('touchcancel', cancelHold, {capture: true, passive: true});
 	surface.addEventListener('contextmenu', function(event) {
 		if(timer !== null || held) event.preventDefault();
 	});
@@ -333,6 +336,8 @@ function isMapSearchTypingTarget(el) {
 }
 
 function shouldKeepMapSearchFocused() {
+	if(document.body.classList.contains('map_pin_adjusting'))
+		return false;
 	if(typeof isMapViewActive == 'function' && !isMapViewActive())
 		return false;
 	if(document.body.classList.contains('decode'))
@@ -405,6 +410,7 @@ function onMapSearchGlobalKeydown(event) {
 function initMap() {
 	initOsmMapType();
 	initMapFocusCancellation();
+	initMapPinAdjustment();
 
 	var input = document.getElementById('pac-input');
 	var searchCluster = document.getElementById('map_search_cluster');
@@ -505,7 +511,7 @@ function initMap() {
 					position: place.geometry.location
 				});
 				var entry = {marker: resultMarker, name: place.name, result: true};
-				resultMarker.addListener('click', function(event) {
+				bindMapPlaceMarker(resultMarker, function(event) {
 					loadMapPlace(entry, !!(event && event.domEvent && event.domEvent.shiftKey));
 				});
 				mapPlaces.push(entry);
@@ -528,6 +534,7 @@ function initMap() {
 	map.addListener('idle', clearMapDragClickGuard);
 	map.addListener('click', function(event) {
 		if(isIgnorableMapClick(event)) {
+			if(mapPinAdjustment && event.stop) event.stop();
 			return;
 		}
 		cleanUp(true, !!(event.domEvent && event.domEvent.shiftKey));
@@ -899,6 +906,7 @@ function toggleActiveMapCard() {
 }
 
 function loadMapPlace(entry, keepMapCard) {
+	if(mapPinAdjustment) finishMapPinAdjustment();
 	if(entry.card) {
 		activateMapCard(entry.card);
 		focus_(entry.marker.getPosition());
@@ -1091,7 +1099,7 @@ function syncBottomStackMapPan() {
 	var next = getBottomStackHeight();
 	var delta = next - lastBottomStackPanY;
 	if(delta) {
-		if(!programmaticMapFocus)
+		if(!programmaticMapFocus && !mapPinAdjustment && !keepAdjustedPinCamera)
 			map.panBy(0, -delta);
 		lastBottomStackPanY = next;
 	}
@@ -1185,6 +1193,8 @@ function clearMap() {
 }
 
 function cleanUp(full = false, keepMapCard = false) {
+	if(mapPinAdjustment) finishMapPinAdjustment();
+	keepAdjustedPinCamera = false;
 	pendingWoloLinkZoom = undefined;
 	if(keepMapCard)
 		retainActiveMapCard();
@@ -1301,6 +1311,7 @@ function toggleDecodeView() {
 }
 
 function removeMapPlace(entry) {
+	if(mapPinAdjustment) finishMapPinAdjustment();
 	mapPlaces = mapPlaces.filter(function(place) { return place !== entry; });
 	if(entry.marker === marker) {
 		mapSelectionVersion++;
@@ -1422,7 +1433,7 @@ function restoreMapRoute() {
 			var name = stop.name || (index === 0 ? 'From' : index === stops.length - 1 ? 'To' : 'Via ' + getMapPlaceLabel(index));
 			var routeMarker = new google.maps.Marker({map: map, position: stop.position, title: name});
 			var entry = {marker: routeMarker, name: name, result: true, routeCode: stop.routeCode};
-			routeMarker.addListener('click', function() { loadMapPlace(entry, true); });
+			bindMapPlaceMarker(routeMarker, function() { loadMapPlace(entry, true); });
 			mapPlaces.push(entry);
 			bounds.extend(stop.position);
 		});

@@ -30,7 +30,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(fragment, /id='code_scan_review_w1'/);
 	assert.match(fragment, /id='code_scan_review_w2'/);
 	assert.match(fragment, /id='code_scan_review_w3'/);
-	assert.match(fragment, /id='code_scan_status'[^>]*>Processed on your device\s*–\s*No images are uploaded</);
+	assert.match(fragment, /id='code_scan_status'[^>]*>Processed on your device<br>No images are uploaded</);
 	assert.doesNotMatch(fragment, /Review and edit before decoding/);
 	assert.doesNotMatch(fragment, /Enter three valid Wolo words/);
 	assert.doesNotMatch(fragment, /id='code_scan_use_code'/);

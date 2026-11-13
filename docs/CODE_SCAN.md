@@ -13,7 +13,7 @@ This sequence specifies the requested recognition behavior for labels printed wi
 5. **Read Title and Segment above the frame.** In the rectified band above the top edge, read the first label row as Title and the second as Segment. A single readable row fills Title. Keep both fields optional and exclude branding and unrelated text.
 6. **Read Address line 1 and Address line 2 below the frame.** In the rectified band below the bottom edge, read the first address group as Address line 1 and the second as Address line 2. Use visible gaps between groups and keep wrapped rows together. A single address group fills line 1. When the outer card edge is unclear, limit both metadata bands to the immediate label area. Leave missing or uncertain fields blank.
 
-The recognition result contains the three canonical words, the matched city record when available, the four optional metadata fields, and their regions in source-image coordinates. Live capture can use this result for its stability checks. A completed Shutter Button hold uses the detection already shown, and a short tap reads a fresh frame.
+The recognition result contains the three canonical words, the matched city record when available, the four optional metadata fields, and their regions in source-image coordinates. Live capture can use this result for its stability checks. Releasing a Shutter Button hold freezes the inspected frame and keeps its outlines visible. If the words are unreadable, the scanner runs still-image OCR on that frame. A short tap reads a fresh frame.
 
 ### Acceptance examples
 

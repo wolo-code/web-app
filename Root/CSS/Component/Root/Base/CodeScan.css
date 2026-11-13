@@ -352,6 +352,7 @@
 	border-radius: 50%;
 	display: block;
 	height: 45.6px;
+	pointer-events: none;
 	transition: background 150ms ease;
 	width: 45.6px;
 }
@@ -362,6 +363,8 @@
 	margin: 0 0 6px;
 	min-height: 1.3em;
 	text-align: center;
+	text-wrap: balance;
+	white-space: pre-line;
 }
 
 .code_scan_review {
@@ -664,7 +667,7 @@ html.dark-mode .code_scan_apply_crop {
 .code_scan_live_controls > button, .code_scan_crop_controls > button { justify-self: center; }
 .code_scan_live_controls.hide, .code_scan_crop_controls.hide { display: none; }
 .code_scan_crop_button { width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; }
-.code_scan_status { min-height: 36px; margin: 0; flex: 0 0 auto; }
+.code_scan_status { min-height: 36px; max-inline-size: 42ch; margin: 0 auto; flex: 0 0 auto; }
 .code_scan_review { animation: code-scan-review-in 180ms ease-out; }
 @keyframes code-scan-review-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 662px) {

@@ -130,7 +130,7 @@ test('live debug skips portrait and square candidates and reads landscape frames
  context.codeScanState.worker = { setParameters: async () => {}, recognize: () => assert.fail('live OCR should read a crop') };
  context.ocrCodeScanBand = async (_image, crop, _worker, maxHeight, rotation) => {
   rotations.push(rotation);
-  assert.equal(maxHeight, 160);
+  assert.equal(maxHeight, 240);
   assert.ok(crop.x1 - crop.x0 > crop.y1 - crop.y0);
   return [];
  };
@@ -473,8 +473,35 @@ test('releasing a shutter hold captures the displayed match even after a missed 
  windowEvents.pointercancel({ type: 'pointercancel' });
  assert.equal(captured, undefined);
  buttonEvents.pointerdown({ type: 'pointerdown', button: 0 }); timer();
- windowEvents.pointerup({ type: 'pointerup' }); assert.equal(context.codeScanState.showRegions, false);
+ windowEvents.pointerup({ type: 'pointerup' }); assert.equal(context.codeScanState.showRegions, true);
  assert.equal(captured, match);
  assert.equal(captured.regions.container.x0, 20);
  assert.equal(context.codeScanState.regionPressConsumed, true); assert.ok(clears > 0);
+});
+
+test('touch hold suppresses selection and freezes the frame with detected borders before a code is read', () => {
+ const { context, canvas } = scanner();
+ const handlers = {};
+ context.document.getElementById = () => ({ addEventListener: (name, fn) => handlers[name] = fn });
+ context.window = { addEventListener() {} };
+ let timer, prevented = 0, drawn;
+ context.setTimeout = fn => { timer = fn; };
+ context.clearTimeout = () => {};
+ const frame = { width: 200, height: 100 };
+ const box = { x0: 10, y0: 10, x1: 90, y1: 40 };
+ context.codeScanState.regionFrame = { frame, width: 100, height: 50, boxes: [box] };
+ canvas.getContext = () => ({ drawImage: source => assert.equal(source, frame) });
+ for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
+  context[name] = () => {};
+ context.beginCodeScanCapture = match => assert.equal(match, undefined);
+ context.drawCodeScanMatchRegions = (match, image, boxes) => { drawn = { match, image, boxes }; };
+ context.initCodeScanRegionPress();
+ const changedTouches = [{ identifier: 1 }];
+ handlers.touchstart({ touches: changedTouches, changedTouches, preventDefault: () => prevented++ });
+ timer();
+ handlers.touchend({ type: 'touchend', changedTouches, cancelable: true, preventDefault: () => prevented++ });
+ assert.equal(prevented, 2);
+ assert.equal(context.codeScanState.showRegions, true);
+ assert.equal(drawn.image, canvas);
+ assert.deepEqual({ ...drawn.boxes[0] }, { x0: 20, y0: 20, x1: 180, y1: 80 });
 });

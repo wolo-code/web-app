@@ -84,12 +84,23 @@ function captureMapPinDrag(event) {
 	mapPinAdjustment.drag = {id: event.pointerId, x: offset.x, y: offset.y};
 }
 
+function reserveMapPinGesture() {
+	var previous = map.get('gestureHandling') || 'auto';
+	map.setOptions({gestureHandling: 'none'});
+	return function() { map.setOptions({gestureHandling: previous}); };
+}
+
 function setupMapPinMouseHold(surface) {
 	var press;
 	var timer;
+	var releaseGesture;
+	var offset;
 	function cancelHold() {
 		clearTimeout(timer);
 		press = null;
+		offset = null;
+		if(releaseGesture) releaseGesture();
+		releaseGesture = null;
 	}
 	surface.addEventListener('pointerdown', function(event) {
 		if(mapPinAdjustment || event.pointerType === 'touch' || !event.isPrimary || event.button !== 0 ||
@@ -100,17 +111,26 @@ function setupMapPinMouseHold(surface) {
 		var entry = getMapPlaceAtPixel(projection, new google.maps.Point(event.clientX - rect.left, event.clientY - rect.top));
 		if(!entry) return;
 		cancelHold();
+		// Reserve the gesture before Maps receives the original press.
+		releaseGesture = reserveMapPinGesture();
 		press = event;
 		timer = setTimeout(function() {
 			if(startMapPinAdjustment(entry)) {
-				captureMapPinDrag(press);
+				offset = getMapPinDragOffset(press.clientX, press.clientY);
 				mapHoldClickUntil = Date.now() + 1000;
+				return;
 			}
 			cancelHold();
 		}, 500);
 	}, true);
 	window.addEventListener('pointermove', function(event) {
-		if(press && press.pointerId === event.pointerId && Math.hypot(event.clientX - press.clientX, event.clientY - press.clientY) > 8)
+		if(!press || press.pointerId !== event.pointerId) return;
+		if(offset && mapPinAdjustment) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			moveMapPinDraft(event.clientX + offset.x, event.clientY + offset.y);
+		}
+		else if(Math.hypot(event.clientX - press.clientX, event.clientY - press.clientY) > 8)
 			cancelHold();
 	}, true);
 	['pointerup', 'pointercancel'].forEach(function(type) {

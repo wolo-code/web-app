@@ -361,7 +361,12 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
  let timer;
  context.setTimeout = fn => { timer = fn; return 1; };
  context.clearTimeout = () => { timer = null; };
- context.map = {getDiv: () => ({addEventListener: (name, fn) => {listeners[name] = fn;}, getBoundingClientRect: () => ({left: 10, top: 20})}), addListener() {}};
+ const gestures = [];
+ context.window.addEventListener = () => {};
+ context.map = {
+  getDiv: () => ({addEventListener: (name, fn) => {listeners[name] = fn;}, getBoundingClientRect: () => ({left: 10, top: 20})}),
+  get: () => 'greedy', setOptions: options => gestures.push(options.gestureHandling), addListener() {}
+ };
  context.google.maps.Point = function(x, y) {this.x = x; this.y = y;};
  context.mapPinProjectionOverlay = {getProjection: () => ({
   fromContainerPixelToLatLng: p => p, fromLatLngToContainerPixel: () => ({x: 0, y: 0})
@@ -412,12 +417,14 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
 	context.moveMapPinDraft = (x, y) => draftMoves.push([x, y]);
 	context.encode = () => assert.fail('holding a marker must not create a new location');
 	listeners.touchstart(touch(110));
+	assert.deepEqual(gestures, ['none']);
 	timer();
 	const move = {...touch(130), cancelable: true, preventDefault() {}, stopImmediatePropagation() {}};
 	listeners.touchmove(move);
 	listeners.touchend({cancelable: false});
 	listeners.touchmove(move);
 	assert.deepEqual(draftMoves, [[120, 230]]);
+	assert.deepEqual(gestures, ['none', 'greedy']);
 });
 
 test('pin adjustment preserves the camera, keeps the route order, and encodes only on Apply', () => {

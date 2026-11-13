@@ -39,7 +39,7 @@
 			</button>
 		</div>
 		<div id='code_scan_live_controls' class='code_scan_live_controls'>
-			<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' capture='environment' tabindex='-1' aria-hidden='true'>
+			<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' tabindex='-1' aria-hidden='true'>
 			<button id='code_scan_use_photo' class='border code_scan_icon_button code_scan_use_photo' type='button' aria-label='Choose photo from gallery' title='Choose photo from gallery'>
 				<span class='image'><?php includeSVG('', 'Gallery'); ?></span>
 			</button>

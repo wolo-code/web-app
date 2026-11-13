@@ -19,6 +19,7 @@ var codeScanState = {
 	workerJobs: [],
 	session: 0,
 	cameraRequest: 0,
+	cameraState: 'idle',
 	scanTimer: null,
 	processing: false,
 	lastMatchCode: '',
@@ -55,10 +56,10 @@ const shutterAudioWav = new Audio('/sounds/camera-shutter-release.wav');
 shutterAudioWav.load();
 
 function playShutterSound() {
-  // Attempt to play MP3; on failure, play WAV fallback
-  shutterAudio.play().catch(() => {
-    shutterAudioWav.play().catch(() => {});
-  });
+	if(document.hidden) return;
+	shutterAudio.play().catch(function(error) {
+		if(!document.hidden && (!error || error.name !== 'AbortError')) shutterAudioWav.play().catch(function() {});
+	});
 }
 
 var CODE_SCAN_FRAME_INTERVAL_MS = 250;
@@ -122,6 +123,12 @@ function initCodeScan() {
 	bindControl('code_scan_apply_crop', 'click', useCodeScanReview);
 	bindCodeScanReviewInputListeners();
 	initCodeScanZoomAndPan();
+	document.addEventListener('visibilitychange', function() {
+		if(document.hidden) suspendCodeScanMedia();
+		else resumeCodeScanCamera();
+	});
+	window.addEventListener('pagehide', suspendCodeScanMedia);
+	window.addEventListener('pageshow', resumeCodeScanCamera);
 	window.addEventListener('resize', redrawCodeScanReviewRegions);
 	var previewCanvas = getCodeScanCanvas();
 	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
@@ -355,15 +362,40 @@ function getCodeScanCanvas() {
 	return document.getElementById('code_scan_canvas');
 }
 
+function suspendCodeScanMedia() {
+	[shutterAudio, shutterAudioWav].forEach(function(audio) {
+		audio.pause();
+		if(audio.currentTime) audio.currentTime = 0;
+	});
+	if(codeScanState.cameraState !== 'active') return;
+	invalidateCodeScanSession();
+	codeScanState.cameraState = 'suspended';
+	resetCodeScanMatchState();
+	clearCodeScanCandidateHighlight();
+	setCodeScanWoloFoundCue(false);
+}
+
+function resumeCodeScanCamera() {
+	if(document.hidden || codeScanState.cameraState !== 'suspended' || !codeScanState.active ||
+		!isCodeScanVisible() || codeScanState.phase !== 'live' || codeScanState.hasCaptured) return;
+	setCodeScanStatus('Requesting camera...');
+	startCodeScanCamera();
+}
+
 function startCodeScanCamera() {
 	var video = getCodeScanVideo();
+	if(!video) return;
+	if(document.hidden) {
+		codeScanState.cameraState = 'suspended';
+		return;
+	}
+	codeScanState.cameraState = 'active';
+	setCodeScanCaptureEnabled(false);
 	var session = codeScanState.session;
 	var request = ++codeScanState.cameraRequest;
 	function current() {
-		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !codeScanState.hasCaptured;
+		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !document.hidden && !codeScanState.hasCaptured;
 	}
-	if(!video)
-		return;
 	navigator.mediaDevices.getUserMedia({
 		video: {
 			facingMode: {ideal: 'environment'},
@@ -385,6 +417,7 @@ function startCodeScanCamera() {
 		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
+		setCodeScanCaptureEnabled(true);
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanFrozenPreview(false);
@@ -398,6 +431,8 @@ function startCodeScanCamera() {
 
 function stopCodeScanCamera() {
 	codeScanState.cameraRequest += 1;
+	codeScanState.cameraState = 'idle';
+	codeScanState.cameraAvailable = false;
 	var video = getCodeScanVideo();
 	if(codeScanState.stream) {
 		codeScanState.stream.getTracks().forEach(function(track) {

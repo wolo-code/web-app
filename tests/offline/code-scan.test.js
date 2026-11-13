@@ -42,8 +42,9 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(fragment, /includeSVG\('', 'Keyboard'\)/);
 	assert.match(fragment, /includeSVG\('', 'Reverse'\)/);
 	assert.match(fragment, /includeSVG\('', 'Proceed'\)/);
-	assert.match(fragment, /id='code_scan_photo_input'/);
-	assert.match(fragment, /capture='environment'/);
+	const photoInput = fragment.match(/<input\b[^>]*id='code_scan_photo_input'[^>]*>/)?.[0];
+	assert.match(photoInput, /type='file' accept='image\/\*'/);
+	assert.doesNotMatch(photoInput, /\bcapture\b/);
 	assert.match(script, /initCodeScan\(\)/);
 	assert.match(codeScan, /getUserMedia/);
 	assert.match(codeScan, /CODE_SCAN_TESSERACT_BASE\s*=\s*'\/tesseract'/);

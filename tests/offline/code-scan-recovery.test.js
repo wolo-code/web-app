@@ -15,7 +15,7 @@ function scanner() {
 	const timers = new Map();
 	let nextTimer = 0;
 	const context = {
-		Audio: function() { this.load = () => {}; },
+		Audio: function() { this.load = () => {}; this.pause = () => {}; },
 		setTimeout: (callback, delay) => { timers.set(++nextTimer, { callback, delay }); return nextTimer; },
 		clearTimeout: id => timers.delete(id),
 		window: {},
@@ -199,6 +199,45 @@ test('late camera failure cannot clear a new session', async () => {
 	c.codeScanState.session++;
 	request.reject(new Error('denied'));
 	await flush();
+});
+
+test('hiding the scanner releases live media and only resumes an interrupted live scan', async () => {
+	const c = scanner(), pending = deferred();
+	let requests = 0, stopped = 0, paused = 0, frames = 0;
+	const stream = () => ({ getTracks: () => [{ stop: () => stopped++ }] });
+	const video = { play: async () => {}, pause: () => paused++ };
+	c.getCodeScanVideo = () => video;
+	c.isCodeScanVisible = () => true;
+	c.prepareCodeScanWorker = async () => worker();
+	c.runCodeScanFrame = () => frames++;
+	c.navigator = { mediaDevices: { getUserMedia: () => ++requests === 1 ? pending.promise : Promise.resolve(stream()) } };
+	c.startCodeScanCamera();
+	c.document.hidden = true;
+	c.suspendCodeScanMedia();
+	pending.resolve(stream());
+	await flush();
+	assert.equal(stopped, 1);
+	assert.equal(video.srcObject, null);
+	assert.equal(frames, 0);
+	c.resumeCodeScanCamera();
+	assert.equal(requests, 1);
+	c.document.hidden = false;
+	c.resumeCodeScanCamera();
+	c.resumeCodeScanCamera();
+	await flush();
+	assert.equal(requests, 2);
+	assert.equal(frames, 1);
+	assert.ok(video.srcObject);
+	c.document.hidden = true;
+	c.suspendCodeScanMedia();
+	assert.equal(stopped, 2);
+	assert.equal(paused, 2);
+	assert.equal(video.srcObject, null);
+	c.codeScanState.phase = 'review';
+	c.codeScanState.hasCaptured = true;
+	c.document.hidden = false;
+	c.resumeCodeScanCamera();
+	assert.equal(requests, 2);
 });
 
 test('oversized images and synchronous canvas failures reject instead of hanging', async () => {

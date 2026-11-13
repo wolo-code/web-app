@@ -144,7 +144,7 @@ The sign-in widget starts once the default Firebase app and FirebaseUI are both 
 | `Location.svg` | Current-location action on the map. |
 | `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
 | `Scan.svg` | On-device label Scan action on Wolo Code Input View and Map View. |
-| `Gallery.svg` | Photo picker action flanking the shutter button on Wolo Code Scan Dialog. |
+| `Gallery.svg` | Gallery action beside the Shutter Button in the Wolo Code Scan Dialog. Opens the system image picker for selecting an existing photo. |
 | `Keyboard.svg` | Typing fallback action flanking the shutter button on Wolo Code Scan Dialog. |
 | `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |
 | `Hamburger.svg` | Previous-city popup action. |
@@ -225,6 +225,8 @@ Scanner capture control is 20% larger. Sparse-text OCR reads the visible camera 
 The detected text rectangle adds 10% centered padding, clipped at image edges. Live capture fills review fields immediately with the recognized code. Zoom and pan rerun framed OCR after 350ms of inactivity; outdated crop results are ignored and a pending read waits for ongoing recognition to finish. Live zoom resets detection and requests a fresh frame.
 
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. Initial and crop OCR use full-resolution pixels rather than a photo reduced to 1600 pixels wide.
+
+When the browser tab is hidden, the Wolo Code Scan Dialog releases its camera stream and pauses shutter audio. Returning to the dialog restarts the camera if a live scan was interrupted. Captured photos and review fields are preserved.
 
 Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/segment above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
 

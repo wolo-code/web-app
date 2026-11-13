@@ -28,10 +28,9 @@
 	left: 50%;
 	bottom: calc(52px + var(--app-safe-bottom, 0px));
 	transform: translateX(-50%);
-	display: flex;
+	display: grid;
+	grid-template-columns: auto auto auto;
 	align-items: center;
-	justify-content: center;
-	flex-wrap: wrap;
 	gap: 4px;
 	width: max-content;
 	max-width: calc(100% - 16px);
@@ -49,8 +48,15 @@ html.dark-mode #map_pin_adjustment {
 }
 
 .map_pin_nudges {
-	display: flex;
+	display: grid;
+	grid-template-areas: 'left up right' 'left down right';
+	align-items: center;
 }
+
+.map_pin_nudges [data-nudge='ArrowUp'] { grid-area: up; }
+.map_pin_nudges [data-nudge='ArrowLeft'] { grid-area: left; }
+.map_pin_nudges [data-nudge='ArrowRight'] { grid-area: right; }
+.map_pin_nudges [data-nudge='ArrowDown'] { grid-area: down; }
 
 #map_pin_adjustment button,
 .map_card_adjust {
@@ -73,6 +79,10 @@ html.dark-mode #map_pin_adjustment {
 #map_pin_adjustment [data-nudge] {
 	color: #69b7cf;
 	touch-action: none;
+}
+
+#map_pin_adjustment > button {
+	min-width: 48px;
 }
 
 #map_pin_adjustment button:active {

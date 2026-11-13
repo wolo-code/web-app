@@ -7,10 +7,10 @@
 <div id='map_pin_adjustment' role='group' aria-label='Adjust pin' hidden>
 	<button id='map_pin_cancel' type='button' aria-label='Cancel' title='Cancel'>&times;</button>
 	<div class='map_pin_nudges' role='group' aria-label='Nudge pin one pixel'>
-		<button type='button' data-nudge='ArrowLeft' aria-label='Move pin left'>&larr;</button>
 		<button type='button' data-nudge='ArrowUp' aria-label='Move pin up'>&uarr;</button>
-		<button type='button' data-nudge='ArrowDown' aria-label='Move pin down'>&darr;</button>
+		<button type='button' data-nudge='ArrowLeft' aria-label='Move pin left'>&larr;</button>
 		<button type='button' data-nudge='ArrowRight' aria-label='Move pin right'>&rarr;</button>
+		<button type='button' data-nudge='ArrowDown' aria-label='Move pin down'>&darr;</button>
 	</div>
 	<button id='map_pin_apply' type='button' aria-label='Apply' title='Apply'>&#10003;</button>
 </div>

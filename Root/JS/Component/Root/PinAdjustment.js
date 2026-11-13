@@ -1,5 +1,6 @@
 var mapPinProjectionOverlay;
 var mapPinCrosshair;
+var mapPinNudgeTimer;
 var MAP_PIN_NUDGES = {
 	ArrowLeft: [-1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowRight: [1, 0]
 };
@@ -40,8 +41,28 @@ function initMapPinAdjustment() {
 		if(drag && drag.id === event.pointerId) mapPinAdjustment.drag = null;
 	});
 	panel.querySelectorAll('[data-nudge]').forEach(function(button) {
-		button.addEventListener('click', function() { nudgeMapPin(button.dataset.nudge); });
+		var key = button.dataset.nudge;
+		function repeatNudge() {
+			nudgeMapPin(key);
+			mapPinNudgeTimer = setTimeout(repeatNudge, 40);
+		}
+		button.addEventListener('pointerdown', function(event) {
+			if(!mapPinAdjustment || !event.isPrimary || event.button !== 0) return;
+			button.setPointerCapture(event.pointerId);
+			stopMapPinNudging();
+			nudgeMapPin(key);
+			mapPinNudgeTimer = setTimeout(repeatNudge, 300);
+		});
+		['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function(event) {
+			button.addEventListener(event, stopMapPinNudging);
+		});
+		button.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+		button.addEventListener('click', function(event) {
+			// Keyboard and assistive activation have no preceding pointer press.
+			if(event.detail === 0) nudgeMapPin(key);
+		});
 	});
+	window.addEventListener('blur', stopMapPinNudging);
 	document.getElementById('map_pin_cancel').addEventListener('click', function() { finishMapPinAdjustment(); });
 	document.getElementById('map_pin_apply').addEventListener('click', applyMapPinAdjustment);
 	document.addEventListener('keydown', function(event) {
@@ -156,7 +177,12 @@ function nudgeMapPin(key) {
 	if(pixel) moveMapPinDraft(pixel.x + offset[0], pixel.y + offset[1]);
 }
 
+function stopMapPinNudging() {
+	clearTimeout(mapPinNudgeTimer);
+}
+
 function finishMapPinAdjustment(restoreFocus = true) {
+	stopMapPinNudging();
 	var adjustment = mapPinAdjustment;
 	mapPinAdjustment = null;
 	if(adjustment.drag && mapPinCrosshair.hasPointerCapture(adjustment.drag.id))

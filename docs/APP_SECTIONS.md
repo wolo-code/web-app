@@ -6,7 +6,7 @@ The Terrain Map Canvas and alternate map sources keep manual pan and zoom in con
 
 ## Map View: Adjust pin
 
-Hold a marker for half a second or choose **Adjust pin** on its info card. The draggable crosshair starts at the marker's exact coordinate. The selected marker and info cards are hidden during adjustment. The directional buttons and arrow keys nudge the crosshair one screen pixel at a time. The crosshair stays anchored to its draft coordinate through map pan and zoom. **Apply** moves the marker without reframing the map. **Cancel** or Escape discards the move.
+Hold a marker for half a second or choose **Adjust pin** on its info card. The draggable crosshair starts at the marker's exact coordinate. The selected marker and info cards are hidden during adjustment. The directional buttons and arrow keys nudge the crosshair one screen pixel at a time. Hold a directional button to keep nudging. The crosshair stays anchored to its draft coordinate through map pan and zoom. The checkmark on the right applies the move without reframing the map. The × on the left or Escape discards it.
 
 ## Country and regional choices in city selectors
 

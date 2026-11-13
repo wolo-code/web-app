@@ -116,6 +116,7 @@
 }
 .code_scan_regions { position: absolute; inset: 0; pointer-events: none; }
 
+.code_scan_detected_box { border: 1px dashed #69B7CF; box-shadow: none; }
 .code_scan_container_highlight { border-radius: 8% / 13%; border-color: #69B7CF; box-shadow: none; }
 .code_scan_card_highlight { border-radius: 12px; border-color: #b7a4ef; box-shadow: none; }
 .code_scan_city_highlight { border-color: #e8c568; box-shadow: none; }
@@ -320,8 +321,17 @@
 	justify-content: center;
 	margin: 0;
 	padding: 0;
+	touch-action: none;
 	transition: transform 150ms ease, border-color 150ms ease;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 	width: 62.4px;
+}
+
+.code_scan_live_controls, .code_scan_status, .code_scan_dialog .message_dialog_label {
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .code_scan_capture:hover {

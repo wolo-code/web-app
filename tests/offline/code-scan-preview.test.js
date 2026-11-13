@@ -91,6 +91,7 @@ test('every recognition detects printed boxes before OCR and retains its pixel c
  const calls = [];
  const containers = [{ x0: 90, y0: 225, x1: 370, y1: 330 }];
  context.detectCodeScanContainers = input => { assert.equal(input, canvas); calls.push('detect'); return containers; };
+ context.extractMatchFromOcrResult = () => ({ code: 'bengaluru mail nebula flower' });
  context.codeScanState.worker = { recognize: async input => {
   assert.equal(input, canvas); calls.push('ocr'); return { data: { text: 'Bengaluru mail nebula flower', words: [] } };
  } };
@@ -102,13 +103,35 @@ test('every recognition detects printed boxes before OCR and retains its pixel c
 test('live recognition reads the full viewport instead of clipping to the initial guide', async () => {
  const { context, canvas } = scanner(); let scanned, handled;
  context.getCodeScanVideo = () => ({ readyState: 2 });
- context.captureCodeScanFrame = () => {};
+ const snapshot = { width: 1920, height: 1080 };
+ const liveCanvas = { width: 960, height: 540 };
+ const buffers = [snapshot, liveCanvas];
+ context.document.createElement = () => buffers.shift();
+ context.captureCodeScanFullRes = (_video, target) => { assert.equal(target, snapshot); return true; };
+ context.captureCodeScanFrame = (frame, target) => { assert.equal(frame, snapshot); assert.equal(target, liveCanvas); };
  context.getCodeScanFixedRatioSlice = () => { throw new Error('Guide cannot restrict recognition'); };
  context.scheduleCodeScanFrame = () => {};
- context.handleCodeScanLiveOcrResult = (result, input) => handled = input;
+ context.handleCodeScanLiveOcrResult = (result, input, frame) => { handled = input; assert.equal(frame, snapshot); };
  context.codeScanState.worker = { recognize: async input => { scanned = input; return { data: {} }; } };
  context.runCodeScanFrame(); await new Promise(resolve => setImmediate(resolve));
- assert.equal(scanned, canvas); assert.equal(handled, canvas);
+ assert.equal(scanned, liveCanvas); assert.equal(handled, liveCanvas); assert.notEqual(scanned, canvas);
+});
+
+test('shutter takes a fresh frame while live OCR is pending', async () => {
+ const { context, canvas } = scanner();
+ const video = { readyState: 2 };
+ let captured, processed, cancelled = 0;
+ context.getCodeScanVideo = () => video;
+ context.codeScanState.processing = true;
+ context.captureCodeScanFullRes = (input, target) => { assert.equal(input, video); captured = target; return true; };
+ context.terminateCodeScanWorker = () => cancelled++;
+ for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
+  context[name] = () => {};
+ context.beginCodeScanCapture = (...args) => { processed = args; };
+ context.captureCodeScanManually();
+ assert.equal(captured, canvas);
+ assert.equal(cancelled, 1);
+ assert.deepEqual(processed, []);
 });
 
 test('recognition uses word confidence inside a box even when unrelated OCR lowers page confidence', () => {
@@ -145,22 +168,32 @@ test('bounded border detection maps back to native photo dimensions without redu
  assert.equal(canvas.width, 4000); assert.equal(canvas.height, 3000);
 });
 
-test('live OCR captures a stable box-first candidate without imposing a text aspect ratio', () => {
+test('live OCR captures a stable candidate from the recognized frame and yields to an ongoing shutter press', () => {
  const { context, canvas } = scanner();
  const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };
- context.extractGuidanceFromOcrResult = () => ({ match: { code: 'apple berry cherry' }, bbox });
+ const match = { code: 'apple berry cherry', regions: { container: bbox } };
+ const snapshot = { width: 1920, height: 1080 };
+ const liveCanvas = { width: 960, height: 540 };
+ let captured;
+ canvas.getContext = () => ({ drawImage: frame => captured = frame });
+ context.extractGuidanceFromOcrResult = () => ({ match, bbox });
  context.codeScanOcrMatch = { bboxIoU: () => 1 };
  context.setCodeScanCandidateHighlight = () => {};
  context.setCodeScanWoloFoundCue = () => {};
- context.getCodeScanVideo = () => null;
- context.resetCodeScanGuide = () => {};
+ for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
+  context[name] = () => {};
  let captures = 0;
  context.beginCodeScanCapture = () => captures++;
- context.handleCodeScanLiveOcrResult({}, canvas);
- context.handleCodeScanLiveOcrResult({}, canvas);
+ context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
+ context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
+ context.codeScanState.shutterPressed = true;
+ context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
  assert.equal(captures, 0);
- context.handleCodeScanLiveOcrResult({}, canvas);
+ context.codeScanState.shutterPressed = false;
+ context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
  assert.equal(captures, 1);
+ assert.equal(captured, snapshot);
+ assert.equal(match.regions.container.x0, bbox.x0 * 2);
 });
 
 test('live OCR crop follows the visible guide rather than an unrelated 3:1 slice', () => {

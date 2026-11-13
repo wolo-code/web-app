@@ -428,6 +428,25 @@
 		return match;
 	}
 
+	function getLabelCodeBoxes(containers, focus) {
+		containers = containers.filter(validOcrBox);
+		var boxes = containers.filter(function(container) {
+			// A surrounding card cannot rescue words that spill out of its inner box.
+			var width = container.x1 - container.x0;
+			var height = container.y1 - container.y0;
+			return !containers.some(function(inner) {
+				var iw = inner.x1 - inner.x0;
+				var ih = inner.y1 - inner.y0;
+				return containsBBox(container, inner) && iw >= width * 0.35 && ih >= height * 0.12 && iw * ih < width * height * 0.9;
+			});
+		});
+		if(!focus) return boxes;
+		function distance(box) {
+			return Math.hypot((box.x0 + box.x1) / 2 - focus.x, (box.y0 + box.y1) / 2 - focus.y);
+		}
+		return boxes.sort(function(a, b) { return distance(a) - distance(b); });
+	}
+
 	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
 		var words = result && result.data && result.data.words;
 		var containers = result && result.data && result.data.labelContainers;
@@ -437,15 +456,7 @@
 		containers = containers.filter(validOcrBox);
 		if(focus && (!Number.isFinite(focus.x) || !Number.isFinite(focus.y))) focus = null;
 		words = words.filter(function(word) { return word && validOcrBox(word.bbox) && normalizeOcrText(word.text); });
-		containers.forEach(function(container) {
-			// A surrounding card cannot rescue words that spill out of its inner box.
-			var width = container.x1 - container.x0;
-			var height = container.y1 - container.y0;
-			if(containers.some(function(inner) {
-				var iw = inner.x1 - inner.x0;
-				var ih = inner.y1 - inner.y0;
-				return containsBBox(container, inner) && iw >= width * 0.35 && ih >= height * 0.12 && iw * ih < width * height * 0.9;
-			})) return;
+		getLabelCodeBoxes(containers).forEach(function(container) {
 			var rows = groupOcrRows(words.filter(function(word) { return containsBBox(container, word.bbox); }));
 			rows.forEach(function(row) {
 				var tokens = normalizeOcrText(row.text).split(' ');
@@ -823,6 +834,7 @@
 	}
 
 	var codeScanOcrMatch = {
+		getLabelCodeBoxes: getLabelCodeBoxes,
 		normalizeOcrText: normalizeOcrText,
 		levenshteinDistance: levenshteinDistance,
 		fuzzyMatchWord: fuzzyMatchWord,

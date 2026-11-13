@@ -1,7 +1,11 @@
 var codeScanState = {
 	active: false,
 	showRegions: false,
+	shutterPressed: false,
 	regionPressConsumed: false,
+	regionMatch: null,
+	regionCanvas: null,
+	regionBoxes: [],
 	source: 'decode',
 	phase: 'live',
 	detectionMode: 'fixed',
@@ -19,7 +23,6 @@ var codeScanState = {
 	lastMatchCode: '',
 	stableMatchCount: 0,
 	lastMatchBBox: null,
-	lastDetectedMatch: null,
 	reviewMatch: null,
 	reviewMetadata: null,
 	metadataDirty: {},
@@ -57,12 +60,11 @@ function playShutterSound() {
   });
 }
 
-var CODE_SCAN_FRAME_INTERVAL_MS = 1600;
+var CODE_SCAN_FRAME_INTERVAL_MS = 650;
 
 
 var CODE_SCAN_STABLE_MATCHES = 3;
 var CODE_SCAN_BBOX_IOU_MIN = 0.55;
-var CODE_SCAN_MIN_CONFIDENCE = 55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_LOAD_TIMEOUT_MS = 45000;
 var CODE_SCAN_OCR_TIMEOUT_MS = 60000;
@@ -88,7 +90,7 @@ function initCodeScan() {
 	bindControl('code_scan_type_instead', 'click', closeCodeScan);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
 	bindControl('code_scan_capture', 'click', function(event) {
-		if(codeScanState.regionPressConsumed) { event.preventDefault(); codeScanState.regionPressConsumed = false; return; }
+		if(event.detail && codeScanState.regionPressConsumed) { event.preventDefault(); codeScanState.regionPressConsumed = false; return; }
 		captureCodeScanManually(event);
 	});
 	initCodeScanRegionPress();
@@ -130,27 +132,32 @@ function initCodeScan() {
 function initCodeScanRegionPress() {
 	var button = document.getElementById('code_scan_capture');
 	var timer;
+	var pointerId;
 	if(!button) return;
-	function endPress() {
+	function endPress(event) {
+		if(event && event.pointerId !== undefined && event.pointerId !== pointerId) return;
 		clearTimeout(timer);
+		pointerId = undefined;
+		codeScanState.shutterPressed = false;
 		codeScanState.showRegions = false;
 		clearCodeScanCandidateHighlight();
 	}
 	function startPress(event) {
-		if(event.type === 'pointerdown' && event.button !== 0) return;
-		if(event.type === 'keydown' && (event.repeat || (event.key !== ' ' && event.key !== 'Enter'))) return;
+		if(event.button !== 0 || event.isPrimary === false) return;
 		endPress();
+		pointerId = event.pointerId;
+		codeScanState.shutterPressed = true;
 		codeScanState.regionPressConsumed = false;
+		var session = codeScanState.session;
 		timer = setTimeout(function() {
-			if(!codeScanState.active) return;
+			if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 			codeScanState.showRegions = true;
 			codeScanState.regionPressConsumed = true;
-			drawCodeScanMatchRegions(codeScanState.regionMatch, codeScanState.regionCanvas);
+			drawCodeScanMatchRegions(codeScanState.regionMatch, codeScanState.regionCanvas, codeScanState.regionBoxes);
 		}, 500);
 	}
 	button.addEventListener('pointerdown', startPress);
-	button.addEventListener('keydown', startPress);
-	button.addEventListener('keyup', function(event) { if(event.key === ' ' || event.key === 'Enter') endPress(); });
+	button.addEventListener('selectstart', function(event) { event.preventDefault(); });
 	button.addEventListener('contextmenu', function(event) { event.preventDefault(); });
 	window.addEventListener('pointerup', endPress);
 	window.addEventListener('pointercancel', endPress);
@@ -235,6 +242,9 @@ function stopCodeScan() {
 
 function invalidateCodeScanSession() {
 	codeScanState.session += 1;
+	codeScanState.shutterPressed = false;
+	codeScanState.showRegions = false;
+	codeScanState.regionPressConsumed = false;
 	codeScanState.cropRevision += 1;
 	codeScanState.processing = false;
 	clearTimeout(codeScanState.cropScanTimer);
@@ -270,7 +280,9 @@ function resetCodeScanUi() {
 }
 
 function resetCodeScanMatchState() {
-	codeScanState.lastDetectedMatch = null;
+	codeScanState.regionMatch = null;
+	codeScanState.regionCanvas = null;
+	codeScanState.regionBoxes = [];
 	codeScanState.lastMatchCode = '';
 	codeScanState.stableMatchCount = 0;
 	codeScanState.lastMatchBBox = null;
@@ -374,7 +386,7 @@ function startCodeScanCamera() {
 		setCodeScanStatus(getCodeScanInitialStatus());
 		prepareCodeScanWorker().then(function() {
 			if(current() && codeScanState.phase === 'live')
-				scheduleCodeScanFrame();
+				runCodeScanFrame();
 		}).catch(function(error) { if(current()) handleCodeScanWorkerError(error); });
 	}).catch(function(error) { if(current()) handleCodeScanCameraError(error); });
 }
@@ -554,34 +566,33 @@ function runCodeScanFrame() {
 		return;
 	}
 	var video = getCodeScanVideo();
-	var canvas = getCodeScanCanvas();
-	var ocrCanvas;
-	if(!video || !canvas || video.readyState < 2) {
+	if(!video || video.readyState < 2) {
 		scheduleCodeScanFrame();
 		return;
 	}
+	var frame = document.createElement('canvas');
+	var canvas = document.createElement('canvas');
 	codeScanState.processing = true;
 	// The dashed frame is a guide; both the code box and whole card may extend beyond it.
-	ocrCanvas = canvas;
 	Promise.resolve().then(function() {
 		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
-		captureCodeScanFrame(video, canvas);
-		return recognizeCodeScanCanvas(ocrCanvas);
+		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
+		captureCodeScanFrame(frame, canvas);
+		return recognizeCodeScanCanvas(canvas);
 	}).then(function(result) {
-		if(!isCurrentCodeScanSession(session)) return;
+		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 		codeScanState.processing = false;
-		if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
-			return;
 		if(revision !== codeScanState.cropRevision) {
 			scheduleCodeScanFrame();
 			return;
 		}
-		handleCodeScanLiveOcrResult(result, ocrCanvas);
+		handleCodeScanLiveOcrResult(result, canvas, frame);
 		scheduleCodeScanFrame();
 	}).catch(function() {
-		if(!isCurrentCodeScanSession(session)) return;
+		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 		codeScanState.processing = false;
 		resetCodeScanMatchState();
+		clearCodeScanCandidateHighlight();
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 	});
@@ -600,23 +611,11 @@ function getCodeScanVideoSourceRect(video) {
 	return { sx: 0, sy: 0, sw: cw || 0, sh: ch || 0 };
 }
 
-function captureCodeScanFrame(video, canvas) {
-	if(!video || !canvas)
-		return;
-	var rect = getCodeScanVideoSourceRect(video);
-	var targetWidth;
-	var targetHeight;
-	if(!rect.sw || !rect.sh)
-		return;
-	targetWidth = Math.min(rect.sw, 960);
-	targetHeight = Math.round(rect.sh * (targetWidth / rect.sw));
-	canvas.width = targetWidth;
-	canvas.height = targetHeight;
-	canvas.getContext('2d').drawImage(
-		video,
-		rect.sx, rect.sy, rect.sw, rect.sh,
-		0, 0, targetWidth, targetHeight
-	);
+function captureCodeScanFrame(frame, canvas) {
+	var scale = Math.min(1, 960 / frame.width);
+	canvas.width = Math.round(frame.width * scale);
+	canvas.height = Math.round(frame.height * scale);
+	canvas.getContext('2d').drawImage(frame, 0, 0, canvas.width, canvas.height);
 }
 
 function saveCodeScanSourceFromCanvas(canvas, forceOriginal) {
@@ -794,9 +793,38 @@ function recognizeCodeScanCanvas(canvas, focus) {
 		result.data = result.data || {};
 		result.data.labelContainers = containers;
 		result.data.scanFocus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
-		return result;
+			if(!containers.length || extractMatchFromOcrResult(result)) return result;
+			return recognizeCodeScanBoxes(canvas, result, worker);
 		});
 	});
+}
+
+function recognizeCodeScanBoxes(canvas, result, worker) {
+	var data = result.data;
+	var boxes = codeScanOcrMatch.getLabelCodeBoxes(data.labelContainers, data.scanFocus).slice(0, 4);
+	if(!boxes.length) return result;
+	var pageWords = data.words || [];
+	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(async function() {
+		for(var box of boxes) {
+			// Leave the printed border outside the OCR image.
+			var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
+			var words = await ocrCodeScanBand(canvas, {
+				x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
+			}, worker);
+			var candidate = { data: Object.assign({}, data, { words: words }) };
+			var match = extractMatchFromOcrResult(candidate);
+			if(match && match.regions.container === box) {
+				// Keep the surrounding text from the original pass for metadata.
+				data.words = pageWords.filter(function(word) {
+					var bounds = word.bbox;
+					return bounds && (bounds.x1 <= box.x0 || bounds.x0 >= box.x1 || bounds.y1 <= box.y0 || bounds.y0 >= box.y1);
+				}).concat(words);
+				return;
+			}
+		}
+	}).then(function() {
+		return worker.setParameters({ tessedit_pageseg_mode: '11' });
+	}).then(function() { return result; });
 }
 
 function extractMatchFromOcrResult(result) {
@@ -923,69 +951,63 @@ function enrichCodeScanMetadata(canvas, match) {
 	});
 }
 
-function extractGuidanceFromOcrResult(result, canvas) {
+function extractGuidanceFromOcrResult(result) {
 	var match = extractMatchFromOcrResult(result);
 	var bbox;
 	if(!match)
 		return null;
-	bbox = match.regions.code;
+	bbox = match.regions.container;
 	return {
 		match: match,
 		bbox: bbox
 	};
 }
 
-function handleCodeScanLiveOcrResult(result, canvas) {
-	var guidance = extractGuidanceFromOcrResult(result, canvas);
+function handleCodeScanLiveOcrResult(result, canvas, frame) {
+	var guidance = extractGuidanceFromOcrResult(result);
+	var boxes = result.data && result.data.labelContainers || [];
 	var match;
 	var bbox;
 	var iou;
 	if(!guidance || !guidance.bbox) {
 		setCodeScanStatus(getCodeScanInitialStatus());
 		resetCodeScanMatchState();
-		clearCodeScanCandidateHighlight();
+		drawCodeScanMatchRegions(null, canvas, boxes);
 		setCodeScanWoloFoundCue(false);
 		return;
 	}
 	match = guidance.match;
-	codeScanState.lastDetectedMatch = match;
 	bbox = guidance.bbox;
-	if(match.regions) drawCodeScanMatchRegions(match, canvas);
-	else setCodeScanCandidateHighlight(bbox, canvas);
+	drawCodeScanMatchRegions(match, canvas, boxes);
 	setCodeScanWoloFoundCue(true);
 	setCodeScanStatus('Wolo Code found');
 	if(match.code === codeScanState.lastMatchCode && codeScanState.lastMatchBBox && bbox)
 		iou = codeScanOcrMatch.bboxIoU(codeScanState.lastMatchBBox, bbox);
 	else
 		iou = 0;
-	if(match.code === codeScanState.lastMatchCode && (!bbox || !codeScanState.lastMatchBBox || iou >= CODE_SCAN_BBOX_IOU_MIN))
+	if(iou >= CODE_SCAN_BBOX_IOU_MIN)
 		codeScanState.stableMatchCount += 1;
 	else {
 		codeScanState.lastMatchCode = match.code;
 		codeScanState.stableMatchCount = 1;
-		codeScanState.lastMatchBBox = bbox;
 	}
+	codeScanState.lastMatchBBox = bbox;
 	// A candidate already has a detected printed container and three words inside.
-	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.showRegions) {
-		setCodeScanStatus('Wolo Code found. Capturing...');
-		var autoVideo = getCodeScanVideo();
+	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.shutterPressed) {
 		var autoCanvas = getCodeScanCanvas();
-		if(autoVideo && autoCanvas && autoVideo.readyState >= 2) {
-			var recognitionWidth = canvas.width;
-			var recognitionHeight = canvas.height;
-			captureCodeScanFullRes(autoVideo, autoCanvas);
-			if(match.regions) {
-				var scaleX = autoCanvas.width / recognitionWidth;
-				var scaleY = autoCanvas.height / recognitionHeight;
-				Object.keys(match.regions).forEach(function(key) {
-					var box = match.regions[key];
-					if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
-				});
-			}
-			resetCodeScanLiveZoom();
-			saveCodeScanSourceFromCanvas(autoCanvas, true);
-			resetCodeScanZoom();
-		}
+		if(!autoCanvas) return;
+		autoCanvas.width = frame.width;
+		autoCanvas.height = frame.height;
+		autoCanvas.getContext('2d').drawImage(frame, 0, 0);
+		var scaleX = frame.width / canvas.width;
+		var scaleY = frame.height / canvas.height;
+		Object.keys(match.regions).forEach(function(key) {
+			var box = match.regions[key];
+			if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
+		});
+		resetCodeScanLiveZoom();
+		saveCodeScanSourceFromCanvas(autoCanvas, true);
+		resetCodeScanZoom();
 		resetCodeScanGuide();
 		beginCodeScanCapture(match);
 		return;
@@ -999,16 +1021,14 @@ function captureCodeScanManually(event) {
 	var canvas;
 	if(event && event.preventDefault)
 		event.preventDefault();
-	if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.processing || codeScanState.hasCaptured)
+	if(!codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured)
 		return;
 	video = getCodeScanVideo();
 	canvas = getCodeScanCanvas();
 	if(!video || !canvas || video.readyState < 2)
 		return;
-	clearCodeScanTimer();
-	codeScanState.processing = true;
-	setCodeScanCaptureEnabled(false);
-	captureCodeScanFullRes(video, canvas);
+	if(!captureCodeScanFullRes(video, canvas)) return;
+	if(codeScanState.processing) terminateCodeScanWorker();
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
@@ -1030,6 +1050,7 @@ function captureCodeScanFullRes(video, canvas) {
 		rect.sx, rect.sy, rect.sw, rect.sh,
 		0, 0, rect.sw, rect.sh
 	);
+	return true;
 }
 
 function beginCodeScanCapture(detectedMatch) {
@@ -1053,7 +1074,6 @@ function beginCodeScanCapture(detectedMatch) {
 function processCodeScanCapture(detectedMatch) {
 	var session = codeScanState.session;
 	var canvas = getCodeScanCanvas();
-	var rawCanvas = codeScanState.originalSourceCanvas || canvas;
 	var ocrCanvas;
 	if(!canvas) {
 		codeScanState.processing = false;
@@ -1595,10 +1615,9 @@ function recognizeCodeScanPhoto(file) {
 	}, function(error) { cleanup(); throw error; });
 }
 
-function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
-	var highlight = document.getElementById(id || 'code_scan_candidate_highlight');
+function setCodeScanCandidateHighlight(bbox, canvas, id, padded, element) {
+	var highlight = element || document.getElementById(id || 'code_scan_candidate_highlight');
 	var viewport = document.querySelector('.code_scan_viewport');
-	var video = getCodeScanVideo();
 	var width;
 	var height;
 	var left;
@@ -1634,11 +1653,21 @@ function setCodeScanCandidateHighlight(bbox, canvas, id, padded) {
 	highlight.classList.remove('hide');
 }
 
-function drawCodeScanMatchRegions(match, canvas) {
+function drawCodeScanMatchRegions(match, canvas, boxes) {
 	codeScanState.regionMatch = match;
 	codeScanState.regionCanvas = canvas;
+	codeScanState.regionBoxes = boxes || [];
 	clearCodeScanCandidateHighlight();
-	if(!match || !match.regions || !canvas) return;
+	if(!codeScanState.showRegions || !canvas) return;
+	var detected = document.getElementById('code_scan_detected_boxes');
+	if(detected) codeScanState.regionBoxes.forEach(function(box) {
+		if(match && match.regions && (box === match.regions.container || box === match.regions.card)) return;
+		var outline = document.createElement('div');
+		outline.className = 'code_scan_candidate_highlight code_scan_detected_box';
+		setCodeScanCandidateHighlight(box, canvas, null, false, outline);
+		detected.appendChild(outline);
+	});
+	if(!match || !match.regions) return;
 	if(match.regions.card) setCodeScanCandidateHighlight(match.regions.card, canvas, 'code_scan_card_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.code, canvas);
@@ -1651,6 +1680,8 @@ function redrawCodeScanReviewRegions() {
 }
 
 function clearCodeScanCandidateHighlight() {
+	var detected = document.getElementById('code_scan_detected_boxes');
+	if(detected) detected.replaceChildren();
 	['code_scan_card_highlight', 'code_scan_candidate_highlight', 'code_scan_container_highlight', 'code_scan_city_highlight'].forEach(function(id) {
 		var highlight = document.getElementById(id);
 		if(highlight) highlight.classList.add('hide');

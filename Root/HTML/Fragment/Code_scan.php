@@ -12,6 +12,7 @@
 			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'>
 			</div>
 			<div class='code_scan_regions' aria-hidden='true'>
+				<div id='code_scan_detected_boxes'></div>
 				<div id='code_scan_card_highlight' class='code_scan_candidate_highlight code_scan_card_highlight hide' aria-hidden='true'></div>
 				<div id='code_scan_container_highlight' class='code_scan_candidate_highlight code_scan_container_highlight hide' aria-hidden='true'></div>
 				<div id='code_scan_city_highlight' class='code_scan_candidate_highlight code_scan_city_highlight hide' aria-hidden='true'></div>

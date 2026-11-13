@@ -224,16 +224,26 @@
 		}
 		// Collapse the neighboring edge rows of the same horizontal stroke.
 		var strokes = [];
+		var recentStrokes = [];
+		var currentRow = -1;
 		segments.forEach(function(segment) {
-			var previous = strokes.find(function(stroke) {
-				return segment.y - stroke.bottom <= 3 && Math.abs(stroke.x0 - segment.x0) <= 4 && Math.abs(stroke.x1 - segment.x1) <= 4;
+			if(segment.y !== currentRow) {
+				currentRow = segment.y;
+				recentStrokes = recentStrokes.filter(function(stroke) { return currentRow - stroke.bottom <= 3; });
+			}
+			var previous = recentStrokes.find(function(stroke) {
+				return Math.abs(stroke.x0 - segment.x0) <= 4 && Math.abs(stroke.x1 - segment.x1) <= 4;
 			});
 			if(previous) {
 				previous.bottom = segment.y;
 				previous.x0 = Math.min(previous.x0, segment.x0);
 				previous.x1 = Math.max(previous.x1, segment.x1);
 			}
-			else strokes.push({ x0: segment.x0, x1: segment.x1, top: segment.y, bottom: segment.y });
+			else {
+				var stroke = { x0: segment.x0, x1: segment.x1, top: segment.y, bottom: segment.y };
+				strokes.push(stroke);
+				recentStrokes.push(stroke);
+			}
 		});
 		// Bound work for busy camera frames; long printed sides take priority.
 		strokes.sort(function(a, b) { return (b.x1 - b.x0) - (a.x1 - a.x0); });
@@ -311,24 +321,33 @@
 					if(!rightBottom || !findSide(left.x - 1, left.x + 1, bottom - leg, bottom - 3) ||
 						!findSide(right.x - 1, right.x + 1, bottom - leg, bottom - 3)) return;
 					var rect = { x0: left.x, y0: top, x1: right.x + 1, y1: Math.max(bottom, rightBottom.bottom) + 1 };
-					if(!rectangles.some(function(existing) { return bboxIoU(existing, rect) > 0.9; })) rectangles.push(rect);
+					var aspect = (rect.x1 - rect.x0) / (rect.y1 - rect.y0);
+					if(aspect > 1 / 1.2 && aspect < 1.2) return;
+					var existing = rectangles.find(function(box) { return bboxIoU(box, rect) > 0.9; });
+					if(existing) existing.anchored = true;
+					else {
+						rect.anchored = true;
+						rectangles.push(rect);
+					}
 				});
 			});
 		});
 		return rectangles;
 	}
 
-	function findLabelCard(containers, container) {
-		var width = container.x1 - container.x0;
-		var height = container.y1 - container.y0;
+	function findLabelCard(containers, container, sideways) {
+		function width(box) { return sideways ? box.y1 - box.y0 : box.x1 - box.x0; }
+		function height(box) { return sideways ? box.x1 - box.x0 : box.y1 - box.y0; }
+		var codeWidth = width(container);
+		var codeHeight = height(container);
 		var cards = containers.filter(function(card) {
-			return containsBBox(card, container) && card.x1 - card.x0 >= width + Math.max(4, width * 0.04) && card.y1 - card.y0 >= height * 1.25;
+			return !card.anchored && containsBBox(card, container) && width(card) >= codeWidth + Math.max(4, codeWidth * 0.04) && height(card) >= codeHeight * 1.25;
 		});
 		if(!cards.length) return null;
-		var minWidth = Math.min.apply(null, cards.map(function(card) { return card.x1 - card.x0; }));
+		var minWidth = Math.min.apply(null, cards.map(width));
 		// Prefer the paper's close side margins, then its complete vertical extent.
-		return cards.filter(function(card) { return card.x1 - card.x0 <= minWidth * 1.02; }).sort(function(a, b) {
-			return (b.y1 - b.y0) - (a.y1 - a.y0);
+		return cards.filter(function(card) { return width(card) <= minWidth * 1.02; }).sort(function(a, b) {
+			return height(b) - height(a);
 		})[0];
 	}
 
@@ -431,6 +450,7 @@
 	function getLabelCodeBoxes(containers, focus) {
 		containers = containers.filter(validOcrBox);
 		var boxes = containers.filter(function(container) {
+			if(container.anchored) return true;
 			// A surrounding card cannot rescue words that spill out of its inner box.
 			var width = container.x1 - container.x0;
 			var height = container.y1 - container.y0;
@@ -444,7 +464,18 @@
 		function distance(box) {
 			return Math.hypot((box.x0 + box.x1) / 2 - focus.x, (box.y0 + box.y1) / 2 - focus.y);
 		}
-		return boxes.sort(function(a, b) { return distance(a) - distance(b); });
+		return boxes.sort(function(a, b) {
+			return Number(!!b.anchored) - Number(!!a.anchored) || distance(a) - distance(b);
+		});
+	}
+
+	function rotateLabelBox(box, width, height, rotation) {
+		if(!box || !rotation) return box;
+		var rotated = { x0: height - box.y1, y0: box.x0, x1: height - box.y0, y1: box.x1 };
+		if(rotation === 180) rotated = { x0: width - box.x1, y0: height - box.y1, x1: width - box.x0, y1: height - box.y0 };
+		if(rotation === 270) rotated = { x0: box.y0, y0: width - box.x1, x1: box.y1, y1: width - box.x0 };
+		if(box.anchored) rotated.anchored = true;
+		return rotated;
 	}
 
 	function matchOcrRegionsToWoloCode(result, includesFn, canonicalWords) {
@@ -456,7 +487,7 @@
 		containers = containers.filter(validOcrBox);
 		if(focus && (!Number.isFinite(focus.x) || !Number.isFinite(focus.y))) focus = null;
 		words = words.filter(function(word) { return word && validOcrBox(word.bbox) && normalizeOcrText(word.text); });
-		getLabelCodeBoxes(containers).forEach(function(container) {
+		getLabelCodeBoxes(containers).filter(function(container) { return container.x1 - container.x0 > container.y1 - container.y0; }).forEach(function(container) {
 			var rows = groupOcrRows(words.filter(function(word) { return containsBBox(container, word.bbox); }));
 			rows.forEach(function(row) {
 				var tokens = normalizeOcrText(row.text).split(' ');
@@ -467,7 +498,8 @@
 				var area = (container.x1 - container.x0) * (container.y1 - container.y0);
 				var distance = focus ? Math.pow((row.bbox.x0 + row.bbox.x1) / 2 - focus.x, 2) + Math.pow((row.bbox.y0 + row.bbox.y1) / 2 - focus.y, 2) : 0;
 				if(!best || distance < best.distance || distance === best.distance && (score > best.score || score === best.score && area < best.area))
-					best = { words: corrected, bbox: row.bbox, container: container, rows: rows, score: score, area: area, distance: distance };
+					best = { words: corrected, bbox: row.bbox, container: container, rows: rows, score: score, area: area, distance: distance,
+						exact: tokens.every(includesFn), confidence: Math.min.apply(null, row.words.map(function(word) { return word.confidence; })) };
 			});
 		});
 		if(!best) return null;
@@ -483,6 +515,7 @@
 			words: matched,
 			code: matched.join(' '),
 			cityWordCount: cityTokens.length,
+			highConfidence: best.exact && best.confidence >= 85 && !!cityRow && cityRow.words.every(function(word) { return word.confidence >= 85; }),
 			metadata: optional.metadata,
 			regions: Object.assign({ card: card, container: best.container, city: cityRow ? cityRow.bbox : null, code: codeBox }, optional.regions)
 		};
@@ -834,6 +867,8 @@
 	}
 
 	var codeScanOcrMatch = {
+		findLabelCard: findLabelCard,
+		rotateLabelBox: rotateLabelBox,
 		getLabelCodeBoxes: getLabelCodeBoxes,
 		normalizeOcrText: normalizeOcrText,
 		levenshteinDistance: levenshteinDistance,

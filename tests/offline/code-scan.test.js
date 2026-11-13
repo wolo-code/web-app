@@ -47,7 +47,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(script, /initCodeScan\(\)/);
 	assert.match(codeScan, /getUserMedia/);
 	assert.match(codeScan, /CODE_SCAN_TESSERACT_BASE\s*=\s*'\/tesseract'/);
-	assert.match(codeScan, /CODE_SCAN_STABLE_MATCHES\s*=\s*3/);
+	assert.match(codeScan, /CODE_SCAN_STABLE_MATCHES\s*=\s*2/);
 	assert.match(codeScan, /CODE_SCAN_BBOX_IOU_MIN\s*=\s*0\.55/);
 	assert.match(codeScan, /hasCaptured/);
 	assert.match(codeScan, /workerPath:\s*CODE_SCAN_TESSERACT_BASE\s*\+\s*'\/worker\.min\.js'/);

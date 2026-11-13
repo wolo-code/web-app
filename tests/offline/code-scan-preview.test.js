@@ -12,6 +12,7 @@ function scanner() {
  context.showCodeScanReview = match => { context.reviewMatch = match; };
  context.extractSpatialMatch = context.extractMatchFromOcrResult;
  context.extractMatchFromOcrResult = result => result.match;
+ context.codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
  context.detectCodeScanContainers = () => [];
  context.codeScanState.active = true;
  context.codeScanState.sourceCanvas = canvas;
@@ -100,7 +101,7 @@ test('every recognition detects printed boxes before OCR and retains its pixel c
  assert.equal(result.data.labelContainers, containers);
 });
 
-test('live recognition reads the full viewport instead of clipping to the initial guide', async () => {
+test('live recognition detects across the full viewport and skips OCR without a frame', async () => {
  const { context, canvas } = scanner(); let scanned, handled;
  context.getCodeScanVideo = () => ({ readyState: 2 });
  const snapshot = { width: 1920, height: 1080 };
@@ -112,9 +113,46 @@ test('live recognition reads the full viewport instead of clipping to the initia
  context.getCodeScanFixedRatioSlice = () => { throw new Error('Guide cannot restrict recognition'); };
  context.scheduleCodeScanFrame = () => {};
  context.handleCodeScanLiveOcrResult = (result, input, frame) => { handled = input; assert.equal(frame, snapshot); };
- context.codeScanState.worker = { recognize: async input => { scanned = input; return { data: {} }; } };
+ context.detectCodeScanContainers = input => { scanned = input; return []; };
+ context.codeScanState.worker = { recognize: async () => assert.fail('no frame to read') };
  context.runCodeScanFrame(); await new Promise(resolve => setImmediate(resolve));
  assert.equal(scanned, liveCanvas); assert.equal(handled, liveCanvas); assert.notEqual(scanned, canvas);
+});
+
+test('live recognition prioritizes the sideways four-corner frame and maps its rotated OCR back to the camera', async () => {
+ const { context } = scanner();
+ const matcher = context.codeScanOcrMatch;
+ const camera = { width: 400, height: 550 };
+ const label = { x0: 100, y0: 200, x1: 250, y1: 470, anchored: true };
+ const square = { x0: 175, y0: 240, x1: 245, y1: 310 };
+ const distractor = { x0: 120, y0: 40, x1: 280, y1: 120 };
+ const rotations = [];
+ const vocabulary = ['mail', 'nebula', 'flower'];
+ context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
+ context.extractMatchFromOcrResult = context.extractSpatialMatch;
+ context.detectCodeScanContainers = () => [square, distractor, label];
+ context.ocrCodeScanBand = async (image, crop, _worker, maxHeight, rotation) => {
+  rotations.push(rotation);
+  assert.equal(image, camera);
+  assert.equal(maxHeight, 160);
+  assert.ok(crop.x1 - crop.x0 > crop.y1 - crop.y0);
+  return [
+   { text: 'Bengaluru', confidence: 95, bbox: { x0: 120, y0: 123, x1: 175, y1: 144 } },
+   ...vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 120 + i * 50, y0: 170, x1: 165 + i * 50, y1: 200 } }))
+  ];
+ };
+ context.codeScanState.worker = { setParameters: async () => {}, recognize: () => assert.fail('live OCR should read the crop') };
+ const result = await context.recognizeCodeScanCanvas(camera, null, {
+  isCurrent: () => true,
+  showBoxes: boxes => { assert.equal(boxes.length, 1); assert.equal(boxes[0], label); }
+ });
+ const match = context.extractSpatialMatch(result);
+ assert.deepEqual(rotations, [90]);
+ assert.equal(match.code, 'bengaluru mail nebula flower');
+ assert.equal(match.rotation, 90);
+ assert.equal(match.highConfidence, true);
+ assert.deepEqual(match.regions.container, label);
+ assert.deepEqual(match.regions.city, matcher.rotateLabelBox({ x0: 120, y0: 123, x1: 175, y1: 144 }, 550, 400, 270));
 });
 
 test('shutter takes a fresh frame while live OCR is pending', async () => {
@@ -130,7 +168,7 @@ test('shutter takes a fresh frame while live OCR is pending', async () => {
  context.beginCodeScanCapture = (...args) => { processed = args; };
  context.captureCodeScanManually();
  assert.equal(captured, canvas);
- assert.equal(cancelled, 1);
+ assert.equal(cancelled, 0);
  assert.deepEqual(processed, []);
 });
 
@@ -168,7 +206,7 @@ test('bounded border detection maps back to native photo dimensions without redu
  assert.equal(canvas.width, 4000); assert.equal(canvas.height, 3000);
 });
 
-test('live OCR captures a stable candidate from the recognized frame and yields to an ongoing shutter press', () => {
+test('live OCR confirms uncertain reads twice and yields to a shutter press even with high confidence', () => {
  const { context, canvas } = scanner();
  const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };
  const match = { code: 'apple berry cherry', regions: { container: bbox } };
@@ -185,11 +223,13 @@ test('live OCR captures a stable candidate from the recognized frame and yields 
  let captures = 0;
  context.beginCodeScanCapture = () => captures++;
  context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
- context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
+ assert.equal(captures, 0);
  context.codeScanState.shutterPressed = true;
+ match.highConfidence = true;
  context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
  assert.equal(captures, 0);
  context.codeScanState.shutterPressed = false;
+ context.resetCodeScanMatchState();
  context.handleCodeScanLiveOcrResult({}, liveCanvas, snapshot);
  assert.equal(captures, 1);
  assert.equal(captured, snapshot);
@@ -208,20 +248,6 @@ test('live OCR crop follows the visible guide rather than an unrelated 3:1 slice
  assert.equal(crop.width, 900);
  assert.equal(crop.height, 480);
  assert.deepEqual(draw.slice(1, 5), [60, 80, 900, 480]);
-});
-
-test('capture keeps the detected code when full-frame OCR fails or finds another code', async () => {
- for(const result of [null, { code: 'different code' }, 'error']) {
-  const { context } = scanner();
-  const detected = { code: 'apple berry cherry' };
-  context.codeScanState.worker = { recognize: async () => {
-   if(result === 'error') throw new Error('OCR failed');
-   return { match: result };
-  } };
-  context.processCodeScanCapture(detected);
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(context.reviewMatch, detected);
- }
 });
 
 test('capture reads scaled bands when the code pass missed title, segment, and address', async () => {
@@ -313,26 +339,29 @@ test('capture reads bands around the code box when no outer card is printed', as
  assert.equal(detailed.metadata.address_line_2, 'Bengaluru, Karnataka, India - 560078');
 });
 
-test('live capture rereads the full-resolution card for optional text', async () => {
+test('live capture opens review immediately and only reads optional details in the background', async () => {
  const { context } = scanner();
  for(const name of ['clearCodeScanTimer', 'setCodeScanCaptureEnabled', 'setCodeScanLiveControlsVisible',
   'setCodeScanPhotoFallbackVisible', 'clearCodeScanCandidateHighlight', 'setCodeScanWoloFoundCue',
   'stopCodeScanCamera', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible', 'playShutterSound'])
   context[name] = () => {};
- const detected = { code: 'apple berry cherry' };
- const complete = { code: detected.code, metadata: { title: 'Home', segment: 'Main door', address_line_1: '12 MG Road', address_line_2: 'Flat 4B' } };
- let reads = 0;
- context.codeScanState.worker = { recognize: async input => {
-  assert.equal(input, context.getCodeScanCanvas()); reads++;
-  return { match: complete };
- } };
+ const detected = { code: 'apple berry cherry', regions: { container: { x0: 20, y0: 40, x1: 160, y1: 100 } } };
+ context.showCodeScanReview = match => { context.codeScanState.reviewMatch = match; };
+ context.processCodeScanCapture = () => assert.fail('code OCR must not run again');
+ let complete;
+ context.enrichCodeScanMetadata = (image, match) => {
+  assert.equal(image, context.codeScanState.originalSourceCanvas);
+  assert.notEqual(match, detected);
+  return new Promise(resolve => { complete = () => resolve({ ...match, metadata: { title: 'Home' } }); });
+ };
  context.beginCodeScanCapture(detected);
- await new Promise(resolve => setImmediate(resolve));
- assert.equal(reads, 1);
- assert.equal(context.reviewMatch, complete);
- assert.equal(context.reviewMatch.metadata.address_line_2, 'Flat 4B');
+ assert.equal(context.codeScanState.reviewMatch, detected);
  assert.equal(context.codeScanState.processing, false);
  assert.equal(context.codeScanState.hasCaptured, true);
+ await new Promise(resolve => setImmediate(resolve));
+ complete();
+ await new Promise(resolve => setImmediate(resolve));
+ assert.equal(context.codeScanState.reviewMatch.metadata.title, 'Home');
 });
 
 test('detected rectangle grows ten percent around its center and stays within the image', () => {

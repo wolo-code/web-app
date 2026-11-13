@@ -61,10 +61,10 @@ function playShutterSound() {
   });
 }
 
-var CODE_SCAN_FRAME_INTERVAL_MS = 650;
+var CODE_SCAN_FRAME_INTERVAL_MS = 250;
 
 
-var CODE_SCAN_STABLE_MATCHES = 3;
+var CODE_SCAN_STABLE_MATCHES = 2;
 var CODE_SCAN_BBOX_IOU_MIN = 0.55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_LOAD_TIMEOUT_MS = 45000;
@@ -480,7 +480,7 @@ function prepareCodeScanWorker() {
 	if(codeScanState.workerPromise) return codeScanState.workerPromise;
 	var epoch = codeScanState.workerEpoch;
 	var pendingWorker;
-	setCodeScanStatus('Loading on-device scanner...');
+	if(codeScanState.phase !== 'review') setCodeScanStatus('Loading on-device scanner...');
 	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		return Tesseract.createWorker('eng', 1, {
@@ -583,7 +583,14 @@ function runCodeScanFrame() {
 		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
 		captureCodeScanFrame(frame, canvas);
-		return recognizeCodeScanCanvas(canvas);
+		return recognizeCodeScanCanvas(canvas, null, {
+			isCurrent: function() {
+				return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
+			},
+			showBoxes: function(boxes) {
+				if(!codeScanState.recognizedFrame) drawCodeScanMatchRegions(null, canvas, boxes);
+			}
+		});
 	}).then(function(result) {
 		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 		codeScanState.processing = false;
@@ -787,45 +794,86 @@ function detectCodeScanContainers(canvas) {
 	var sx = canvas.width / detectionCanvas.width;
 	var sy = canvas.height / detectionCanvas.height;
 	return codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height).map(function(box) {
-		return { x0: box.x0 * sx, y0: box.y0 * sy, x1: box.x1 * sx, y1: box.y1 * sy };
+		return Object.assign({}, box, { x0: box.x0 * sx, y0: box.y0 * sy, x1: box.x1 * sx, y1: box.y1 * sy });
 	});
 }
 
-function recognizeCodeScanCanvas(canvas, focus) {
+function recognizeCodeScanCanvas(canvas, focus, live) {
 	return runCodeScanWorkerTask(function(worker) {
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var containers = detectCodeScanContainers(canvas);
+		focus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
+		if(live) {
+			var boxes = codeScanOcrMatch.getLabelCodeBoxes(containers, focus).filter(function(box) {
+				var width = box.x1 - box.x0;
+				var height = box.y1 - box.y0;
+				return Math.max(width, height) >= 1.2 * Math.min(width, height);
+			}).slice(0, 2);
+			var debugBoxes = boxes.slice(0, 1);
+			if(live.isCurrent()) live.showBoxes(debugBoxes);
+			return recognizeCodeScanBoxes(canvas, { data: { labelContainers: containers, debugBoxes: debugBoxes } }, worker, boxes, live);
+		}
 		return worker.recognize(canvas).then(function(result) {
-		if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
-		result.data = result.data || {};
-		result.data.labelContainers = containers;
-		result.data.scanFocus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
+			if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
+			result.data = result.data || {};
+			result.data.labelContainers = containers;
+			result.data.scanFocus = focus;
 			if(!containers.length || extractMatchFromOcrResult(result)) return result;
-			return recognizeCodeScanBoxes(canvas, result, worker);
+			return recognizeCodeScanBoxes(canvas, result, worker, codeScanOcrMatch.getLabelCodeBoxes(containers, focus).slice(0, 4));
 		});
 	});
 }
 
-function recognizeCodeScanBoxes(canvas, result, worker) {
+function rotateCodeScanCanvas(source, rotation) {
+	var rotated = document.createElement('canvas');
+	var sideways = rotation % 180 !== 0;
+	rotated.width = sideways ? source.height : source.width;
+	rotated.height = sideways ? source.width : source.height;
+	var ctx = rotated.getContext('2d');
+	ctx.translate(rotated.width / 2, rotated.height / 2);
+	ctx.rotate(rotation * Math.PI / 180);
+	ctx.drawImage(source, -source.width / 2, -source.height / 2);
+	return rotated;
+}
+
+function rotateCodeScanMatch(match, canvas, rotation) {
+	var regions = {};
+	Object.keys(match.regions).forEach(function(key) {
+		regions[key] = codeScanOcrMatch.rotateLabelBox(match.regions[key], canvas.width, canvas.height, rotation);
+	});
+	return Object.assign({}, match, { regions: regions });
+}
+
+function recognizeCodeScanBoxes(canvas, result, worker, boxes, live) {
 	var data = result.data;
-	var boxes = codeScanOcrMatch.getLabelCodeBoxes(data.labelContainers, data.scanFocus).slice(0, 4);
-	if(!boxes.length) return result;
-	var pageWords = data.words || [];
+	if(!boxes.length || (live && !live.isCurrent())) return result;
 	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(async function() {
-		for(var box of boxes) {
-			// Leave the printed border outside the OCR image.
-			var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
-			var words = await ocrCodeScanBand(canvas, {
-				x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
-			}, worker);
-			var candidate = { data: Object.assign({}, data, { words: words }) };
-			var match = extractMatchFromOcrResult(candidate);
-			if(match && match.regions.container === box) {
-				// Keep the surrounding text from the original pass for metadata.
-				data.words = pageWords.filter(function(word) {
-					var bounds = word.bbox;
-					return bounds && (bounds.x1 <= box.x0 || bounds.x0 >= box.x1 || bounds.y1 <= box.y0 || bounds.y0 >= box.y1);
-				}).concat(words);
+		// Try the natural orientation of each frame before trying its reverse.
+		for(var reverse of [false, true]) {
+			for(var sourceBox of boxes) {
+				if(live && !live.isCurrent()) return;
+				var sideways = sourceBox.y1 - sourceBox.y0 > sourceBox.x1 - sourceBox.x0;
+				var rotation = (sideways ? 90 : 0) + (reverse ? 180 : 0);
+				var orientation = { width: sideways ? canvas.height : canvas.width, height: sideways ? canvas.width : canvas.height };
+				var box = codeScanOcrMatch.rotateLabelBox(sourceBox, canvas.width, canvas.height, rotation);
+				var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
+				var words = await ocrCodeScanBand(canvas, {
+					x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
+				}, worker, live ? 160 : undefined, rotation);
+				var card = codeScanOcrMatch.findLabelCard(data.labelContainers, sourceBox, sideways);
+				card = codeScanOcrMatch.rotateLabelBox(card, canvas.width, canvas.height, rotation);
+				if(!rotation && card) {
+					words = words.concat((data.words || []).filter(function(word) {
+						return word.bbox && (word.bbox.y1 <= box.y0 || word.bbox.y0 >= box.y1);
+					}));
+				}
+				var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
+				if(!match || match.regions.container !== box) continue;
+				if(rotation) {
+					match = rotateCodeScanMatch(match, orientation, 360 - rotation);
+					match.rotation = rotation;
+				}
+				data.scanMatch = match;
 				return;
 			}
 		}
@@ -835,6 +883,7 @@ function recognizeCodeScanBoxes(canvas, result, worker) {
 }
 
 function extractMatchFromOcrResult(result) {
+	if(result && result.data && result.data.scanMatch) return result.data.scanMatch;
 	return codeScanOcrMatch.matchOcrRegionsToWoloCode(result, wordList.includes.bind(wordList), wordList.curList);
 }
 
@@ -842,12 +891,15 @@ function detailBandScale(height) {
 	return height < 100 ? 4 : 3;
 }
 
-function ocrCodeScanBand(canvas, band, worker) {
+function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation) {
 	worker = worker || codeScanState.worker;
+	var sideways = rotation % 180 === 90;
+	var imageWidth = sideways ? canvas.height : canvas.width;
+	var imageHeight = sideways ? canvas.width : canvas.height;
 	var x0 = Math.max(0, Math.round(band.x0));
 	var y0 = Math.max(0, Math.round(band.y0));
-	var x1 = Math.min(canvas.width || 0, Math.round(band.x1));
-	var y1 = Math.min(canvas.height || 0, Math.round(band.y1));
+	var x1 = Math.min(imageWidth || 0, Math.round(band.x1));
+	var y1 = Math.min(imageHeight || 0, Math.round(band.y1));
 	var width = x1 - x0;
 	var height = y1 - y0;
 	var scale;
@@ -855,16 +907,28 @@ function ocrCodeScanBand(canvas, band, worker) {
 	var ctx;
 	if(!Number.isFinite(width) || !Number.isFinite(height) || width < 20 || height < 12 || !worker) return Promise.resolve([]);
 	scale = Math.min(detailBandScale(height), 4096 / Math.max(width, height), Math.sqrt(4000000 / (width * height)));
+	if(maxHeight) scale = Math.min(scale, maxHeight / height, 1200 / width);
 	target = document.createElement('canvas');
 	target.width = Math.round(width * scale);
 	target.height = Math.round(height * scale);
+	var sx = target.width / width;
+	var sy = target.height / height;
 	ctx = target.getContext('2d');
 	if(!ctx) return Promise.resolve([]);
 	ctx.fillStyle = '#ffffff';
 	ctx.fillRect(0, 0, target.width, target.height);
 	ctx.imageSmoothingEnabled = true;
 	ctx.imageSmoothingQuality = 'high';
-	ctx.drawImage(canvas, x0, y0, width, height, 0, 0, target.width, target.height);
+	if(rotation) {
+		var source = codeScanOcrMatch.rotateLabelBox({ x0: x0, y0: y0, x1: x1, y1: y1 }, imageWidth, imageHeight, 360 - rotation);
+		var targetWidth = sideways ? target.height : target.width;
+		var targetHeight = sideways ? target.width : target.height;
+		ctx.translate(target.width / 2, target.height / 2);
+		ctx.rotate(rotation * Math.PI / 180);
+		ctx.drawImage(canvas, source.x0, source.y0, source.x1 - source.x0, source.y1 - source.y0,
+			-targetWidth / 2, -targetHeight / 2, targetWidth, targetHeight);
+	}
+	else ctx.drawImage(canvas, x0, y0, width, height, 0, 0, target.width, target.height);
 	return worker.recognize(target).then(function(result) {
 		var words = result && result.data && result.data.words || [];
 		return words.map(function(word) {
@@ -874,10 +938,10 @@ function ocrCodeScanBand(canvas, band, worker) {
 				text: word.text,
 				confidence: word.confidence,
 				bbox: {
-					x0: x0 + box.x0 / scale,
-					y0: y0 + box.y0 / scale,
-					x1: x0 + box.x1 / scale,
-					y1: y0 + box.y1 / scale
+					x0: x0 + box.x0 / sx,
+					y0: y0 + box.y0 / sy,
+					x1: x0 + box.x1 / sx,
+					y1: y0 + box.y1 / sy
 				}
 			};
 		}).filter(Boolean);
@@ -906,6 +970,17 @@ function withCodeScanDetailSegmentation(work) {
 }
 
 function enrichCodeScanMetadata(canvas, match) {
+	if(match && match.rotation) {
+		var rotation = match.rotation;
+		var rotated = rotateCodeScanCanvas(canvas, rotation);
+		var upright = rotateCodeScanMatch(match, canvas, rotation);
+		upright.rotation = 0;
+		return enrichCodeScanMetadata(rotated, upright).then(function(detailed) {
+			var restored = rotateCodeScanMatch(detailed, rotated, 360 - rotation);
+			restored.rotation = rotation;
+			return restored;
+		});
+	}
 	var keys = ['title', 'segment', 'address_line_1', 'address_line_2'];
 	var bands;
 	var extra;
@@ -972,7 +1047,7 @@ function extractGuidanceFromOcrResult(result) {
 
 function handleCodeScanLiveOcrResult(result, canvas, frame) {
 	var guidance = extractGuidanceFromOcrResult(result);
-	var boxes = result.data && result.data.labelContainers || [];
+	var boxes = result.data && result.data.debugBoxes || [];
 	var match;
 	var bbox;
 	var iou;
@@ -1002,7 +1077,7 @@ function handleCodeScanLiveOcrResult(result, canvas, frame) {
 	}
 	codeScanState.lastMatchBBox = bbox;
 	// A candidate already has a detected printed container and three words inside.
-	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.shutterPressed) {
+	if(!codeScanState.shutterPressed && (match.highConfidence || codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES)) {
 		captureCodeScanDetection();
 		return;
 	}
@@ -1026,7 +1101,6 @@ function captureCodeScanDetection() {
 		var box = match.regions[key];
 		if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
 	});
-	if(codeScanState.processing) terminateCodeScanWorker();
 	resetCodeScanMatchState();
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
@@ -1047,7 +1121,6 @@ function captureCodeScanManually(event) {
 	if(!video || !canvas || video.readyState < 2)
 		return;
 	if(!captureCodeScanFullRes(video, canvas)) return;
-	if(codeScanState.processing) terminateCodeScanWorker();
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom();
@@ -1085,46 +1158,54 @@ function beginCodeScanCapture(detectedMatch) {
 	stopCodeScanCamera();
 	setCodeScanFrozenPreview(true);
 	setCodeScanCropControlsVisible(true);
+	playShutterSound();
+	if(detectedMatch) {
+		codeScanState.processing = false;
+		showCodeScanReview(detectedMatch);
+		fillCodeScanReviewDetails(detectedMatch);
+		return;
+	}
 	setCodeScanStatus('Reading label on your device...');
-    playShutterSound();
-	processCodeScanCapture(detectedMatch);
+	processCodeScanCapture();
 }
 
-function processCodeScanCapture(detectedMatch) {
+function fillCodeScanReviewDetails(match) {
+	if(!match.regions || !match.regions.container) return;
+	var session = codeScanState.session;
+	var revision = codeScanState.cropRevision;
+	var source = codeScanState.originalSourceCanvas || getCodeScanCanvas();
+	var details = Object.assign({}, match, { regions: Object.assign({}, match.regions), metadata: Object.assign({}, match.metadata) });
+	Promise.resolve().then(function() {
+		if(isCurrentCodeScanSession(session)) return enrichCodeScanMetadata(source, details);
+	}).then(function(detailed) {
+		if(!detailed) return;
+		if(!isCurrentCodeScanSession(session) || revision !== codeScanState.cropRevision || codeScanState.reviewMatch !== match) return;
+		populateCodeScanMetadata(detailed);
+		codeScanState.reviewMatch = detailed;
+	}).catch(function() {});
+}
+
+function processCodeScanCapture() {
 	var session = codeScanState.session;
 	var canvas = getCodeScanCanvas();
-	var ocrCanvas;
 	if(!canvas) {
 		codeScanState.processing = false;
 		if(codeScanState.active)
-			showCodeScanReview(detectedMatch || null);
+			showCodeScanReview(null);
 		return;
 	}
-	ocrCanvas = canvas;
-	recognizeCodeScanCanvas(ocrCanvas).then(function(result) {
-		if(!isCurrentCodeScanSession(session))
-			return null;
-		var match = extractMatchFromOcrResult(result);
-		if(detectedMatch && (!match || match.code !== detectedMatch.code)) match = detectedMatch;
-		if(match && detectedMatch && match !== detectedMatch && detectedMatch.metadata) {
-			match.metadata = match.metadata || {};
-			['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
-				if(!match.metadata[key]) match.metadata[key] = detectedMatch.metadata[key] || '';
-			});
-		}
-		return enrichCodeScanMetadata(ocrCanvas, match);
-	}).then(function(match) {
+	recognizeCodeScanCanvas(canvas).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
-		if(!codeScanState.active)
-			return;
+		var match = extractMatchFromOcrResult(result);
 		showCodeScanReview(match);
-		if(!match) setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
+		if(match) fillCodeScanReviewDetails(match);
+		else setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		if(codeScanState.active)
-			showCodeScanReview(detectedMatch || null);
+			showCodeScanReview(null);
 	});
 }
 
@@ -1679,8 +1760,7 @@ function drawCodeScanMatchRegions(match, canvas, boxes) {
 	clearCodeScanCandidateHighlight();
 	if(!codeScanState.showRegions || !canvas) return;
 	var detected = document.getElementById('code_scan_detected_boxes');
-	if(detected) codeScanState.regionBoxes.forEach(function(box) {
-		if(match && match.regions && (box === match.regions.container || box === match.regions.card)) return;
+	if(detected && !match) codeScanState.regionBoxes.forEach(function(box) {
 		var outline = document.createElement('div');
 		outline.className = 'code_scan_candidate_highlight code_scan_detected_box';
 		setCodeScanCandidateHighlight(box, canvas, null, false, outline);

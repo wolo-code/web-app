@@ -163,6 +163,11 @@ body.satellite #map {
 	font-weight: 300;
 }
 
+#logo,
+#logo a {
+	-webkit-touch-callout: none;
+}
+
 #logo {
 	position: absolute;
 	right: 10px;

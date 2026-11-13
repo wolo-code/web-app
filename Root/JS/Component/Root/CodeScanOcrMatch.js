@@ -355,13 +355,24 @@
 		return [metadata.address_line_1, metadata.address_line_2].map(function(part) { return String(part || '').trim(); }).filter(Boolean).join('\n\n');
 	}
 
+	function isLabelBranding(row, container) {
+		var text = normalizeOcrText(row.text).replace(/0/g, 'o');
+		if(/(?:www\.|https?:)/i.test(row.text) || /^(?:wolo(?: codes?)?|codes?)$/.test(text)) return true;
+		// The stylized W can disappear, and OCR can split or join the wordmark.
+		if(row.bbox.y1 <= container.y0) return /^w?olo\s*(?:codes?)?$/.test(text);
+		// The footer can be read with a damaged URL or with the URL missing entirely.
+		return row.bbox.y0 >= container.y1 &&
+			(/^scan or enter(?:\s|$)/.test(text) || text === 'enter at' ||
+			/^(?:w{2,3})?w?olocodes?$/.test(text.replace(/\s/g, '')));
+	}
+
 	function extractLabelMetadata(words, container, card) {
 		var metadata = { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' };
 		var regions = { title: null, segment: null, address_line_1: null, address_line_2: null, address: null };
 		if(!card) return { metadata: metadata, regions: regions };
 		var rows = groupOcrRows(words.filter(function(word) {
 			return containsBBox(card, word.bbox) && (typeof word.confidence !== 'number' || word.confidence >= 70);
-		})).filter(function(row) { return !/(?:www\.|https?:)/i.test(row.text) && !/^(?:wolo(?: codes?)?|codes?)$/.test(normalizeOcrText(row.text)); });
+		})).filter(function(row) { return !isLabelBranding(row, container); });
 		var above = rows.filter(function(row) {
 			return row.bbox.y1 <= container.y0;
 		}).slice(-2);

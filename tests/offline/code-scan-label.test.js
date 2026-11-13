@@ -144,6 +144,42 @@ test('optional unreadable metadata and city do not prevent review of three words
 	assert.equal(match(badCode), null);
 });
 
+test('logo and footer OCR leave missing label details blank in both passes', () => {
+	const variants = [
+		[
+			[word('olo', 170, 85, 218, 110), word('code', 222, 93, 275, 109)],
+			[word('scan or enter at', 145, 435, 300, 452)]
+		],
+		[
+			[word('\\W0L0/C0DE', 170, 85, 275, 110)],
+			[word('w0lo . c0des', 170, 435, 290, 452)]
+		],
+		[
+			[word('Wolo', 170, 85, 218, 110), word('Code', 222, 111, 275, 125)],
+			[word('scan 0r enter at wolo,codes', 120, 435, 335, 452)]
+		]
+	];
+	for(const [logo, footer] of variants) {
+		const decorations = [...logo, ...footer];
+		const expected = match(codeWords());
+		const initial = match([...codeWords(), ...decorations]);
+		const reread = matcher.fillLabelMetadata(match(codeWords()), decorations);
+		assert.deepEqual(initial, expected);
+		assert.deepEqual(reread, expected);
+	}
+});
+
+test('one heading and one address stay in the first fields alongside misread branding', () => {
+	const result = match([
+		...codeWords(), word('olo code', 170, 85, 275, 110),
+		word('Code House', 170, 176, 275, 190),
+		word('12 Wolo Road', 170, 350, 275, 365), word('scan or enter at', 145, 435, 300, 452)
+	]);
+	assert.deepEqual(result.metadata, {
+		title: 'Code House', segment: '', address_line_1: '12 Wolo Road', address_line_2: '', address: '12 Wolo Road'
+	});
+});
+
 test('dictionary correction only applies to the code row; punctuation survives in metadata', () => {
 	const result = match([
 		word('Ram & Sons', 160, 176, 280, 188), word('Main door', 205, 196, 255, 208),

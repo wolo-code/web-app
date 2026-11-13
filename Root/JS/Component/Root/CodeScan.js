@@ -6,6 +6,7 @@ var codeScanState = {
 	regionMatch: null,
 	regionCanvas: null,
 	regionBoxes: [],
+	recognizedFrame: null,
 	source: 'decode',
 	phase: 'live',
 	detectionMode: 'fixed',
@@ -136,11 +137,13 @@ function initCodeScanRegionPress() {
 	if(!button) return;
 	function endPress(event) {
 		if(event && event.pointerId !== undefined && event.pointerId !== pointerId) return;
+		var useDetection = event && event.type === 'pointerup' && codeScanState.showRegions;
 		clearTimeout(timer);
 		pointerId = undefined;
 		codeScanState.shutterPressed = false;
 		codeScanState.showRegions = false;
 		clearCodeScanCandidateHighlight();
+		if(useDetection) captureCodeScanDetection();
 	}
 	function startPress(event) {
 		if(event.button !== 0 || event.isPrimary === false) return;
@@ -245,6 +248,7 @@ function invalidateCodeScanSession() {
 	codeScanState.shutterPressed = false;
 	codeScanState.showRegions = false;
 	codeScanState.regionPressConsumed = false;
+	codeScanState.recognizedFrame = null;
 	codeScanState.cropRevision += 1;
 	codeScanState.processing = false;
 	clearTimeout(codeScanState.cropScanTimer);
@@ -280,6 +284,7 @@ function resetCodeScanUi() {
 }
 
 function resetCodeScanMatchState() {
+	codeScanState.recognizedFrame = null;
 	codeScanState.regionMatch = null;
 	codeScanState.regionCanvas = null;
 	codeScanState.regionBoxes = [];
@@ -591,8 +596,10 @@ function runCodeScanFrame() {
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 		codeScanState.processing = false;
-		resetCodeScanMatchState();
-		clearCodeScanCandidateHighlight();
+		if(!codeScanState.showRegions || !codeScanState.recognizedFrame) {
+			resetCodeScanMatchState();
+			clearCodeScanCandidateHighlight();
+		}
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 	});
@@ -970,6 +977,7 @@ function handleCodeScanLiveOcrResult(result, canvas, frame) {
 	var bbox;
 	var iou;
 	if(!guidance || !guidance.bbox) {
+		if(codeScanState.showRegions && codeScanState.recognizedFrame) return;
 		setCodeScanStatus(getCodeScanInitialStatus());
 		resetCodeScanMatchState();
 		drawCodeScanMatchRegions(null, canvas, boxes);
@@ -978,6 +986,7 @@ function handleCodeScanLiveOcrResult(result, canvas, frame) {
 	}
 	match = guidance.match;
 	bbox = guidance.bbox;
+	codeScanState.recognizedFrame = { match: match, width: canvas.width, height: canvas.height, frame: frame };
 	drawCodeScanMatchRegions(match, canvas, boxes);
 	setCodeScanWoloFoundCue(true);
 	setCodeScanStatus('Wolo Code found');
@@ -994,26 +1003,36 @@ function handleCodeScanLiveOcrResult(result, canvas, frame) {
 	codeScanState.lastMatchBBox = bbox;
 	// A candidate already has a detected printed container and three words inside.
 	if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES && !codeScanState.shutterPressed) {
-		var autoCanvas = getCodeScanCanvas();
-		if(!autoCanvas) return;
-		autoCanvas.width = frame.width;
-		autoCanvas.height = frame.height;
-		autoCanvas.getContext('2d').drawImage(frame, 0, 0);
-		var scaleX = frame.width / canvas.width;
-		var scaleY = frame.height / canvas.height;
-		Object.keys(match.regions).forEach(function(key) {
-			var box = match.regions[key];
-			if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
-		});
-		resetCodeScanLiveZoom();
-		saveCodeScanSourceFromCanvas(autoCanvas, true);
-		resetCodeScanZoom();
-		resetCodeScanGuide();
-		beginCodeScanCapture(match);
+		captureCodeScanDetection();
 		return;
 	}
-	if(codeScanState.stableMatchCount >= 2)
+	if(codeScanState.stableMatchCount >= 2 && !codeScanState.showRegions)
 		setCodeScanStatus('Hold steady...');
+}
+
+function captureCodeScanDetection() {
+	var detected = codeScanState.recognizedFrame;
+	if(!detected || !codeScanState.active || codeScanState.phase !== 'live' || codeScanState.hasCaptured) return;
+	var canvas = getCodeScanCanvas();
+	if(!canvas) return;
+	var frame = detected.frame;
+	var match = detected.match;
+	canvas.width = frame.width;
+	canvas.height = frame.height;
+	canvas.getContext('2d').drawImage(frame, 0, 0);
+	var scaleX = frame.width / detected.width;
+	var scaleY = frame.height / detected.height;
+	Object.keys(match.regions).forEach(function(key) {
+		var box = match.regions[key];
+		if(box) match.regions[key] = { x0: box.x0 * scaleX, y0: box.y0 * scaleY, x1: box.x1 * scaleX, y1: box.y1 * scaleY };
+	});
+	if(codeScanState.processing) terminateCodeScanWorker();
+	resetCodeScanMatchState();
+	resetCodeScanLiveZoom();
+	saveCodeScanSourceFromCanvas(canvas, true);
+	resetCodeScanZoom();
+	resetCodeScanGuide();
+	beginCodeScanCapture(match);
 }
 
 function captureCodeScanManually(event) {

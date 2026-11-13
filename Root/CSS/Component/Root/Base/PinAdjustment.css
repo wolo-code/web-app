@@ -1,7 +1,6 @@
 .map_pin_adjusting #map .gm-style-iw-a,
 .map_pin_adjusting #map .gm-style-iw-t,
 .map_pin_adjusting #map .gm-style-iw,
-.map_pin_adjusting #map .gm-bundled-control,
 .map_pin_adjusting #map_bottom_stack,
 .map_pin_adjusting #map_places_panel {
 	display: none !important;
@@ -26,7 +25,7 @@
 	position: absolute;
 	z-index: 101;
 	left: 50%;
-	bottom: calc(52px + var(--app-safe-bottom, 0px));
+	bottom: calc(112px + var(--app-safe-bottom, 0px));
 	transform: translateX(-50%);
 	display: grid;
 	grid-template-columns: auto auto auto;
@@ -35,16 +34,29 @@
 	width: max-content;
 	max-width: calc(100% - 16px);
 	padding: 4px;
-	border-radius: 22px;
 	color: #65737d;
-	background: rgb(255 255 255 / 92%);
-	box-shadow: 0 2px 10px rgb(0 0 0 / 22%);
+	--pin-pad-background: rgb(255 255 255 / 92%);
+	isolation: isolate;
+	pointer-events: none;
+}
+
+.map_pin_shape {
+	position: absolute;
+}
+
+#map_pin_adjustment::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	clip-path: url('#map_pin_outline');
+	background: var(--pin-pad-background);
 	backdrop-filter: blur(4px);
 }
 
 html.dark-mode #map_pin_adjustment {
 	color: #aeb9c5;
-	background: rgb(34 34 68 / 92%);
+	--pin-pad-background: rgb(34 34 68 / 92%);
 }
 
 .map_pin_nudges {
@@ -74,6 +86,10 @@ html.dark-mode #map_pin_adjustment {
 	padding: 0 8px;
 	font-size: 1.3em;
 	user-select: none;
+	pointer-events: auto;
+	-webkit-tap-highlight-color: transparent;
+	position: relative;
+	isolation: isolate;
 }
 
 #map_pin_adjustment [data-nudge] {
@@ -85,8 +101,32 @@ html.dark-mode #map_pin_adjustment {
 	min-width: 48px;
 }
 
-#map_pin_adjustment button:active {
-	background: rgb(105 183 207 / 18%);
+#map_pin_adjustment button::before {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: radial-gradient(circle, rgb(105 183 207 / 40%), transparent 72%);
+	opacity: 0;
+	transform: translate(-50%, -50%) scale(.75);
+	transition: opacity 180ms ease-out, transform 180ms ease-out;
+	pointer-events: none;
+	z-index: -1;
+}
+
+#map_pin_adjustment button:active::before {
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+	transition-duration: 60ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#map_pin_adjustment button::before,
+	#map_pin_adjustment button:active::before {
+		transition: none;
+	}
 }
 
 .map_card_adjust {

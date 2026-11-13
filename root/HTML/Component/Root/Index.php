@@ -4,7 +4,12 @@
 	<div id='apple_map' class='hide' aria-hidden='true'></div>
 	<div id='map' tabindex='-1'></div>
 </div>
-<div id='map_pin_adjustment' role='group' aria-label='Adjust pin' hidden>
+<div id='map_pin_adjustment' role='group' aria-label='Pin Adjustment D-pad' hidden>
+	<svg class='map_pin_shape' width='0' height='0' aria-hidden='true' focusable='false'>
+		<clipPath id='map_pin_outline' clipPathUnits='objectBoundingBox'>
+			<path d='M .11,.24 H .27 C .35,.24 .33,0 .5,0 S .65,.24 .73,.24 H .89 C 1.037,.24 1.037,.76 .89,.76 H .73 C .65,.76 .67,1 .5,1 S .35,.76 .27,.76 H .11 C -.037,.76 -.037,.24 .11,.24 Z'/>
+		</clipPath>
+	</svg>
 	<button id='map_pin_cancel' type='button' aria-label='Cancel' title='Cancel'>&times;</button>
 	<div class='map_pin_nudges' role='group' aria-label='Nudge pin one pixel'>
 		<button type='button' data-nudge='ArrowUp' aria-label='Move pin up'>&uarr;</button>

@@ -4,9 +4,9 @@
 
 The Terrain Map Canvas and alternate map sources keep manual pan and zoom in control: wheel, touch, drag, double-click, and camera-key input cancel automatic location focus, including its delayed final fit and chrome pan. New location selections, map-source changes, and entering Wolo Code Input View discard earlier camera callbacks. Bounds focus uses the full projected bounds and actual map dimensions with consistent padding, including across the dateline, so it does not zoom in too far before fitting back out. Focusing the current center works without a pan event, and camera limits stop animation cleanly.
 
-## Map View: Adjust pin
+## Map View: Pin Adjustment D-pad
 
-Hold a marker for half a second or choose **Adjust pin** on its info card. The draggable crosshair starts at the marker's exact coordinate. The selected marker and info cards are hidden during adjustment. The directional buttons and arrow keys nudge the crosshair one screen pixel at a time. The directional buttons form a D-pad with up and down stacked between left and right. Hold a directional button to keep nudging. The crosshair stays anchored to its draft coordinate through map pan and zoom. The checkmark on the right applies the move without reframing the map. The × on the left or Escape discards it.
+Hold a marker for half a second or choose **Adjust pin** on its info card. The draggable crosshair starts at the marker's exact coordinate. The selected marker and info cards are hidden during adjustment. The directional buttons and arrow keys nudge the crosshair one screen pixel at a time. The **Pin Adjustment D-pad** has a rounded center and two side arms. Up and down stack in the center, and left and right sit on either side. A soft circular glow marks each press. The **Camera D-pad** remains available for camera movement, and the **Locate Button** stays centered below the **Pin Adjustment D-pad**. Hold a directional button to keep nudging. The crosshair stays anchored to its draft coordinate through map pan and zoom. The checkmark on the right applies the move without reframing the map. The × on the left or Escape discards it.
 
 ## Country and regional choices in city selectors
 

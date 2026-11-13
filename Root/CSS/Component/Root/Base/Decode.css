@@ -798,6 +798,7 @@ body:not(.decode) :is(#action_menu_info, #action_menu_decode, #map_type_button, 
 body:not(.decode) #location_button {
  left: 50%;
  right: auto;
+ margin-left: 0;
  transform: translateX(-50%);
 }
 body:not(.decode) #map_type_button { right: 11px; }

@@ -584,11 +584,13 @@ function runCodeScanFrame() {
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
 		captureCodeScanFrame(frame, canvas);
 		return recognizeCodeScanCanvas(canvas, null, {
-			isCurrent: function() {
-				return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
-			},
-			showBoxes: function(boxes) {
-				if(!codeScanState.recognizedFrame) drawCodeScanMatchRegions(null, canvas, boxes);
+			live: {
+				isCurrent: function() {
+					return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
+				},
+				showBoxes: function(boxes) {
+					if(!codeScanState.recognizedFrame) drawCodeScanMatchRegions(null, canvas, boxes);
+				}
 			}
 		});
 	}).then(function(result) {
@@ -798,16 +800,16 @@ function detectCodeScanContainers(canvas) {
 	});
 }
 
-function recognizeCodeScanCanvas(canvas, focus, live) {
+function recognizeCodeScanCanvas(canvas, focus, options) {
 	return runCodeScanWorkerTask(function(worker) {
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var containers = detectCodeScanContainers(canvas);
+		var live = options && options.live;
+		var allowRotation = options && options.allowRotation;
 		focus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
 		if(live) {
 			var boxes = codeScanOcrMatch.getLabelCodeBoxes(containers, focus).filter(function(box) {
-				var width = box.x1 - box.x0;
-				var height = box.y1 - box.y0;
-				return Math.max(width, height) >= 1.2 * Math.min(width, height);
+				return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0);
 			}).slice(0, 2);
 			var debugBoxes = boxes.slice(0, 1);
 			if(live.isCurrent()) live.showBoxes(debugBoxes);
@@ -819,7 +821,10 @@ function recognizeCodeScanCanvas(canvas, focus, live) {
 			result.data.labelContainers = containers;
 			result.data.scanFocus = focus;
 			if(!containers.length || extractMatchFromOcrResult(result)) return result;
-			return recognizeCodeScanBoxes(canvas, result, worker, codeScanOcrMatch.getLabelCodeBoxes(containers, focus).slice(0, 4));
+			var boxes = codeScanOcrMatch.getLabelCodeBoxes(containers, focus).filter(function(box) {
+				return allowRotation || box.x1 - box.x0 > box.y1 - box.y0;
+			}).slice(0, 4);
+			return recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation);
 		});
 	});
 }
@@ -844,15 +849,15 @@ function rotateCodeScanMatch(match, canvas, rotation) {
 	return Object.assign({}, match, { regions: regions });
 }
 
-function recognizeCodeScanBoxes(canvas, result, worker, boxes, live) {
+function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotation) {
 	var data = result.data;
 	if(!boxes.length || (live && !live.isCurrent())) return result;
 	return worker.setParameters({ tessedit_pageseg_mode: '6' }).then(async function() {
-		// Try the natural orientation of each frame before trying its reverse.
-		for(var reverse of [false, true]) {
+		// Only a fresh shutter photo may try the opposite orientation.
+		for(var reverse of (allowRotation ? [false, true] : [false])) {
 			for(var sourceBox of boxes) {
 				if(live && !live.isCurrent()) return;
-				var sideways = sourceBox.y1 - sourceBox.y0 > sourceBox.x1 - sourceBox.x0;
+				var sideways = allowRotation && sourceBox.y1 - sourceBox.y0 > sourceBox.x1 - sourceBox.x0;
 				var rotation = (sideways ? 90 : 0) + (reverse ? 180 : 0);
 				var orientation = { width: sideways ? canvas.height : canvas.width, height: sideways ? canvas.width : canvas.height };
 				var box = codeScanOcrMatch.rotateLabelBox(sourceBox, canvas.width, canvas.height, rotation);
@@ -1194,7 +1199,7 @@ function processCodeScanCapture() {
 			showCodeScanReview(null);
 		return;
 	}
-	recognizeCodeScanCanvas(canvas).then(function(result) {
+	recognizeCodeScanCanvas(canvas, null, { allowRotation: true }).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		var match = extractMatchFromOcrResult(result);
@@ -1767,7 +1772,8 @@ function drawCodeScanMatchRegions(match, canvas, boxes) {
 		detected.appendChild(outline);
 	});
 	if(!match || !match.regions) return;
-	if(match.regions.card) setCodeScanCandidateHighlight(match.regions.card, canvas, 'code_scan_card_highlight', false);
+	var card = match.regions.card;
+	if(card && card.x1 - card.x0 > card.y1 - card.y0) setCodeScanCandidateHighlight(card, canvas, 'code_scan_card_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.code, canvas);
 	if(match.regions.city) setCodeScanCandidateHighlight(match.regions.city, canvas, 'code_scan_city_highlight');

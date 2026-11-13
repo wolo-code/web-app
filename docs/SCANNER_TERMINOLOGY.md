@@ -7,7 +7,7 @@ Call the overall process **Spatial Wolo Code Recognition**: recognizing a Wolo C
 | Term | Meaning | Current overlay |
 | --- | --- | --- |
 | **Label Region / Wolo Code Region** | The enclosing region containing the city and the three Wolo words. Its actual printed rectangle or rounded rectangle is detected first. | Blue |
-| **Card Region** | The whole card separated from its background, containing the inner Label Region and optional outside text. | Purple |
+| **Card Region** | The whole card separated from its background, containing the inner Label Region and optional outside text. | Purple for landscape cards |
 | **City Region** | The region containing city text above the three Wolo words and inside the Label Region. | Gold |
 | **Three-Word Region** | The region containing exactly the three recognized Wolo dictionary words. | Green |
 

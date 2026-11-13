@@ -220,7 +220,19 @@ function downloadQR() {
 		qrBody.setAttribute( 'style',
 		 "height: "+(qrBody.offsetHeight-6)+"px"+"; "+
 		 "width: "+qrBody.offsetWidth+"px" );
-	html2canvas( document.querySelector('#qr_body'), {scale:1} ).then( canvas => {
+	html2canvas(qrBody, {
+		scale: 1,
+		onclone: function(clonedDocument) {
+			// html2canvas uses SVG attributes to determine the source image size.
+			clonedDocument.querySelectorAll('#logo_qr svg').forEach(function(logo) {
+				var style = clonedDocument.defaultView.getComputedStyle(logo);
+				var width = style.width;
+				var height = style.height;
+				logo.setAttribute('width', width);
+				logo.setAttribute('height', height);
+			});
+		}
+	}).then( canvas => {
 		if(mode_preview_activated)
 			toggleQRpreview();
 		removeClassIfPresent(overlay, 'raster');

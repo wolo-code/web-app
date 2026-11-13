@@ -133,9 +133,7 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	var content = document.createElement('div');
 	content.className = 'map_card_content';
 	content.innerHTML = "<div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'>" + city_accent + "</span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
-	content.addEventListener('pointerdown', function(event) {
-		if(!event.target.closest('.map_card_adjust')) activateMapCard(card);
-	});
+	content.addEventListener('pointerdown', function() { activateMapCard(card); });
 	function forThisCard(action) {
 		return function() {
 			if(activateMapCard(card))
@@ -147,15 +145,6 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	addLongpressListener(content.querySelector('.map_card_address'), forThisCard(toggleAddress), forThisCard(handleShareWCode));
 	addLongpressListener(content.querySelector('.map_card_launch'), forThisCard(gotoCoordinate), forThisCard(copyWcodeJumpLink));
 	addLongpressListener(content.querySelector('.map_card_label'), forThisCard(showQR), forThisCard(downloadQR_minimal));
-	var adjust = document.createElement('button');
-	adjust.type = 'button';
-	adjust.className = 'map_card_adjust control';
-	adjust.textContent = 'Adjust pin';
-	adjust.addEventListener('click', function() {
-		var entry = card === infoWindow ? getMapPlace(marker) : mapPlaces.find(function(place) { return place.card === card; });
-		startMapPinAdjustment(entry);
-	});
-	content.append(adjust);
 	infoWindow_setContent(content);
 	var entry = getMapPlace(marker);
 	if(entry && (!entry.result || !entry.name)) {

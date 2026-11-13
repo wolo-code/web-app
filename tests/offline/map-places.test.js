@@ -404,11 +404,20 @@ test('map touch hold keeps the previous card and cancels on movement', () => {
 	});
 	context.startMapPinAdjustment = pin => {
 		assert.equal(pin, entry);
+		context.mapPinAdjustment = {entry};
 		return true;
 	};
+	context.getMapPinDragOffset = (x, y) => ({x: 100 - x, y: 230 - y});
+	const draftMoves = [];
+	context.moveMapPinDraft = (x, y) => draftMoves.push([x, y]);
 	context.encode = () => assert.fail('holding a marker must not create a new location');
 	listeners.touchstart(touch(110));
 	timer();
+	const move = {...touch(130), cancelable: true, preventDefault() {}, stopImmediatePropagation() {}};
+	listeners.touchmove(move);
+	listeners.touchend({cancelable: false});
+	listeners.touchmove(move);
+	assert.deepEqual(draftMoves, [[120, 230]]);
 });
 
 test('pin adjustment preserves the camera, keeps the route order, and encodes only on Apply', () => {

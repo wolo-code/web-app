@@ -18,23 +18,19 @@ function initMapPinAdjustment() {
 	mapPinProjectionOverlay.draw = drawMapPinCrosshair;
 	mapPinProjectionOverlay.onRemove = function() {};
 	mapPinProjectionOverlay.setMap(map);
+	setupMapPinMouseHold(map.getDiv());
 
 	mapPinCrosshair.addEventListener('pointerdown', function(event) {
 		if(!mapPinAdjustment || !event.isPrimary || event.button !== 0) return;
-		var pixel = getMapPinDraftPixel();
-		if(!pixel) return;
 		event.preventDefault();
-		mapPinCrosshair.setPointerCapture(event.pointerId);
-		mapPinAdjustment.drag = {
-			id: event.pointerId,
-			x: pixel.x - event.clientX,
-			y: pixel.y - event.clientY
-		};
+		captureMapPinDrag(event);
 	});
 	mapPinCrosshair.addEventListener('pointermove', function(event) {
 		var drag = mapPinAdjustment && mapPinAdjustment.drag;
-		if(drag && drag.id === event.pointerId)
+		if(drag && drag.id === event.pointerId) {
+			event.stopPropagation();
 			moveMapPinDraft(event.clientX + drag.x, event.clientY + drag.y);
+		}
 	});
 	mapPinCrosshair.addEventListener('lostpointercapture', function(event) {
 		var drag = mapPinAdjustment && mapPinAdjustment.drag;
@@ -76,6 +72,57 @@ function initMapPinAdjustment() {
 	}, true);
 }
 
+function getMapPinDragOffset(clientX, clientY) {
+	var pixel = getMapPinDraftPixel();
+	return pixel ? {x: pixel.x - clientX, y: pixel.y - clientY} : null;
+}
+
+function captureMapPinDrag(event) {
+	var offset = getMapPinDragOffset(event.clientX, event.clientY);
+	if(!offset) return;
+	mapPinCrosshair.setPointerCapture(event.pointerId);
+	mapPinAdjustment.drag = {id: event.pointerId, x: offset.x, y: offset.y};
+}
+
+function setupMapPinMouseHold(surface) {
+	var press;
+	var timer;
+	function cancelHold() {
+		clearTimeout(timer);
+		press = null;
+	}
+	surface.addEventListener('pointerdown', function(event) {
+		if(mapPinAdjustment || event.pointerType === 'touch' || !event.isPrimary || event.button !== 0 ||
+			isMapChromeClick({domEvent: event}) || mapEventPathHasSelector({domEvent: event}, 'input, a, .gm-style-iw')) return;
+		var projection = mapPinProjectionOverlay.getProjection();
+		if(!projection) return;
+		var rect = surface.getBoundingClientRect();
+		var entry = getMapPlaceAtPixel(projection, new google.maps.Point(event.clientX - rect.left, event.clientY - rect.top));
+		if(!entry) return;
+		cancelHold();
+		press = event;
+		timer = setTimeout(function() {
+			if(startMapPinAdjustment(entry)) {
+				captureMapPinDrag(press);
+				mapHoldClickUntil = Date.now() + 1000;
+			}
+			cancelHold();
+		}, 500);
+	}, true);
+	window.addEventListener('pointermove', function(event) {
+		if(press && press.pointerId === event.pointerId && Math.hypot(event.clientX - press.clientX, event.clientY - press.clientY) > 8)
+			cancelHold();
+	}, true);
+	['pointerup', 'pointercancel'].forEach(function(type) {
+		window.addEventListener(type, function(event) {
+			if(press && press.pointerId === event.pointerId) cancelHold();
+		}, true);
+	});
+	window.addEventListener('blur', cancelHold);
+	map.addListener('dragstart', cancelHold);
+	map.addListener('zoom_changed', cancelHold);
+}
+
 function getMapPlaceAtPixel(projection, pixel) {
 	var nearest;
 	var closest = Infinity;
@@ -98,21 +145,7 @@ function getMapPlaceAtPixel(projection, pixel) {
 }
 
 function bindMapPlaceMarker(placeMarker, onClick) {
-	var timer;
-	function cancelHold() { clearTimeout(timer); }
-	placeMarker.addListener('mousedown', function(event) {
-		var domEvent = event && event.domEvent;
-		if(!domEvent || domEvent.button !== 0 || domEvent.pointerType === 'touch' ||
-			domEvent.sourceCapabilities?.firesTouchEvents || mapPinAdjustment) return;
-		cancelHold();
-		timer = setTimeout(function() {
-			if(!mapDragClickGuard && startMapPinAdjustment(getMapPlace(placeMarker))) mapHoldClickUntil = Date.now() + 1000;
-		}, 500);
-	});
-	placeMarker.addListener('mouseup', cancelHold);
-	placeMarker.addListener('mouseout', cancelHold);
 	placeMarker.addListener('click', function(event) {
-		cancelHold();
 		if(!mapPinAdjustment && Date.now() >= mapHoldClickUntil) onClick(event);
 	});
 }

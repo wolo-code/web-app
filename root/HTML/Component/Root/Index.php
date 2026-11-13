@@ -7,7 +7,7 @@
 <div id='map_pin_adjustment' role='group' aria-label='Pin Adjustment D-pad' hidden>
 	<svg class='map_pin_shape' width='0' height='0' aria-hidden='true' focusable='false'>
 		<clipPath id='map_pin_outline' clipPathUnits='objectBoundingBox'>
-			<path d='M .11,.24 H .27 C .35,.24 .33,0 .5,0 S .65,.24 .73,.24 H .89 C 1.037,.24 1.037,.76 .89,.76 H .73 C .65,.76 .67,1 .5,1 S .35,.76 .27,.76 H .11 C -.037,.76 -.037,.24 .11,.24 Z'/>
+			<path d='M .105,.25 H .275 C .36,.25 .355,.015 .5,.015 S .64,.25 .725,.25 H .895 A .1,.25 0 0 1 .895,.75 H .725 C .64,.75 .645,.985 .5,.985 S .36,.75 .275,.75 H .105 A .1,.25 0 0 1 .105,.25 Z'/>
 		</clipPath>
 	</svg>
 	<button id='map_pin_cancel' type='button' aria-label='Cancel' title='Cancel'>&times;</button>
@@ -17,7 +17,7 @@
 		<button type='button' data-nudge='ArrowRight' aria-label='Move pin right'>&rarr;</button>
 		<button type='button' data-nudge='ArrowDown' aria-label='Move pin down'>&darr;</button>
 	</div>
-	<button id='map_pin_apply' type='button' aria-label='Apply' title='Apply'>&#10003;</button>
+	<button id='map_pin_apply' type='button' aria-label='Apply' title='Apply'><span aria-hidden='true'>&#10003;</span></button>
 </div>
 <div id='osm_attribution' class='map_attribution hide blur_background' data-map-layer='osm'>
 	<button type='button' class='map_attribution_toggle' aria-expanded='false'>Map &copy; OpenStreetMap</button>

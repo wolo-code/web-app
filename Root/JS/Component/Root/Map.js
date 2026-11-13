@@ -183,6 +183,8 @@ function setupMapTouchHold() {
 	var timer = null;
 	var origin = null;
 	var held = false;
+	var pinDrag = null;
+	var pinTouchTarget = null;
 	function cancelHold() {
 		clearTimeout(timer);
 		timer = null;
@@ -190,6 +192,7 @@ function setupMapTouchHold() {
 	}
 	surface.addEventListener('touchstart', function(event) {
 		cancelHold();
+		stopPinDrag();
 		held = false;
 		if(mapPinAdjustment || event.touches.length !== 1 || isMapChromeClick({domEvent: event})) return;
 		var touch = event.touches[0];
@@ -208,7 +211,17 @@ function setupMapTouchHold() {
 			if(entry ? !startMapPinAdjustment(entry) : !latLng) return;
 			held = true;
 			mapHoldClickUntil = Date.now() + 1000;
-			if(entry) return;
+			if(entry) {
+				pinDrag = getMapPinDragOffset(touch.clientX, touch.clientY);
+				// The map can detach the hidden marker while its original touch is still active.
+				pinTouchTarget = touch.target;
+				if(pinTouchTarget && pinTouchTarget !== surface) {
+					pinTouchTarget.addEventListener('touchmove', moveHeldPin, {passive: false});
+					pinTouchTarget.addEventListener('touchend', endHold, {passive: false});
+					pinTouchTarget.addEventListener('touchcancel', stopPinDrag);
+				}
+				return;
+			}
 			cleanUp(true, true);
 			infoWindow_setContent(MESSAGE_LOADING);
 			var pos = resolveLatLng(latLng);
@@ -217,19 +230,44 @@ function setupMapTouchHold() {
 			getAddress(pos);
 		}, 500);
 	}, {capture: true, passive: true});
+	function moveHeldPin(event) {
+		if(pinDrag && mapPinAdjustment && event.touches.length === 1) {
+			var touch = event.touches[0];
+			if(event.cancelable) event.preventDefault();
+			event.stopImmediatePropagation();
+			moveMapPinDraft(touch.clientX + pinDrag.x, touch.clientY + pinDrag.y);
+			return true;
+		}
+		return false;
+	}
+	function stopPinDrag() {
+		pinDrag = null;
+		if(pinTouchTarget && pinTouchTarget !== surface) {
+			pinTouchTarget.removeEventListener('touchmove', moveHeldPin);
+			pinTouchTarget.removeEventListener('touchend', endHold);
+			pinTouchTarget.removeEventListener('touchcancel', stopPinDrag);
+		}
+		pinTouchTarget = null;
+	}
 	surface.addEventListener('touchmove', function(event) {
+		if(moveHeldPin(event)) return;
 		if(!origin) return;
 		var touch = event.touches[0];
 		if(event.touches.length !== 1 || Math.hypot(touch.clientX - origin.x, touch.clientY - origin.y) > 10) cancelHold();
-	}, {capture: true, passive: true});
-	surface.addEventListener('touchend', function(event) {
+	}, {capture: true, passive: false});
+	function endHold(event) {
 		cancelHold();
+		stopPinDrag();
 		if(held) {
 			mapHoldClickUntil = Date.now() + 1000;
 			if(event.cancelable) event.preventDefault();
 		}
-	}, {capture: true, passive: false});
-	surface.addEventListener('touchcancel', cancelHold, {capture: true, passive: true});
+	}
+	surface.addEventListener('touchend', endHold, {capture: true, passive: false});
+	surface.addEventListener('touchcancel', function() {
+		cancelHold();
+		stopPinDrag();
+	}, {capture: true, passive: true});
 	surface.addEventListener('contextmenu', function(event) {
 		if(timer !== null || held) event.preventDefault();
 	});

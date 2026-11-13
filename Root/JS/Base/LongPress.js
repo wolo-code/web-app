@@ -19,7 +19,8 @@ var click = function(e) {
 	if(this.classList)
 		this.classList.remove('longpress');
 
-	if (this.longpress) {
+	if (this.longpress && e.detail !== 0) {
+		this.longpress = false;
 		return false;
 	}
 
@@ -28,7 +29,7 @@ var click = function(e) {
 
 var start = function(e) {
 
-	if (e.type === 'click' && e.button !== 0) {
+	if (e.button !== 0 || e.isPrimary === false) {
 		return;
 	}
 
@@ -40,8 +41,8 @@ var start = function(e) {
 	var parent = this;
 	if (this.presstimer === null) {
 		listPressTimer[this.pressTimerIndex] = this.presstimer = setTimeout(function() {
-			parent.fnLong(e);
 			parent.longpress = true;
+			parent.fnLong(e);
 		}, 500);
 	}
 
@@ -51,13 +52,15 @@ var start = function(e) {
 function addLongpressListener(node, fnShort, fnLong) {
 	if(!node || !node.addEventListener)
 		return;
-	node.addEventListener('mousedown', start);
-	node.addEventListener('touchstart', start, { passive: true });
+	node.addEventListener('pointerdown', start);
 	node.addEventListener('click', click);
-	node.addEventListener('mouseout', cancel);
-	node.addEventListener('touchend', cancel);
-	node.addEventListener('touchleave', cancel);
-	node.addEventListener('touchcancel', cancel);
+	node.addEventListener('pointerup', cancel);
+	node.addEventListener('pointerleave', cancel);
+	node.addEventListener('pointercancel', cancel);
+	node.addEventListener('contextmenu', function(event) {
+		if(event.pointerType === 'touch' || this.longpress)
+			event.preventDefault();
+	});
 	node.longpress = false;
 	node.presstimer = null;
 	node.longtarget = null;

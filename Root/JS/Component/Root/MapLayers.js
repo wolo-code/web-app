@@ -195,14 +195,10 @@ function onOsmTileLoad(zoom) {
 }
 
 function onOsmTileError(zoom) {
-	if(!isOsmMapLayerActive() || zoom !== map.getZoom()) {
+	if(!isOsmMapLayerActive() || zoom > OSM_NATIVE_MAX_ZOOM || zoom !== map.getZoom()) {
 		return;
 	}
 	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
-		return;
-	}
-	if(zoom > OSM_NATIVE_MAX_ZOOM) {
-		scheduleOsmZoomFallback(false);
 		return;
 	}
 	osmTileErrorStreak++;
@@ -278,22 +274,23 @@ function watchOsmZoomFallback() {
 	}
 	osmZoomFallbackInitialized = true;
 	map.addListener('zoom_changed', function() {
-		if(!isOsmMapLayerActive() || osmFallbackApplying) {
+		if(!isOsmMapLayerActive()) {
 			return;
 		}
 		osmTileErrorStreak = 0;
-		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
-			scheduleOsmZoomFallback(false);
-		}
+		clampOsmCameraZoom();
 	});
 	map.addListener('idle', function() {
-		if(!isOsmMapLayerActive() || osmFallbackApplying) {
-			return;
-		}
-		if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
-			scheduleOsmZoomFallback(false);
+		if(isOsmMapLayerActive()) {
+			clampOsmCameraZoom();
 		}
 	});
+}
+
+function clampOsmCameraZoom() {
+	if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
+		map.setZoom(OSM_NATIVE_MAX_ZOOM);
+	}
 }
 
 function getAppleMapsToken() {
@@ -617,7 +614,6 @@ function setRasterMapType(id, name, template, maxZoom) {
 	var mapType = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
 			if(id === MAP_LAYER_OSM && zoom > OSM_NATIVE_MAX_ZOOM) {
-				scheduleOsmZoomFallback(false);
 				return null;
 			}
 			return rasterTileUrl(template, coord, zoom);
@@ -771,8 +767,11 @@ function setGoogleMapTypeId(typeId) {
 	if(!isGoogleMapReady()) {
 		return false;
 	}
-	// Set a camera limit as well as a tile limit so automatic fits respect it.
-	map.set('maxZoom', typeId === MAP_LAYER_OSM ? OSM_NATIVE_MAX_ZOOM : undefined);
+	// Set the camera limit before the new layer can request tiles.
+	map.setOptions({maxZoom: typeId === MAP_LAYER_OSM ? OSM_NATIVE_MAX_ZOOM : null});
+	if(typeId === MAP_LAYER_OSM) {
+		clampOsmCameraZoom();
+	}
 	map.setMapTypeId(typeId);
 	return true;
 }
@@ -799,9 +798,6 @@ function setMapLayer(layer) {
 		document.body.classList.add('osm');
 		if(setGoogleMapTypeId(MAP_LAYER_OSM)) {
 			watchOsmZoomFallback();
-			if(map.getZoom() > OSM_NATIVE_MAX_ZOOM) {
-				scheduleOsmZoomFallback(false);
-			}
 		}
 	}
 	else if(layer === MAP_LAYER_APPLE) {
@@ -1086,13 +1082,13 @@ function getMapLayerCycle() {
 	return layers;
 }
 
-function getNextMapLayer(current) {
+function getNextMapLayer(current, direction = 1) {
 	var layers = getMapLayerCycle();
 	var index = layers.indexOf(current);
 	if(index < 0) {
 		return getDefaultMapLayer();
 	}
-	return layers[(index + 1) % layers.length];
+	return layers[(index + direction + layers.length) % layers.length];
 }
 
 function setControlTooltip(el, label) {

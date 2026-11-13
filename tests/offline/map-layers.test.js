@@ -73,6 +73,32 @@ test('OSM retries missing tiles through consecutive zoom transitions and ignores
 	assert.equal(zoom, 12);
 });
 
+test('entering OSM clamps a deeper zoom before changing the map type', () => {
+	const calls = [];
+	const listeners = {};
+	let zoom = 22;
+	const context = {
+		document: { body: { classList: { contains: name => name === 'osm' } } },
+		map: {
+			getZoom: () => zoom,
+			setZoom: value => { calls.push(['zoom', value]); zoom = value; },
+			setOptions: options => calls.push(['maxZoom', options.maxZoom]),
+			setMapTypeId: type => calls.push(['type', type]),
+			addListener: (event, listener) => { listeners[event] = listener; }
+		},
+		showNotification: message => calls.push(['notification', message])
+	};
+	vm.runInNewContext(read('Root/JS/Component/Root/MapLayers.js'), context);
+	context.watchOsmZoomFallback();
+	context.setGoogleMapTypeId('osm');
+	assert.deepEqual(calls, [['maxZoom', 19], ['zoom', 19], ['type', 'osm']]);
+	zoom = 20;
+	listeners.zoom_changed();
+	assert.equal(zoom, 19);
+	context.setGoogleMapTypeId('roadmap');
+	assert.deepEqual(calls.slice(3), [['zoom', 19], ['maxZoom', null], ['type', 'roadmap']]);
+});
+
 test('OSM and raster tiles do not steal map click or drag', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const mapJs = read('Root/JS/Component/Root/Map.js');
@@ -220,6 +246,55 @@ test('map view toggle cycles enabled map layers', () => {
 	assert.match(mapJs, /setMapLayer\(MAP_LAYER_SATELLITE\)/);
 	assert.match(mapLayers, /function getNextMapLayer/);
 	assert.match(mapLayers, /MAP_LAYER_OSM/);
+});
+
+test('holding Switch map cycles backward and skips disabled layers', () => {
+	const context = {};
+	vm.runInNewContext(read('Root/JS/Component/Root/MapLayers.js'), context);
+	vm.runInNewContext(read('Root/JS/Component/Root/Map.js'), context);
+	let selected;
+	context.getCurrentMapLayer = () => 'roadmap';
+	context.isMapViewActive = () => true;
+	context.setMapLayer = layer => { selected = layer; };
+	context.mapSourcePrefs.microsoft = 'off';
+	context.switchToPreviousMapLayer();
+	assert.equal(selected, 'esri');
+	assert.equal(context.getNextMapLayer('esri'), 'roadmap');
+});
+
+test('holding Info requests the guide and consumes the release click', () => {
+	let showInfoCalls = 0;
+	let guideRequests = 0;
+	let timer;
+	const handlers = {};
+	const info = {
+		addEventListener: (event, handler) => { handlers[event] = handler; },
+		closest: selector => selector === '#action_menu_info' ? info : null
+	};
+	const context = {
+		document: { getElementById: id => id === 'action_menu_info' ? info : null },
+		showInfo: () => { showInfoCalls++; },
+		setTimeout: fn => { timer = fn; return 1; },
+		clearTimeout: () => {}
+	};
+	vm.createContext(context);
+	vm.runInContext(read('Root/JS/Base/LongPress.js'), context);
+	vm.runInContext(read('Root/JS/Component/Root/DecodeIconGuide.js'), context);
+	context.startDecodeIconGuide = force => { assert.equal(force, true); guideRequests++; };
+	const setup = read('Root/JS/Component/Root/Script.js');
+	const binding = setup.split(/\r?\n/).find(line => line.includes("addLongpressListener(document.getElementById('action_menu_info')"));
+	vm.runInContext(binding, context);
+
+	handlers.pointerdown.call(info, {button: 0, pointerType: 'touch'});
+	timer();
+	handlers.pointerup.call(info, {});
+	const click = {type: 'click', detail: 1, target: info};
+	assert.equal(context.isDecodeIconGuideDismissEvent(click), false);
+	handlers.click.call(info, click);
+	assert.equal(guideRequests, 1);
+	assert.equal(showInfoCalls, 0);
+	handlers.click.call(info, {type: 'click', detail: 0, target: info});
+	assert.equal(showInfoCalls, 1);
 });
 
 test('map source constants are declared before pref helpers and layer setters', () => {

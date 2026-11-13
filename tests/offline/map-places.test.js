@@ -500,10 +500,10 @@ test('holding Go adds a card and the release click does not replace either marke
  document.getElementById('pac-input').value = 'one two three';
  let decodes = 0;
  context.decode = () => {decodes++; show(2);};
- go.touchstart({type: 'touchstart'});
+ go.pointerdown({type: 'pointerdown', pointerType: 'touch', button: 0});
  hold();
  const second = context.infoWindow;
- go.touchend({type: 'touchend'});
+ go.pointerup({type: 'pointerup', pointerType: 'touch', button: 0});
  go.click({type: 'click'});
  assert.equal(decodes, 1);
  assert.notEqual(first, second);

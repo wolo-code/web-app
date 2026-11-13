@@ -8,7 +8,7 @@ var DECODE_ICON_GUIDE_MIN_TOP = 56;
 var DECODE_ICON_GUIDE_STACK_GAP = 12;
 var MAP_INFOCARD_CALLOUT_START_GAP = 8;
 var MAP_INFOCARD_CALLOUT_END_GAP = 38;
-var MAP_ICON_GUIDE_REPLAY_HINT = "You can view the guide again from <br> 'Info' button -> 'Show guide'";
+var MAP_ICON_GUIDE_REPLAY_HINT = "Hold Info to show the guide again";
 var MAP_ICON_GUIDE_REPLAY_HINT_MS = 5000;
 var decodeIconGuideVisible = false;
 var decodeIconGuideConsumed = false;
@@ -683,6 +683,7 @@ function unbindDecodeIconGuideDismiss() {
 function isDecodeIconGuideDismissEvent(event) {
 	var overlay;
 	var target;
+	var infoButton;
 	if(!event || event.isTrusted === false)
 		return false;
 	if(event.type !== 'click')
@@ -690,6 +691,9 @@ function isDecodeIconGuideDismissEvent(event) {
 	if(typeof event.detail === 'number' && event.detail === 0)
 		return false;
 	target = event.target;
+	infoButton = target && target.closest && target.closest('#action_menu_info');
+	if(infoButton && infoButton.longpress)
+		return false;
 	overlay = document.getElementById('overlay');
 	if(overlay && !overlay.classList.contains('hide') && overlay.contains(target))
 		return false;

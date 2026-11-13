@@ -610,9 +610,7 @@ function initMap() {
 	addLongpressListener(document.getElementById('decode_button'), decode_input_from_map, decode_input_from_map_add);
 	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form);
 
-	map_type_button.addEventListener('click', function() {
-		toggleMapViewType();
-	});
+	addLongpressListener(map_type_button, toggleMapViewType, switchToPreviousMapLayer);
 
 	location_button.addEventListener('mousedown', processPositionButtonDown);
 	location_button.addEventListener('touchstart', processPositionButtonTouchStart);
@@ -1339,6 +1337,11 @@ function toggleMapViewType() {
 	}
 
 	setMapLayer(getNextMapLayer(getCurrentMapLayer()));
+}
+
+function switchToPreviousMapLayer() {
+	if(isMapViewActive())
+		setMapLayer(getNextMapLayer(getCurrentMapLayer(), -1));
 }
 
 function toggleDecodeView() {

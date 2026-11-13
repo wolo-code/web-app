@@ -215,8 +215,11 @@ function setupControls() {
 	bindControl('info_version_indicator', 'focus', fillInfoVersionStamps);
 	fillInfoVersionStamps();
 	bindControl('info_show_icon_labels', 'click', showInfoIconGuide);
-	bindControl('action_menu_info', 'click', showInfoFromActionMenu);
-	bindControl('action_menu_map', 'click', toggleMapViewTypeFromActionMenu);
+	addLongpressListener(document.getElementById('action_menu_info'), showInfo, requestDecodeIconGuide);
+	addLongpressListener(document.getElementById('action_menu_map'), toggleMapViewTypeFromActionMenu, function() {
+		closeActionMenu();
+		switchToPreviousMapLayer();
+	});
 	bindControl('action_menu_decode', 'click', toggleDecodeViewFromActionMenu);
 	bindControl('decode_map_view_button', 'click', toggleDecodeView);
 	bindControl('footer_author', 'click', showInfoLinks);
@@ -316,10 +319,6 @@ function syncActionMenuAccess() {
 
 function closeActionMenu() {
 	syncActionMenuAccess();
-}
-
-function showInfoFromActionMenu() {
-	showInfo();
 }
 
 function toggleMapViewTypeFromActionMenu() {

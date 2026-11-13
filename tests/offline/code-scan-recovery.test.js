@@ -190,6 +190,28 @@ test('camera requests from an earlier session stop their tracks without attachin
 	assert.equal(c.codeScanState.cameraAvailable, false);
 });
 
+test('Typing keeps the scanner open for manual entry while cancelling a pending camera request', async () => {
+	const c = scanner(), request = deferred();
+	let stopped = 0, focused = false;
+	const video = { pause() {}, play: () => assert.fail('camera attached during manual entry') };
+	c.getCodeScanVideo = () => video;
+	c.document.getElementById = id => id === 'code_scan_review_w1' ? { focus: () => focused = true } : null;
+	c.navigator = { mediaDevices: { getUserMedia: () => request.promise } };
+	c.showCodeScanReview = (match, manualEntry) => {
+		assert.equal(match, null);
+		assert.equal(manualEntry, true);
+		c.codeScanState.phase = 'review';
+	};
+	c.startCodeScanCamera();
+	c.openCodeScanManualEntry();
+	request.resolve({ getTracks: () => [{ stop: () => stopped++ }] });
+	await flush();
+	assert.equal(stopped, 1);
+	assert.equal(focused, true);
+	assert.equal(c.codeScanState.active, true);
+	assert.equal(c.codeScanState.phase, 'review');
+});
+
 test('late camera failure cannot clear a new session', async () => {
 	const c = scanner(), request = deferred();
 	c.getCodeScanVideo = () => ({});

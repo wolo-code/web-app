@@ -1,26 +1,30 @@
 <div id='code_scan_message' class="message_dialog hide code_scan_dialog">
-	<h2 class='message_dialog_label'>
+	<h2 id='code_scan_heading' class='message_dialog_label'>
 		Scan Wolo Code
 	</h2>
 	<div id='code_scan_close' class="message_dialog_close control">
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div class='message_dialog_body code_scan_body'>
-		<div class='code_scan_viewport'>
-			<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
-			<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
-			<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'>
+		<div class='code_scan_preview'>
+			<div class='code_scan_viewport'>
+				<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
+				<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
+				<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'></div>
+				<div class='code_scan_regions' aria-hidden='true'>
+					<div id='code_scan_detected_boxes'></div>
+					<div id='code_scan_card_highlight' class='code_scan_candidate_highlight code_scan_card_highlight hide' aria-hidden='true'></div>
+					<div id='code_scan_container_highlight' class='code_scan_candidate_highlight code_scan_container_highlight hide' aria-hidden='true'></div>
+					<div id='code_scan_city_highlight' class='code_scan_candidate_highlight code_scan_city_highlight hide' aria-hidden='true'></div>
+					<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
+				</div>
+				<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
 			</div>
-			<div class='code_scan_regions' aria-hidden='true'>
-				<div id='code_scan_detected_boxes'></div>
-				<div id='code_scan_card_highlight' class='code_scan_candidate_highlight code_scan_card_highlight hide' aria-hidden='true'></div>
-				<div id='code_scan_container_highlight' class='code_scan_candidate_highlight code_scan_container_highlight hide' aria-hidden='true'></div>
-				<div id='code_scan_city_highlight' class='code_scan_candidate_highlight code_scan_city_highlight hide' aria-hidden='true'></div>
-				<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
+			<div class='code_scan_messages'>
+				<p id='code_scan_status' class='code_scan_status' role='status'>Processed on your device<br>No images are uploaded</p>
+				<p id='code_scan_review_validity' class='code_scan_review_validity' role='status'></p>
 			</div>
-			<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
 		</div>
-		<p id='code_scan_status' class='code_scan_status'>Processed on your device<br>No images are uploaded</p>
 		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide' role='toolbar' aria-label='Crop and zoom controls'>
 			<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan' type='button' aria-label='Rescan' title='Rescan'>
 				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
@@ -80,7 +84,6 @@
 					<input id='code_scan_review_w3' class='code_scan_review_input' type='text' autocomplete='off' autocapitalize='none' spellcheck='false' aria-describedby='code_scan_review_validity' required>
 				</label>
 			</div>
-			<p id='code_scan_review_validity' class='code_scan_review_validity' role='status' aria-live='polite'></p>
 			<div id='code_scan_details' class='code_scan_details' role='group' aria-label='Optional label details' hidden>
 				<div class='code_scan_address_parts'>
 					<label class='code_scan_review_field' for='code_scan_address_line_1'>Address line 1

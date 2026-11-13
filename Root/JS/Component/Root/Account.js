@@ -302,13 +302,14 @@ function buildSaveAddressPayload(title, segment, addressLines, city, code) {
 	};
 }
 
-function saveAddress(title, segment, savedAddress, callback, location) {
+function saveAddress(title, segment, savedAddress, callback, location, notify) {
+	notify = notify || showNotification;
 	var user = getBookmarkUser();
 	var city = location ? location.city : (typeof getCodeCity == 'function' ? getCodeCity() : null);
 	var code = normalizeSavedWcode(location ? location.code : (typeof getCodeWCode == 'function' ? getCodeWCode() : null));
 	var basePayload = buildSaveAddressPayload(title, segment, savedAddress, city, code);
 	if(!basePayload) {
-		showNotification('Locate or decode a Wolo Code first');
+		notify('Locate or decode a Wolo Code first');
 		return;
 	}
 	var payload = {
@@ -325,34 +326,35 @@ function saveAddress(title, segment, savedAddress, callback, location) {
 	if(!user) {
 		var local = readLocalBookmarks();
 		local['local_' + Date.now() + '_' + Math.random().toString(36).slice(2)] = payload;
-		if(writeLocalBookmarks(local)) {
+		if(writeLocalBookmarks(local, notify)) {
 			loadSaveList();
 			if(typeof callback === 'function') callback();
-			showNotification('Bookmark saved on this device');
+			notify('Bookmark saved on this device');
 		}
 		return;
 	}
 	uid = user.uid;
-	if (isOfflineMode()) {
-		enqueueOfflineSave(payload).then(function() {
-			if(typeof callback != 'undefined')
-				callback();
+	function saveOffline() {
+		return enqueueOfflineSave(payload, notify).then(function() {
+			if(typeof callback === 'function') callback();
+		}).catch(function() {
+			notify('Could not save address');
 		});
+	}
+	if (isOfflineMode()) {
+		saveOffline();
 		return;
 	}
 	pushOfflineSave(payload).then(function() {
 		if(typeof callback != 'undefined')
 			callback();
-		showNotification('Address saved');
+		notify('Address saved');
 	}).catch(function(error) {
 		if (shouldQueueOfflineSave(error)) {
-			enqueueOfflineSave(payload).then(function() {
-				if(typeof callback != 'undefined')
-					callback();
-			});
+			saveOffline();
 			return;
 		}
-		showNotification('Could not save address');
+		notify('Could not save address');
 	});
 }
 
@@ -438,9 +440,9 @@ function readLocalBookmarks() {
   return valid;
  } catch(error) { return {}; }
 }
-function writeLocalBookmarks(entries) {
+function writeLocalBookmarks(entries, notify) {
  try { localStorage.setItem(LOCAL_BOOKMARKS_KEY, JSON.stringify(entries)); return true; }
- catch(error) { showNotification('Could not save bookmarks on this device'); return false; }
+ catch(error) { (notify || showNotification)('Could not save bookmarks on this device'); return false; }
 }
 function renderAllBookmarks() {
  if(typeof updateQRBookmarkStatus === 'function') updateQRBookmarkStatus();

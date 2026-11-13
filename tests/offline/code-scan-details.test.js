@@ -165,7 +165,8 @@ function savingScanner() {
 	context.codeScanState.phase = 'review';
 	context.getCodeScanReviewCode = () => 'bengaluru mail nebula flower';
 	context.updateCodeScanReviewValidity = () => {};
-	context.showNotification = text => api.notification = text;
+	context.setCodeScanStatus = text => api.notification = text;
+	context.isCodeScanVisible = () => true;
 	context.saveAddress = (...args) => api.saved = args;
 	return api;
 }
@@ -187,6 +188,10 @@ test('scanner saves reviewed city, words and edited fields without decoding or c
 	assert.equal(api.saved[4].code.join(' '), 'mail nebula flower');
 	assert.equal(context.codeScanState.active, true);
 	assert.equal(nodes.code_scan_title.value, 'Ram');
+	assert.equal(context.codeScanState.saving, true);
+	api.saved[5]('Address saved');
+	assert.equal(api.notification, 'Address saved');
+	assert.equal(context.codeScanState.saving, false);
 });
 
 test('scanner save requires a title and reveals the heading for entry', () => {

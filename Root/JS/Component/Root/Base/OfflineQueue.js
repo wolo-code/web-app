@@ -33,13 +33,12 @@ function shouldQueueOfflineSave(error) {
 	return isOfflineMode() || isOfflineNetworkError(error);
 }
 
-function enqueueOfflineSave(payload) {
+function enqueueOfflineSave(payload, notify) {
 	var item = createOfflineQueueItem(payload);
 	return putOfflineSaveQueueItem(item).then(function() {
 		updateOfflineQueueBadge();
-		if (typeof showNotification === 'function') {
-			showNotification('Saved offline — will sync when online', NOTIFICATION_DURATION_LONG);
-		}
+		var report = notify || (typeof showNotification === 'function' ? showNotification : null);
+		if (report) report('Saved offline — will sync when online', NOTIFICATION_DURATION_LONG);
 		return item;
 	});
 }

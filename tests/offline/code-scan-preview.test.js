@@ -95,16 +95,6 @@ test('gallery photos preserve native resolution for the preview, source and reco
   assert.equal(context.codeScanState.originalSourceCanvas.height, height);
  }
 });
-test('recognition preserves the complete captured preview on success and no match', async () => {
- for(const match of [{ code: 'test' }, null]) {
-  const { context, canvas } = scanner();
-  context.recognizeCodeScanCanvas = async input => { assert.equal(input, canvas); return { match }; };
-  context.processCodeScanCapture(); await new Promise(resolve => setImmediate(resolve));
-  assert.equal(canvas.width, 1200); assert.equal(canvas.height, 800);
-  assert.equal(context.codeScanState.sourceCanvas, canvas);
-  assert.equal(context.reviewMatch, match);
- }
-});
 test('reframing scans the complete image even when a small guide clips the card', async () => {
  const { context, canvas } = scanner(); let scanned;
  const guide = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 30, height: 20 }) };
@@ -250,6 +240,28 @@ test('a failed card-first OCR read searches outside the card without rereading i
  assert.equal(result.data.scanMatch.regions.container, outside);
 });
 
+test('live OCR tries the centered code box before other graphics on the detected card', async () => {
+ const { context, canvas } = scanner();
+ const card = { x0: 450, y0: 100, x1: 750, y1: 550 };
+ const code = { x0: 460, y0: 275, x1: 740, y1: 365 };
+ const graphic = { x0: 500, y0: 350, x1: 690, y1: 430, anchored: true };
+ context.detectCodeScanContainers = () => [card, code, graphic];
+ context.runCodeScanWorkerTask = run => run({});
+ const reads = [];
+ context.ocrCodeScanBand = async (_input, crop) => {
+  reads.push(crop.x0);
+  return [];
+ };
+ const live = { isCurrent: () => true, showBoxes() {} };
+ await context.recognizeCodeScanCanvas(canvas, null, { live });
+ assert.deepEqual(reads, [465, 505]);
+
+ reads.length = 0;
+ live.previousBox = graphic;
+ await context.recognizeCodeScanCanvas(canvas, null, { live });
+ assert.deepEqual(reads, [505, 465]);
+});
+
 test('a close-up reads all four code markers with the outer card clipped', async () => {
  const { context, canvas } = scanner();
  canvas.width = 400;
@@ -343,63 +355,6 @@ test('live OCR tries the previous label first when confirming a read', async () 
  assert.deepEqual(reads, [274, 164]);
 });
 
-test('manual shutter OCR rotates the fresh still and maps recognized regions back', async () => {
- const { context } = scanner();
- const matcher = context.codeScanOcrMatch;
- const camera = context.getCodeScanCanvas();
- camera.width = 400;
- camera.height = 550;
- const label = { x0: 100, y0: 200, x1: 250, y1: 470, anchored: true };
- const square = { x0: 175, y0: 240, x1: 245, y1: 310 };
- const distractor = { x0: 120, y0: 40, x1: 280, y1: 120 };
- const rotations = [];
- const vocabulary = ['mail', 'nebula', 'flower'];
- context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
- context.extractMatchFromOcrResult = context.extractSpatialMatch;
- context.ocrCodeScanBand = async (image, crop, _worker, maxHeight, rotation) => {
-  rotations.push(rotation);
-  assert.equal(image, camera);
-  assert.equal(maxHeight, 480);
-  assert.ok(crop.x1 - crop.x0 > crop.y1 - crop.y0);
-  return [
-   { text: 'Bengaluru', confidence: 95, bbox: { x0: 120, y0: 123, x1: 175, y1: 144 } },
-   ...vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 120 + i * 50, y0: 170, x1: 165 + i * 50, y1: 200 } }))
-  ];
- };
- context.codeScanState.worker = { setParameters: async () => {}, recognize: async () => ({ data: { words: [] } }) };
- context.detectCodeScanContainers = () => [label];
- assert.equal(context.extractSpatialMatch(await context.recognizeCodeScanCanvas(camera)), null);
- assert.deepEqual(rotations, []);
- context.detectCodeScanContainers = () => [square, distractor, label];
- context.fillCodeScanReviewDetails = () => {};
- context.processCodeScanCapture();
- await new Promise(resolve => setImmediate(resolve));
- const match = context.reviewMatch;
- assert.deepEqual(rotations, [90]);
- assert.equal(match.code, 'bengaluru mail nebula flower');
- assert.equal(match.rotation, 90);
- assert.equal(match.highConfidence, true);
- assert.deepEqual(match.regions.container, label);
- assert.deepEqual(match.regions.city, matcher.rotateLabelBox({ x0: 120, y0: 123, x1: 175, y1: 144 }, 550, 400, 270));
-});
-
-test('shutter takes a fresh frame while live OCR is pending', async () => {
- const { context, canvas } = scanner();
- const video = { readyState: 2 };
- let captured, processed, cancelled = 0;
- context.getCodeScanVideo = () => video;
- context.codeScanState.processing = true;
- context.captureCodeScanFullRes = (input, target) => { assert.equal(input, video); captured = target; return true; };
- context.terminateCodeScanWorker = () => cancelled++;
- for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
-  context[name] = () => {};
- context.beginCodeScanCapture = (...args) => { processed = args; };
- context.captureCodeScanManually();
- assert.equal(captured, canvas);
- assert.equal(cancelled, 0);
- assert.deepEqual(processed, []);
-});
-
 test('recognition uses word confidence inside a box even when unrelated OCR lowers page confidence', () => {
  const { context } = scanner();
  context.codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
@@ -441,7 +396,7 @@ test('bounded border detection maps back to native photo dimensions without redu
  assert.ok(Math.abs(local.y0 - (300 + detected.y0)) < 1e-6);
 });
 
-test('live OCR confirms uncertain reads twice and yields to a shutter press even with high confidence', () => {
+test('live OCR captures a high-confidence read immediately', () => {
  const { context, canvas } = scanner();
  const bbox = { x0: 100, y0: 120, x1: 900, y1: 170 };
  const match = { code: 'apple berry cherry', words: ['apple', 'berry', 'cherry'], regions: { container: bbox } };
@@ -450,18 +405,11 @@ test('live OCR confirms uncertain reads twice and yields to a shutter press even
  canvas.getContext = () => ({ drawImage: frame => captured = frame });
  context.setCodeScanCandidateHighlight = () => {};
  context.setCodeScanWoloFoundCue = () => {};
- for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
+ for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom'])
   context[name] = () => {};
  let captures = 0;
  context.beginCodeScanCapture = () => captures++;
- context.handleCodeScanLiveOcrResult({ match }, snapshot);
- assert.equal(captures, 0);
- context.codeScanState.shutterPressed = true;
  match.highConfidence = true;
- context.handleCodeScanLiveOcrResult({ match }, snapshot);
- assert.equal(captures, 0);
- context.codeScanState.shutterPressed = false;
- context.resetCodeScanMatchState();
  context.handleCodeScanLiveOcrResult({ match }, snapshot);
  assert.equal(captures, 1);
  assert.equal(captured, snapshot);
@@ -513,18 +461,17 @@ test('live OCR clears an uncertain read after two misses or a different box', ()
  assert.equal(context.codeScanState.stableMatchCount, 1);
 });
 
-test('live OCR crop follows the visible guide rather than an unrelated 3:1 slice', () => {
+test('live capture uses the full visible camera viewport regardless of the Scan Frame', () => {
  const { context, canvas } = scanner();
  let draw;
- const guide = { getBoundingClientRect: () => ({ left: 30, top: 40, width: 300, height: 180 }) };
- const viewport = { clientWidth: 400, clientHeight: 300, getBoundingClientRect: () => ({ left: 10, top: 10, width: 400, height: 300 }) };
- context.document.getElementById = () => guide;
- context.document.querySelector = () => viewport;
- context.document.createElement = () => ({ getContext: () => ({ drawImage: (...args) => draw = args }) });
- const crop = context.getCodeScanFixedRatioSlice(canvas);
- assert.equal(crop.width, 900);
- assert.equal(crop.height, 480);
- assert.deepEqual(draw.slice(1, 5), [60, 80, 900, 480]);
+ context.document.getElementById = () => assert.fail('The guide must not be queried for capture');
+ context.document.querySelector = () => ({ clientWidth: 400, clientHeight: 300 });
+ canvas.getContext = () => ({ drawImage: (...args) => draw = args });
+ const video = { videoWidth: 1920, videoHeight: 1080 };
+ context.captureCodeScanFullRes(video, canvas);
+ assert.equal(canvas.width, 1440);
+ assert.equal(canvas.height, 1080);
+ assert.deepEqual(draw.slice(1), [240, 0, 1440, 1080, 0, 0, 1440, 1080]);
 });
 
 test('capture reads scaled bands when the code pass missed title, segment, and address', async () => {
@@ -624,7 +571,6 @@ test('live capture opens review immediately and only reads optional details in t
   context[name] = () => {};
  const detected = { code: 'apple berry cherry', regions: { container: { x0: 20, y0: 40, x1: 160, y1: 100 } } };
  context.showCodeScanReview = match => { context.codeScanState.reviewMatch = match; };
- context.processCodeScanCapture = () => assert.fail('code OCR must not run again');
  let complete;
  context.enrichCodeScanMetadata = (image, match) => {
   assert.equal(image, context.codeScanState.originalSourceCanvas);
@@ -697,71 +643,4 @@ test('zoom and pan debounce crop OCR and wait for an in-flight read to finish', 
  assert.equal(scans, 0);
  context.codeScanState.phase = 'review'; run();
  assert.equal(scans, 1);
-});
-
-test('releasing a shutter hold captures the displayed match even after a missed read', () => {
- const { context } = scanner(); const buttonEvents = {}, windowEvents = {}; let timer, draws = 0, clears = 0;
- let inspectionVisible = false;
- context.document.querySelector = selector => selector === '.code_scan_viewport' ? { classList: {
-  toggle: (name, active) => { if(name === 'code_scan_inspecting') inspectionVisible = active; }
- } } : null;
- context.document.getElementById = () => ({ addEventListener: (name, fn) => buttonEvents[name] = fn });
- context.window = { addEventListener: (name, fn) => windowEvents[name] = fn };
- context.setTimeout = fn => { timer = fn; return 1; }; context.clearTimeout = () => { timer = null; };
- context.drawCodeScanMatchRegions = () => draws++; context.clearCodeScanCandidateHighlight = () => clears++;
- const box = { x0: 10, y0: 20, x1: 80, y1: 50 };
- const match = { code: 'bengaluru mail nebula flower', words: ['bengaluru', 'mail', 'nebula', 'flower'], regions: { container: box } };
- const frame = { width: 200, height: 100 };
- let captured;
- context.getCodeScanCanvas().getContext = () => ({ drawImage: source => { assert.equal(source, frame); } });
- context.beginCodeScanCapture = detected => { captured = detected; };
- for(const name of ['setCodeScanWoloFoundCue', 'resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
-  context[name] = () => {};
- context.initCodeScanRegionPress();
- buttonEvents.pointerdown({ type: 'pointerdown', button: 0 });
- assert.equal(context.codeScanState.showRegions, false);
- windowEvents.pointerup({ type: 'pointerup' }); assert.equal(timer, null);
- assert.equal(captured, undefined);
- buttonEvents.pointerdown({ type: 'pointerdown', button: 0 }); timer();
- assert.equal(context.codeScanState.showRegions, true); assert.equal(draws, 1);
- assert.equal(inspectionVisible, true);
- context.handleCodeScanLiveOcrResult({ match }, frame);
- context.handleCodeScanLiveOcrResult({}, frame);
- assert.equal(captured, undefined);
- windowEvents.pointercancel({ type: 'pointercancel' });
- assert.equal(captured, undefined);
- assert.equal(inspectionVisible, false);
- buttonEvents.pointerdown({ type: 'pointerdown', button: 0 }); timer();
- windowEvents.pointerup({ type: 'pointerup' }); assert.equal(context.codeScanState.showRegions, true);
- assert.equal(inspectionVisible, true);
- assert.equal(captured, match);
- assert.equal(captured.regions.container, box);
- assert.equal(context.codeScanState.regionPressConsumed, true); assert.ok(clears > 0);
-});
-
-test('touch hold suppresses selection and freezes the frame with detected borders before a code is read', () => {
- const { context, canvas } = scanner();
- const handlers = {};
- context.document.getElementById = () => ({ addEventListener: (name, fn) => handlers[name] = fn });
- context.window = { addEventListener() {} };
- let timer, prevented = 0, drawn;
- context.setTimeout = fn => { timer = fn; };
- context.clearTimeout = () => {};
- const frame = { width: 200, height: 100 };
- const box = { x0: 10, y0: 10, x1: 90, y1: 40 };
- context.codeScanState.regionFrame = { frame, boxes: [box] };
- canvas.getContext = () => ({ drawImage: source => assert.equal(source, frame) });
- for(const name of ['resetCodeScanLiveZoom', 'saveCodeScanSourceFromCanvas', 'resetCodeScanZoom', 'resetCodeScanGuide'])
-  context[name] = () => {};
- context.beginCodeScanCapture = match => assert.equal(match, undefined);
- context.drawCodeScanMatchRegions = (match, image, boxes) => { drawn = { match, image, boxes }; };
- context.initCodeScanRegionPress();
- const changedTouches = [{ identifier: 1 }];
- handlers.touchstart({ touches: changedTouches, changedTouches, preventDefault: () => prevented++ });
- timer();
- handlers.touchend({ type: 'touchend', changedTouches, cancelable: true, preventDefault: () => prevented++ });
- assert.equal(prevented, 2);
- assert.equal(context.codeScanState.showRegions, true);
- assert.equal(drawn.image, canvas);
- assert.equal(drawn.boxes[0], box);
 });

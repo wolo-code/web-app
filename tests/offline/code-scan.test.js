@@ -23,7 +23,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(index, /Code_scan\.php/);
 	assert.match(fragment, /Processed on your device/);
 	assert.match(fragment, /id='code_scan_video'/);
-	assert.match(fragment, /id='code_scan_capture'/);
+	assert.doesNotMatch(fragment, /id='code_scan_capture'/);
 	assert.match(fragment, /id='code_scan_candidate_highlight'/);
 	assert.match(fragment, /id='code_scan_review_city'/);
 	assert.match(fragment, /id='code_scan_city_choices'/);
@@ -57,7 +57,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.doesNotMatch(codeScan, /jsdelivr|unpkg|cdn\./i);
 	assert.match(codeScan, /useCodeScanReview/);
 	assert.match(codeScan, /rescanCodeScan/);
-	assert.match(codeScan, /captureCodeScanManually/);
+	assert.doesNotMatch(codeScan, /captureCodeScanManually/);
 	assert.match(codeScan, /showCodeScanReview/);
 	assert.match(codeScan, /updateCodeScanReviewValidity/);
 	assert.match(codeScan, /setCodeScanCandidateHighlight/);
@@ -69,7 +69,6 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(fragment, /id='code_scan_zoom_out'/);
 	assert.match(fragment, /id='code_scan_zoom_level'/);
 	assert.match(fragment, /id='code_scan_zoom_in'/);
-	assert.match(fragment, /id='code_scan_zoom_reset'/);
 	assert.match(fragment, /id='code_scan_apply_crop'/);
 	assert.match(codeScan, /sourceCanvas/);
 	assert.match(codeScan, /originalSourceCanvas/);
@@ -87,7 +86,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.doesNotMatch(fragment, /code_scan_confirm/);
 	assert.doesNotMatch(fragment, /code_scan_retake/);
 	assert.match(css, /\.code_scan_viewport/);
-	assert.match(css, /\.code_scan_capture/);
+	assert.match(css, /repeating-conic-gradient/);
 	assert.match(css, /\.code_scan_icon_button/);
 	assert.match(css, /\.code_scan_review/);
 	assert.match(css, /\.code_scan_candidate_highlight/);

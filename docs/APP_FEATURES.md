@@ -63,9 +63,9 @@ Use this file as a feature-level map of the Wolo Code root app. Pair it with `AP
 | --- | --- | --- |
 | Encode Location | `encode()`, map click listener, `focus___()` | Selecting a map position generates the corresponding Wolo Code. Online, a covering city identified by Google’s address hierarchy takes priority over a sublocality or the nearest city. Nearby city codes remain available through explicit selection. Points outside the city's ~32.8 km encode grid (for example a large prefecture centroid far from the stored city center) do not emit a colliding fallback code; the InfoWindow and a bottom notification say `Area not covered`. |
 | Decode Wolo Code | `decode()`, `beginDecode()`, `decode_input_from_form()`, `showInvalidCodeDialog()` | A typed Wolo Code, DIGIPIN, or plus code resolves to a place and can jump back to the map. DIGIPIN and plus-code jumps keep the Address Panel open. Unrecognized input opens a padded popup with edge-aligned Edit code and Search map actions instead of a notification toast. Search map geocodes the typed text and opens the Address Panel in Map View. Wolo Code Input and Place Search Input use CSS `text-transform` to show DIGIPIN and plus-code values in uppercase (`:valid` against those patterns) and return to lowercase when the value no longer matches. |
-| Scan Wolo Code label | `#decode_code_scan_button`, `CodeScan.js`, `Code_scan.php` | The Wolo Code Scan Dialog reads landscape code frames from native camera pixels and retries slightly tilted labels on a straightened copy. Label Edit View opens after one high-confidence read or two matching three-word reads from the same region, allowing one missed frame. A tap on the Shutter Button takes a fresh frame even during live OCR and permits quarter-turn rotation. A 500 ms hold shows detected regions with square corners, including a purple outline for the enclosing Card Region. Releasing freezes that frame with its outlines. If the words are unreadable, still-image OCR runs on the frozen frame. Gallery and the Shutter Button try block and sparse-text OCR inside the code box before falling back to the enclosing Card Region. Label Edit View shows the city and words while optional details finish reading. A successful capture shows the message "verify the wolo code below". |
+| Scan Wolo Code label | `#decode_code_scan_button`, `CodeScan.js`, `Code_scan.php` | The Wolo Code Scan Dialog reads landscape code frames from native camera pixels and retries slightly tilted labels on a straightened copy. Label Edit View opens after one high-confidence read or two matching three-word reads from the same region, allowing one missed frame. Gallery tries block and sparse-text OCR inside the code box before falling back to the enclosing Card Region. Label Edit View shows the city and words while optional details finish reading. A successful capture shows the message "verify the wolo code below". |
 | Type a Wolo Code label | `#code_scan_type_instead`, `#code_scan_review` | Typing stops the camera and opens Label Edit View without the viewfinder or zoom controls. Word 1 receives focus. The same city, three word fields, optional address details, Go and Save actions are available for typed and scanned codes. Rescan returns to capture. |
-| Inspect label regions | `#code_scan_fixed_guide`, `.code_scan_inspecting` | Holding the Shutter Button for 500 ms activates Region Inspection and animates the bright dashes around the Scan Frame. A solid bright frame indicates inspection on a frozen image and with reduced motion enabled. |
+| Inspect label regions | `#code_scan_fixed_guide`, `.code_scan_inspecting` | Hold the Scan Button for 500 ms to open the Scan Debug Log and enter Region Inspection. The Scan Frame uses bright moving dashes in live debug mode and a bright solid border on the frozen image or with reduced motion. |
 | Decode keyboard shortcut | `#decode_input`, `decode_input_from_form_external()` | Enter runs Go from the Wolo Code input. Shift+Enter inserts a line break. |
 | Decode input hint | `#notification_bottom`, `showDecodeInputAltTip()` | While the Wolo Code input is focused, a bottom notification notes that DIGIPIN and plus codes can also be entered, then fades out. |
 | City Resolution | `getCityGpId()`, `getCityByIp()`, `decodeWithIpCity()`, `#decode_city_context`, city chooser fragments | Codes can include city context, reuse a previous city, infer city from IP, or ask the user to choose a matching city. Initial load never requests browser geolocation; it defaults to the previous city when available, otherwise the IP city. IP-derived city hints are validated before display and briefly retried when the first response has no usable city. |
@@ -146,8 +146,8 @@ The sign-in widget starts once the default Firebase app and FirebaseUI are both 
 | `Location.svg` | Current-location action on the map. |
 | `Location-source.svg` | Geolocation city-source action on Wolo Code Input View; selected state uses the primary accent. |
 | `Scan.svg` | On-device label Scan action on Wolo Code Input View and Map View. |
-| `Gallery.svg` | Gallery action beside the Shutter Button in the Wolo Code Scan Dialog. Opens the system image picker for selecting an existing photo. |
-| `Keyboard.svg` | Typing fallback action flanking the shutter button on Wolo Code Scan Dialog. |
+| `Gallery.svg` | Gallery action below the viewfinder in the Wolo Code Scan Dialog. Opens the system image picker for selecting an existing photo. |
+| `Keyboard.svg` | Typing fallback action below the viewfinder in the Wolo Code Scan Dialog. |
 | `Globe.svg` | IP-derived city source action; selected state uses the primary accent. |
 | `Hamburger.svg` | Previous-city popup action. |
 | `Proceed.svg` | Submit/proceed action for map and decode inputs, and Search map in the unrecognized-code dialog. |
@@ -178,9 +178,7 @@ Installed app canvas: standalone/fullscreen mode uses `height: 100vh` on html/bo
 
 Decode navigation: Saved opens a dedicated modal using the account dialog design, with saved addresses expanded and existing add/edit/delete actions. Account retains profile and preferences. Info and Map sit at bottom left; Camera sits beside Bookmarks at bottom right. The bookmark modal has no empty-list placeholder text. Profile retains its original position. Bookmarks opens without sign-in; signed-out saves persist in this browser with a notice that they are not saved to the cloud. Local bookmarks remain visible after sign-in, are labeled “On this device”, and support editing, deleting and reopening. Signed-in new saves retain cloud storage. Clearing browser data removes local bookmarks.
 
-
 Scanner continuity: Capture, adjustment and recognition share a stable viewfinder and control area. The dotted guide uses a golden-ratio width/height and fills up to 94% of the available viewfinder. Captured and gallery images remain fully visible at fit zoom; OCR crop scanning leaves the original preview intact, so users can reframe repeatedly. Review fields fade in with reduced-motion support; letterboxed image crops intersect the frame with actual image bounds.
-
 
 Scanner spacing: Back and forward buttons are centered in the remaining space on each side of the zoom controls, within the viewfinder width. The scanner title has a small gap before the viewfinder. The no-match adjustment instruction is omitted.
 
@@ -189,15 +187,16 @@ Offline release manifest: Native publishing generates the precache list from eac
 
 The top-bar loader stays visible while the Input Icon Guide is shown.
 
-Scanner controls: Progress, word validation and save feedback overlay the frozen viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Capture and photo review use matching three-column layouts. When Typing opens Label Edit View, Rescan and Go share the control row. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
+Scanner controls: Progress, word validation and save feedback overlay the frozen viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Gallery and Typing share the live control row. Photo review places Zoom Controls between Rescan and Go. When Typing opens Label Edit View, Rescan and Go share the control row. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
 
-Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Go sits beside the zoom controls; Address details, bookmark Save and the Cancel icon share the bottom action row. Zoom Reset uses an accessible reset-arrow icon.
+Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Go sits beside the zoom controls; Address details, bookmark Save and the Cancel icon share the bottom action row.
 
-Scanner field controls: The city chooser icon sits inside the left edge of the city input. Zoom percentage and the small reset icon above it share one reset button. The icon appears only away from 100% zoom; its space stays reserved to prevent layout shifts.
+The city chooser icon sits inside the left edge of the city input.
 
-Scanner compact controls: City input is centered at 75% width, with an anchored city-choice popup that dismisses on selection, outside click, or Escape. Zoom percentage floats above the pill and is visible only away from 100%, alongside the conditional reset icon; the combined reset target remains stable. Wolo Code Input View orders city-source controls as Previous city, IP globe, then GPS.
+Scanner compact controls: City input is centered at 75% width, with an anchored city-choice popup that dismisses on selection, outside click, or Escape. Wolo Code Input View orders city-source controls as Previous city, IP globe, then GPS.
 
-Scanner zoom reset: The reset glyph is centered in a fixed-width middle slot between minus and plus, with no individual background circle, including hover and pressed states. The shared zoom pill retains its background.
+
+Zoom Controls sit just below the chequered viewfinder. Zoom Percentage stays visible and resets zoom when pressed. The three controls show circular feedback on hover, press or keyboard focus.
 
 Scanner City label sits just outside the input's left edge with an 8px gap, preserving the city field and embedded chooser positions.
 
@@ -213,8 +212,7 @@ City-list icon placement: The scanner review icon sits 4 px higher. In Map View,
 
 The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.
 
-Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at normal zoom. Changed zoom displays the reset glyph in the same slot, retaining the existing reset target, percentage position, and behavior.
-
+Zoom Controls sit just below the viewfinder, with Zoom In (+), Zoom Percentage and Zoom Out (-) stacked vertically. Zoom Percentage displays the current level and resets zoom when pressed. Each control shows a circle on hover, press or keyboard focus. The viewfinder uses a chequered background around the image.
 
 Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Go and Save stay disabled until all three words are complete and valid. City uses the same underline as the three word fields.
 
@@ -224,7 +222,7 @@ Camera, Saved, Account, Locate, Info, Map, map switching, and Go share a smooth 
 
 The Bookmarks control uses inline SVG artwork in Root/HTML/Component/Root/Index.php, scaled to 95% around its center within the unchanged circular button.
 
-Scanner capture control is 20% larger. The scanner detects the inner code box and outer card boundary, then reads the interior of the code box. Still-image scans can retry with sparse-text OCR.
+
 
 The detected text rectangle adds 10% centered padding, clipped at image edges. Live capture fills review fields immediately with the recognized code. Zoom and pan rerun framed OCR after 350ms of inactivity; outdated crop results are ignored and a pending read waits for ongoing recognition to finish. Live zoom resets detection and requests a fresh frame.
 
@@ -259,7 +257,6 @@ QR Label View adds 5px of horizontal padding on each side, increasing the label 
 Info and footer Details share a modal with 25px rounded corners. Its close action is a keyboard-accessible button with a 44px hit area above the modal content, supporting mouse and touch dismissal.
 
 Saved-address navigation and the info-window Address action use the same Address Panel renderer. Both preserve the separator between saved address lines and show the address QR button whenever the address has nonempty text. The QR payload retains both lines in order.
-
 
 Scanner card and optional details: the Wolo Code Scan Dialog first looks for straight or rounded card boundaries across the available image. When a portrait Card Region covers the current focus, the scanner searches inside it for the smaller landscape Wolo Code Region before searching for markers elsewhere. OCR starts inside the code box. When a close-up clips the outer card, the scanner searches the full camera viewport and reads the inner Wolo Code Region on its own if its frame is visible. Live confirmation searches a padded crop around the previous card when it fits within half the frame. If the code box or card has moved outside that crop, the scanner searches the full frame again. Still-image OCR tries the inner code box with block and sparse-text modes before trying the card crop. Optional detail reads stay inside the detected card. The dashed Scan Frame guides alignment, and zoom and pan change which label is tried first. The Address icon expands optional Title and Segment fields above the city/words section and Address line 1 and Address line 2 below it, matching the card. The existing Go arrow opens the reviewed address; there is no duplicate caret action. The top-right Close control dismisses the scanner; the bottom action row has only Address details and Save. The modal grows with its content up to the viewport height with a gap above and below to reveal its extent before its body scrolls. A bookmark Save action saves the reviewed city, words and optional details directly while keeping the scanner open; Title is required for saving, and signed-out saves stay on the device. Title and Segment are separate rows above the inner box; both address parts are below it inside the card, line 1 first with blank-paragraph spacing before line 2. Wrapped rows stay in their paragraph. Edited values survive recognition of the same card and flow into the decoded location and its label/save editors on Use address. If Address details are expanded when Use address is chosen, the Address Panel opens immediately on decode with the recognized or edited address and stays open after reverse geocoding; collapsed details retain the normal closed panel behavior. The core code remains usable when the card or optional text is unreadable. Region Inspection can show the portrait Card Region in purple as soon as its boundary is detected, even before the blue Wolo Code Region is found. The full preview stays visible for reframing.
 

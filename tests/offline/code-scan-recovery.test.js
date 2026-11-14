@@ -190,21 +190,6 @@ test('termination cancels running and queued recognition without calling the old
 	assert.equal(c.timers.size, 0);
 });
 
-test('late capture completion cannot change a reopened dialog or its processing flag', async () => {
-	for(const fails of [false, true]) {
-		const c = scanner(), read = deferred();
-		c.getCodeScanCanvas = () => ({ width: 20, height: 20 });
-		c.recognizeCodeScanCanvas = () => read.promise;
-		c.showCodeScanReview = () => assert.fail('stale review');
-		c.processCodeScanCapture();
-		c.codeScanState.session++;
-		c.codeScanState.processing = true;
-		if(fails) read.reject(new Error('old failure')); else read.resolve({ data: {} });
-		await flush();
-		assert.equal(c.codeScanState.processing, true);
-	}
-});
-
 test('live OCR loads during the camera request and starts when both are ready', async () => {
 	for(const cameraFirst of [true, false]) {
 		const c = scanner(), camera = deferred(), creation = deferred(), w = worker();

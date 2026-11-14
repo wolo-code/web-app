@@ -61,23 +61,21 @@ test('review flags unknown words and validates the code while the city is editab
  assert.equal(nodes.code_scan_apply_crop.disabled, true);
 });
 
-test('zoom reset indicator follows zoom changes and clears on reset', () => {
- const level = {}, reset = { classList: { toggle(name, visible) { this.visible = visible; } } };
+test('Zoom Percentage updates its text and accessible name', () => {
+ const level = { setAttribute(name, value) { this[name] = value; } };
  const context = { Audio: function() { this.load = () => {}; }, document: {
-  getElementById: id => ({ code_scan_zoom_level: level, code_scan_zoom_reset: reset })[id]
+  getElementById: id => ({ code_scan_zoom_level: level })[id]
  } };
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.getCodeScanCanvas = () => null;
  context.clampCodeScanPan = () => {};
  context.setCodeScanZoom(1);
- assert.equal(reset.classList.visible, false);
  context.setCodeScanZoom(1.5);
  assert.equal(level.textContent, '150%');
- assert.equal(reset.classList.visible, true);
+ assert.equal(level['aria-label'], 'Zoom 150%. Reset zoom');
  context.resetCodeScanZoom();
  assert.equal(level.textContent, '100%');
- assert.equal(reset.classList.visible, false);
 });
 
 test('scanner city picker deduplicates choices and updates only the review city', () => {

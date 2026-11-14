@@ -37,7 +37,7 @@
 
 .code_scan_viewport {
 	align-items: center;
-	background: #0d1117;
+	background: repeating-conic-gradient(#d8dde1 0% 25%, #aeb7bf 0% 50%) 0 0 / 16px 16px;
 	border-radius: 10px;
 	display: flex;
 	height: clamp(140px, 28vh, 220px);
@@ -114,7 +114,6 @@
 }
 
 .code_scan_viewport.code_scan_viewport_frozen #code_scan_canvas {
-	background: #000;
 	border-radius: 10px;
 	cursor: grab;
 	display: block;
@@ -181,24 +180,6 @@
 .code_scan_card_highlight { border-color: #b7a4ef; box-shadow: none; }
 .code_scan_city_highlight { border-color: #e8c568; box-shadow: none; }
 
-.code_scan_viewport.code_scan_viewport_frozen.code_scan_is_editing_crop .code_scan_fixed_guide {
-	aspect-ratio: 3 / 1;
-	border: 2px dashed rgba(105, 183, 207, 0.9);
-	border-radius: 6px;
-	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
-	box-sizing: border-box;
-	display: block;
-	height: auto;
-	inset: auto;
-	left: 50%;
-	max-width: 88%;
-	pointer-events: none;
-	position: absolute;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: 88%;
-}
-
 .code_scan_crop_controls {
 	align-items: center;
 	display: flex;
@@ -213,44 +194,40 @@
 }
 
 .code_scan_zoom_group {
-	--zoom-pill-width: 52px;
 	align-items: center;
-	background: rgba(105, 183, 207, 0.17);
-	border-radius: 999px;
 	display: inline-flex;
 	flex-direction: column;
-	width: var(--zoom-pill-width);
+	margin-top: 8px;
 }
 
 .code_scan_zoom_button {
 	align-items: center;
 	background: transparent;
 	border: none;
-	border-radius: 0;
-	color: #69B7CF;
+	border-radius: 50%;
+	color: #38849d;
 	cursor: pointer;
 	display: flex;
 	font-family: Abel, 'Roboto Condensed', sans-serif;
 	font-size: 1.1em;
 	font-weight: 600;
-	height: 35px;
+	height: 40px;
 	justify-content: center;
 	line-height: 1;
-	width: 100%;
 	padding: 0;
-	transition: background 150ms ease, color 150ms ease;
+	transition: background-color 150ms ease;
+	width: 40px;
 }
 
-.code_scan_zoom_button:hover {
-	background: rgba(105, 183, 207, 0.15);
+@media (hover: hover) {
+	.code_scan_zoom_button:hover {
+		background-color: rgba(105, 183, 207, 0.22);
+	}
 }
 
-#code_scan_zoom_in {
-	border-radius: calc(var(--zoom-pill-width) / 2) calc(var(--zoom-pill-width) / 2) 0 0;
-}
-
-#code_scan_zoom_out {
-	border-radius: 0 0 calc(var(--zoom-pill-width) / 2) calc(var(--zoom-pill-width) / 2);
+.code_scan_zoom_button:active,
+.code_scan_zoom_button:focus-visible {
+	background-color: rgba(105, 183, 207, 0.35);
 }
 
 .code_scan_zoom_button:focus-visible {
@@ -261,11 +238,8 @@
 .code_scan_zoom_level {
 	color: #444;
 	font-family: Roboto, sans-serif;
-	font-size: 0.82em;
+	font-size: 0.75em;
 	font-weight: 500;
-	min-width: 42px;
-	text-align: center;
-	user-select: none;
 }
 
 .code_scan_crop_button {
@@ -379,51 +353,9 @@
 	width: 22px;
 }
 
-.code_scan_capture {
-	align-items: center;
-	background: transparent;
-	border: 3px solid #69B7CF;
-	border-radius: 50%;
-	cursor: pointer;
-	display: flex;
-	height: 62.4px;
-	justify-content: center;
-	margin: 0;
-	padding: 0;
-	touch-action: none;
-	transition: transform 150ms ease, border-color 150ms ease;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	user-select: none;
-	width: 62.4px;
-}
-
 .code_scan_live_controls, .code_scan_status, .code_scan_dialog .message_dialog_label {
 	-webkit-user-select: none;
 	user-select: none;
-}
-
-.code_scan_capture:hover {
-	transform: scale(1.06);
-}
-
-.code_scan_capture:disabled {
-	cursor: not-allowed;
-	opacity: 0.5;
-}
-
-.code_scan_capture.hide {
-	display: none;
-}
-
-.code_scan_capture_inner {
-	background: #69B7CF;
-	border-radius: 50%;
-	display: block;
-	height: 45.6px;
-	pointer-events: none;
-	transition: background 150ms ease;
-	width: 45.6px;
 }
 
 .code_scan_status {
@@ -555,10 +487,6 @@ html.dark-mode .code_scan_review_input::placeholder {
 	color: rgba(105, 183, 207, 0.5);
 }
 
-html.dark-mode .code_scan_viewport {
-	background: #000;
-}
-
 html.dark-mode .code_scan_icon_button {
 	background: rgba(255, 255, 255, 0.06);
 	border-color: #69B7CF;
@@ -573,10 +501,6 @@ html.dark-mode .code_scan_crop_rescan {
 	background: transparent;
 	border-color: #69B7CF;
 	color: #9fd4e8;
-}
-
-html.dark-mode .code_scan_zoom_group {
-	background: rgba(105, 183, 207, 0.22);
 }
 
 html.dark-mode .code_scan_zoom_button {
@@ -708,8 +632,7 @@ html.dark-mode .code_scan_apply_crop {
  height: clamp(180px, calc(100dvh - 380px), 400px);
  max-height: none; width: 100%; margin: 0;
 }
-.code_scan_fixed_guide,
-.code_scan_viewport.code_scan_viewport_frozen.code_scan_is_editing_crop .code_scan_fixed_guide {
+.code_scan_fixed_guide {
  display: block; aspect-ratio: 1.618033989 / 1;
  width: min(94cqw, 152.095cqh); max-width: 94%; max-height: 94%;
  border: 2px var(--code-scan-frame-stroke, dashed rgba(105, 183, 207, .9));
@@ -752,6 +675,7 @@ html.dark-mode .code_scan_apply_crop {
  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
  align-content: center;
 }
+.code_scan_live_controls { grid-template-columns: 1fr 1fr; }
 .code_scan_live_controls > button, .code_scan_crop_controls > button { justify-self: center; }
 .code_scan_live_controls.hide, .code_scan_crop_controls.hide { display: none; }
 .code_scan_crop_button { width: 44px; height: 44px; border-radius: 50%; flex: 0 0 auto; }
@@ -790,23 +714,6 @@ html.dark-mode .code_scan_apply_crop {
 	}
 }
 
-.code_scan_zoom_button.code_scan_zoom_reset {
- position: relative; height: 26px;
- background: transparent;
-}
-.code_scan_zoom_button.code_scan_zoom_reset:hover,
-.code_scan_zoom_button.code_scan_zoom_reset:active { background: transparent; }
-.code_scan_zoom_reset .code_scan_zoom_level {
- position: absolute; left: 100%; pointer-events: none;
- visibility: hidden;
-}
-.code_scan_zoom_reset.code_scan_zoom_changed .code_scan_zoom_level { visibility: visible; }
-.code_scan_zoom_reset svg { width: 12px; height: 12px; display: block; visibility: hidden; }
-.code_scan_zoom_reset.code_scan_zoom_changed svg { visibility: visible; }
-.code_scan_zoom_reset svg.code_scan_zoom_default_icon {
- position: absolute; width: 14px; height: 14px; color: #9a9a9a; visibility: visible;
-}
-.code_scan_zoom_reset.code_scan_zoom_changed svg.code_scan_zoom_default_icon { visibility: hidden; }
 .code_scan_review_city_row { display: flex; position: relative; width: 75%; margin: 0 auto; }
 .code_scan_review_city_row > button {
  position: absolute; left: 2px; bottom: 11px; width: 32px; height: 32px;

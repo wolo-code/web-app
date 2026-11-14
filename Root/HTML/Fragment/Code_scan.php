@@ -35,11 +35,7 @@
 			</button>
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
 				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
-				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom' title='Reset zoom'>
-					<svg class='code_scan_zoom_default_icon' viewBox='0 0 24 24' aria-hidden='true'><circle cx='10' cy='10' r='6' fill='none' stroke='currentColor' stroke-width='2'/><path d='m15 15 5 5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg>
-					<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 8a8 8 0 1 1-1 8M5 3v5h5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>
-					<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
-				</button>
+				<button id='code_scan_zoom_level' class='code_scan_zoom_button code_scan_zoom_level' type='button' aria-label='Zoom 100%. Reset zoom' title='Reset zoom'>100%</button>
 				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
 			</div>
 			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
@@ -50,9 +46,6 @@
 			<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' tabindex='-1' aria-hidden='true'>
 			<button id='code_scan_use_photo' class='border code_scan_icon_button code_scan_use_photo' type='button' aria-label='Choose photo from gallery' title='Choose photo from gallery'>
 				<span class='image'><?php includeSVG('', 'Gallery'); ?></span>
-			</button>
-			<button id='code_scan_capture' class='code_scan_capture' type='button' aria-label='Capture label' title='Capture label'>
-				<span class='code_scan_capture_inner'></span>
 			</button>
 			<button id='code_scan_type_instead' class='border code_scan_icon_button code_scan_type_instead' type='button' aria-label='Type code instead' title='Type code instead'>
 				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>

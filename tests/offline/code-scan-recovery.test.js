@@ -227,6 +227,61 @@ test('live OCR loads during the camera request and starts when both are ready', 
 	}
 });
 
+test('opening the scanner reuses an in-progress idle preload without showing a loading status', async () => {
+	const c = scanner(), creation = deferred(), w = worker();
+	let starts = 0;
+	const messages = [];
+	c.setCodeScanStatus = message => messages.push(message);
+	c.codeScanState.active = false;
+	c.wordList = {};
+	c.document.body = { classList: { contains: () => true } };
+	c.resetCodeScanUi = c.showOverlay = () => {};
+	c.codeScanOcrMatch = { isCodeScanSupported: () => false };
+	c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
+	c.preloadCodeScanWorker();
+	const pending = c.codeScanState.workerPromise;
+	c.openCodeScan();
+	assert.equal(c.codeScanState.workerPromise, pending);
+	creation.resolve(w);
+	await pending;
+	assert.equal(starts, 1);
+	assert.ok(messages.every(message => !/loading on-device/i.test(message)));
+});
+
+test('Gallery decodes the selected file while OCR loads and revokes the local object URL', async () => {
+	const c = scanner(), creation = deferred(), w = worker();
+	const file = { type: 'image/jpeg', size: 100 };
+	const canvas = { classList: { toggle() {} }, getContext: () => ({ drawImage() {} }) };
+	const revoked = [];
+	let starts = 0;
+	c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
+	c.window.URL = {
+		createObjectURL: blob => { assert.equal(blob, file); return 'blob:photo'; },
+		revokeObjectURL: url => revoked.push(url)
+	};
+	c.Image = function() {
+		this.naturalWidth = 40;
+		this.naturalHeight = 50;
+		Object.defineProperty(this, 'src', { set: () => this.onload() });
+	};
+	c.getCodeScanCanvas = () => canvas;
+	c.saveCodeScanSourceFromCanvas = c.resetCodeScanZoom = () => {};
+	c.extractMatchFromOcrResult = () => null;
+	c.showCodeScanReview = () => { c.reviewOpened = true; };
+	const pending = c.prepareCodeScanWorker();
+	c.handleCodeScanPhotoInput({ target: { files: [file] } });
+	await flush();
+	assert.equal(c.codeScanState.workerPromise, pending);
+	assert.equal(canvas.width, 40);
+	assert.equal(c.reviewOpened, undefined);
+	assert.equal(c.status, 'Reading photo on your device...');
+	creation.resolve(w);
+	await flush();
+	assert.equal(starts, 1);
+	assert.equal(c.reviewOpened, true);
+	assert.deepEqual(revoked, ['blob:photo']);
+});
+
 test('camera requests from an earlier session stop their tracks without attaching', async () => {
 	const c = scanner(), request = deferred();
 	let stopped = 0;

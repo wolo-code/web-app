@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 function scanner() {
  const canvas = { width: 1200, height: 800 };
- const context = { setTimeout, clearTimeout, Audio: function() { this.load = () => {}; }, document: { getElementById: () => null, querySelector: () => null }, console };
+ const context = { setTimeout, clearTimeout, window: {}, Audio: function() { this.load = () => {}; }, document: { getElementById: () => null, querySelector: () => null }, console };
  vm.createContext(context);
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  context.getCodeScanCanvas = () => canvas;

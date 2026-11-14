@@ -56,6 +56,7 @@ var CODE_SCAN_BBOX_IOU_MIN = 0.55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
 var CODE_SCAN_LOAD_TIMEOUT_MS = 45000;
 var CODE_SCAN_OCR_TIMEOUT_MS = 60000;
+var CODE_SCAN_PRELOAD_KEEPALIVE_MS = 30000;
 var CODE_SCAN_MAX_PHOTO_PIXELS = 24000000;
 var CODE_SCAN_FIXED_ASPECT = 3;
 var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
@@ -88,7 +89,7 @@ function initCodeScan() {
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_zoom_out', 'click', zoomOutCodeScan);
 	bindControl('code_scan_zoom_in', 'click', zoomInCodeScan);
-	bindControl('code_scan_zoom_reset', 'click', resetCodeScanZoom);
+	bindControl('code_scan_zoom_reset', 'click', function() { resetCodeScanZoom(); });
 	bindControl('code_scan_city_select', 'click', toggleCodeScanCityChoices);
 	bindControl('code_scan_details_toggle', 'click', toggleCodeScanDetails);
 	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
@@ -121,8 +122,24 @@ function initCodeScan() {
 	var previewCanvas = getCodeScanCanvas();
 	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
 	var photoInput = document.getElementById('code_scan_photo_input');
-	if(photoInput)
+	if(photoInput) {
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
+		var connection = navigator.connection;
+		if(!connection || (!connection.saveData && !/2g$/.test(connection.effectiveType))) {
+			if(window.requestIdleCallback) window.requestIdleCallback(preloadCodeScanWorker);
+			else setTimeout(preloadCodeScanWorker, 1500);
+		}
+	}
+}
+
+function preloadCodeScanWorker() {
+	if(document.hidden || codeScanState.active) return;
+	var epoch = codeScanState.workerEpoch;
+	prepareCodeScanWorker().then(function() {
+		setTimeout(function() {
+			if(!codeScanState.active && epoch === codeScanState.workerEpoch) terminateCodeScanWorker();
+		}, CODE_SCAN_PRELOAD_KEEPALIVE_MS);
+	}).catch(function() {});
 }
 
 function initCodeScanRegionPress() {
@@ -202,7 +219,7 @@ function openCodeScan(event) {
 		showNotification('Word list is still loading. Try again in a moment.');
 		return;
 	}
-	invalidateCodeScanSession();
+	invalidateCodeScanSession(!codeScanState.active);
 	codeScanState.source = document.body.classList.contains('decode') ? 'decode' : 'map';
 	codeScanState.hasCaptured = false;
 	resetCodeScanUi();
@@ -215,6 +232,7 @@ function openCodeScan(event) {
 		startCodeScanCamera();
 		return;
 	}
+	prepareCodeScanWorker().catch(function() {});
 	codeScanState.cameraAvailable = false;
 	setCodeScanViewportVisible(false);
 	setCodeScanCaptureVisible(false);
@@ -227,6 +245,7 @@ function openCodeScanPhotoPicker(event) {
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(!photoInput)
 		return;
+	prepareCodeScanWorker().catch(function() {});
 	photoInput.value = '';
 	photoInput.click();
 }
@@ -263,15 +282,13 @@ function stopCodeScan() {
 	codeScanState.sourceCanvas = null;
 	resetCodeScanMatchState();
 	clearCodeScanTimer();
-	stopCodeScanCamera();
-	terminateCodeScanWorker();
 	resetCodeScanUi();
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput)
 		photoInput.value = '';
 }
 
-function invalidateCodeScanSession() {
+function invalidateCodeScanSession(keepWorker) {
 	codeScanState.session += 1;
 	codeScanState.shutterPressed = false;
 	setCodeScanRegionInspection(false);
@@ -283,7 +300,7 @@ function invalidateCodeScanSession() {
 	codeScanState.cropScanTimer = null;
 	clearCodeScanTimer();
 	stopCodeScanCamera();
-	terminateCodeScanWorker();
+	if(!keepWorker) terminateCodeScanWorker();
 }
 
 function isCurrentCodeScanSession(session) {
@@ -386,6 +403,7 @@ function getCodeScanCanvas() {
 }
 
 function suspendCodeScanMedia() {
+	if(!codeScanState.active && codeScanState.workerPromise) terminateCodeScanWorker();
 	if(codeScanState.cameraState !== 'active') return;
 	invalidateCodeScanSession();
 	codeScanState.cameraState = 'suspended';
@@ -416,7 +434,7 @@ function startCodeScanCamera() {
 		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !document.hidden && !codeScanState.hasCaptured;
 	}
 	// Load the worker while the browser starts the camera. Camera readiness owns the visible status.
-	var workerReady = prepareCodeScanWorker(true);
+	var workerReady = prepareCodeScanWorker();
 	workerReady.catch(function() {});
 	navigator.mediaDevices.getUserMedia({
 		video: {
@@ -443,10 +461,9 @@ function startCodeScanCamera() {
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanFrozenPreview(false);
-		setCodeScanStatus(codeScanState.worker ? getCodeScanInitialStatus() : 'Loading on-device scanner...');
+		setCodeScanStatus(getCodeScanInitialStatus());
 		workerReady.then(function() {
 			if(current() && codeScanState.phase === 'live') {
-				setCodeScanStatus(getCodeScanInitialStatus());
 				runCodeScanFrame();
 			}
 		}).catch(function(error) { if(current()) handleCodeScanWorkerError(error); });
@@ -533,12 +550,11 @@ function disposeCodeScanWorker(worker) {
 	try { Promise.resolve(worker.terminate()).catch(function() {}); } catch(error) {}
 }
 
-function prepareCodeScanWorker(quiet) {
+function prepareCodeScanWorker() {
 	if(codeScanState.worker)
 		return Promise.resolve(codeScanState.worker);
 	if(codeScanState.workerPromise) return codeScanState.workerPromise;
 	var epoch = codeScanState.workerEpoch;
-	if(!quiet && codeScanState.phase !== 'review') setCodeScanStatus('Loading on-device scanner...');
 	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		return Tesseract.createWorker('eng', 1, {
@@ -576,17 +592,18 @@ function terminateCodeScanWorker(error) {
 	disposeCodeScanWorker(worker);
 }
 
-// Keep segmentation changes and recognition atomic on the single OCR worker.
+// Serialize recognition on the single OCR worker.
 function runCodeScanWorkerTask(work) {
 	var epoch = codeScanState.workerEpoch;
+	var session = codeScanState.session;
 	var task = codeScanState.workerQueue.then(function() {
-		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+		if(epoch !== codeScanState.workerEpoch || session !== codeScanState.session) throw codeScanCancelledError();
 		return prepareCodeScanWorker();
 	}).then(function(worker) {
-		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+		if(epoch !== codeScanState.workerEpoch || session !== codeScanState.session) throw codeScanCancelledError();
 		return waitForCodeScanWorker(Promise.resolve().then(function() { return work(worker); }), CODE_SCAN_OCR_TIMEOUT_MS);
 	}).catch(function(error) {
-		if(epoch === codeScanState.workerEpoch) terminateCodeScanWorker();
+		if(epoch === codeScanState.workerEpoch && (session === codeScanState.session || error.name !== 'AbortError')) terminateCodeScanWorker();
 		throw error;
 	});
 	codeScanState.workerQueue = task.catch(function() {});
@@ -607,7 +624,6 @@ function handleCodeScanCameraError(error) {
 	setCodeScanStatus(message);
 	showNotification(message);
 	stopCodeScanCamera();
-	terminateCodeScanWorker();
 }
 
 function handleCodeScanWorkerError() {
@@ -693,13 +709,7 @@ function saveCodeScanSourceFromCanvas(canvas, forceOriginal) {
 	copy.height = canvas.height;
 	copy.getContext('2d').drawImage(canvas, 0, 0);
 	codeScanState.sourceCanvas = copy;
-	if(forceOriginal || !codeScanState.originalSourceCanvas) {
-		var origCopy = document.createElement('canvas');
-		origCopy.width = canvas.width;
-		origCopy.height = canvas.height;
-		origCopy.getContext('2d').drawImage(canvas, 0, 0);
-		codeScanState.originalSourceCanvas = origCopy;
-	}
+	if(forceOriginal || !codeScanState.originalSourceCanvas) codeScanState.originalSourceCanvas = copy;
 }
 
 function getCodeScanFixedRatioSlice(canvas) {
@@ -956,9 +966,10 @@ function restoreCodeScanRollMatch(match, transform, angle) {
 
 function recognizeCodeScanCanvas(canvas, focus, options) {
 	return runCodeScanWorkerTask(async function(worker) {
+		var live = options && options.live;
+		if(live && !live.isCurrent()) return { data: {} };
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var epoch = codeScanState.workerEpoch;
-		var live = options && options.live;
 		var search = { focus: focus };
 		var containers = detectCodeScanConfirmation(canvas, live) || detectCodeScanContainers(canvas, null, search);
 		var result = await recognizeCodeScanImage(canvas, focus, options, worker, containers);
@@ -1115,6 +1126,7 @@ function detailBandScale(height) {
 async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation, segmentation) {
 	worker = worker || codeScanState.worker;
 	var epoch = codeScanState.workerEpoch;
+	var session = codeScanState.session;
 	var sideways = rotation % 180 === 90;
 	var imageWidth = sideways ? canvas.height : canvas.width;
 	var imageHeight = sideways ? canvas.width : canvas.height;
@@ -1158,8 +1170,9 @@ async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation, segmen
 		if(!blob) throw new Error('Could not encode scanner image');
 		input = new Uint8Array(await blob.arrayBuffer());
 	}
-	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+	if(epoch !== codeScanState.workerEpoch || session !== codeScanState.session) throw codeScanCancelledError();
 	var result = await worker.recognize(input, { tessedit_pageseg_mode: segmentation || '6' }, { text: false, hocr: false, tsv: false });
+	if(epoch !== codeScanState.workerEpoch || session !== codeScanState.session) throw codeScanCancelledError();
 	if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
 	var words = result.data && result.data.words || [];
 	return words.map(function(word) {
@@ -1323,7 +1336,7 @@ function captureCodeScanDetection(keepRegions) {
 	resetCodeScanMatchState();
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
-	resetCodeScanZoom();
+	resetCodeScanZoom(true);
 	resetCodeScanGuide();
 	beginCodeScanCapture(match);
 	if(keepRegions && !match) drawCodeScanMatchRegions(null, canvas, detected.boxes);
@@ -1344,7 +1357,7 @@ function captureCodeScanManually(event) {
 	if(!captureCodeScanFullRes(video, canvas)) return;
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
-	resetCodeScanZoom();
+	resetCodeScanZoom(true);
 	resetCodeScanGuide();
 	// Read the full-resolution card again on a manual shutter press.
 	beginCodeScanCapture();
@@ -1813,7 +1826,8 @@ function handleCodeScanPhotoInput(event) {
 		setCodeScanStatus('Choose an image smaller than 40 MB.');
 		return;
 	}
-	invalidateCodeScanSession();
+	// Reuse a preloading or idle worker. Cancel any OCR already in flight.
+	invalidateCodeScanSession(!codeScanState.hasCaptured && (!codeScanState.processing || !codeScanState.worker));
 	var session = codeScanState.session;
 	codeScanState.reviewMatch = null;
 	resetCodeScanDetails();
@@ -1831,12 +1845,9 @@ function handleCodeScanPhotoInput(event) {
 	setCodeScanPhotoFallbackVisible(false);
 	clearCodeScanCandidateHighlight();
 	setCodeScanWoloFoundCue(false);
-	stopCodeScanCamera();
 	setCodeScanStatus('Reading photo on your device...');
-	prepareCodeScanWorker().then(function() {
-		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
-		return recognizeCodeScanPhoto(file);
-	}).then(function(result) {
+	prepareCodeScanWorker().catch(function() {});
+	recognizeCodeScanPhoto(file).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		var match = extractMatchFromOcrResult(result);
@@ -1866,18 +1877,21 @@ function recognizeCodeScanPhoto(file) {
 	var finished = false;
 	var reader;
 	var image;
+	var objectUrl;
+	function releaseImage() {
+		if(image) image.onload = image.onerror = null;
+		image = null;
+		if(objectUrl) window.URL.revokeObjectURL(objectUrl);
+		objectUrl = null;
+	}
 	var reading = new Promise(function(resolve, reject) {
-		reader = new FileReader();
 		image = new Image();
-		reader.onload = function() {
-			if(finished || !isCurrentCodeScanSession(session)) { reject(codeScanCancelledError()); return; }
-			image.onload = function() {
-				try {
+		image.onload = function() {
+			try {
 				if(finished || !isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 				var canvas = getCodeScanCanvas();
 				var width;
 				var height;
-				var ocrCanvas;
 				if(!canvas) {
 					reject(new Error('Missing scan canvas'));
 					return;
@@ -1891,20 +1905,24 @@ function recognizeCodeScanPhoto(file) {
 				canvas.width = width;
 				canvas.height = height;
 				canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+				releaseImage();
 				saveCodeScanSourceFromCanvas(canvas, true);
-				resetCodeScanZoom();
+				resetCodeScanZoom(true);
 				setCodeScanViewportVisible(true);
 				setCodeScanFrozenPreview(true);
 				setCodeScanCropControlsVisible(true);
-				ocrCanvas = canvas;
-				if(!codeScanState.worker) {
-					reject(new Error('Scanner not ready'));
-					return;
-				}
-				recognizeCodeScanCanvas(ocrCanvas).then(resolve).catch(reject);
-				} catch(error) { reject(error); }
-			};
-			image.onerror = reject;
+				recognizeCodeScanCanvas(canvas).then(resolve, reject);
+			} catch(error) { reject(error); }
+		};
+		image.onerror = reject;
+		if(window.URL && typeof window.URL.createObjectURL === 'function' && typeof window.URL.revokeObjectURL === 'function') {
+			objectUrl = window.URL.createObjectURL(file);
+			image.src = objectUrl;
+			return;
+		}
+		reader = new FileReader();
+		reader.onload = function() {
+			if(finished || !isCurrentCodeScanSession(session)) { reject(codeScanCancelledError()); return; }
 			image.src = reader.result;
 		};
 		reader.onerror = reject;
@@ -1917,7 +1935,7 @@ function recognizeCodeScanPhoto(file) {
 			reader.onload = reader.onerror = reader.onabort = null;
 			if(reader.readyState === 1) reader.abort();
 		}
-		if(image) image.onload = image.onerror = null;
+		releaseImage();
 	}
 	return waitForCodeScanWorker(reading, CODE_SCAN_LOAD_TIMEOUT_MS + CODE_SCAN_OCR_TIMEOUT_MS).then(function(result) {
 		cleanup();
@@ -2177,10 +2195,10 @@ function scheduleCodeScanCropRecognition() {
 	}, 350);
 }
 
-function resetCodeScanZoom() {
+function resetCodeScanZoom(keepPreview) {
 	var canvas = getCodeScanCanvas();
 	var didRestoreOriginal = false;
-	if(codeScanState.zoom === 1 && codeScanState.originalSourceCanvas && codeScanState.sourceCanvas !== codeScanState.originalSourceCanvas && canvas) {
+	if(!keepPreview && codeScanState.zoom === 1 && codeScanState.originalSourceCanvas && codeScanState.sourceCanvas !== codeScanState.originalSourceCanvas && canvas) {
 		canvas.width = codeScanState.originalSourceCanvas.width;
 		canvas.height = codeScanState.originalSourceCanvas.height;
 		canvas.getContext('2d').drawImage(codeScanState.originalSourceCanvas, 0, 0);
@@ -2188,7 +2206,7 @@ function resetCodeScanZoom() {
 		resetCodeScanGuide();
 		didRestoreOriginal = true;
 	}
-	else if(codeScanState.sourceCanvas && canvas) {
+	else if(!keepPreview && codeScanState.sourceCanvas && canvas) {
 		canvas.width = codeScanState.sourceCanvas.width;
 		canvas.height = codeScanState.sourceCanvas.height;
 		canvas.getContext('2d').drawImage(codeScanState.sourceCanvas, 0, 0);

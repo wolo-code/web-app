@@ -232,7 +232,7 @@ Gallery photos retain their native pixel dimensions in the preview and original 
 
 The Wolo Code Scan Dialog captures silently. Hiding the page releases the camera. A live scan resumes when the page becomes visible again. Captured photos and review fields are preserved.
 
-The OCR worker loads the smaller English LSTM model while the camera starts. Three exact, high-confidence words can open Label Edit View with a blank city when the city is unreadable. When a second read is needed, the dialog checks again sooner and starts with the previously read code box. Blank OCR rows are skipped so the first readable address paragraph fills Address line 1.
+The OCR worker can preload during page idle and is reused when the dialog opens. Gallery starts OCR setup before file selection and decodes the selected image while the worker gets ready. Three exact, high-confidence words can open Label Edit View with a blank city when the city is unreadable. When a second read is needed, the dialog checks again sooner and starts with the previously read code box. Blank OCR rows are skipped so the first readable address paragraph fills Address line 1.
 
 Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/segment above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
 

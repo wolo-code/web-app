@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
-test('review flags unknown words and keeps city tags in sync with edits', () => {
+test('review flags unknown words and validates the code while the city is editable', () => {
  const nodes = {};
  for (const id of ['city', 'w1', 'w2', 'w3']) {
   const classes = new Set();
@@ -43,14 +43,12 @@ test('review flags unknown words and keeps city tags in sync with edits', () => 
  context.updateCodeScanReviewValidity();
  assert.equal(nodes.code_scan_review_w2.classList.contains('code_scan_word_invalid'), true);
  assert.match(nodes.code_scan_review_validity.textContent, /zz/);
- assert.equal(nodes.code_scan_review_city.classList.contains('code_scan_city_tag'), true);
  nodes.code_scan_review_w2.value = 'banana';
  nodes.code_scan_review_city.value = 'Unknown city';
  context.updateCodeScanReviewValidity();
  assert.equal(nodes.code_scan_apply_crop.disabled, false);
  assert.equal(nodes.code_scan_review_w2.error, '');
  assert.equal(nodes.code_scan_review_validity.textContent, '');
- assert.equal(nodes.code_scan_review_city.classList.contains('code_scan_city_tag'), false);
  context.setCodeScanPhase('processing');
  assert.equal(nodes.code_scan_apply_crop.disabled, true);
  context.updateCodeScanReviewValidity();

@@ -49,68 +49,6 @@ var codeScanState = {
 	liveZoom: 1
 };
 
-var codeScanShutter = { context: null, buffer: null, source: null, revision: 0 };
-
-async function loadCodeScanShutterBuffer(context, extension) {
-	var response = await fetch('/sounds/camera-shutter-release.' + extension);
-	if(!response.ok) throw new Error('Shutter sound unavailable');
-	return context.decodeAudioData(await response.arrayBuffer());
-}
-
-function prepareCodeScanShutterSound() {
-	var AudioContext = window.AudioContext || window.webkitAudioContext;
-	if(!AudioContext || document.hidden) return;
-	try {
-		// Activate Web Audio from the opening gesture and keep the shutter as a sound effect.
-		var context = codeScanShutter.context || (codeScanShutter.context = new AudioContext());
-		context.resume().catch(function() {});
-		if(!codeScanShutter.buffer) {
-			codeScanShutter.buffer = loadCodeScanShutterBuffer(context, 'mp3').catch(function() {
-				return loadCodeScanShutterBuffer(context, 'wav');
-			}).catch(function() {
-				codeScanShutter.buffer = null;
-				return null;
-			});
-		}
-	} catch(error) {}
-}
-
-async function playShutterSound() {
-	var context = codeScanShutter.context;
-	if(!context || document.hidden) return;
-	var revision = ++codeScanShutter.revision;
-	try {
-		await context.resume();
-		var buffer = await codeScanShutter.buffer;
-		if(!buffer || document.hidden || revision !== codeScanShutter.revision) return;
-		var source = context.createBufferSource();
-		source.buffer = buffer;
-		source.connect(context.destination);
-		source.onended = function() {
-			source.disconnect();
-			if(codeScanShutter.source === source) {
-				codeScanShutter.source = null;
-				context.suspend().catch(function() {});
-			}
-		};
-		source.start();
-		codeScanShutter.source = source;
-	} catch(error) {}
-}
-
-function stopCodeScanShutterSound() {
-	codeScanShutter.revision += 1;
-	var source = codeScanShutter.source;
-	if(source) {
-		source.onended = null;
-		source.stop();
-		source.disconnect();
-		codeScanShutter.source = null;
-	}
-	var context = codeScanShutter.context;
-	if(context) context.suspend().catch(function() {});
-}
-
 var CODE_SCAN_FRAME_INTERVAL_MS = 250;
 var CODE_SCAN_CONFIRM_INTERVAL_MS = 70;
 var CODE_SCAN_STABLE_MATCHES = 2;
@@ -273,7 +211,6 @@ function openCodeScan(event) {
 	codeScanState.active = true;
 	setCodeScanDetectionMode('fixed');
 	if(codeScanOcrMatch.isCodeScanSupported()) {
-		prepareCodeScanShutterSound();
 		setCodeScanStatus('Requesting camera...');
 		startCodeScanCamera();
 		return;
@@ -336,7 +273,6 @@ function stopCodeScan() {
 
 function invalidateCodeScanSession() {
 	codeScanState.session += 1;
-	stopCodeScanShutterSound();
 	codeScanState.shutterPressed = false;
 	setCodeScanRegionInspection(false);
 	codeScanState.regionPressConsumed = false;
@@ -450,10 +386,7 @@ function getCodeScanCanvas() {
 }
 
 function suspendCodeScanMedia() {
-	if(codeScanState.cameraState !== 'active') {
-		stopCodeScanShutterSound();
-		return;
-	}
+	if(codeScanState.cameraState !== 'active') return;
 	invalidateCodeScanSession();
 	codeScanState.cameraState = 'suspended';
 	resetCodeScanMatchState();
@@ -1411,7 +1344,6 @@ function beginCodeScanCapture(detectedMatch) {
 	stopCodeScanCamera();
 	setCodeScanFrozenPreview(true);
 	setCodeScanCropControlsVisible(true);
-	playShutterSound();
 	if(detectedMatch) {
 		codeScanState.processing = false;
 		showCodeScanReview(detectedMatch);
@@ -1690,12 +1622,6 @@ function updateCodeScanReviewValidity() {
 			}, 3000);
 		}
 	}
-	if(cityInput) {
-		var city = cityInput.value.trim().toLowerCase();
-		cityInput.classList.toggle('code_scan_city_tag', !!city && codeScanCityChoices.some(function(choice) {
-			return String(choice).trim().toLowerCase() === city;
-		}));
-	}
 	if(cityInput && !cityInput.value && typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.name)
 		cityInput.placeholder = selected_decode_city.name;
 }
@@ -1805,7 +1731,6 @@ function rescanCodeScan(event) {
 	resetCodeScanUi();
 	setCodeScanPhotoFallbackVisible(true);
 	if(codeScanOcrMatch.isCodeScanSupported()) {
-		prepareCodeScanShutterSound();
 		startCodeScanCamera();
 		return;
 	}

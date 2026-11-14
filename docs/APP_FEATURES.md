@@ -214,7 +214,7 @@ The previous-city popup shares the scanner city-list styling: white/light or dee
 Scanner zoom pill shows a flat gray magnifying-glass glyph in its middle slot at normal zoom. Changed zoom displays the reset glyph in the same slot, retaining the existing reset target, percentage position, and behavior.
 
 
-Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Go and Save stay disabled until all three words are complete and valid. Recognized or suggested cities display a rounded outlined tag, which clears when edited to an unknown city.
+Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Go and Save stay disabled until all three words are complete and valid. City uses the same underline as the three word fields.
 
 The scan camera disc is styled on its image wrapper, with an unclipped SVG inside, so its lower corners retain the same rounding as its upper corners.
 
@@ -228,7 +228,7 @@ The detected text rectangle adds 10% centered padding, clipped at image edges. L
 
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. The scanner samples bounded OCR crops directly from the original pixels.
 
-The Wolo Code Scan Dialog plays its shutter as a short Web Audio cue. Hiding the page cancels the cue and releases the camera. A live scan resumes when the page becomes visible again. Captured photos and review fields are preserved.
+The Wolo Code Scan Dialog captures silently. Hiding the page releases the camera. A live scan resumes when the page becomes visible again. Captured photos and review fields are preserved.
 
 The OCR worker loads while the camera starts. Three exact, high-confidence words can open Label Edit View with a blank city when the city is unreadable. When a second read is needed, the dialog checks again sooner and starts with the previously read code box. Blank OCR rows are skipped so the first readable address paragraph fills Address line 1.
 

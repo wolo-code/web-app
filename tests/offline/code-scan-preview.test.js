@@ -459,7 +459,7 @@ test('live capture opens review immediately and only reads optional details in t
  const { context } = scanner();
  for(const name of ['clearCodeScanTimer', 'setCodeScanCaptureEnabled', 'setCodeScanLiveControlsVisible',
   'setCodeScanPhotoFallbackVisible', 'clearCodeScanCandidateHighlight', 'setCodeScanWoloFoundCue',
-  'stopCodeScanCamera', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible', 'playShutterSound'])
+  'stopCodeScanCamera', 'setCodeScanFrozenPreview', 'setCodeScanCropControlsVisible'])
   context[name] = () => {};
  const detected = { code: 'apple berry cherry', regions: { container: { x0: 20, y0: 40, x1: 160, y1: 100 } } };
  context.showCodeScanReview = match => { context.codeScanState.reviewMatch = match; };

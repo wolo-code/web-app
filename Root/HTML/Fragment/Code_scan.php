@@ -47,6 +47,11 @@
 			<button id='code_scan_use_photo' class='border code_scan_icon_button code_scan_use_photo' type='button' aria-label='Choose photo from gallery' title='Choose photo from gallery'>
 				<span class='image'><?php includeSVG('', 'Gallery'); ?></span>
 			</button>
+			<button id='code_scan_flashlight' class='border code_scan_icon_button hide' type='button' aria-label='Flashlight' title='Flashlight' aria-pressed='false' disabled>
+				<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+					<path d='M7 4h10v4l-2 4v8H9v-8L7 8V4Zm0 4h10m-5 5v2'/>
+				</svg>
+			</button>
 			<button id='code_scan_type_instead' class='border code_scan_icon_button code_scan_type_instead' type='button' aria-label='Type code instead' title='Type code instead'>
 				<span class='image'><?php includeSVG('', 'Keyboard'); ?></span>
 			</button>

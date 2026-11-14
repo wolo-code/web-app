@@ -81,6 +81,7 @@ function initCodeScan() {
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', openCodeScanManualEntry);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
+	bindControl('code_scan_flashlight', 'click', toggleCodeScanFlashlight);
 	bindControl('code_scan_save', 'click', saveCodeScanReview);
 	bindControl('code_scan_rescan', 'click', rescanCodeScan);
 	bindControl('code_scan_zoom_out', 'click', zoomOutCodeScan);
@@ -114,7 +115,14 @@ function initCodeScan() {
 	});
 	window.addEventListener('pagehide', suspendCodeScanMedia);
 	window.addEventListener('pageshow', resumeCodeScanCamera);
-	window.addEventListener('resize', redrawCodeScanReviewRegions);
+	window.addEventListener('resize', function() {
+		if(!codeScanState.active || !codeScanState.hasCaptured) return;
+		if(codeScanState.zoom > 1) {
+			setCodeScanZoom(codeScanState.zoom);
+			scheduleCodeScanCropRecognition();
+		}
+		else redrawCodeScanReviewRegions();
+	});
 	var previewCanvas = getCodeScanCanvas();
 	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
 	bindControl('code_scan_video', 'resize', function(event) { sizeCodeScanVideo(event.currentTarget); });
@@ -286,6 +294,8 @@ function resetCodeScanUi() {
 	setCodeScanStatus(getCodeScanInitialStatus());
 	codeScanState.originalSourceCanvas = null;
 	codeScanState.sourceCanvas = null;
+	codeScanState.isDragging = false;
+	codeScanState.touchStartDist = 0;
 	resetCodeScanZoom();
 	resetCodeScanLiveZoom();
 }
@@ -359,8 +369,42 @@ function getCodeScanVideo() {
 
 function sizeCodeScanVideo(video) {
 	if(!video.videoWidth || !video.videoHeight) return;
-	// Size the video itself to cover the Viewfinder, including in iOS portrait mode.
+	// Size the video box for portrait Safari and keep object-fit: cover while dimensions change.
 	video.style.setProperty('--code-scan-video-ratio', String(video.videoWidth / video.videoHeight));
+}
+
+function getCodeScanVideoTrack() {
+	var stream = codeScanState.stream;
+	return stream && stream.getVideoTracks && stream.getVideoTracks()[0];
+}
+
+function setCodeScanFlashlightAvailable(track) {
+	var button = document.getElementById('code_scan_flashlight');
+	if(!button) return;
+	var torch = track && track.getCapabilities && track.getCapabilities()['torch'];
+	var available = !!(track && track.applyConstraints &&
+		(torch === true || (Array.isArray(torch) && torch.includes(true) && torch.includes(false))));
+	button.classList.toggle('hide', !available);
+	button.disabled = !available;
+	button.setAttribute('aria-pressed', 'false');
+}
+
+async function toggleCodeScanFlashlight(event) {
+	var button = event.currentTarget;
+	var track = getCodeScanVideoTrack();
+	if(button.disabled || !codeScanState.cameraAvailable || !track || track.readyState !== 'live') return;
+	var request = codeScanState.cameraRequest;
+	var enabled = button.getAttribute('aria-pressed') !== 'true';
+	button.disabled = true;
+	try {
+		await track.applyConstraints({ advanced: [{ 'torch': enabled }] });
+		if(request === codeScanState.cameraRequest)
+			button.setAttribute('aria-pressed', String(enabled));
+	} catch(error) {
+		if(request === codeScanState.cameraRequest) setCodeScanStatus('Could not change the flashlight.');
+	} finally {
+		if(request === codeScanState.cameraRequest) button.disabled = false;
+	}
 }
 
 function getCodeScanCanvas() {
@@ -425,6 +469,7 @@ function startCodeScanCamera() {
 		codeScanState.cameraAvailable = true;
 		sizeCodeScanVideo(video);
 		video.classList.add('code_scan_video_ready');
+		setCodeScanFlashlightAvailable(getCodeScanVideoTrack());
 		logCodeScanStep('Camera ready', startedAt);
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
@@ -443,6 +488,7 @@ function stopCodeScanCamera() {
 	codeScanState.cameraRequest += 1;
 	codeScanState.cameraState = 'idle';
 	codeScanState.cameraAvailable = false;
+	setCodeScanFlashlightAvailable(null);
 	var video = getCodeScanVideo();
 	if(codeScanState.stream) {
 		codeScanState.stream.getTracks().forEach(function(track) {
@@ -1326,13 +1372,14 @@ function beginCodeScanCapture(detectedMatch) {
 	fillCodeScanReviewDetails(detectedMatch);
 }
 
-function fillCodeScanReviewDetails(match) {
+function fillCodeScanReviewDetails(match, cropRead) {
 	if(!match.regions || !match.regions.container) return;
 	var session = codeScanState.session;
 	var revision = codeScanState.cropRevision;
-	var source = codeScanState.originalSourceCanvas || getCodeScanCanvas();
+	var source = cropRead ? cropRead.image : codeScanState.originalSourceCanvas || getCodeScanCanvas();
 	if(!source || CODE_SCAN_METADATA_KEYS.every(function(key) { return match.metadata && match.metadata[key]; })) return;
-	var details = Object.assign({}, match, { regions: Object.assign({}, match.regions), metadata: Object.assign({}, match.metadata) });
+	var localMatch = cropRead ? cropRead.match : match;
+	var details = Object.assign({}, localMatch, { regions: Object.assign({}, localMatch.regions), metadata: Object.assign({}, match.metadata) });
 	function ownsFields() {
 		return isCurrentCodeScanSession(session) && codeScanState.reviewMatch === match;
 	}
@@ -1343,6 +1390,7 @@ function fillCodeScanReviewDetails(match) {
 		if(!ownsFields()) return;
 		setCodeScanDetailsLoading(false);
 		if(!detailed || revision !== codeScanState.cropRevision) return;
+		if(cropRead) detailed = offsetCodeScanReviewMatch(detailed, cropRead.x, cropRead.y);
 		populateCodeScanMetadata(detailed);
 		codeScanState.reviewMatch = detailed;
 	}).catch(function() {
@@ -1413,7 +1461,7 @@ function resetCodeScanDetails() {
 function populateCodeScanMetadata(match) {
 	var previous = codeScanState.reviewMatch;
 	var same = match && previous && match.code === previous.code && match.regions && previous.regions &&
-		codeScanOcrMatch.bboxIoU(match.regions.card || match.regions.container, previous.regions.card || previous.regions.container) >= 0.55;
+		codeScanOcrMatch.bboxIoU(match.regions.container, previous.regions.container) >= 0.55;
 	if(!same) resetCodeScanDetails();
 	var metadata = {};
 	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
@@ -1981,14 +2029,13 @@ function setCodeScanCropControlsVisible(visible) {
 	});
 }
 
-function clampCodeScanPan() {
+function clampCodeScanPan(canvas) {
+	if(!canvas || !canvas.width || !canvas.height) return;
 	var viewport = document.querySelector('.code_scan_viewport');
-	var maxPanX = 150;
-	var maxPanY = 150;
-	if(viewport) {
-		maxPanX = Math.max(100, Math.round(viewport.clientWidth * codeScanState.zoom * 0.75));
-		maxPanY = Math.max(100, Math.round(viewport.clientHeight * codeScanState.zoom * 0.75));
-	}
+	if(!viewport) return;
+	var scale = Math.min(canvas.clientWidth / canvas.width, canvas.clientHeight / canvas.height) * codeScanState.zoom;
+	var maxPanX = Math.max(0, (canvas.width * scale - viewport.clientWidth) / 2);
+	var maxPanY = Math.max(0, (canvas.height * scale - viewport.clientHeight) / 2);
 	codeScanState.panX = Math.max(-maxPanX, Math.min(maxPanX, codeScanState.panX));
 	codeScanState.panY = Math.max(-maxPanY, Math.min(maxPanY, codeScanState.panY));
 }
@@ -2006,7 +2053,7 @@ function setCodeScanZoom(zoom, panX, panY) {
 		codeScanState.panX = panX;
 	if(typeof panY === 'number')
 		codeScanState.panY = panY;
-	clampCodeScanPan();
+	clampCodeScanPan(canvas);
 	if(canvas)
 		canvas.style.transform = 'translate(' + codeScanState.panX + 'px, ' + codeScanState.panY + 'px) scale(' + codeScanState.zoom + ')';
 	if(zoomLevelNode) {
@@ -2022,14 +2069,14 @@ function setCodeScanZoom(zoom, panX, panY) {
 }
 
 function scheduleCodeScanCropRecognition() {
-	if(!codeScanState.active || !codeScanState.hasCaptured || !codeScanState.worker)
+	if(!codeScanState.active || !codeScanState.hasCaptured)
 		return;
 	codeScanState.cropRevision += 1;
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = setTimeout(function retry() {
 		codeScanState.cropScanTimer = null;
 		if(!codeScanState.active || !codeScanState.hasCaptured) return;
-		if(codeScanState.phase === 'processing' || codeScanState.isDragging) {
+		if(codeScanState.phase === 'processing' || codeScanState.isDragging || codeScanState.touchStartDist > 0) {
 			codeScanState.cropScanTimer = setTimeout(retry, 350);
 			return;
 		}
@@ -2269,45 +2316,73 @@ function getCodeScanRenderedImageRect(canvas) {
 	};
 }
 
+function getCodeScanReviewCrop(canvas, source, viewport) {
+	var image = getCodeScanRenderedImageRect(canvas);
+	var frame = viewport.getBoundingClientRect();
+	if(!image.width || !image.height) return null;
+	var xScale = source.width / image.width;
+	var yScale = source.height / image.height;
+	var x = Math.max(0, Math.floor((frame.left - image.left) * xScale));
+	var y = Math.max(0, Math.floor((frame.top - image.top) * yScale));
+	var right = Math.min(source.width, Math.ceil((frame.right - image.left) * xScale));
+	var bottom = Math.min(source.height, Math.ceil((frame.bottom - image.top) * yScale));
+	if(right <= x || bottom <= y) return null;
+	return { x: x, y: y, width: right - x, height: bottom - y };
+}
+
+function offsetCodeScanReviewBox(box, x, y) {
+	return box && Object.assign({}, box, { x0: box.x0 + x, y0: box.y0 + y, x1: box.x1 + x, y1: box.y1 + y });
+}
+
+function offsetCodeScanReviewMatch(match, x, y) {
+	var regions = {};
+	Object.keys(match.regions).forEach(function(key) {
+		regions[key] = offsetCodeScanReviewBox(match.regions[key], x, y);
+	});
+	return Object.assign({}, match, { regions: regions });
+}
+
 function applyCodeScanCrop() {
 	var revision = codeScanState.cropRevision;
 	var session = codeScanState.session;
 	var canvas = getCodeScanCanvas();
 	var source = codeScanState.originalSourceCanvas || codeScanState.sourceCanvas || canvas;
-	if(!canvas || !source || codeScanState.phase === 'processing') return;
+	var viewport = document.querySelector('.code_scan_viewport');
+	if(!canvas || !source || !viewport || codeScanState.phase === 'processing') return;
 	clearTimeout(codeScanState.cropScanTimer);
 	codeScanState.cropScanTimer = null;
-	var focus = { x: source.width / 2, y: source.height / 2 };
-	var viewport = document.querySelector('.code_scan_viewport');
-	if(viewport) {
-		var viewportRect = viewport.getBoundingClientRect();
-		var imageRect = getCodeScanRenderedImageRect(canvas);
-		if(imageRect.width && imageRect.height) {
-			focus.x = Math.max(0, Math.min(source.width, (viewportRect.left + viewportRect.width / 2 - imageRect.left) / imageRect.width * source.width));
-			focus.y = Math.max(0, Math.min(source.height, (viewportRect.top + viewportRect.height / 2 - imageRect.top) / imageRect.height * source.height));
-		}
+	var crop = getCodeScanReviewCrop(canvas, source, viewport);
+	if(!crop) return;
+	var image = source;
+	if(crop.width !== source.width || crop.height !== source.height) {
+		image = document.createElement('canvas');
+		image.width = crop.width;
+		image.height = crop.height;
+		image.getContext('2d').drawImage(source, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
 	}
 	setCodeScanPhase('processing');
 	setCodeScanStatus('Reading label on your device...');
-	// Reframing changes candidate preference, never clips the card to the guide.
-	logCodeScanStep('Rechecking reframed image');
-	recognizeCodeScanCanvas(source, focus).then(function(result) {
+	logCodeScanStep('Reading the visible photo crop');
+	recognizeCodeScanCanvas(image).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
 		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
 		var match = extractMatchFromOcrResult(result);
 		if(match) {
-			showCodeScanReview(match);
-			fillCodeScanReviewDetails(match);
+			var reviewMatch = offsetCodeScanReviewMatch(match, crop.x, crop.y);
+			showCodeScanReview(reviewMatch);
+			fillCodeScanReviewDetails(reviewMatch, { image: image, match: match, x: crop.x, y: crop.y });
 		}
 		else {
 			setCodeScanPhase('review');
 			logCodeScanStep('No match in reframed image');
-			drawCodeScanMatchRegions(null, canvas, result.data && result.data.debugBoxes || []);
-			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
+			var boxes = result.data && result.data.debugBoxes || [];
+			drawCodeScanMatchRegions(null, canvas, boxes.map(function(box) { return offsetCodeScanReviewBox(box, crop.x, crop.y); }));
+			setCodeScanStatus('Could not read a code in this crop. Reframe or edit the words.');
 		}
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session)) return;
 		setCodeScanPhase('review');
+		if(revision !== codeScanState.cropRevision) return;
 		logCodeScanStep('Reframed image recognition failed');
 		setCodeScanStatus('Recognition failed. Try again or edit the words.');
 	});

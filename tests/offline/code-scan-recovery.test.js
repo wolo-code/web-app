@@ -291,6 +291,45 @@ test('camera requests from an earlier session stop their tracks without attachin
 	assert.equal(c.codeScanState.cameraAvailable, false);
 });
 
+test('Flashlight tracks the current camera and resets when it stops', async () => {
+	const c = scanner(), pending = deferred();
+	const attributes = new Map(), calls = [];
+	const button = { classList: { toggle: (_name, hidden) => { button.hidden = hidden; } },
+		setAttribute: (name, value) => attributes.set(name, value), getAttribute: name => attributes.get(name) };
+	const track = {
+		readyState: 'live', getCapabilities: () => ({ torch: [false, true] }),
+		applyConstraints: async constraints => { calls.push(constraints.advanced[0].torch); },
+		stop() { this.readyState = 'ended'; }
+	};
+	c.document.getElementById = id => id === 'code_scan_flashlight' ? button : null;
+	c.getCodeScanVideo = () => ({ classList: { add() {}, remove() {} }, play: async () => {}, pause() {} });
+	c.prepareCodeScanWorker = async () => worker();
+	c.runCodeScanFrame = () => {};
+	c.navigator = { mediaDevices: { getUserMedia: async () => ({ getVideoTracks: () => [track], getTracks: () => [track] }) } };
+	c.setCodeScanFlashlightAvailable({ ...track, getCapabilities: () => ({ torch: [false] }) });
+	assert.equal(button.hidden, true);
+	c.startCodeScanCamera();
+	await flush();
+	assert.equal(button.hidden, false);
+	assert.equal(button.disabled, false);
+	const click = () => c.toggleCodeScanFlashlight({ currentTarget: button });
+	await click();
+	assert.equal(attributes.get('aria-pressed'), 'true');
+	await click();
+	assert.equal(attributes.get('aria-pressed'), 'false');
+	assert.deepEqual(calls, [true, false]);
+	track.applyConstraints = () => pending.promise;
+	const changing = click();
+	assert.equal(button.disabled, true);
+	c.stopCodeScanCamera();
+	pending.resolve();
+	await changing;
+	assert.equal(track.readyState, 'ended');
+	assert.equal(button.hidden, true);
+	assert.equal(button.disabled, true);
+	assert.equal(attributes.get('aria-pressed'), 'false');
+});
+
 test('Typing keeps the scanner open for manual entry while cancelling a pending camera request', async () => {
 	const c = scanner(), request = deferred();
 	let stopped = 0, focused = false;

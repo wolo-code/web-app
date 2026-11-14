@@ -95,8 +95,16 @@ test('gallery photos preserve native resolution for the preview, source and reco
   assert.equal(context.codeScanState.originalSourceCanvas.height, height);
  }
 });
-test('reframing scans the complete image even when a small guide clips the card', async () => {
+function setReviewRects(context, canvas, image, frame) {
+ canvas.getBoundingClientRect = () => image;
+ context.document.querySelector = selector => selector === '.code_scan_viewport' ? {
+  getBoundingClientRect: () => ({ ...frame, right: frame.left + frame.width, bottom: frame.top + frame.height })
+ } : null;
+}
+
+test('fit zoom scans the entire letterboxed photo regardless of the Scan Frame', async () => {
  const { context, canvas } = scanner(); let scanned;
+ setReviewRects(context, canvas, { left: 10, top: 20, width: 300, height: 200 }, { left: 10, top: 0, width: 300, height: 240 });
  const guide = { getBoundingClientRect: () => ({ left: 0, top: 0, width: 30, height: 20 }) };
  context.document.getElementById = id => id === 'code_scan_fixed_guide' ? guide : null;
  context.document.createElement = () => { throw new Error('The guide must not crop pixels'); };
@@ -107,24 +115,44 @@ test('reframing scans the complete image even when a small guide clips the card'
  assert.equal(canvas.width, 1200); assert.equal(canvas.height, 800);
 });
 
-test('reframing preserves native card, code and metadata coordinates', async () => {
- const { context } = scanner();
+test('zoom and pan scan only the visible native pixels and translate review regions back', async () => {
+ const { context, canvas } = scanner();
+ setReviewRects(context, canvas, { left: -140, top: -90, width: 600, height: 400 }, { left: 10, top: 10, width: 300, height: 180 });
+ let cropArgs;
+ const cropped = { getContext: () => ({ drawImage: (...args) => { cropArgs = args; } }) };
+ context.document.createElement = () => cropped;
  const match = { regions: {
-  card: { x0: 100, y0: 10, x1: 600, y1: 750 },
-  container: { x0: 150, y0: 180, x1: 500, y1: 400 },
-  city: { x0: 200, y0: 200, x1: 300, y1: 230 },
-  code: { x0: 170, y0: 270, x1: 480, y1: 320 },
-  title: { x0: 200, y0: 80, x1: 300, y1: 110 },
+  card: { x0: 100, y0: 10, x1: 550, y1: 350 },
+  container: { x0: 150, y0: 100, x1: 500, y1: 250 },
+  city: { x0: 200, y0: 110, x1: 300, y1: 130 },
+  code: { x0: 170, y0: 150, x1: 480, y1: 200 },
+  title: { x0: 200, y0: 50, x1: 300, y1: 80 },
   segment: null,
-  address_line_1: { x0: 140, y0: 430, x1: 550, y1: 480 }
+  address_line_1: { x0: 140, y0: 280, x1: 530, y1: 320 }
  }, metadata: { title: 'Ram', segment: '', address_line_1: '#43, Main St.', address_line_2: '' } };
- context.recognizeCodeScanCanvas = async () => ({ match });
+ context.showCodeScanReview = result => { context.codeScanState.reviewMatch = result; };
+ context.recognizeCodeScanCanvas = async input => {
+  assert.equal(input, cropped);
+  assert.equal(input.width, 600);
+  assert.equal(input.height, 360);
+  return { match };
+ };
+ let detailsSource;
+ context.enrichCodeScanMetadata = async (input, details) => {
+  detailsSource = input;
+  assert.equal(details.regions.container.x0, 150);
+  return details;
+ };
  context.applyCodeScanCrop(); await new Promise(resolve => setImmediate(resolve));
- assert.equal(context.reviewMatch, match);
- assert.equal(context.reviewMatch.regions.card.x0, 100);
- assert.equal(context.reviewMatch.regions.container.y0, 180);
- assert.equal(context.reviewMatch.regions.title.x0, 200);
- assert.equal(context.reviewMatch.regions.address_line_1.y0, 430);
+ assert.deepEqual(cropArgs, [canvas, 300, 200, 600, 360, 0, 0, 600, 360]);
+ assert.equal(detailsSource, cropped);
+ assert.equal(context.codeScanState.originalSourceCanvas, canvas);
+ const review = context.codeScanState.reviewMatch;
+ assert.equal(review.regions.card.x0, 400);
+ assert.equal(review.regions.container.y0, 300);
+ assert.equal(review.regions.title.x0, 500);
+ assert.equal(review.regions.address_line_1.y0, 480);
+ assert.equal(review.regions.segment, null);
 });
 
 test('still recognition reads a bounded code crop before any sparse full-photo OCR', async () => {

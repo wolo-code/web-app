@@ -429,7 +429,8 @@
 		var regions = { title: null, segment: null, address_line_1: null, address_line_2: null, address: null };
 		if(!card) return { metadata: metadata, regions: regions };
 		var rows = groupOcrRows(words.filter(function(word) {
-			return containsBBox(card, word.bbox) && (typeof word.confidence !== 'number' || word.confidence >= 70);
+			return word && typeof word.text === 'string' && word.text.trim() && validOcrBox(word.bbox) &&
+				containsBBox(card, word.bbox) && (typeof word.confidence !== 'number' || word.confidence >= 70);
 		})).filter(function(row) { return !isLabelBranding(row, container); });
 		var above = rows.filter(function(row) {
 			return row.bbox.y1 <= container.y0;

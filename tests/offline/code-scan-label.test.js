@@ -307,6 +307,17 @@ test('address line 2 on its own has no leading blank paragraph', () => {
 	assert.equal(matcher.formatScanAddress({ address_line_1: '  ', address_line_2: ' Flat 4B ' }), 'Flat 4B');
 });
 
+test('blank detail OCR rows do not take the first address slot', () => {
+	const found = match(codeWords());
+	const address = word('12 Main Road', 120, 387, 340, 403);
+	matcher.fillLabelMetadata(found, [word('  ', 115, 344, 280, 359), address]);
+	assert.equal(found.metadata.address_line_1, address.text);
+	assert.equal(found.metadata.address_line_2, '');
+	assert.equal(found.metadata.address, address.text);
+	assert.deepEqual(found.regions.address_line_1, address.bbox);
+	assert.equal(found.regions.address_line_2, null);
+});
+
 test('reframing prefers the code near the image focus without restricting recognition to a guide', () => {
 	const result = matcher.matchOcrRegionsToWoloCode({ data: {
 		words: [...codeWords(), word('cat', 450, 275, 480, 295), word('apple', 490, 275, 530, 295), word('tomato', 540, 275, 590, 295)],

@@ -49,17 +49,66 @@ var codeScanState = {
 	liveZoom: 1
 };
 
-// Preload shutter sounds (MP3 and WAV fallback)
-const shutterAudio = new Audio('/sounds/camera-shutter-release.mp3');
-shutterAudio.load();
-const shutterAudioWav = new Audio('/sounds/camera-shutter-release.wav');
-shutterAudioWav.load();
+var codeScanShutter = { context: null, buffer: null, source: null, revision: 0 };
 
-function playShutterSound() {
-	if(document.hidden) return;
-	shutterAudio.play().catch(function(error) {
-		if(!document.hidden && (!error || error.name !== 'AbortError')) shutterAudioWav.play().catch(function() {});
-	});
+async function loadCodeScanShutterBuffer(context, extension) {
+	var response = await fetch('/sounds/camera-shutter-release.' + extension);
+	if(!response.ok) throw new Error('Shutter sound unavailable');
+	return context.decodeAudioData(await response.arrayBuffer());
+}
+
+function prepareCodeScanShutterSound() {
+	var AudioContext = window.AudioContext || window.webkitAudioContext;
+	if(!AudioContext || document.hidden) return;
+	try {
+		// Activate Web Audio from the opening gesture and keep the shutter as a sound effect.
+		var context = codeScanShutter.context || (codeScanShutter.context = new AudioContext());
+		context.resume().catch(function() {});
+		if(!codeScanShutter.buffer) {
+			codeScanShutter.buffer = loadCodeScanShutterBuffer(context, 'mp3').catch(function() {
+				return loadCodeScanShutterBuffer(context, 'wav');
+			}).catch(function() {
+				codeScanShutter.buffer = null;
+				return null;
+			});
+		}
+	} catch(error) {}
+}
+
+async function playShutterSound() {
+	var context = codeScanShutter.context;
+	if(!context || document.hidden) return;
+	var revision = ++codeScanShutter.revision;
+	try {
+		await context.resume();
+		var buffer = await codeScanShutter.buffer;
+		if(!buffer || document.hidden || revision !== codeScanShutter.revision) return;
+		var source = context.createBufferSource();
+		source.buffer = buffer;
+		source.connect(context.destination);
+		source.onended = function() {
+			source.disconnect();
+			if(codeScanShutter.source === source) {
+				codeScanShutter.source = null;
+				context.suspend().catch(function() {});
+			}
+		};
+		source.start();
+		codeScanShutter.source = source;
+	} catch(error) {}
+}
+
+function stopCodeScanShutterSound() {
+	codeScanShutter.revision += 1;
+	var source = codeScanShutter.source;
+	if(source) {
+		source.onended = null;
+		source.stop();
+		source.disconnect();
+		codeScanShutter.source = null;
+	}
+	var context = codeScanShutter.context;
+	if(context) context.suspend().catch(function() {});
 }
 
 var CODE_SCAN_FRAME_INTERVAL_MS = 250;
@@ -225,6 +274,7 @@ function openCodeScan(event) {
 	codeScanState.active = true;
 	setCodeScanDetectionMode('fixed');
 	if(codeScanOcrMatch.isCodeScanSupported()) {
+		prepareCodeScanShutterSound();
 		setCodeScanStatus('Requesting camera...');
 		startCodeScanCamera();
 		return;
@@ -287,6 +337,7 @@ function stopCodeScan() {
 
 function invalidateCodeScanSession() {
 	codeScanState.session += 1;
+	stopCodeScanShutterSound();
 	codeScanState.shutterPressed = false;
 	setCodeScanRegionInspection(false);
 	codeScanState.regionPressConsumed = false;
@@ -400,11 +451,10 @@ function getCodeScanCanvas() {
 }
 
 function suspendCodeScanMedia() {
-	[shutterAudio, shutterAudioWav].forEach(function(audio) {
-		audio.pause();
-		if(audio.currentTime) audio.currentTime = 0;
-	});
-	if(codeScanState.cameraState !== 'active') return;
+	if(codeScanState.cameraState !== 'active') {
+		stopCodeScanShutterSound();
+		return;
+	}
 	invalidateCodeScanSession();
 	codeScanState.cameraState = 'suspended';
 	resetCodeScanMatchState();
@@ -1740,6 +1790,7 @@ function rescanCodeScan(event) {
 	resetCodeScanUi();
 	setCodeScanPhotoFallbackVisible(true);
 	if(codeScanOcrMatch.isCodeScanSupported()) {
+		prepareCodeScanShutterSound();
 		startCodeScanCamera();
 		return;
 	}

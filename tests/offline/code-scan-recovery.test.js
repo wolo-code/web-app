@@ -15,7 +15,6 @@ function scanner({ useRecognition = false } = {}) {
 	const timers = new Map();
 	let nextTimer = 0;
 	const context = {
-		Audio: function() { this.load = () => {}; this.pause = () => {}; },
 		setTimeout: (callback, delay) => { timers.set(++nextTimer, { callback, delay }); return nextTimer; },
 		clearTimeout: id => timers.delete(id),
 		window: {},
@@ -362,4 +361,56 @@ test('a small-roll retry reads the straightened box and restores source coordina
 	assert.ok(data.scanMatch.regions.container.y0 < 120 && data.scanMatch.regions.container.y1 > 280);
 	assert.equal(data.scanMatch.regions.city, null);
 	assert.deepEqual(painted, [-Math.PI / 30, source]);
+});
+
+test('scanner plays the shutter as a one-shot Web Audio buffer and stops it when hidden', async () => {
+	const c = scanner(), actions = [], requested = [];
+	const buffer = {}, destination = {};
+	const source = {
+		connect(target) { actions.push(target); },
+		start() { actions.push('start'); },
+		stop() { actions.push('stop'); },
+		disconnect() { actions.push('disconnect'); }
+	};
+	c.window.AudioContext = function() {
+		this.destination = destination;
+		this.resume = async () => { actions.push('resume'); };
+		this.suspend = async () => { actions.push('suspend'); };
+		this.decodeAudioData = async () => buffer;
+		this.createBufferSource = () => source;
+	};
+	c.fetch = async url => {
+		requested.push(url);
+		return { ok: url.endsWith('.wav'), arrayBuffer: async () => new ArrayBuffer(0) };
+	};
+
+	c.prepareCodeScanShutterSound();
+	assert.deepEqual(actions, ['resume']);
+	await c.playShutterSound();
+	assert.deepEqual(requested, ['/sounds/camera-shutter-release.mp3', '/sounds/camera-shutter-release.wav']);
+	assert.deepEqual(actions, ['resume', 'resume', destination, 'start']);
+	assert.equal(source.buffer, buffer);
+	c.document.hidden = true;
+	c.suspendCodeScanMedia();
+	assert.deepEqual(actions.slice(-3), ['stop', 'disconnect', 'suspend']);
+});
+
+test('a shutter sound loaded after pagehide cannot play when the page returns', async () => {
+	const c = scanner(), fetch = deferred();
+	let sources = 0;
+	c.window.AudioContext = function() {
+		this.resume = async () => {};
+		this.suspend = async () => {};
+		this.decodeAudioData = async () => ({});
+		this.createBufferSource = () => { sources++; };
+	};
+	c.fetch = () => fetch.promise;
+	c.prepareCodeScanShutterSound();
+	const playback = c.playShutterSound();
+	c.document.hidden = true;
+	c.suspendCodeScanMedia();
+	c.document.hidden = false;
+	fetch.resolve({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) });
+	await playback;
+	assert.equal(sources, 0);
 });

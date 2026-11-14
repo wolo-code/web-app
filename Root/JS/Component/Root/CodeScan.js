@@ -125,7 +125,6 @@ function initCodeScan() {
 	});
 	var previewCanvas = getCodeScanCanvas();
 	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
-	bindControl('code_scan_video', 'resize', function(event) { sizeCodeScanVideo(event.currentTarget); });
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput) {
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
@@ -461,6 +460,7 @@ function startCodeScanCamera() {
 			return;
 		}
 		codeScanState.stream = stream;
+		video.onresize = function() { sizeCodeScanVideo(video); };
 		video.srcObject = stream;
 		return video.play();
 	}).then(function() {
@@ -497,9 +497,16 @@ function stopCodeScanCamera() {
 		codeScanState.stream = null;
 	}
 	if(video) {
+		var hadStream = !!video.srcObject;
 		video.classList.remove('code_scan_video_ready');
+		video.onresize = null;
 		video.pause();
 		video.srcObject = null;
+		if(hadStream) {
+			// Reusing the video element can retain the previous camera's rendering geometry on iOS.
+			video.style.removeProperty('--code-scan-video-ratio');
+			video.replaceWith(video.cloneNode(false));
+		}
 	}
 }
 
@@ -1417,7 +1424,7 @@ function showCodeScanReview(match, manualEntry) {
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
 	drawCodeScanMatchRegions(match, getCodeScanCanvas(), match ? [] : codeScanState.regionBoxes);
-	setCodeScanStatus(manualEntry || !match ? '' : 'verify the wolo code below');
+	setCodeScanStatus(manualEntry || !match ? '' : 'Please verify the code below');
 }
 
 function setCodeScanDetailsExpanded(expanded) {

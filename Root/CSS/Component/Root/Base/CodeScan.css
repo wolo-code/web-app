@@ -141,6 +141,19 @@ html.dark-mode .code_scan_viewport {
 	width: fit-content;
 }
 
+.code_scan_viewport_frozen:not(.hide) + .code_scan_messages :is(.code_scan_status, .code_scan_review_validity) {
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	background: rgb(248 252 255 / 84%);
+	box-shadow: inset 0 0 0 1px rgb(255 255 255 / 35%), 0 1px 4px rgb(0 0 0 / 18%);
+	color: #1f4e5f;
+}
+
+html.dark-mode .code_scan_viewport_frozen:not(.hide) + .code_scan_messages :is(.code_scan_status, .code_scan_review_validity) {
+	background: rgb(34 34 68 / 84%);
+	color: #e4f5fa;
+}
+
 .code_scan_viewport.code_scan_viewport_frozen #code_scan_video {
 	display: none;
 }
@@ -483,7 +496,7 @@ html.dark-mode .code_scan_apply_crop:hover:not(:disabled) {
 	flex: 0 0 auto;
 	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 	justify-items: center;
-	padding: 8px 14px 14px;
+	padding: 8px 24px 14px;
 }
 
 .code_scan_review_actions > #code_scan_save {

@@ -302,7 +302,11 @@ test('Flashlight tracks the current camera and resets when it stops', async () =
 		stop() { this.readyState = 'ended'; }
 	};
 	c.document.getElementById = id => id === 'code_scan_flashlight' ? button : null;
-	c.getCodeScanVideo = () => ({ classList: { add() {}, remove() {} }, play: async () => {}, pause() {} });
+	const video = {
+		classList: { add() {}, remove() {} }, style: { removeProperty() {} },
+		play: async () => {}, pause() {}, cloneNode() {}, replaceWith() {}
+	};
+	c.getCodeScanVideo = () => video;
 	c.prepareCodeScanWorker = async () => worker();
 	c.runCodeScanFrame = () => {};
 	c.navigator = { mediaDevices: { getUserMedia: async () => ({ getVideoTracks: () => [track], getTracks: () => [track] }) } };
@@ -367,7 +371,18 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	const c = scanner(), pending = deferred();
 	let requests = 0, stopped = 0, paused = 0, frames = 0;
 	const stream = () => ({ getTracks: () => [{ stop: () => stopped++ }] });
-	const video = { classList: { add() {}, remove() {} }, play: async () => {}, pause: () => paused++ };
+	const preview = () => {
+		const style = new Map();
+		const classes = new Set();
+		return {
+			classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name) },
+			style: { setProperty: (key, value) => style.set(key, value), removeProperty: key => style.delete(key) },
+			play: async () => {}, pause: () => paused++, cloneNode: preview, replaceWith: fresh => { video = fresh; },
+			readRatio: () => style.get('--code-scan-video-ratio')
+		};
+	};
+	let video = preview();
+	const firstVideo = video;
 	c.getCodeScanVideo = () => video;
 	c.isCodeScanVisible = () => true;
 	c.prepareCodeScanWorker = async () => worker();
@@ -390,16 +405,33 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	assert.equal(requests, 2);
 	assert.equal(frames, 1);
 	assert.ok(video.srcObject);
+	video.videoWidth = 720;
+	video.videoHeight = 1280;
+	video.onresize();
+	assert.equal(video.readRatio(), '0.5625');
 	c.document.hidden = true;
 	c.suspendCodeScanMedia();
 	assert.equal(stopped, 2);
 	assert.equal(paused, 2);
-	assert.equal(video.srcObject, null);
+	assert.equal(firstVideo.srcObject, null);
+	assert.equal(firstVideo.onresize, null);
+	assert.equal(firstVideo.readRatio(), undefined);
+	assert.notEqual(video, firstVideo);
+	assert.equal(video.readRatio(), undefined);
+	c.document.hidden = false;
+	c.resumeCodeScanCamera();
+	await flush();
+	assert.equal(requests, 3);
+	assert.equal(frames, 2);
+	assert.ok(video.srcObject);
+	assert.ok(video.classList.contains('code_scan_video_ready'));
+	c.document.hidden = true;
+	c.suspendCodeScanMedia();
 	c.codeScanState.phase = 'review';
 	c.codeScanState.hasCaptured = true;
 	c.document.hidden = false;
 	c.resumeCodeScanCamera();
-	assert.equal(requests, 2);
+	assert.equal(requests, 3);
 });
 
 test('oversized images and synchronous canvas failures reject instead of hanging', async () => {

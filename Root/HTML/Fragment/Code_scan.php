@@ -1,13 +1,13 @@
 <div id='code_scan_message' class="message_dialog hide code_scan_dialog">
-	<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan hide' type='button' aria-label='Rescan' title='Rescan'>
+	<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan control hide' type='button' aria-label='Rescan' title='Rescan'>
 		<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
 	</button>
 	<h2 id='code_scan_heading' class='message_dialog_label'>
 		Scan Wolo Code
 	</h2>
-	<div id='code_scan_close' class="message_dialog_close control">
+	<button id='code_scan_close' class='message_dialog_close control' type='button' aria-label='Close scanner' title='Close scanner'>
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
-	</div>
+	</button>
 	<div class='message_dialog_body code_scan_body'>
 		<div class='code_scan_preview'>
 			<div class='code_scan_viewport'>
@@ -91,18 +91,18 @@
 					</label>
 				</div>
 			</div>
-			<div class='code_scan_review_actions'>
-				<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_heading_details code_scan_details'>
-					<span class='image'><?php includeSVG('', 'Address'); ?></span>
-				</button>
-				<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
-					<span class='image'><?php includeSVG('', 'Save'); ?></span>
-				</button>
-			</div>
 		</div>
 	</div>
-	<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop hide' type='button' aria-label='Go' title='Use address' disabled>
-		<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
-	</button>
+	<div id='code_scan_review_actions' class='code_scan_review_actions hide' role='group' aria-label='Review controls'>
+		<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_heading_details code_scan_details'>
+			<span class='image'><?php includeSVG('', 'Address'); ?></span>
+		</button>
+		<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
+			<span class='image'><?php includeSVG('', 'Save'); ?></span>
+		</button>
+		<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
+			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+		</button>
+	</div>
 	<dialog id='code_scan_city_choices' class='code_scan_city_choices hide' aria-label='Choose city'></dialog>
 </div>

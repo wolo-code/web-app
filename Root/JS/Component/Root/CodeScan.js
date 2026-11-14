@@ -416,6 +416,7 @@ function startCodeScanCamera() {
 		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
+		video.classList.add('code_scan_video_ready');
 		logCodeScanStep('Camera ready', startedAt);
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
@@ -442,6 +443,7 @@ function stopCodeScanCamera() {
 		codeScanState.stream = null;
 	}
 	if(video) {
+		video.classList.remove('code_scan_video_ready');
 		video.pause();
 		video.srcObject = null;
 	}
@@ -1951,9 +1953,10 @@ function setCodeScanLiveControlsVisible(visible) {
 }
 
 function setCodeScanReviewVisible(visible) {
-	var node = document.getElementById('code_scan_review');
-	if(node)
-		node.classList.toggle('hide', !visible);
+	['code_scan_review', 'code_scan_review_actions'].forEach(function(id) {
+		var node = document.getElementById(id);
+		if(node) node.classList.toggle('hide', !visible);
+	});
 	var heading = document.getElementById('code_scan_heading');
 	if(heading) heading.textContent = visible ? 'Edit label' : 'Scan Wolo Code';
 }
@@ -1961,24 +1964,15 @@ function setCodeScanReviewVisible(visible) {
 function setCodeScanManualEntry(manualEntry) {
 	var dialog = document.getElementById('code_scan_message');
 	if(dialog) dialog.classList.toggle('code_scan_manual_entry', manualEntry);
-	var controls = document.getElementById('code_scan_crop_controls');
 	var rescan = document.getElementById('code_scan_rescan');
-	var go = document.getElementById('code_scan_apply_crop');
-	var anchor = document.getElementById(manualEntry ? 'code_scan_review' : 'code_scan_live_controls');
-	if(!dialog || !controls || !rescan || !go || !anchor) return;
-	if(manualEntry) {
-		anchor.after(controls);
-		controls.append(rescan, go);
-	}
-	else {
-		anchor.before(controls);
-		dialog.prepend(rescan);
-		dialog.append(go);
-	}
+	var actions = document.getElementById('code_scan_review_actions');
+	var parent = manualEntry ? actions : dialog;
+	if(parent && rescan && rescan.parentNode !== parent)
+		parent.prepend(rescan);
 }
 
 function setCodeScanCropControlsVisible(visible) {
-	['code_scan_crop_controls', 'code_scan_rescan', 'code_scan_apply_crop'].forEach(function(id) {
+	['code_scan_crop_controls', 'code_scan_rescan'].forEach(function(id) {
 		var node = document.getElementById(id);
 		if(node) node.classList.toggle('hide', !visible);
 	});

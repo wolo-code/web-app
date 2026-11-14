@@ -15,9 +15,28 @@
 	margin: 12px 0 2px;
 }
 
+.code_scan_dialog > :is(.message_dialog_close, .code_scan_crop_rescan) {
+	background: transparent;
+	border: 0;
+	border-radius: 50%;
+	height: 44px;
+	padding: 0;
+	position: absolute;
+	top: 0;
+	width: 44px;
+}
+
 .code_scan_dialog .message_dialog_close {
-	right: 14px;
-	top: 10px;
+	right: 4px;
+}
+
+.code_scan_dialog > .code_scan_crop_rescan {
+	left: 4px;
+}
+
+.code_scan_dialog > .code_scan_crop_rescan:hover {
+	background: transparent;
+	transform: none;
 }
 
 .code_scan_body {
@@ -37,7 +56,7 @@
 
 .code_scan_viewport {
 	align-items: center;
-	background: repeating-conic-gradient(#d8dde1 0% 25%, #aeb7bf 0% 50%) 0 0 / 16px 16px;
+	background: #aeb7bf repeating-conic-gradient(#d8dde1 0% 25%, #aeb7bf 0% 50%) 0 0 / 16px 16px;
 	border-radius: 10px;
 	display: flex;
 	height: clamp(140px, 28vh, 220px);
@@ -114,7 +133,6 @@
 }
 
 .code_scan_viewport.code_scan_viewport_frozen #code_scan_canvas {
-	border-radius: 10px;
 	cursor: grab;
 	display: block;
 	flex: 0 0 auto;
@@ -134,13 +152,17 @@
 }
 
 #code_scan_video {
-	border-radius: 10px;
 	display: block;
 	height: 100%;
 	object-fit: cover;
 	transform-origin: center center;
 	transition: transform 120ms ease-out;
+	visibility: hidden;
 	width: 100%;
+}
+
+#code_scan_video.code_scan_video_ready {
+	visibility: visible;
 }
 
 #code_scan_canvas.hide {
@@ -437,9 +459,19 @@
 }
 
 .code_scan_review_actions {
+	align-items: center;
 	display: flex;
-	gap: 6px;
-	justify-content: center;
+	flex: 0 0 auto;
+	gap: 12px;
+	padding: 8px 14px 14px;
+}
+
+.code_scan_review_actions > button {
+	flex: 0 0 auto;
+}
+
+.code_scan_review_actions > .code_scan_apply_crop {
+	margin-inline-start: auto;
 }
 
 .code_scan_footer_actions {
@@ -585,9 +617,8 @@ html.dark-mode .code_scan_apply_crop {
 		padding: 0 16px;
 	}
 
-	.code_scan_dialog .message_dialog_close {
-		right: 14px;
-		top: calc(10px + env(safe-area-inset-top));
+	.code_scan_dialog > :is(.message_dialog_close, .code_scan_crop_rescan) {
+		top: env(safe-area-inset-top);
 	}
 
 	.code_scan_body {
@@ -628,10 +659,6 @@ html.dark-mode .code_scan_apply_crop {
 	.code_scan_review {
 		flex: 0 0 auto;
 		margin: 0 0 4px;
-	}
-
-	.code_scan_review_actions {
-		flex-direction: row-reverse;
 	}
 
 }
@@ -705,21 +732,10 @@ html.dark-mode .code_scan_apply_crop {
 
 .code_scan_dialog .message_dialog_label { margin-bottom: 10px; }
 
-.code_scan_dialog > .code_scan_crop_rescan {
-	left: 14px;
-	position: absolute;
-	top: calc(4px + env(safe-area-inset-top));
-}
-
 .code_scan_crop_rescan:not(.hide) + .message_dialog_label {
 	align-content: center;
 	min-height: 36px;
 	padding-inline: 62px;
-}
-
-.code_scan_dialog > .code_scan_apply_crop {
-	align-self: flex-end;
-	margin: 0 14px 14px;
 }
 
 .code_scan_status:empty { display: none; }
@@ -731,11 +747,7 @@ html.dark-mode .code_scan_apply_crop {
 
 .code_scan_manual_entry .code_scan_body { height: auto; }
 .code_scan_manual_entry .code_scan_preview:not(:has(.code_scan_messages > :not(:empty))),
-.code_scan_manual_entry .code_scan_zoom_group { display: none; }
-.code_scan_manual_entry .code_scan_crop_controls {
-	justify-content: space-around;
-	min-height: 64px;
-}
+.code_scan_manual_entry .code_scan_crop_controls { display: none; }
 
 @media (max-width: 662px) {
 	.code_scan_dialog.code_scan_manual_entry {
@@ -775,10 +787,6 @@ html.dark-mode #code_scan_city_select:active {
 .code_scan_review_field,
 html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 .code_scan_review_input { font-size: 1.4rem; }
-.code_scan_review_actions { justify-content: space-around; gap: 24px; margin-top: 14px; }
-.code_scan_review_actions > button { flex: 0 1 130px; }
-.code_scan_review_actions { align-items: center; gap: 12px; }
-.code_scan_review_actions > .code_scan_icon_button { flex: 0 0 44px; }
 .code_scan_details { margin-top: 16px; }
 .code_scan_details[hidden] { display: none; }
 .code_scan_details .code_scan_review_field { margin-bottom: 12px; }
@@ -802,7 +810,11 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 }
 .code_scan_details textarea { resize: vertical; line-height: 1.5; white-space: pre-wrap; }
 .code_scan_address_parts { display: grid; gap: 1em; margin-top: 20px; }
-.code_scan_review_actions > .code_scan_icon_button:focus-visible { outline: 2px solid #69B7CF; outline-offset: 3px; }
+.code_scan_review_actions > button:focus-visible,
+.code_scan_dialog > :is(.message_dialog_close, .code_scan_crop_rescan):focus-visible {
+	outline: 2px solid #69B7CF;
+	outline-offset: -2px;
+}
 .code_scan_city_choices {
  position: fixed; inset: 0; margin: auto; box-sizing: border-box;
  display: flex; flex-direction: column; gap: 0; padding: 8px 0;

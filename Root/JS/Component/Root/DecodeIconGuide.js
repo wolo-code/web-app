@@ -16,6 +16,7 @@ var mapIconGuideConsumed = false;
 var decodeIconGuideForced = false;
 var decodeIconGuideTimer = null;
 var decodeIconGuideFadeTimer = null;
+var finishDecodeIconGuideFade = null;
 var decodeIconGuideReadyTimer = null;
 var decodeIconGuideReady = false;
 var decodeIconGuideLaunchRecorded = false;
@@ -651,6 +652,7 @@ function layoutDecodeIconGuide() {
 }
 
 function clearDecodeIconGuideTimers() {
+	finishDecodeIconGuideFade = null;
 	if(decodeIconGuideTimer != null) {
 		clearTimeout(decodeIconGuideTimer);
 		decodeIconGuideTimer = null;
@@ -742,7 +744,7 @@ function hideDecodeIconGuide(fromFade) {
 }
 
 function fadeDecodeIconGuide() {
-	if(!decodeIconGuideVisible)
+	if(!decodeIconGuideVisible || finishDecodeIconGuideFade)
 		return;
 	decodeIconGuideReplayHint = shouldHintMapIconGuideReplay();
 	markDecodeIconGuideConsumed();
@@ -751,10 +753,20 @@ function fadeDecodeIconGuide() {
 	unbindDecodeIconGuideDismiss();
 	unwatchMapCameraCaption();
 	document.body.classList.add('decode-icon-guide-fade');
-	decodeIconGuideFadeTimer = setTimeout(function() {
-		decodeIconGuideFadeTimer = null;
-		hideDecodeIconGuide(true);
-	}, DECODE_ICON_GUIDE_FADE_MS);
+	var scrim = document.getElementById('decode_icon_guide_scrim');
+	function finish() {
+		if(finishDecodeIconGuideFade === finish)
+			hideDecodeIconGuide(true);
+	}
+	finishDecodeIconGuideFade = finish;
+	if(scrim && scrim.getAnimations) {
+		var fade = scrim.getAnimations().find(function(animation) {
+			return animation.transitionProperty === 'opacity';
+		});
+		if(fade) fade.finished.then(finish, finish);
+		else finish();
+	}
+	else decodeIconGuideFadeTimer = setTimeout(finish, DECODE_ICON_GUIDE_FADE_MS);
 }
 
 function beginDecodeIconGuideTimers() {
@@ -827,7 +839,7 @@ function syncDecodeIconGuide() {
 	else if(!directWoloLinkEntry)
 		recordMapIconGuideVisit();
 	autoShow = !directWoloLinkEntry && (decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide());
-	allow = (decodeIconGuideForced || autoShow) && !shouldHoldDecodeIconGuide();
+	allow = (decodeIconGuideForced || autoShow || finishDecodeIconGuideFade) && !shouldHoldDecodeIconGuide();
 	if(allow && !isDecodeIconGuideConsumed() && !decodeIconGuideVisible)
 		startDecodeIconGuide();
 	else if(!allow && decodeIconGuideVisible)

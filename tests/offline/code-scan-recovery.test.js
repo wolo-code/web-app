@@ -196,12 +196,14 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		let starts = 0, frames = 0;
 		c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
 		c.navigator = { mediaDevices: { getUserMedia: () => camera.promise } };
-		c.getCodeScanVideo = () => ({ play: async () => {} });
+		const video = { classList: new Set(), play: async () => {} };
+		c.getCodeScanVideo = () => video;
 		c.runCodeScanFrame = () => frames++;
 		c.startCodeScanCamera();
 		await flush();
 		assert.equal(starts, 1);
 		assert.equal(frames, 0);
+		assert.equal(video.classList.has('code_scan_video_ready'), false);
 		if(cameraFirst) camera.resolve({}); else creation.resolve(w);
 		await flush();
 		assert.equal(frames, 0);
@@ -209,6 +211,7 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		await flush();
 		assert.equal(starts, 1);
 		assert.equal(frames, 1);
+		assert.equal(video.classList.has('code_scan_video_ready'), true);
 	}
 });
 
@@ -285,7 +288,7 @@ test('camera requests from an earlier session stop their tracks without attachin
 test('Typing keeps the scanner open for manual entry while cancelling a pending camera request', async () => {
 	const c = scanner(), request = deferred();
 	let stopped = 0, focused = false;
-	const video = { pause() {}, play: () => assert.fail('camera attached during manual entry') };
+	const video = { classList: { remove() {} }, pause() {}, play: () => assert.fail('camera attached during manual entry') };
 	c.getCodeScanVideo = () => video;
 	c.document.getElementById = id => id === 'code_scan_review_w1' ? { focus: () => focused = true } : null;
 	c.navigator = { mediaDevices: { getUserMedia: () => request.promise } };
@@ -319,7 +322,7 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	const c = scanner(), pending = deferred();
 	let requests = 0, stopped = 0, paused = 0, frames = 0;
 	const stream = () => ({ getTracks: () => [{ stop: () => stopped++ }] });
-	const video = { play: async () => {}, pause: () => paused++ };
+	const video = { classList: { add() {}, remove() {} }, play: async () => {}, pause: () => paused++ };
 	c.getCodeScanVideo = () => video;
 	c.isCodeScanVisible = () => true;
 	c.prepareCodeScanWorker = async () => worker();

@@ -297,6 +297,39 @@ test('holding Info requests the guide and consumes the release click', () => {
 	assert.equal(showInfoCalls, 1);
 });
 
+test('a manual Input Icon Guide stays visible through its fade during a view sync', async () => {
+	const classes = new Set(['decode', 'decode-icon-guide']);
+	let finishFade;
+	const finished = new Promise(resolve => { finishFade = resolve; });
+	const scrim = {
+		getAnimations: () => [{ transitionProperty: 'opacity', finished }],
+		removeEventListener() {}
+	};
+	const context = {
+		directWoloLinkEntry: true,
+		document: {
+			body: { classList: {
+				contains: name => classes.has(name),
+				add: name => classes.add(name),
+				remove: (...names) => names.forEach(name => classes.delete(name))
+			} },
+			getElementById: id => id === 'decode_icon_guide_scrim' ? scrim : null,
+			removeEventListener() {}
+		}
+	};
+	vm.runInNewContext(read('Root/JS/Component/Root/DecodeIconGuide.js'), context);
+	context.decodeIconGuideVisible = context.decodeIconGuideShownOnDecode = context.decodeIconGuideForced = true;
+	context.layoutDecodeIconGuide = context.layoutMapCameraCaption = () => {};
+	context.fadeDecodeIconGuide();
+	context.syncDecodeIconGuide();
+	assert.ok(classes.has('decode-icon-guide-fade'));
+	assert.ok(classes.has('decode-icon-guide'));
+	finishFade();
+	await finished;
+	assert.equal(classes.has('decode-icon-guide'), false);
+	assert.equal(classes.has('decode-icon-guide-fade'), false);
+});
+
 test('map source constants are declared before pref helpers and layer setters', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const constantsPos = mapLayers.indexOf('var MAP_SOURCE_IDS');

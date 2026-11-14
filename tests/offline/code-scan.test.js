@@ -96,7 +96,11 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(css, /\.code_scan_apply_crop/);
 	assert.match(css, /\.code_scan_crop_rescan/);
 	assert.match(css, /\.code_scan_review_input[\s\S]*border-bottom:\s*1px/);
-	assert.match(css, /@media\s*\(max-width:\s*662px\)[\s\S]*\.code_scan_review_actions[\s\S]*flex-direction:\s*row-reverse/);
+	const reviewControls = fragment.match(/id='code_scan_review_actions'[^>]*>([\s\S]*?)<\/div>/)?.[1];
+	assert.match(reviewControls, /id='code_scan_details_toggle'/);
+	assert.match(reviewControls, /id='code_scan_save'/);
+	assert.match(reviewControls, /id='code_scan_apply_crop'/);
+	assert.match(css, /\.code_scan_review_actions\s*\{[^}]*flex:\s*0 0 auto/);
 });
 
 test('OCR matcher module is self-contained and testable', () => {

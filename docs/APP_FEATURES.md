@@ -228,7 +228,9 @@ The detected text rectangle adds 10% centered padding, clipped at image edges. L
 
 Gallery photos retain their native pixel dimensions in the preview and original source, including portrait images. The scanner samples bounded OCR crops directly from the original pixels.
 
-When the browser tab is hidden, the Wolo Code Scan Dialog releases its camera stream and pauses shutter audio. Returning to the dialog restarts the camera if a live scan was interrupted. Captured photos and review fields are preserved.
+The Wolo Code Scan Dialog plays its shutter as a short Web Audio cue. Hiding the page cancels the cue and releases the camera. A live scan resumes when the page becomes visible again. Captured photos and review fields are preserved.
+
+The OCR worker loads while the camera starts. Three exact, high-confidence words can open Label Edit View with a blank city when the city is unreadable. When a second read is needed, the dialog checks again sooner and starts with the previously read code box. Blank OCR rows are skipped so the first readable address paragraph fills Address line 1.
 
 Scanner recognition follows the box-first algorithm in [CODE_SCAN.md](CODE_SCAN.md): detect the actual printed rectangle or rounded rectangle, read exactly three words inside it, then read the city above those words within the same box. Optional title/segment above and address below are stored separately in match metadata when readable. City spelling is preserved; Wolo dictionary correction applies only to the three words. Blue container, gold city and green word outlines map through capture, crop, zoom and pan. No container is inferred from text.
 

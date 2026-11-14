@@ -1972,11 +1972,6 @@ function setCodeScanReviewVisible(visible) {
 function setCodeScanManualEntry(manualEntry) {
 	var dialog = document.getElementById('code_scan_message');
 	if(dialog) dialog.classList.toggle('code_scan_manual_entry', manualEntry);
-	var rescan = document.getElementById('code_scan_rescan');
-	var leading = document.getElementById('code_scan_review_leading');
-	if(!rescan || !dialog || !leading) return;
-	if(manualEntry) leading.append(rescan);
-	else if(rescan.parentNode !== dialog) dialog.prepend(rescan);
 }
 
 function setCodeScanCropControlsVisible(visible) {

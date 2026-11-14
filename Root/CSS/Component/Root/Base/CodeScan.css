@@ -55,8 +55,10 @@
 }
 
 .code_scan_viewport {
+	--code-scan-preview-base: #aeb7bf;
+	--code-scan-preview-tile: #d8dde1;
 	align-items: center;
-	background: #aeb7bf repeating-conic-gradient(#d8dde1 0% 25%, #aeb7bf 0% 50%) 0 0 / 16px 16px;
+	background-color: var(--code-scan-preview-base);
 	border-radius: 10px;
 	display: flex;
 	height: clamp(140px, 28vh, 220px);
@@ -66,6 +68,16 @@
 	max-width: 100%;
 	overflow: hidden;
 	position: relative;
+}
+
+.code_scan_viewport_frozen {
+	background-image: repeating-conic-gradient(var(--code-scan-preview-tile) 0% 25%, var(--code-scan-preview-base) 0% 50%);
+	background-size: 16px 16px;
+}
+
+html.dark-mode .code_scan_viewport {
+	--code-scan-preview-base: #19192e;
+	--code-scan-preview-tile: #292946;
 }
 
 .code_scan_preview {
@@ -335,16 +347,22 @@
 	color: #69B7CF;
 }
 
-.code_scan_apply_crop,
-html.dark-mode .code_scan_apply_crop {
+.code_scan_apply_crop {
 	background: #fff;
-	border: 1px solid #69B7CF;
 	color: #2a6f86;
 }
 
-.code_scan_apply_crop:hover:not(:disabled),
-html.dark-mode .code_scan_apply_crop:hover:not(:disabled) {
+.code_scan_apply_crop:hover:not(:disabled) {
 	background: #eaf6fa;
+}
+
+html.dark-mode .code_scan_apply_crop {
+	background: #2a2a4a;
+	color: #9fd4e8;
+}
+
+html.dark-mode .code_scan_apply_crop:hover:not(:disabled) {
+	background: #33335a;
 }
 
 .code_scan_live_controls {
@@ -468,9 +486,7 @@ html.dark-mode .code_scan_apply_crop:hover:not(:disabled) {
 	padding: 8px 14px 14px;
 }
 
-.code_scan_review_leading {
-	display: flex;
-	gap: 6px;
+.code_scan_review_actions > #code_scan_save {
 	justify-self: start;
 }
 

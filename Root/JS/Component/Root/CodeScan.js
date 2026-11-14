@@ -932,7 +932,7 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		if(!angle) return result;
 		var transform = getCodeScanRollTransform(canvas.width, canvas.height, angle);
 		var aligned = transform.image(canvas);
-		var tiltedOptions = Object.assign({}, options, { cropOnly: true });
+		var tiltedOptions = Object.assign({}, options);
 		if(live) tiltedOptions.live = {
 			isCurrent: live.isCurrent,
 			showBoxes: function(boxes) { if(boxes.length) live.showBoxes(boxes.map(transform.box)); }
@@ -940,9 +940,9 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		var alignedResult = await recognizeCodeScanImage(aligned, focus && transform.point(focus), tiltedOptions, worker, detectCodeScanContainers(aligned));
 		var data = alignedResult.data;
 		if(data.scanMatch) result.data.scanMatch = restoreCodeScanRollMatch(data.scanMatch, transform, angle);
-		if(data.debugBoxes && data.debugBoxes.length) result.data.debugBoxes = data.debugBoxes.map(transform.box);
-		if(data.labelContainers.length && (data.scanMatch || !result.data.words || !result.data.words.length))
+		if(data.labelContainers.length && (data.scanMatch || !result.data.debugBoxes || !result.data.debugBoxes.length))
 			result.data.labelContainers = data.labelContainers.map(transform.box);
+		if(data.debugBoxes && data.debugBoxes.length) result.data.debugBoxes = data.debugBoxes.map(transform.box);
 		return result;
 	});
 }
@@ -967,11 +967,8 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 			boxes.sort(function(a, b) { return overlap(b) - overlap(a); });
 		}
 		boxes = boxes.slice(0, 2);
-		var debugBoxes = boxes.slice(0, 1);
-		var card = debugBoxes.length && codeScanOcrMatch.findLabelCard(containers, debugBoxes[0]);
-		if(card && card.x1 - card.x0 > card.y1 - card.y0) debugBoxes.push(card);
-		if(live.isCurrent()) live.showBoxes(debugBoxes);
-		result.data.debugBoxes = debugBoxes;
+		result.data.debugBoxes = getCodeScanDebugBoxes(containers, boxes[0]);
+		if(live.isCurrent()) live.showBoxes(result.data.debugBoxes);
 		return recognizeCodeScanBoxes(canvas, result, worker, boxes, live);
 	}
 	boxes = boxes.filter(function(box) {
@@ -979,18 +976,21 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 		var height = box.y1 - box.y0;
 		return width > height || allowRotation && width < height;
 	}).slice(0, 4);
+	result.data.debugBoxes = getCodeScanDebugBoxes(containers, boxes[0]);
 	if(!boxes.length) return result;
 	await recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation);
 	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 	if(result.data.scanMatch) return result;
-	// A sparse page read can recover text missed by block segmentation on the crop.
-	if(!(options && options.cropOnly)) {
-		result.data.words = await ocrCodeScanBand(canvas, { x0: 0, y0: 0, x1: canvas.width, y1: canvas.height }, worker, 1600);
-		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-		result.data.scanMatch = extractMatchFromOcrResult(result);
-		if(result.data.scanMatch) return result;
-	}
+	// Sparse OCR can use the surrounding card while matching the code inside its box.
+	await recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation, '11', true);
+	if(result.data.scanMatch) return result;
 	return recognizeCodeScanBoxes(canvas, result, worker, boxes.slice(0, 2), null, allowRotation, '11');
+}
+
+function getCodeScanDebugBoxes(containers, box) {
+	if(!box) return [];
+	var card = codeScanOcrMatch.findLabelCard(containers, box, box.y1 - box.y0 > box.x1 - box.x0);
+	return card ? [box, card] : [box];
 }
 
 function rotateCodeScanCanvas(source, rotation) {
@@ -1013,31 +1013,33 @@ function rotateCodeScanMatch(match, canvas, rotation) {
 	return Object.assign({}, match, { regions: regions });
 }
 
-function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotation, segmentation) {
+function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotation, segmentation, useCardCrop) {
 	var data = result.data;
 	if(!boxes.length || (live && !live.isCurrent())) return result;
+	var candidates = boxes.map(function(box) {
+		var sideways = allowRotation && box.y1 - box.y0 > box.x1 - box.x0;
+		return { box: box, sideways: sideways, card: codeScanOcrMatch.findLabelCard(data.labelContainers, box, sideways) };
+	});
+	if(useCardCrop) candidates = candidates.filter(function(candidate) { return candidate.card; });
+	if(!candidates.length) return result;
 	var epoch = codeScanState.workerEpoch;
 	return worker.setParameters({ tessedit_pageseg_mode: segmentation || '6' }).then(async function() {
 		// Only a fresh shutter photo may try the opposite orientation.
 		for(var reverse of (allowRotation ? [false, true] : [false])) {
-			for(var sourceBox of boxes) {
+			for(var candidate of candidates) {
 				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 				if(live && !live.isCurrent()) return;
-				var sideways = allowRotation && sourceBox.y1 - sourceBox.y0 > sourceBox.x1 - sourceBox.x0;
+				var sideways = candidate.sideways;
 				var rotation = (sideways ? 90 : 0) + (reverse ? 180 : 0);
 				var orientation = { width: sideways ? canvas.height : canvas.width, height: sideways ? canvas.width : canvas.height };
-				var box = codeScanOcrMatch.rotateLabelBox(sourceBox, canvas.width, canvas.height, rotation);
+				var box = codeScanOcrMatch.rotateLabelBox(candidate.box, canvas.width, canvas.height, rotation);
+				var card = codeScanOcrMatch.rotateLabelBox(candidate.card, canvas.width, canvas.height, rotation);
 				var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
-				var words = await ocrCodeScanBand(canvas, {
+				var crop = useCardCrop ? card : {
 					x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
-				}, worker, live ? 240 : 480, rotation);
-				var card = codeScanOcrMatch.findLabelCard(data.labelContainers, sourceBox, sideways);
-				card = codeScanOcrMatch.rotateLabelBox(card, canvas.width, canvas.height, rotation);
-				if(!rotation && card) {
-					words = words.concat((data.words || []).filter(function(word) {
-						return word.bbox && (word.bbox.y1 <= box.y0 || word.bbox.y0 >= box.y1);
-					}));
-				}
+				};
+				var words = await ocrCodeScanBand(canvas, crop, worker, useCardCrop ? 1600 : live ? 240 : 480, rotation);
+				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 				var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
 				if(!match || match.regions.container !== box) continue;
 				if(rotation) {
@@ -1384,8 +1386,7 @@ function processCodeScanCapture() {
 		codeScanState.processing = false;
 		var match = extractMatchFromOcrResult(result);
 		if(codeScanState.showRegions && !match && !codeScanState.regionBoxes.length) {
-			var boxes = result.data && result.data.labelContainers || [];
-			codeScanState.regionBoxes = codeScanOcrMatch.getLabelCodeBoxes(boxes).slice(0, 1);
+			codeScanState.regionBoxes = result.data && result.data.debugBoxes || [];
 		}
 		showCodeScanReview(match);
 		if(match) fillCodeScanReviewDetails(match);
@@ -1805,6 +1806,7 @@ function handleCodeScanPhotoInput(event) {
 		if(!isCurrentCodeScanSession(session)) return;
 		codeScanState.processing = false;
 		var match = extractMatchFromOcrResult(result);
+		codeScanState.regionBoxes = result.data && result.data.debugBoxes || [];
 		showCodeScanReview(match);
 		if(match) fillCodeScanReviewDetails(match);
 		else setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
@@ -1934,15 +1936,18 @@ function drawCodeScanMatchRegions(match, canvas, boxes) {
 	clearCodeScanCandidateHighlight();
 	if(!codeScanState.showRegions || !canvas) return;
 	var detected = document.getElementById('code_scan_detected_boxes');
-	if(detected && !match) codeScanState.regionBoxes.forEach(function(box) {
-		var outline = document.createElement('div');
-		outline.className = 'code_scan_candidate_highlight code_scan_detected_box';
-		setCodeScanCandidateHighlight(box, canvas, null, false, outline);
-		detected.appendChild(outline);
-	});
-	if(!match || !match.regions) return;
-	var card = match.regions.card;
-	if(card && card.x1 - card.x0 > card.y1 - card.y0) setCodeScanCandidateHighlight(card, canvas, 'code_scan_card_highlight', false);
+	var card = match && match.regions ? match.regions.card : codeScanState.regionBoxes[1];
+	if(card) setCodeScanCandidateHighlight(card, canvas, 'code_scan_card_highlight', false);
+	if(!match || !match.regions) {
+		var box = codeScanState.regionBoxes[0];
+		if(detected && box) {
+			var outline = document.createElement('div');
+			outline.className = 'code_scan_candidate_highlight code_scan_detected_box';
+			setCodeScanCandidateHighlight(box, canvas, null, false, outline);
+			detected.appendChild(outline);
+		}
+		return;
+	}
 	setCodeScanCandidateHighlight(match.regions.container, canvas, 'code_scan_container_highlight', false);
 	setCodeScanCandidateHighlight(match.regions.code, canvas);
 	if(match.regions.city) setCodeScanCandidateHighlight(match.regions.city, canvas, 'code_scan_city_highlight');
@@ -2402,6 +2407,7 @@ function applyCodeScanCrop() {
 		}
 		else {
 			setCodeScanPhase('review');
+			drawCodeScanMatchRegions(null, canvas, result.data && result.data.debugBoxes || []);
 			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 		}
 	}).catch(function() {

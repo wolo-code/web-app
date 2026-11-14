@@ -355,20 +355,20 @@ test('a small-roll retry reads the straightened box and restores source coordina
 	const c = scanner();
 	const source = { width: 600, height: 400 };
 	const straightenedBox = { x0: 110, y0: 140, x1: 500, y1: 300, anchored: true };
-	const straightenedMatch = { code: 'bengaluru mail nebula flower', regions: { container: straightenedBox, city: null } };
+	const card = { x0: 90, y0: 110, x1: 520, y1: 330 };
+	const straightenedMatch = { code: 'bengaluru mail nebula flower', regions: { container: straightenedBox, card, city: null } };
 	const reported = [];
 	const painted = [];
 	const context = { fillRect() {}, translate() {}, rotate: angle => painted.push(angle), drawImage: image => painted.push(image) };
 	c.document.createElement = () => ({ getContext: () => context });
 	c.getCodeScanLabelRoll = () => 6;
-	c.detectCodeScanContainers = canvas => canvas === source ? [] : [straightenedBox];
+	c.detectCodeScanContainers = canvas => canvas === source ? [] : [straightenedBox, card];
 	c.recognizeCodeScanImage = async (canvas, focus, options, _worker, containers) => {
 		if(canvas === source) return { data: { labelContainers: containers, debugBoxes: [] } };
 		assert.equal(canvas.width, 639);
 		assert.equal(canvas.height, 461);
 		assert.equal(focus.x, canvas.width / 2);
 		assert.equal(focus.y, canvas.height / 2);
-		assert.equal(options.cropOnly, true);
 		options.live.showBoxes(containers);
 		return { data: { scanMatch: straightenedMatch, labelContainers: containers, debugBoxes: containers } };
 	};
@@ -377,6 +377,7 @@ test('a small-roll retry reads the straightened box and restores source coordina
 	const { data } = await c.recognizeCodeScanCanvas(source, { x: 300, y: 200 }, { live });
 	assert.equal(data.scanMatch.code, straightenedMatch.code);
 	assert.deepEqual(data.scanMatch.regions.container, data.debugBoxes[0]);
+	assert.deepEqual(data.scanMatch.regions.card, data.debugBoxes[1]);
 	assert.deepEqual(data.labelContainers, data.debugBoxes);
 	assert.deepEqual(reported, [data.debugBoxes]);
 	assert.ok(data.scanMatch.regions.container.x0 < 110 && data.scanMatch.regions.container.x1 > 480);

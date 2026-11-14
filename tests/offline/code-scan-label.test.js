@@ -45,6 +45,15 @@ test('blank images and borders with an entire side missing are rejected', () => 
 	assert.deepEqual(matcher.detectLabelRectangles(raster(400, 300, [{ x0: 40, y0: 35, x1: 300, y1: 160, missing: 'right' }]), 400, 300), []);
 });
 
+test('straight and rounded outer borders are paired with the inner code box from pixels', () => {
+	for(const radius of [0, 16]) {
+		const detected = matcher.detectLabelRectangles(raster(500, 500, [{ ...card, radius }, { ...box, radius: 12 }]), 500, 500);
+		const inner = matcher.getLabelCodeBoxes(detected).find(candidate => matcher.bboxIoU(candidate, box) > 0.9);
+		assert.ok(inner);
+		assert.ok(matcher.bboxIoU(matcher.findLabelCard(detected, inner), card) > 0.9);
+	}
+});
+
 function cornerFrame(width, height, rect, leg, thickness, missing = -1) {
 	const pixels = raster(width, height);
 	let index = 0;

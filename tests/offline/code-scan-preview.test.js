@@ -111,28 +111,40 @@ test('still recognition reads a bounded code crop before any sparse full-photo O
  assert.equal(result.data.scanMatch.regions.container, containers[0]);
 });
 
-test('still recognition retries a missed code crop with sparse text segmentation', async () => {
+test('still recognition retries a missed code crop within its enclosing card', async () => {
  const { context, canvas } = scanner();
  const box = { x0: 90, y0: 225, x1: 370, y1: 330, anchored: true };
+ const card = { x0: 60, y0: 60, x1: 400, y1: 465 };
  const vocabulary = ['mail', 'nebula', 'flower'];
  const calls = [];
  let mode;
- context.detectCodeScanContainers = () => [box];
+ context.detectCodeScanContainers = () => [box, card];
  context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
  context.extractMatchFromOcrResult = context.extractSpatialMatch;
  context.codeScanState.worker = { setParameters: async params => { mode = params.tessedit_pageseg_mode; } };
  context.ocrCodeScanBand = async (input, crop, _worker, maxHeight) => {
-  const isPage = crop.x0 === 0;
+  const isCard = crop === card;
   assert.equal(input, canvas);
-  assert.equal(maxHeight, isPage ? 1600 : 480);
-  calls.push([mode, isPage]);
-  if(mode !== '11' || isPage) return [];
-  return vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 120 + i * 50, y0: 270, x1: 165 + i * 50, y1: 300 } }));
+  assert.equal(maxHeight, isCard ? 1600 : 480);
+  calls.push([mode, isCard]);
+  if(!isCard) return [];
+  return [
+   { text: 'Main door', confidence: 95, bbox: { x0: 80, y0: 190, x1: 150, y1: 215 } },
+   ...vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 120 + i * 50, y0: 270, x1: 165 + i * 50, y1: 300 } }))
+  ];
  };
  const result = await context.recognizeCodeScanCanvas(canvas);
- assert.deepEqual(calls, [['6', false], ['11', true], ['11', false]]);
+ assert.deepEqual(calls, [['6', false], ['11', true]]);
  assert.equal(result.data.scanMatch.code, 'mail nebula flower');
  assert.equal(result.data.scanMatch.regions.container, box);
+ assert.equal(result.data.scanMatch.regions.card, card);
+ assert.equal(result.data.scanMatch.metadata.title, 'Main door');
+
+ calls.length = 0;
+ context.detectCodeScanContainers = () => [box];
+ const noCard = await context.recognizeCodeScanCanvas(canvas);
+ assert.deepEqual(calls, [['6', false], ['11', false]]);
+ assert.equal(noCard.data.scanMatch, undefined);
 });
 
 test('live recognition detects across the full viewport and skips OCR without a frame', async () => {
@@ -156,6 +168,7 @@ test('live debug skips portrait and square candidates and reads landscape frames
  const portrait = { x0: 100, y0: 200, x1: 250, y1: 470, anchored: true };
  const square = { x0: 5, y0: 210, x1: 90, y1: 295 };
  const landscape = { x0: 120, y0: 40, x1: 280, y1: 120 };
+ const card = { x0: 110, y0: 20, x1: 290, y1: 210 };
  const boxesShown = [], rotations = [];
  const options = { live: { isCurrent: () => true, showBoxes: boxes => boxesShown.push(Array.from(boxes)) } };
  context.codeScanState.worker = { setParameters: async () => {}, recognize: () => assert.fail('live OCR should read a crop') };
@@ -169,9 +182,9 @@ test('live debug skips portrait and square candidates and reads landscape frames
  await context.recognizeCodeScanCanvas(camera, null, options);
  assert.deepEqual(boxesShown, [[]]);
  assert.deepEqual(rotations, []);
- context.detectCodeScanContainers = () => [portrait, square, landscape];
+ context.detectCodeScanContainers = () => [portrait, square, landscape, card];
  await context.recognizeCodeScanCanvas(camera, null, options);
- assert.deepEqual(boxesShown, [[], [landscape]]);
+ assert.deepEqual(boxesShown, [[], [landscape, card]]);
  assert.deepEqual(rotations, [0]);
 });
 
@@ -498,16 +511,19 @@ test('detected rectangle grows ten percent around its center and stays within th
  assert.equal(highlight.style.width, '100%');
 });
 
-test('debug shows recognized code regions without outlining a portrait card', () => {
+test('Region Inspection shows a portrait card before and after recognizing the code', () => {
  const { context, canvas } = scanner();
  const card = { x0: 90, y0: 30, x1: 410, y1: 470 };
  const container = { x0: 100, y0: 100, x1: 400, y1: 240 };
  const code = { x0: 120, y0: 180, x1: 380, y1: 220 };
  const outlines = [];
  context.codeScanState.showRegions = true;
- context.setCodeScanCandidateHighlight = box => outlines.push(box);
+ context.setCodeScanCandidateHighlight = (box, _canvas, id) => outlines.push([box, id]);
+ context.drawCodeScanMatchRegions(null, canvas, [container, card]);
+ assert.deepEqual(outlines, [[card, 'code_scan_card_highlight']]);
+ outlines.length = 0;
  context.drawCodeScanMatchRegions({ regions: { card, container, code } }, canvas);
- assert.deepEqual(outlines, [container, code]);
+ assert.deepEqual(outlines, [[card, 'code_scan_card_highlight'], [container, 'code_scan_container_highlight'], [code, undefined]]);
 });
 
 test('zoom and pan debounce crop OCR and wait for an in-flight read to finish', () => {

@@ -174,7 +174,33 @@ test('live confirmation searches the previous portrait card crop and falls back 
  cardInCrop = false;
  boundsUsed.length = 0;
  await context.recognizeCodeScanCanvas(canvas, null, { live });
- assert.deepEqual(boundsUsed, [expected, undefined]);
+ assert.deepEqual(boundsUsed, [expected, null]);
+});
+
+test('a failed card-first OCR read searches outside the card without rereading its code box', async () => {
+ const { context, canvas } = scanner();
+ const card = { x0: 450, y0: 130, x1: 750, y1: 640 };
+ const inside = { x0: 460, y0: 360, x1: 740, y1: 440, anchored: true };
+ const outside = { x0: 100, y0: 300, x1: 380, y1: 400, anchored: true };
+ context.detectCodeScanContainers = (_input, _bounds, search) => {
+  search.findRemaining = () => [card, inside, outside];
+  return [card, inside];
+ };
+ const reads = [];
+ const vocabulary = ['mail', 'nebula', 'flower'];
+ context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
+ context.extractMatchFromOcrResult = context.extractSpatialMatch;
+ context.codeScanState.worker = { setParameters: async () => {} };
+ context.ocrCodeScanBand = async (_input, crop) => {
+  reads.push(crop.x0);
+  return crop.x0 > 400 ? [] : vocabulary.map((text, i) => ({
+   text, confidence: 95, bbox: { x0: 120 + i * 80, y0: 350, x1: 180 + i * 80, y1: 375 }
+  }));
+ };
+ const live = { isCurrent: () => true, showBoxes: () => {} };
+ const result = await context.recognizeCodeScanCanvas(canvas, null, { live });
+ assert.deepEqual(reads, [465, 106]);
+ assert.equal(result.data.scanMatch.regions.container, outside);
 });
 
 test('live recognition detects across the full viewport and skips OCR without a frame', async () => {
@@ -556,6 +582,10 @@ test('Region Inspection shows a portrait card before and after recognizing the c
  const outlines = [];
  context.codeScanState.showRegions = true;
  context.setCodeScanCandidateHighlight = (box, _canvas, id) => outlines.push([box, id]);
+ const cardOnly = context.getCodeScanDebugBoxes([card], null, { x: 250, y: 250 });
+ context.drawCodeScanMatchRegions(null, canvas, cardOnly);
+ assert.deepEqual(outlines, [[card, 'code_scan_card_highlight']]);
+ outlines.length = 0;
  context.drawCodeScanMatchRegions(null, canvas, [container, card]);
  assert.deepEqual(outlines, [[card, 'code_scan_card_highlight']]);
  outlines.length = 0;

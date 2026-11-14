@@ -87,6 +87,41 @@ test('four printed corner brackets form a container at different image scales an
 	assert.equal(matcher.detectLabelRectangles(square, 400, 400).some(box => box.anchored), false);
 });
 
+test('card-first search isolates a tight landscape marker frame and can find labels elsewhere', () => {
+	const width = 800, height = 560;
+	const outer = { x0: 295, y0: 80, x1: 505, y1: 490 };
+	const inner = { x0: 299, y0: 235, x1: 501, y1: 320 };
+	const other = { x0: 535, y0: 210, x1: 775, y1: 320 };
+	for(const radius of [0, 16]) {
+		const pixels = raster(width, height, [{ ...outer, radius }]);
+		for(const rect of [inner, other]) {
+			const markers = cornerFrame(width, height, rect, 21, 2).data;
+			for(let i = 0; i < markers.length; i += 4) {
+				if(markers[i] !== 255) pixels.data.set(markers.subarray(i, i + 4), i);
+			}
+		}
+		const result = matcher.detectLabelRegions(pixels, width, height, { x: 400, y: 280 });
+		const code = result.rectangles.find(candidate => candidate.anchored && matcher.bboxIoU(candidate, inner) > 0.9);
+		assert.ok(code);
+		assert.ok(matcher.bboxIoU(matcher.findLabelCard(result.rectangles, code), outer) > 0.94);
+		assert.ok(!result.rectangles.some(candidate => matcher.bboxIoU(candidate, other) > 0.9));
+		assert.ok(result.searchFullImage().some(candidate => candidate.anchored && matcher.bboxIoU(candidate, other) > 0.9));
+	}
+});
+
+test('a soft, low-contrast portrait card edge is detectable on its own', () => {
+	const width = 400, height = 500;
+	const outer = { x0: 70, y0: 50, x1: 330, y1: 450 };
+	const data = new Uint8ClampedArray(width * height * 4);
+	for(let y = 0; y < height; y++) for(let x = 0; x < width; x++) {
+		const inset = Math.min(x - outer.x0, outer.x1 - 1 - x, y - outer.y0, outer.y1 - 1 - y);
+		const shade = inset < 0 ? 210 : inset === 0 ? 225 : 240;
+		data.set([shade, shade, shade, 255], (y * width + x) * 4);
+	}
+	const { rectangles } = matcher.detectLabelRegions({ data }, width, height, { x: 200, y: 250 });
+	assert.ok(matcher.bboxIoU(matcher.findPortraitCard(rectangles, { x: 200, y: 250 }), outer) > 0.97);
+});
+
 test('estimates mild camera roll from the four printed corners in both directions', () => {
 	const width = 480, height = 360;
 	const rect = { x0: 85, y0: 110, x1: 395, y1: 250 };

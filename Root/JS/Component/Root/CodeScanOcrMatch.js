@@ -235,8 +235,8 @@
 
 	// Locate four printed sides before interpreting text. Central side samples
 	// tolerate rounded corners; no text-derived or fixed-aspect box is invented.
-	function detectLabelRectangles(imageData, width, height) {
-		if(!imageData || !imageData.data || width < 60 || height < 30) return [];
+	function detectLabelRegions(imageData, width, height, focus) {
+		if(!imageData || !imageData.data || width < 60 || height < 30) return { rectangles: [] };
 		var data = imageData.data;
 		var horizontal = new Uint8Array(width * height);
 		var vertical = new Uint8Array(width * height);
@@ -249,6 +249,13 @@
 		function contrast(a, b) {
 			return Math.max(Math.abs(data[a] - data[b]), Math.abs(data[a + 1] - data[b + 1]), Math.abs(data[a + 2] - data[b + 2]));
 		}
+		function hasEdge(pixel, stride) {
+			var before = pixel - stride;
+			var after = pixel + stride;
+			var strength = Math.max(contrast(pixel, before), contrast(pixel, after));
+			// A soft edge can spread across two samples after focus or downsampling.
+			return strength >= 18 || (strength >= 12 && contrast(before, after) >= 24);
+		}
 		for(var y = 1; y < height - 1; y++) {
 			var start = -1;
 			var last = -1;
@@ -257,8 +264,8 @@
 			for(var x = 1; x < width - 1; x++) {
 				var index = y * width + x;
 				var pixel = index * 4;
-				horizontal[index] = Math.max(contrast(pixel, pixel - width * 4), contrast(pixel, pixel + width * 4)) >= 18 ? 1 : 0;
-				vertical[index] = Math.max(contrast(pixel, pixel - 4), contrast(pixel, pixel + 4)) >= 18 ? 1 : 0;
+				horizontal[index] = hasEdge(pixel, width * 4) ? 1 : 0;
+				vertical[index] = hasEdge(pixel, 4) ? 1 : 0;
 				verticalSums[index + width] = verticalSums[index] + vertical[index];
 				if(horizontal[index]) {
 					if(start < 0) start = x;
@@ -305,8 +312,7 @@
 		});
 		// Bound work for busy camera frames; long printed sides take priority.
 		strokes.sort(function(a, b) { return (b.x1 - b.x0) - (a.x1 - a.x0); });
-		var bracketStrokes = strokes.filter(function(stroke) { return stroke.x1 - stroke.x0 <= width * 0.3; }).slice(0, 200);
-		strokes = strokes.filter(function(stroke) { return stroke.x1 - stroke.x0 >= minWidth; }).slice(0, 120).sort(function(a, b) { return a.top - b.top; });
+		var longStrokes = strokes.filter(function(stroke) { return stroke.x1 - stroke.x0 >= minWidth; }).slice(0, 120).sort(function(a, b) { return a.top - b.top; });
 		function findSide(from, to, y0, y1, preferRight) {
 			var best = null;
 			for(var sx = Math.max(1, Math.floor(from)); sx <= Math.min(width - 2, Math.ceil(to)); sx++) {
@@ -335,8 +341,8 @@
 			}
 			return hits >= 4;
 		}
-		strokes.forEach(function(top, i) {
-			strokes.slice(i + 1).forEach(function(bottom) {
+		longStrokes.forEach(function(top, i) {
+			longStrokes.slice(i + 1).forEach(function(bottom) {
 				var h = bottom.bottom - top.top;
 				var w = top.x1 - top.x0;
 				var corner = Math.min(w * 0.18, h * 0.3);
@@ -355,42 +361,84 @@
 				if(!rectangles.some(function(existing) { return bboxIoU(existing, rect) > 0.9; })) rectangles.push(rect);
 			});
 		});
-		// Current labels use four L-shaped corners. Require both arms at every
-		// corner; a broken continuous border or isolated text is not a frame.
-		bracketStrokes.forEach(function(leftTop) {
-			bracketStrokes.forEach(function(rightTop) {
-				var span = rightTop.x1 - leftTop.x0;
-				var leftLength = leftTop.x1 - leftTop.x0;
-				var rightLength = rightTop.x1 - rightTop.x0;
-				if(Math.abs(leftTop.top - rightTop.top) > 3 || span < minWidth || rightTop.x0 - leftTop.x1 < span * 0.2 ||
-					Math.min(leftLength, rightLength) < Math.max(leftLength, rightLength) * 0.65) return;
-				var leg = Math.floor(Math.min(leftLength, rightLength) * 0.7);
-				var top = Math.min(leftTop.top, rightTop.top);
-				if(top + leg >= height - 1) return;
-				var left = findSide(leftTop.x0 - 2, leftTop.x0 + 2, top + 3, top + leg);
-				var right = findSide(rightTop.x1 - 2, rightTop.x1 + 2, top + 3, top + leg);
-				if(!left || !right) return;
-				bracketStrokes.forEach(function(leftBottom) {
-					var bottom = leftBottom.bottom;
-					if(bottom - top < Math.max(minHeight, leg * 3) || Math.abs(leftBottom.x0 - leftTop.x0) > 3 || Math.abs(leftBottom.x1 - leftTop.x1) > 4) return;
-					var rightBottom = bracketStrokes.find(function(stroke) {
-						return Math.abs(stroke.bottom - bottom) <= 3 && Math.abs(stroke.x0 - rightTop.x0) <= 4 && Math.abs(stroke.x1 - rightTop.x1) <= 3;
+		// All four corners must have both arms before a box can enter OCR.
+		function findMarkers(bracketStrokes, minSpan, minFrameHeight, found) {
+			bracketStrokes.forEach(function(leftTop) {
+				bracketStrokes.forEach(function(rightTop) {
+					var span = rightTop.x1 - leftTop.x0;
+					var leftLength = leftTop.x1 - leftTop.x0;
+					var rightLength = rightTop.x1 - rightTop.x0;
+					if(Math.abs(leftTop.top - rightTop.top) > 3 || span < minSpan || rightTop.x0 - leftTop.x1 < span * 0.2 ||
+						Math.min(leftLength, rightLength) < Math.max(leftLength, rightLength) * 0.65) return;
+					var leg = Math.floor(Math.min(leftLength, rightLength) * 0.7);
+					var top = Math.min(leftTop.top, rightTop.top);
+					if(top + leg >= height - 1) return;
+					var left = findSide(leftTop.x0 - 2, leftTop.x0 + 2, top + 3, top + leg);
+					var right = findSide(rightTop.x1 - 2, rightTop.x1 + 2, top + 3, top + leg);
+					if(!left || !right) return;
+					bracketStrokes.forEach(function(leftBottom) {
+						var bottom = leftBottom.bottom;
+						if(bottom - top < Math.max(minFrameHeight, leg * 3) || Math.abs(leftBottom.x0 - leftTop.x0) > 3 || Math.abs(leftBottom.x1 - leftTop.x1) > 4) return;
+						var rightBottom = bracketStrokes.find(function(stroke) {
+							return Math.abs(stroke.bottom - bottom) <= 3 && Math.abs(stroke.x0 - rightTop.x0) <= 4 && Math.abs(stroke.x1 - rightTop.x1) <= 3;
+						});
+						if(!rightBottom || !findSide(left.x - 1, left.x + 1, bottom - leg, bottom - 3) ||
+							!findSide(right.x - 1, right.x + 1, bottom - leg, bottom - 3)) return;
+						var rect = { x0: left.x, y0: top, x1: right.x + 1, y1: Math.max(bottom, rightBottom.bottom) + 1 };
+						var aspect = (rect.x1 - rect.x0) / (rect.y1 - rect.y0);
+						if(aspect > 1 / 1.2 && aspect < 1.2) return;
+						var existing = found.find(function(box) { return bboxIoU(box, rect) > 0.9; });
+						if(existing) existing.anchored = true;
+						else {
+							rect.anchored = true;
+							found.push(rect);
+						}
 					});
-					if(!rightBottom || !findSide(left.x - 1, left.x + 1, bottom - leg, bottom - 3) ||
-						!findSide(right.x - 1, right.x + 1, bottom - leg, bottom - 3)) return;
-					var rect = { x0: left.x, y0: top, x1: right.x + 1, y1: Math.max(bottom, rightBottom.bottom) + 1 };
-					var aspect = (rect.x1 - rect.x0) / (rect.y1 - rect.y0);
-					if(aspect > 1 / 1.2 && aspect < 1.2) return;
-					var existing = rectangles.find(function(box) { return bboxIoU(box, rect) > 0.9; });
-					if(existing) existing.anchored = true;
-					else {
-						rect.anchored = true;
-						rectangles.push(rect);
-					}
 				});
 			});
-		});
-		return rectangles;
+		}
+		function searchFullImage() {
+			var bracketStrokes = strokes.filter(function(stroke) { return stroke.x1 - stroke.x0 <= width * 0.3; }).slice(0, 200);
+			findMarkers(bracketStrokes, minWidth, minHeight, rectangles);
+			return rectangles;
+		}
+
+		// Reuse the edge maps and restrict the four-marker search to the portrait
+		// card under the focus point. Small cards get their own stroke budget.
+		var card = focus && findPortraitCard(rectangles, focus);
+		if(card) {
+			var cardWidth = card.x1 - card.x0;
+			var cardHeight = card.y1 - card.y0;
+			var local = rectangles.filter(function(box) { return box !== card && containsBBox(card, box); });
+			var localStrokes = strokes.filter(function(stroke) {
+				return stroke.x0 >= card.x0 && stroke.x1 <= card.x1 && stroke.top >= card.y0 && stroke.bottom < card.y1 &&
+					stroke.x1 - stroke.x0 <= cardWidth * 0.3;
+			}).slice(0, 200);
+			findMarkers(localStrokes, Math.max(50, Math.round(cardWidth * 0.12)), Math.max(25, Math.round(cardHeight * 0.04)), local);
+			if(local.some(function(box) { return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0) && findLabelCard([card], box); }))
+				return { rectangles: [card].concat(local), searchFullImage: searchFullImage };
+		}
+		return { rectangles: searchFullImage() };
+	}
+
+	function detectLabelRectangles(imageData, width, height) {
+		return detectLabelRegions(imageData, width, height).rectangles;
+	}
+
+	function findPortraitCard(rectangles, focus) {
+		var best = null;
+		var bestArea = Infinity;
+		for(var box of rectangles) {
+			var width = box.x1 - box.x0;
+			var height = box.y1 - box.y0;
+			var area = width * height;
+			if(!box.anchored && height > width && area < bestArea &&
+				focus.x >= box.x0 && focus.x <= box.x1 && focus.y >= box.y0 && focus.y <= box.y1) {
+				best = box;
+				bestArea = area;
+			}
+		}
+		return best;
 	}
 
 	function findLabelCard(containers, container, sideways) {
@@ -399,7 +447,11 @@
 		var codeWidth = width(container);
 		var codeHeight = height(container);
 		var cards = containers.filter(function(card) {
-			return !card.anchored && containsBBox(card, container) && width(card) >= codeWidth + Math.max(4, codeWidth * 0.04) && height(card) >= codeHeight * 1.25;
+			var cardWidth = width(card);
+			var cardHeight = height(card);
+			// A portrait card can have very narrow margins beside its landscape code.
+			var minMargin = cardHeight > cardWidth && codeWidth > codeHeight ? 0 : Math.max(4, codeWidth * 0.04);
+			return !card.anchored && containsBBox(card, container) && cardWidth >= codeWidth + minMargin && cardHeight >= codeHeight * 1.25;
 		});
 		if(!cards.length) return null;
 		var minWidth = Math.min.apply(null, cards.map(width));
@@ -940,6 +992,7 @@
 
 	var codeScanOcrMatch = {
 		findLabelCard: findLabelCard,
+		findPortraitCard: findPortraitCard,
 		rotateLabelBox: rotateLabelBox,
 		getLabelCodeBoxes: getLabelCodeBoxes,
 		normalizeOcrText: normalizeOcrText,
@@ -950,6 +1003,7 @@
 		matchOcrTextToWoloCode: matchOcrTextToWoloCode,
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		detectLabelRectangles: detectLabelRectangles,
+		detectLabelRegions: detectLabelRegions,
 		estimateLabelRoll: estimateLabelRoll,
 		detailScanBands: detailScanBands,
 		readLabelMetadata: extractLabelMetadata,

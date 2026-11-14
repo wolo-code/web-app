@@ -840,7 +840,7 @@ function straightenAndCropCanvasToRegion(sourceCanvas, regionDetails) {
 	return cropCanvas;
 }
 
-function detectCodeScanContainers(canvas, bounds) {
+function detectCodeScanContainers(canvas, bounds, search) {
 	// Detection uses a bounded working image; preview and OCR keep native pixels.
 	var scale = Math.min(1, 1200 / Math.max(canvas.width, canvas.height));
 	var x0 = bounds ? bounds.x0 : 0;
@@ -859,9 +859,19 @@ function detectCodeScanContainers(canvas, bounds) {
 	var image = detectionCanvas.getContext('2d').getImageData(0, 0, detectionCanvas.width, detectionCanvas.height);
 	var sx = width / detectionCanvas.width;
 	var sy = height / detectionCanvas.height;
-	return codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height).map(function(box) {
-		return Object.assign({}, box, { x0: x0 + box.x0 * sx, y0: y0 + box.y0 * sy, x1: x0 + box.x1 * sx, y1: y0 + box.y1 * sy });
-	});
+	function toSource(boxes) {
+		return boxes.map(function(box) {
+			return Object.assign({}, box, { x0: x0 + box.x0 * sx, y0: y0 + box.y0 * sy, x1: x0 + box.x1 * sx, y1: y0 + box.y1 * sy });
+		});
+	}
+	if(search) {
+		var focus = search.focus || { x: canvas.width / 2, y: canvas.height / 2 };
+		var result = codeScanOcrMatch.detectLabelRegions(image, detectionCanvas.width, detectionCanvas.height,
+			{ x: (focus.x - x0) / sx, y: (focus.y - y0) / sy });
+		if(result.searchFullImage) search.findRemaining = function() { return toSource(result.searchFullImage()); };
+		return toSource(result.rectangles);
+	}
+	return toSource(codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height));
 }
 
 function detectCodeScanConfirmation(canvas, live) {
@@ -956,10 +966,23 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var epoch = codeScanState.workerEpoch;
 		var live = options && options.live;
-		var containers = detectCodeScanConfirmation(canvas, live) || detectCodeScanContainers(canvas);
+		var search = { focus: focus };
+		var containers = detectCodeScanConfirmation(canvas, live) || detectCodeScanContainers(canvas, null, search);
 		var result = await recognizeCodeScanImage(canvas, focus, options, worker, containers);
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		if(result.data.scanMatch || (live && !live.isCurrent())) return result;
+		if(search.findRemaining) {
+			// The card crop missed in OCR. Try other code boxes using the same edge scan.
+			var remaining = search.findRemaining();
+			var tried = result.data.codeBoxes;
+			var retry = remaining.filter(function(box) {
+				return !tried.some(function(previous) { return codeScanOcrMatch.bboxIoU(previous, box) > 0.9; });
+			});
+			var fallback = await recognizeCodeScanImage(canvas, focus, options, worker, retry, remaining);
+			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+			if(fallback.data.scanMatch) return fallback;
+			if(live && !live.isCurrent()) return result;
+		}
 		var angle = -getCodeScanLabelRoll(canvas);
 		if(!angle) return result;
 		var transform = getCodeScanRollTransform(canvas.width, canvas.height, angle);
@@ -979,13 +1002,14 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 	});
 }
 
-async function recognizeCodeScanImage(canvas, focus, options, worker, containers) {
+async function recognizeCodeScanImage(canvas, focus, options, worker, containers, allContainers) {
 	var epoch = codeScanState.workerEpoch;
 	var live = options && options.live;
 	var allowRotation = options && options.allowRotation;
 	focus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
-	var result = { data: { labelContainers: containers, scanFocus: focus } };
-	var boxes = codeScanOcrMatch.getLabelCodeBoxes(containers, focus);
+	allContainers = allContainers || containers;
+	var result = { data: { labelContainers: allContainers, scanFocus: focus } };
+	var boxes = codeScanOcrMatch.getLabelCodeBoxes(allContainers, focus).filter(function(box) { return containers.includes(box); });
 	if(live) {
 		boxes = boxes.filter(function(box) {
 			return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0);
@@ -999,8 +1023,9 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 			boxes.sort(function(a, b) { return overlap(b) - overlap(a); });
 		}
 		boxes = boxes.slice(0, 2);
-		result.data.debugBoxes = getCodeScanDebugBoxes(containers, boxes[0]);
-		if(live.isCurrent()) live.showBoxes(result.data.debugBoxes);
+		result.data.codeBoxes = boxes;
+		result.data.debugBoxes = getCodeScanDebugBoxes(allContainers, boxes[0], focus);
+		if(allContainers === containers && live.isCurrent()) live.showBoxes(result.data.debugBoxes);
 		return recognizeCodeScanBoxes(canvas, result, worker, boxes, live);
 	}
 	boxes = boxes.filter(function(box) {
@@ -1008,7 +1033,8 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 		var height = box.y1 - box.y0;
 		return width > height || allowRotation && width < height;
 	}).slice(0, 4);
-	result.data.debugBoxes = getCodeScanDebugBoxes(containers, boxes[0]);
+	result.data.codeBoxes = boxes;
+	result.data.debugBoxes = getCodeScanDebugBoxes(allContainers, boxes[0], focus);
 	if(!boxes.length) return result;
 	await recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation);
 	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
@@ -1019,10 +1045,10 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 	return recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation, '11', true);
 }
 
-function getCodeScanDebugBoxes(containers, box) {
-	if(!box) return [];
-	var card = codeScanOcrMatch.findLabelCard(containers, box, box.y1 - box.y0 > box.x1 - box.x0);
-	return card ? [box, card] : [box];
+function getCodeScanDebugBoxes(containers, box, focus) {
+	var card = box && codeScanOcrMatch.findLabelCard(containers, box, box.y1 - box.y0 > box.x1 - box.x0);
+	if(!card) card = codeScanOcrMatch.findPortraitCard(containers, focus);
+	return card ? [box, card] : box ? [box] : [];
 }
 
 function rotateCodeScanCanvas(source, rotation) {

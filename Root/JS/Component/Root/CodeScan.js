@@ -641,9 +641,12 @@ function runCodeScanFrame() {
 	Promise.resolve().then(function() {
 		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
+		var previous = codeScanState.recognizedFrame;
+		var sameSize = previous && previous.frame.width === frame.width && previous.frame.height === frame.height;
 		return recognizeCodeScanCanvas(frame, null, {
 			live: {
-				previousBox: codeScanState.recognizedFrame && codeScanState.recognizedFrame.match.regions.container,
+				previousBox: sameSize ? previous.match.regions.container : null,
+				previousCard: sameSize && !codeScanState.missedMatchFrame ? previous.match.regions.card : null,
 				isCurrent: function() {
 					return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
 				},
@@ -837,22 +840,50 @@ function straightenAndCropCanvasToRegion(sourceCanvas, regionDetails) {
 	return cropCanvas;
 }
 
-function detectCodeScanContainers(canvas) {
+function detectCodeScanContainers(canvas, bounds) {
 	// Detection uses a bounded working image; preview and OCR keep native pixels.
 	var scale = Math.min(1, 1200 / Math.max(canvas.width, canvas.height));
+	var x0 = bounds ? bounds.x0 : 0;
+	var y0 = bounds ? bounds.y0 : 0;
+	var width = bounds ? bounds.x1 - x0 : canvas.width;
+	var height = bounds ? bounds.y1 - y0 : canvas.height;
 	var detectionCanvas = canvas;
-	if(scale < 1) {
+	if(bounds || scale < 1) {
 		detectionCanvas = document.createElement('canvas');
-		detectionCanvas.width = Math.round(canvas.width * scale);
-		detectionCanvas.height = Math.round(canvas.height * scale);
-		detectionCanvas.getContext('2d').drawImage(canvas, 0, 0, detectionCanvas.width, detectionCanvas.height);
+		detectionCanvas.width = Math.max(1, Math.round(width * scale));
+		detectionCanvas.height = Math.max(1, Math.round(height * scale));
+		var ctx = detectionCanvas.getContext('2d');
+		if(bounds) ctx.drawImage(canvas, x0, y0, width, height, 0, 0, detectionCanvas.width, detectionCanvas.height);
+		else ctx.drawImage(canvas, 0, 0, detectionCanvas.width, detectionCanvas.height);
 	}
 	var image = detectionCanvas.getContext('2d').getImageData(0, 0, detectionCanvas.width, detectionCanvas.height);
-	var sx = canvas.width / detectionCanvas.width;
-	var sy = canvas.height / detectionCanvas.height;
+	var sx = width / detectionCanvas.width;
+	var sy = height / detectionCanvas.height;
 	return codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height).map(function(box) {
-		return Object.assign({}, box, { x0: box.x0 * sx, y0: box.y0 * sy, x1: box.x1 * sx, y1: box.y1 * sy });
+		return Object.assign({}, box, { x0: x0 + box.x0 * sx, y0: y0 + box.y0 * sy, x1: x0 + box.x1 * sx, y1: y0 + box.y1 * sy });
 	});
+}
+
+function detectCodeScanConfirmation(canvas, live) {
+	if(!live || !live.previousBox || !live.previousCard) return null;
+	var card = live.previousCard;
+	// Leave room for hand motion and for the detector to see the edge against its background.
+	var padX = Math.max(4, (card.x1 - card.x0) * 0.15);
+	var padY = Math.max(4, (card.y1 - card.y0) * 0.15);
+	var bounds = {
+		x0: Math.max(0, Math.floor(card.x0 - padX)), y0: Math.max(0, Math.floor(card.y0 - padY)),
+		x1: Math.min(canvas.width, Math.ceil(card.x1 + padX)), y1: Math.min(canvas.height, Math.ceil(card.y1 + padY))
+	};
+	var width = bounds.x1 - bounds.x0;
+	var height = bounds.y1 - bounds.y0;
+	if(width <= 0 || height <= 0 || width * height > canvas.width * canvas.height / 2) return null;
+	var containers = detectCodeScanContainers(canvas, bounds);
+	var box = codeScanOcrMatch.getLabelCodeBoxes(containers).find(function(candidate) {
+		return candidate.x1 - candidate.x0 >= 1.2 * (candidate.y1 - candidate.y0) &&
+			codeScanOcrMatch.bboxIoU(candidate, live.previousBox) >= CODE_SCAN_BBOX_IOU_MIN;
+	});
+	var currentCard = box && codeScanOcrMatch.findLabelCard(containers, box);
+	return currentCard ? [box, currentCard] : null;
 }
 
 function getCodeScanLabelRoll(canvas) {
@@ -924,9 +955,10 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 	return runCodeScanWorkerTask(async function(worker) {
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var epoch = codeScanState.workerEpoch;
-		var result = await recognizeCodeScanImage(canvas, focus, options, worker, detectCodeScanContainers(canvas));
-		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		var live = options && options.live;
+		var containers = detectCodeScanConfirmation(canvas, live) || detectCodeScanContainers(canvas);
+		var result = await recognizeCodeScanImage(canvas, focus, options, worker, containers);
+		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		if(result.data.scanMatch || (live && !live.isCurrent())) return result;
 		var angle = -getCodeScanLabelRoll(canvas);
 		if(!angle) return result;
@@ -981,10 +1013,10 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 	await recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation);
 	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 	if(result.data.scanMatch) return result;
-	// Sparse OCR can use the surrounding card while matching the code inside its box.
-	await recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation, '11', true);
+	// Keep both OCR modes on the smaller code crop before trying the card.
+	await recognizeCodeScanBoxes(canvas, result, worker, boxes.slice(0, 2), null, allowRotation, '11');
 	if(result.data.scanMatch) return result;
-	return recognizeCodeScanBoxes(canvas, result, worker, boxes.slice(0, 2), null, allowRotation, '11');
+	return recognizeCodeScanBoxes(canvas, result, worker, boxes, null, allowRotation, '11', true);
 }
 
 function getCodeScanDebugBoxes(containers, box) {

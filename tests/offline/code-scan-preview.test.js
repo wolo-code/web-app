@@ -134,7 +134,7 @@ test('still recognition retries a missed code crop within its enclosing card', a
   ];
  };
  const result = await context.recognizeCodeScanCanvas(canvas);
- assert.deepEqual(calls, [['6', false], ['11', true]]);
+ assert.deepEqual(calls, [['6', false], ['11', false], ['11', true]]);
  assert.equal(result.data.scanMatch.code, 'mail nebula flower');
  assert.equal(result.data.scanMatch.regions.container, box);
  assert.equal(result.data.scanMatch.regions.card, card);
@@ -145,6 +145,36 @@ test('still recognition retries a missed code crop within its enclosing card', a
  const noCard = await context.recognizeCodeScanCanvas(canvas);
  assert.deepEqual(calls, [['6', false], ['11', false]]);
  assert.equal(noCard.data.scanMatch, undefined);
+});
+
+test('live confirmation searches the previous portrait card crop and falls back when it moves', async () => {
+ const { context, canvas } = scanner();
+ const previousCard = { x0: 100, y0: 100, x1: 420, y1: 600 };
+ const previousBox = { x0: 120, y0: 220, x1: 400, y1: 320 };
+ const box = { x0: 130, y0: 230, x1: 410, y1: 330 };
+ const card = { x0: 110, y0: 110, x1: 430, y1: 610 };
+ const boundsUsed = [];
+ let cardInCrop = true;
+ context.detectCodeScanContainers = (input, bounds) => {
+  assert.equal(input, canvas);
+  boundsUsed.push(bounds && { ...bounds });
+  return !bounds || cardInCrop ? [box, card] : [box];
+ };
+ context.codeScanState.worker = { setParameters: async () => {} };
+ context.ocrCodeScanBand = async (input, crop) => {
+  assert.equal(input, canvas);
+  assert.deepEqual({ ...crop }, { x0: 136, y0: 236, x1: 404, y1: 324 });
+  return [];
+ };
+ const live = { previousBox, previousCard, isCurrent: () => true, showBoxes: () => {} };
+ const expected = { x0: 52, y0: 25, x1: 468, y1: 675 };
+ const result = await context.recognizeCodeScanCanvas(canvas, null, { live });
+ assert.deepEqual(boundsUsed, [expected]);
+ assert.deepEqual(Array.from(result.data.debugBoxes), [box, card]);
+ cardInCrop = false;
+ boundsUsed.length = 0;
+ await context.recognizeCodeScanCanvas(canvas, null, { live });
+ assert.deepEqual(boundsUsed, [expected, undefined]);
 });
 
 test('live recognition detects across the full viewport and skips OCR without a frame', async () => {
@@ -276,12 +306,13 @@ test('bounded border detection maps back to native photo dimensions without redu
  vm.runInContext(fs.readFileSync('Root/JS/Component/Root/CodeScan.js', 'utf8'), context);
  const image = {};
  let working, draw;
+ let workingSize = [1200, 900];
  context.document.createElement = () => (working = { getContext: () => ({
   drawImage: (...args) => draw = args,
-  getImageData: (...args) => { assert.deepEqual(args, [0, 0, 1200, 900]); return image; }
+  getImageData: (...args) => { assert.deepEqual(args, [0, 0, ...workingSize]); return image; }
  }) });
  context.codeScanOcrMatch = { detectLabelRectangles: (input, width, height) => {
-  assert.equal(input, image); assert.equal(width, 1200); assert.equal(height, 900);
+  assert.equal(input, image); assert.deepEqual([width, height], workingSize);
   return [{ x0: 100, y0: 150, x1: 300, y1: 250 }];
  } };
  const canvas = { width: 4000, height: 3000 };
@@ -291,6 +322,12 @@ test('bounded border detection maps back to native photo dimensions without redu
  for(const [key, expected] of Object.entries({ x0: 1000 / 3, y0: 500, x1: 1000, y1: 2500 / 3 }))
   assert.ok(Math.abs(detected[key] - expected) < 1e-6);
  assert.equal(canvas.width, 4000); assert.equal(canvas.height, 3000);
+
+ workingSize = [360, 600];
+ const [local] = context.detectCodeScanContainers(canvas, { x0: 600, y0: 300, x1: 1800, y1: 2300 });
+ assert.deepEqual(draw, [canvas, 600, 300, 1200, 2000, 0, 0, 360, 600]);
+ assert.ok(Math.abs(local.x0 - (600 + detected.x0)) < 1e-6);
+ assert.ok(Math.abs(local.y0 - (300 + detected.y0)) < 1e-6);
 });
 
 test('live OCR confirms uncertain reads twice and yields to a shutter press even with high confidence', () => {

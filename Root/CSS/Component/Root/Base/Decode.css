@@ -671,7 +671,7 @@ body.map-source-single #action_menu_map {
 	cursor: pointer;
 	display: none;
 	margin: -8px;
-	padding: 8px;
+	padding: 4px 12px;
 	position: absolute;
 	right: 11px;
 	width: 39px;

@@ -180,23 +180,23 @@ Decode navigation: Saved opens a dedicated modal using the account dialog design
 
 Scanner continuity: Capture, adjustment and recognition share a stable viewfinder and control area. The dotted guide uses a golden-ratio width/height and fills up to 94% of the available viewfinder. Captured and gallery images remain fully visible at fit zoom; OCR crop scanning leaves the original preview intact, so users can reframe repeatedly. Review fields fade in with reduced-motion support; letterboxed image crops intersect the frame with actual image bounds.
 
-Scanner spacing: Back and forward buttons are centered in the remaining space on each side of the zoom controls, within the viewfinder width. The scanner title has a small gap before the viewfinder. The no-match adjustment instruction is omitted.
+Scanner spacing: Rescan and Go sit in opposite corners of the Wolo Code Scan Dialog during photo review. The scanner title has a small gap before the Viewfinder. The no-match adjustment instruction is omitted.
 
 
 Offline release manifest: Native publishing generates the precache list from each final merged environment bundle, including its current hashed script and scanner audio. The service-worker cache uses v3. Manifest tests write isolated temporary fixtures and do not change real publish outputs.
 
 The top-bar loader stays visible while the Input Icon Guide is shown.
 
-Scanner controls: Progress, word validation and save feedback overlay the frozen viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Gallery and Typing share the live control row. Photo review places Zoom Controls between Rescan and Go. When Typing opens Label Edit View, Rescan and Go share the control row. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
+Scanner controls: Progress, word validation and save feedback overlay the frozen viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Gallery and Typing share the live control row. Photo review places Rescan in the top left and Go in the bottom right of the Wolo Code Scan Dialog. When Typing opens Label Edit View, Rescan and Go share the control row. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
 
-Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Go sits beside the zoom controls; Address details, bookmark Save and the Cancel icon share the bottom action row.
+Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Address details and bookmark Save sit below the label fields.
 
 The city chooser icon sits inside the left edge of the city input.
 
 Scanner compact controls: City input is centered at 75% width, with an anchored city-choice popup that dismisses on selection, outside click, or Escape. Wolo Code Input View orders city-source controls as Previous city, IP globe, then GPS.
 
 
-Zoom Controls sit just below the chequered viewfinder. Zoom Percentage stays visible and resets zoom when pressed. The three controls show circular feedback on hover, press or keyboard focus.
+Zoom Out, Reset Zoom and Zoom In share a horizontal row below the Viewfinder. Reset Zoom displays a magnifying glass at 100% and the current percentage at higher zoom levels. Press it to return to 100%.
 
 Scanner City label sits just outside the input's left edge with an 8px gap, preserving the city field and embedded chooser positions.
 
@@ -212,7 +212,7 @@ City-list icon placement: The scanner review icon sits 4 px higher. In Map View,
 
 The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.
 
-Zoom Controls sit just below the viewfinder, with Zoom In (+), Zoom Percentage and Zoom Out (-) stacked vertically. Zoom Percentage displays the current level and resets zoom when pressed. Each control shows a circle on hover, press or keyboard focus. The viewfinder uses a chequered background around the image.
+Zoom Controls sit in a horizontal row below the Viewfinder. Reset Zoom sits between Zoom Out and Zoom In. It shows a magnifying glass at 100% and the current percentage at higher zoom levels. Press it to return to 100%. Each control shows a circle on hover, press or keyboard focus. The viewfinder uses a chequered background around the image.
 
 Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Go and Save stay disabled until all three words are complete and valid. City uses the same underline as the three word fields.
 

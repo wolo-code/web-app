@@ -1962,17 +1962,26 @@ function setCodeScanManualEntry(manualEntry) {
 	var dialog = document.getElementById('code_scan_message');
 	if(dialog) dialog.classList.toggle('code_scan_manual_entry', manualEntry);
 	var controls = document.getElementById('code_scan_crop_controls');
+	var rescan = document.getElementById('code_scan_rescan');
+	var go = document.getElementById('code_scan_apply_crop');
 	var anchor = document.getElementById(manualEntry ? 'code_scan_review' : 'code_scan_live_controls');
-	if(controls && anchor) {
-		if(manualEntry) anchor.after(controls);
-		else anchor.before(controls);
+	if(!dialog || !controls || !rescan || !go || !anchor) return;
+	if(manualEntry) {
+		anchor.after(controls);
+		controls.append(rescan, go);
+	}
+	else {
+		anchor.before(controls);
+		dialog.prepend(rescan);
+		dialog.append(go);
 	}
 }
 
 function setCodeScanCropControlsVisible(visible) {
-	var node = document.getElementById('code_scan_crop_controls');
-	if(node)
-		node.classList.toggle('hide', !visible);
+	['code_scan_crop_controls', 'code_scan_rescan', 'code_scan_apply_crop'].forEach(function(id) {
+		var node = document.getElementById(id);
+		if(node) node.classList.toggle('hide', !visible);
+	});
 }
 
 function clampCodeScanPan() {
@@ -1990,6 +1999,7 @@ function clampCodeScanPan() {
 function setCodeScanZoom(zoom, panX, panY) {
 	var canvas = getCodeScanCanvas();
 	var zoomLevelNode = document.getElementById('code_scan_zoom_level');
+	var zoomPercentageNode = document.getElementById('code_scan_zoom_percentage');
 	var clampedZoom = Math.max(1, Math.min(4, typeof zoom === 'number' ? zoom : 1));
 	var previousZoom = codeScanState.zoom;
 	var previousPanX = codeScanState.panX;
@@ -2004,8 +2014,9 @@ function setCodeScanZoom(zoom, panX, panY) {
 		canvas.style.transform = 'translate(' + codeScanState.panX + 'px, ' + codeScanState.panY + 'px) scale(' + codeScanState.zoom + ')';
 	if(zoomLevelNode) {
 		var percentage = Math.round(codeScanState.zoom * 100) + '%';
-		zoomLevelNode.textContent = percentage;
 		zoomLevelNode.setAttribute('aria-label', 'Zoom ' + percentage + '. Reset zoom');
+		if(zoomPercentageNode)
+			zoomPercentageNode.textContent = codeScanState.zoom === 1 ? '' : percentage;
 	}
 
 	if(previousZoom !== codeScanState.zoom || previousPanX !== codeScanState.panX || previousPanY !== codeScanState.panY)

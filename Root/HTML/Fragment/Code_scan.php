@@ -1,4 +1,7 @@
 <div id='code_scan_message' class="message_dialog hide code_scan_dialog">
+	<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan hide' type='button' aria-label='Rescan' title='Rescan'>
+		<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
+	</button>
 	<h2 id='code_scan_heading' class='message_dialog_label'>
 		Scan Wolo Code
 	</h2>
@@ -29,18 +32,15 @@
 				<p id='code_scan_review_validity' class='code_scan_review_validity' role='status'></p>
 			</div>
 		</div>
-		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide' role='toolbar' aria-label='Crop and zoom controls'>
-			<button id='code_scan_rescan' class='code_scan_crop_button code_scan_crop_rescan' type='button' aria-label='Rescan' title='Rescan'>
-				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
-			</button>
+		<div id='code_scan_crop_controls' class='code_scan_crop_controls hide'>
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
-				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
-				<button id='code_scan_zoom_level' class='code_scan_zoom_button code_scan_zoom_level' type='button' aria-label='Zoom 100%. Reset zoom' title='Reset zoom'>100%</button>
 				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
+				<button id='code_scan_zoom_level' class='code_scan_zoom_button code_scan_zoom_level' type='button' aria-label='Zoom 100%. Reset zoom' title='Reset zoom'>
+					<span id='code_scan_zoom_percentage'></span>
+					<span class='image' aria-hidden='true'><?php includeSVG('', 'Search'); ?></span>
+				</button>
+				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
 			</div>
-			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
-				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
-			</button>
 		</div>
 		<div id='code_scan_live_controls' class='code_scan_live_controls'>
 			<input id='code_scan_photo_input' class='hide' type='file' accept='image/*' tabindex='-1' aria-hidden='true'>
@@ -101,5 +101,8 @@
 			</div>
 		</div>
 	</div>
+	<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop hide' type='button' aria-label='Go' title='Use address' disabled>
+		<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
+	</button>
 	<dialog id='code_scan_city_choices' class='code_scan_city_choices hide' aria-label='Choose city'></dialog>
 </div>

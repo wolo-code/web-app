@@ -40,6 +40,8 @@ JavaScript is assembled by `root/Framework/JS/Component.php`, which embeds frame
 
 The client initializes Firebase with values emitted by `root/Framework/JS/Fragment/Firebase_inits.php`. `FUNCTIONS_BASE_URL` is set to `https://<site_name>/api`, so hosted API routes are expected to map `/api/*` to Firebase Functions.
 
+See [Custom-domain setup](CUSTOM_DOMAINS.md) for the hostname settings used by Cloudflare, Firebase and the map providers.
+
 ## Cloud Functions
 
 `functions/index.js` exports the backend entry points:

@@ -59,12 +59,16 @@
 	inset: auto auto 6px 6px;
 	z-index: 3;
 	max-width: calc(100% - 12px);
+	max-height: calc(60% - 6px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	overflow-anchor: none;
+	touch-action: pan-y;
 	padding: 4px 8px;
 	border-radius: 6px;
 	background: rgba(13, 17, 23, 0.85);
 	color: #fff;
 	font: 11px/1.35 monospace;
-	pointer-events: none;
 }
 
 .code_scan_debug ul {
@@ -210,21 +214,12 @@
 
 .code_scan_zoom_group {
 	align-items: center;
+	background: rgba(105, 183, 207, 0.17);
+	border-radius: 999px;
 	display: inline-flex;
 	flex-direction: column;
-	isolation: isolate;
-	position: relative;
-	width: 64px;
+	width: 52px;
 	padding: 3px 0;
-}
-
-.code_scan_zoom_group::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: -1;
-	background: rgba(105, 183, 207, 0.17);
-	clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
 }
 
 .code_scan_zoom_button {
@@ -567,7 +562,7 @@ html.dark-mode .code_scan_crop_rescan {
 	color: #9fd4e8;
 }
 
-html.dark-mode .code_scan_zoom_group::before {
+html.dark-mode .code_scan_zoom_group {
 	background: rgba(105, 183, 207, 0.22);
 }
 
@@ -838,6 +833,21 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 .code_scan_details .code_scan_review_field { margin-bottom: 12px; }
 .code_scan_details .code_scan_review_input {
  font-size: 1rem; text-align: left; text-transform: none; min-height: 44px;
+}
+.code_scan_details .code_scan_review_input[aria-busy='true'] {
+	background-image: linear-gradient(105deg, rgba(105, 183, 207, 0.1) 25%, rgba(105, 183, 207, 0.28) 50%, rgba(105, 183, 207, 0.1) 75%);
+	background-size: 200% 100%;
+	animation: code-scan-details-shimmer 1.4s ease-in-out infinite;
+}
+.code_scan_details .code_scan_review_input[aria-busy='true']:not(:focus)::placeholder {
+	color: transparent;
+}
+@keyframes code-scan-details-shimmer {
+	from { background-position: 100% 0; }
+	to { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.code_scan_details .code_scan_review_input[aria-busy='true'] { animation: none; }
 }
 .code_scan_details textarea { resize: vertical; line-height: 1.5; white-space: pre-wrap; }
 .code_scan_address_parts { display: grid; gap: 1em; margin-top: 20px; }

@@ -19,7 +19,7 @@
 					<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
 				</div>
 				<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
-				<div id='code_scan_debug' class='code_scan_debug hide'>
+				<div id='code_scan_debug' class='code_scan_debug hide' tabindex='0' role='region' aria-label='Scan Debug Log'>
 					<strong>Debug log</strong>
 					<ul id='code_scan_debug_steps' role='log' aria-label='Scan Debug Log' aria-live='off'></ul>
 				</div>

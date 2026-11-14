@@ -92,6 +92,51 @@ test('manual optional fields remain editable when no label metadata is readable'
 	assert.equal(nodes.code_scan_title.value, '');
 });
 
+test('pending details mark empty fields busy and preserve edits when OCR finishes', async () => {
+	const { context, nodes } = scanner();
+	const match = candidate();
+	match.metadata = { title: 'Home' };
+	context.populateCodeScanMetadata(match);
+	Object.assign(context.codeScanState, { active: true, reviewMatch: match, originalSourceCanvas: {} });
+	let finish;
+	context.enrichCodeScanMetadata = () => new Promise(resolve => { finish = resolve; });
+	context.fillCodeScanReviewDetails(match);
+	assert.equal(nodes.code_scan_title.attributes['aria-busy'], 'false');
+	assert.equal(nodes.code_scan_address_line_1.attributes['aria-busy'], 'true');
+	assert.equal(nodes.code_scan_address_line_2.attributes['aria-busy'], 'true');
+	await Promise.resolve();
+	context.editCodeScanMetadata('address_line_2', 'Side entrance');
+	assert.equal(nodes.code_scan_address_line_2.attributes['aria-busy'], 'false');
+	finish(candidate());
+	await new Promise(resolve => setImmediate(resolve));
+	assert.equal(nodes.code_scan_address_line_1.attributes['aria-busy'], 'false');
+	assert.equal(nodes.code_scan_address_line_1.value, '12 MG Road');
+	assert.equal(nodes.code_scan_address_line_2.value, 'Side entrance');
+});
+
+test('a failed or superseded details read clears its loading state', async () => {
+	for(const outcome of ['failed', 'reframed']) {
+		const { context, nodes } = scanner();
+		const match = candidate();
+		match.metadata = {};
+		context.populateCodeScanMetadata(match);
+		Object.assign(context.codeScanState, { active: true, reviewMatch: match, originalSourceCanvas: {} });
+		let finish, fail;
+		context.enrichCodeScanMetadata = () => new Promise((resolve, reject) => { finish = resolve; fail = reject; });
+		context.fillCodeScanReviewDetails(match);
+		assert.equal(nodes.code_scan_address_line_1.attributes['aria-busy'], 'true');
+		await Promise.resolve();
+		if(outcome === 'failed') fail(new Error('Worker stopped'));
+		else {
+			context.codeScanState.cropRevision += 1;
+			finish(candidate());
+		}
+		await new Promise(resolve => setImmediate(resolve));
+		assert.equal(nodes.code_scan_address_line_1.attributes['aria-busy'], 'false');
+		assert.equal(nodes.code_scan_address_line_1.value, '');
+	}
+});
+
 test('Use Code carries edited metadata through scanner cleanup for map and form entry', () => {
 	for(const source of ['map', 'decode']) {
 		const { context, nodes } = scanner();

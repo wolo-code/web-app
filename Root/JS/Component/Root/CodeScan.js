@@ -1,6 +1,7 @@
 var codeScanState = {
 	active: false,
 	debug: false,
+	debugPaused: false,
 	showRegions: false,
 	shutterPressed: false,
 	regionPressConsumed: false,
@@ -64,6 +65,7 @@ var CODE_SCAN_FIXED_ASPECT_TOLERANCE = 0.35;
 var codeScanInitialStatus = '';
 var codeScanCityChoices = [];
 var codeScanWordPopupTimer = null;
+var CODE_SCAN_METADATA_KEYS = ['title', 'segment', 'address_line_1', 'address_line_2'];
 
 function getCodeScanInitialStatus() {
 	if(!codeScanInitialStatus) {
@@ -96,7 +98,7 @@ function initCodeScan() {
 	bindControl('code_scan_zoom_reset', 'click', function() { resetCodeScanZoom(); });
 	bindControl('code_scan_city_select', 'click', toggleCodeScanCityChoices);
 	bindControl('code_scan_details_toggle', 'click', toggleCodeScanDetails);
-	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
 		bindControl('code_scan_' + key, 'input', function(event) { editCodeScanMetadata(key, event.target.value); });
 	});
 	document.addEventListener('click', function(event) {
@@ -218,6 +220,7 @@ function bindCodeScanReviewInputListeners() {
 
 function setCodeScanDebug(enabled) {
 	codeScanState.debug = enabled;
+	codeScanState.debugPaused = false;
 	var overlay = document.getElementById('code_scan_debug');
 	var steps = document.getElementById('code_scan_debug_steps');
 	if(overlay) overlay.classList.toggle('hide', !enabled);
@@ -225,13 +228,15 @@ function setCodeScanDebug(enabled) {
 }
 
 function logCodeScanStep(message) {
-	if(!codeScanState.debug || !codeScanState.active) return;
+	if(!codeScanState.debug || codeScanState.debugPaused || !codeScanState.active) return;
+	var overlay = document.getElementById('code_scan_debug');
 	var steps = document.getElementById('code_scan_debug_steps');
-	if(!steps || (steps.lastElementChild && steps.lastElementChild.textContent === message)) return;
+	if(!overlay || !steps || (steps.lastElementChild && steps.lastElementChild.textContent === message)) return;
+	var following = overlay.scrollHeight - overlay.clientHeight - overlay.scrollTop <= 2;
 	var step = document.createElement('li');
 	step.textContent = message;
 	steps.appendChild(step);
-	if(steps.childElementCount > 5) steps.firstElementChild.remove();
+	if(following) overlay.scrollTop = overlay.scrollHeight;
 }
 
 function openCodeScan(event, debug) {
@@ -316,6 +321,7 @@ function stopCodeScan() {
 
 function invalidateCodeScanSession(keepWorker) {
 	codeScanState.session += 1;
+	setCodeScanDetailsLoading(false);
 	codeScanState.shutterPressed = false;
 	setCodeScanRegionInspection(false);
 	codeScanState.regionPressConsumed = false;
@@ -1270,7 +1276,6 @@ function enrichCodeScanMetadata(canvas, match) {
 			return restored;
 		});
 	}
-	var keys = ['title', 'segment', 'address_line_1', 'address_line_2'];
 	var bands;
 	var extra;
 	var headingRows;
@@ -1293,7 +1298,7 @@ function enrichCodeScanMetadata(canvas, match) {
 	}
 	if(!match.regions.card) return Promise.resolve(match);
 	if(!codeScanState.worker || typeof codeScanState.worker.recognize !== 'function') return Promise.resolve(finish(match));
-	if(keys.every(function(key) { return match.metadata && match.metadata[key]; })) return Promise.resolve(finish(match));
+	if(CODE_SCAN_METADATA_KEYS.every(function(key) { return match.metadata && match.metadata[key]; })) return Promise.resolve(finish(match));
 	bands = codeScanOcrMatch.detailScanBands(match.regions.container, match.regions.card);
 	if(!bands.length) return Promise.resolve(finish(match));
 	extra = [];
@@ -1307,7 +1312,6 @@ function enrichCodeScanMetadata(canvas, match) {
 				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 				if(band.role === 'above' && headingRows >= 2) return;
 				if(band.role === 'below' && addressRows >= 2) return;
-				logCodeScanStep(band.role === 'above' ? 'Reading title and segment' : 'Reading address lines');
 				return ocrCodeScanBand(canvas, band, worker).then(function(words) {
 					extra = extra.concat(words);
 					if(band.role === 'above') headingRows = headingRowCount(extra, match);
@@ -1317,7 +1321,6 @@ function enrichCodeScanMetadata(canvas, match) {
 		});
 		return chain.then(function() { return extra; });
 	}).then(function(words) {
-		logCodeScanStep('Finished reading label details');
 		return finish(codeScanOcrMatch.fillLabelMetadata(match, words));
 	}).catch(function() {
 		return finish(match);
@@ -1461,15 +1464,23 @@ function fillCodeScanReviewDetails(match) {
 	var session = codeScanState.session;
 	var revision = codeScanState.cropRevision;
 	var source = codeScanState.originalSourceCanvas || getCodeScanCanvas();
+	if(!source || CODE_SCAN_METADATA_KEYS.every(function(key) { return match.metadata && match.metadata[key]; })) return;
 	var details = Object.assign({}, match, { regions: Object.assign({}, match.regions), metadata: Object.assign({}, match.metadata) });
+	function ownsFields() {
+		return isCurrentCodeScanSession(session) && codeScanState.reviewMatch === match;
+	}
+	setCodeScanDetailsLoading(true);
 	Promise.resolve().then(function() {
-		if(isCurrentCodeScanSession(session)) return enrichCodeScanMetadata(source, details);
+		if(ownsFields() && revision === codeScanState.cropRevision) return enrichCodeScanMetadata(source, details);
 	}).then(function(detailed) {
-		if(!detailed) return;
-		if(!isCurrentCodeScanSession(session) || revision !== codeScanState.cropRevision || codeScanState.reviewMatch !== match) return;
+		if(!ownsFields()) return;
+		setCodeScanDetailsLoading(false);
+		if(!detailed || revision !== codeScanState.cropRevision) return;
 		populateCodeScanMetadata(detailed);
 		codeScanState.reviewMatch = detailed;
-	}).catch(function() {});
+	}).catch(function() {
+		if(ownsFields()) setCodeScanDetailsLoading(false);
+	});
 }
 
 function processCodeScanCapture() {
@@ -1502,6 +1513,8 @@ function processCodeScanCapture() {
 
 function showCodeScanReview(match, manualEntry) {
 	if(!manualEntry) logCodeScanStep(match ? 'Wolo Code ready for review' : 'No Wolo Code read. Review manually');
+	codeScanState.debugPaused = true;
+	setCodeScanDetailsLoading(false);
 	populateCodeScanMetadata(match);
 	codeScanState.reviewMatch = match;
 	var review = codeScanOcrMatch.splitMatchForReview(match);
@@ -1541,12 +1554,19 @@ function toggleCodeScanDetails() {
 	redrawCodeScanReviewRegions();
 }
 
+function setCodeScanDetailsLoading(loading) {
+	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
+		var field = document.getElementById('code_scan_' + key);
+		if(field) field.setAttribute('aria-busy', String(loading && !field.value && !codeScanState.metadataDirty[key]));
+	});
+}
+
 function resetCodeScanDetails() {
 	codeScanState.saveRevision += 1;
 	codeScanState.saving = false;
 	codeScanState.reviewMetadata = null;
 	codeScanState.metadataDirty = {};
-	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
 		var field = document.getElementById('code_scan_' + key);
 		if(field) field.value = '';
 	});
@@ -1559,7 +1579,7 @@ function populateCodeScanMetadata(match) {
 		codeScanOcrMatch.bboxIoU(match.regions.card || match.regions.container, previous.regions.card || previous.regions.container) >= 0.55;
 	if(!same) resetCodeScanDetails();
 	var metadata = {};
-	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
 		metadata[key] = same && codeScanState.metadataDirty[key] ? codeScanState.reviewMetadata[key] : (match && match.metadata && match.metadata[key] || '');
 		var field = document.getElementById('code_scan_' + key);
 		if(field) field.value = metadata[key];
@@ -1573,6 +1593,8 @@ function populateCodeScanMetadata(match) {
 function editCodeScanMetadata(key, value) {
 	if(!codeScanState.reviewMetadata) return;
 	codeScanState.metadataDirty[key] = true;
+	var field = document.getElementById('code_scan_' + key);
+	if(field) field.setAttribute('aria-busy', 'false');
 	codeScanState.reviewMetadata[key] = value;
 	codeScanState.reviewMetadata.address = codeScanOcrMatch.formatScanAddress(codeScanState.reviewMetadata);
 	if(codeScanState.reviewMatch) codeScanState.reviewMatch.metadata = codeScanState.reviewMetadata;
@@ -1766,7 +1788,7 @@ function useCodeScanReview(event) {
 
 function getCodeScanReviewMetadata() {
 	var metadata = Object.assign({}, codeScanState.reviewMetadata);
-	['title', 'segment', 'address_line_1', 'address_line_2'].forEach(function(key) {
+	CODE_SCAN_METADATA_KEYS.forEach(function(key) {
 		metadata[key] = String(metadata[key] || '').trim();
 	});
 	return metadata;
@@ -1828,6 +1850,7 @@ function rescanCodeScan(event) {
 		event.preventDefault();
 	if(!codeScanState.active)
 		return;
+	codeScanState.debugPaused = false;
 	logCodeScanStep('Restarting scan');
 	invalidateCodeScanSession();
 	codeScanState.hasCaptured = false;
@@ -2457,6 +2480,12 @@ function initCodeScanZoomAndPan() {
 	}
 	if(!viewport)
 		return;
+	var debugLog = document.getElementById('code_scan_debug');
+	if(debugLog) {
+		['mousedown', 'wheel', 'touchstart', 'touchmove', 'touchend', 'touchcancel'].forEach(function(type) {
+			debugLog.addEventListener(type, function(event) { event.stopPropagation(); }, { passive: true });
+		});
+	}
 	viewport.addEventListener('mousedown', handleCodeScanMouseDown);
 	window.addEventListener('mousemove', handleCodeScanMouseMove);
 	window.addEventListener('mouseup', handleCodeScanMouseUp);

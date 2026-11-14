@@ -114,6 +114,10 @@ html.dark-mode body:not(.decode).decode-icon-guide #decode_icon_guide_scrim .map
 	stroke: #3a3a58;
 }
 
+body.decode-icon-guide #wait_loader.hide {
+	display: block !important;
+}
+
 body.decode-icon-guide #decode_icon_guide_scrim {
 	display: block;
 }

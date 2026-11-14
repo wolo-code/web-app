@@ -187,6 +187,8 @@ Scanner spacing: Back and forward buttons are centered in the remaining space on
 
 Offline release manifest: Native publishing generates the precache list from each final merged environment bundle, including its current hashed script and scanner audio. The service-worker cache uses v3. Manifest tests write isolated temporary fixtures and do not change real publish outputs.
 
+The top-bar loader stays visible while the Input Icon Guide is shown.
+
 Scanner controls: Progress, word validation and save feedback overlay the frozen viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Capture and photo review use matching three-column layouts. When Typing opens Label Edit View, Rescan and Go share the control row. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
 
 Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Go sits beside the zoom controls; Address details, bookmark Save and the Cancel icon share the bottom action row. Zoom Reset uses an accessible reset-arrow icon.

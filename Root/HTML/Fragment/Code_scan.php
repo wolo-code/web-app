@@ -19,6 +19,10 @@
 					<div id='code_scan_candidate_highlight' class='code_scan_candidate_highlight hide' aria-hidden='true'></div>
 				</div>
 				<span id='code_scan_live_zoom_indicator' class='code_scan_live_zoom_indicator hide' aria-live='polite'></span>
+				<div id='code_scan_debug' class='code_scan_debug hide'>
+					<strong>Debug log</strong>
+					<ul id='code_scan_debug_steps' role='log' aria-label='Scan Debug Log' aria-live='off'></ul>
+				</div>
 			</div>
 			<div class='code_scan_messages'>
 				<p id='code_scan_status' class='code_scan_status' role='status'>Processed on your device<br>No images are uploaded</p>
@@ -30,13 +34,13 @@
 				<span class='image'><?php includeSVG('', 'Reverse'); ?></span>
 			</button>
 			<div class='code_scan_zoom_group' role='group' aria-label='Zoom controls'>
-				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
+				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
 				<button id='code_scan_zoom_reset' class='code_scan_zoom_button code_scan_zoom_reset' type='button' aria-label='Reset zoom' title='Reset zoom'>
 					<svg class='code_scan_zoom_default_icon' viewBox='0 0 24 24' aria-hidden='true'><circle cx='10' cy='10' r='6' fill='none' stroke='currentColor' stroke-width='2'/><path d='m15 15 5 5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg>
 					<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M5 8a8 8 0 1 1-1 8M5 3v5h5' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>
 					<span id='code_scan_zoom_level' class='code_scan_zoom_level' aria-live='polite'>100%</span>
 				</button>
-				<button id='code_scan_zoom_in' class='code_scan_zoom_button' type='button' aria-label='Zoom in' title='Zoom in'>&plus;</button>
+				<button id='code_scan_zoom_out' class='code_scan_zoom_button' type='button' aria-label='Zoom out' title='Zoom out'>&minus;</button>
 			</div>
 			<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
 				<span class='image'><?php includeSVG('', 'Proceed'); ?></span>

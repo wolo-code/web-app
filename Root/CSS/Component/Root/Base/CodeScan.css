@@ -54,6 +54,31 @@
 	position: relative;
 }
 
+.code_scan_debug {
+	position: absolute;
+	inset: auto auto 6px 6px;
+	z-index: 3;
+	max-width: calc(100% - 12px);
+	padding: 4px 8px;
+	border-radius: 6px;
+	background: rgba(13, 17, 23, 0.85);
+	color: #fff;
+	font: 11px/1.35 monospace;
+	pointer-events: none;
+}
+
+.code_scan_debug ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+:is(#map_code_scan_button, #decode_code_scan_button) {
+	touch-action: manipulation;
+	user-select: none;
+	-webkit-touch-callout: none;
+}
+
 .code_scan_viewport:not(.hide) + .code_scan_messages {
 	margin-top: 8px;
 }
@@ -185,11 +210,21 @@
 
 .code_scan_zoom_group {
 	align-items: center;
-	background: rgba(0, 0, 0, 0.05);
-	border: 1px solid rgba(105, 183, 207, 0.35);
-	border-radius: 18px;
 	display: inline-flex;
-	padding: 2px 4px;
+	flex-direction: column;
+	isolation: isolate;
+	position: relative;
+	width: 64px;
+	padding: 3px 0;
+}
+
+.code_scan_zoom_group::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: rgba(105, 183, 207, 0.17);
+	clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
 }
 
 .code_scan_zoom_button {
@@ -203,21 +238,16 @@
 	font-family: Abel, 'Roboto Condensed', sans-serif;
 	font-size: 1.1em;
 	font-weight: 600;
-	height: 28px;
+	height: 32px;
 	justify-content: center;
 	line-height: 1;
-	min-width: 28px;
-	padding: 0 6px;
+	width: 44px;
+	padding: 0;
 	transition: background 150ms ease, color 150ms ease;
 }
 
 .code_scan_zoom_button:hover {
 	background: rgba(105, 183, 207, 0.15);
-}
-
-.code_scan_zoom_button.code_scan_zoom_reset {
-	font-size: 0.82em;
-	padding: 0 8px;
 }
 
 .code_scan_zoom_level {
@@ -537,9 +567,8 @@ html.dark-mode .code_scan_crop_rescan {
 	color: #9fd4e8;
 }
 
-html.dark-mode .code_scan_zoom_group {
-	background: rgba(255, 255, 255, 0.08);
-	border-color: rgba(105, 183, 207, 0.4);
+html.dark-mode .code_scan_zoom_group::before {
+	background: rgba(105, 183, 207, 0.22);
 }
 
 html.dark-mode .code_scan_zoom_button {
@@ -754,14 +783,13 @@ html.dark-mode .code_scan_apply_crop {
 }
 
 .code_scan_zoom_button.code_scan_zoom_reset {
- position: relative; width: 28px; height: 28px; padding: 0;
- flex: 0 0 28px; align-items: center; justify-content: center;
- background: transparent; border: none; border-radius: 0; box-shadow: none;
+ position: relative; height: 26px;
+ background: transparent;
 }
 .code_scan_zoom_button.code_scan_zoom_reset:hover,
 .code_scan_zoom_button.code_scan_zoom_reset:active { background: transparent; }
 .code_scan_zoom_reset .code_scan_zoom_level {
- position: absolute; bottom: calc(100% + 7px); left: 50%; transform: translateX(-50%);
+ position: absolute; left: 100%; pointer-events: none;
  visibility: hidden;
 }
 .code_scan_zoom_reset.code_scan_zoom_changed .code_scan_zoom_level { visibility: visible; }

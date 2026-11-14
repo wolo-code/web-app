@@ -1,5 +1,6 @@
 var codeScanState = {
 	active: false,
+	debug: false,
 	showRegions: false,
 	shutterPressed: false,
 	regionPressConsumed: false,
@@ -75,8 +76,11 @@ function getCodeScanInitialStatus() {
 }
 
 function initCodeScan() {
-	bindControl('decode_code_scan_button', 'click', openCodeScan);
-	bindControl('map_code_scan_button', 'click', openCodeScan);
+	['decode_code_scan_button', 'map_code_scan_button'].forEach(function(id) {
+		addLongpressListener(document.getElementById(id), openCodeScan, function(event) {
+			openCodeScan(event, true);
+		});
+	});
 	bindControl('code_scan_close', 'click', closeCodeScan);
 	bindControl('code_scan_type_instead', 'click', openCodeScanManualEntry);
 	bindControl('code_scan_use_photo', 'click', openCodeScanPhotoPicker);
@@ -212,7 +216,25 @@ function bindCodeScanReviewInputListeners() {
 	}
 }
 
-function openCodeScan(event) {
+function setCodeScanDebug(enabled) {
+	codeScanState.debug = enabled;
+	var overlay = document.getElementById('code_scan_debug');
+	var steps = document.getElementById('code_scan_debug_steps');
+	if(overlay) overlay.classList.toggle('hide', !enabled);
+	if(steps) steps.textContent = '';
+}
+
+function logCodeScanStep(message) {
+	if(!codeScanState.debug || !codeScanState.active) return;
+	var steps = document.getElementById('code_scan_debug_steps');
+	if(!steps || (steps.lastElementChild && steps.lastElementChild.textContent === message)) return;
+	var step = document.createElement('li');
+	step.textContent = message;
+	steps.appendChild(step);
+	if(steps.childElementCount > 5) steps.firstElementChild.remove();
+}
+
+function openCodeScan(event, debug) {
 	if(event && event.preventDefault)
 		event.preventDefault();
 	if(typeof wordList == 'undefined' || !wordList) {
@@ -226,6 +248,8 @@ function openCodeScan(event) {
 	setCodeScanPhotoFallbackVisible(true);
 	showOverlay(document.getElementById('code_scan_message'));
 	codeScanState.active = true;
+	setCodeScanDebug(!!debug);
+	logCodeScanStep('Debug mode started');
 	setCodeScanDetectionMode('fixed');
 	if(codeScanOcrMatch.isCodeScanSupported()) {
 		setCodeScanStatus('Requesting camera...');
@@ -234,8 +258,9 @@ function openCodeScan(event) {
 	}
 	prepareCodeScanWorker().catch(function() {});
 	codeScanState.cameraAvailable = false;
-	setCodeScanViewportVisible(false);
+	setCodeScanViewportVisible(codeScanState.debug);
 	setCodeScanCaptureVisible(false);
+	logCodeScanStep('Live camera unsupported');
 	setCodeScanStatus('Live camera is not supported here. Use a photo of the label or type the code instead.');
 }
 
@@ -274,6 +299,7 @@ function stopCodeScan() {
 	codeScanState.cropScanTimer = null;
 	codeScanState.cropRevision += 1;
 	codeScanState.active = false;
+	setCodeScanDebug(false);
 	codeScanState.processing = false;
 	codeScanState.cameraAvailable = false;
 	codeScanState.phase = 'live';
@@ -434,6 +460,7 @@ function startCodeScanCamera() {
 		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !document.hidden && !codeScanState.hasCaptured;
 	}
 	// Load the worker while the browser starts the camera. Camera readiness owns the visible status.
+	logCodeScanStep('Requesting camera');
 	var workerReady = prepareCodeScanWorker();
 	workerReady.catch(function() {});
 	navigator.mediaDevices.getUserMedia({
@@ -457,6 +484,7 @@ function startCodeScanCamera() {
 		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
+		logCodeScanStep('Camera ready');
 		setCodeScanCaptureEnabled(true);
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
@@ -464,6 +492,7 @@ function startCodeScanCamera() {
 		setCodeScanStatus(getCodeScanInitialStatus());
 		workerReady.then(function() {
 			if(current() && codeScanState.phase === 'live') {
+				logCodeScanStep('OCR worker ready');
 				runCodeScanFrame();
 			}
 		}).catch(function(error) { if(current()) handleCodeScanWorkerError(error); });
@@ -553,6 +582,7 @@ function disposeCodeScanWorker(worker) {
 function prepareCodeScanWorker() {
 	if(codeScanState.worker)
 		return Promise.resolve(codeScanState.worker);
+	logCodeScanStep('Loading OCR worker');
 	if(codeScanState.workerPromise) return codeScanState.workerPromise;
 	var epoch = codeScanState.workerEpoch;
 	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
@@ -619,14 +649,16 @@ function handleCodeScanCameraError(error) {
 	else if(error && error.name === 'NotReadableError')
 		message = 'Camera is unavailable. Use a photo of the label or type the code instead.';
 	codeScanState.cameraAvailable = false;
-	setCodeScanViewportVisible(false);
+	setCodeScanViewportVisible(codeScanState.debug);
 	setCodeScanCaptureVisible(false);
+	logCodeScanStep('Camera error: ' + (error && error.name || 'unavailable'));
 	setCodeScanStatus(message);
 	showNotification(message);
 	stopCodeScanCamera();
 }
 
 function handleCodeScanWorkerError() {
+	logCodeScanStep('Could not load OCR worker');
 	setCodeScanStatus('Scanner failed to load. Type or paste your Wolo Code instead.');
 	showNotification('Scanner failed to load. Type or paste your Wolo Code instead.');
 }
@@ -649,6 +681,7 @@ function runCodeScanFrame() {
 	// The dashed frame is a guide; both the code box and whole card may extend beyond it.
 	Promise.resolve().then(function() {
 		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
+		logCodeScanStep('Reading camera frame');
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
 		var previous = codeScanState.recognizedFrame;
 		var sameSize = previous && previous.frame.width === frame.width && previous.frame.height === frame.height;
@@ -678,6 +711,7 @@ function runCodeScanFrame() {
 		scheduleCodeScanFrame(codeScanState.recognizedFrame ? CODE_SCAN_CONFIRM_INTERVAL_MS : CODE_SCAN_FRAME_INTERVAL_MS);
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
+		if(revision === codeScanState.cropRevision) logCodeScanStep('Frame processing failed');
 		codeScanState.processing = false;
 		if(!codeScanState.showRegions) {
 			resetCodeScanMatchState();
@@ -890,6 +924,7 @@ function detectCodeScanConfirmation(canvas, live) {
 	var width = bounds.x1 - bounds.x0;
 	var height = bounds.y1 - bounds.y0;
 	if(width <= 0 || height <= 0 || width * height > canvas.width * canvas.height / 2) return null;
+	logCodeScanStep('Checking previous card region');
 	var containers = detectCodeScanContainers(canvas, bounds);
 	var box = codeScanOcrMatch.getLabelCodeBoxes(containers).find(function(candidate) {
 		return candidate.x1 - candidate.x0 >= 1.2 * (candidate.y1 - candidate.y0) &&
@@ -971,12 +1006,17 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		if(!canvas || !canvas.width || !canvas.height) throw new Error('Empty scan image');
 		var epoch = codeScanState.workerEpoch;
 		var search = { focus: focus };
-		var containers = detectCodeScanConfirmation(canvas, live) || detectCodeScanContainers(canvas, null, search);
+		var containers = detectCodeScanConfirmation(canvas, live);
+		if(!containers) {
+			logCodeScanStep('Detecting card and code regions');
+			containers = detectCodeScanContainers(canvas, null, search);
+		}
 		var result = await recognizeCodeScanImage(canvas, focus, options, worker, containers);
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		if(result.data.scanMatch || (live && !live.isCurrent())) return result;
 		if(search.findRemaining) {
 			// The card crop missed in OCR. Try other code boxes using the same edge scan.
+			logCodeScanStep('Searching for other code regions');
 			var remaining = search.findRemaining();
 			var tried = result.data.codeBoxes;
 			var retry = remaining.filter(function(box) {
@@ -989,6 +1029,7 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		}
 		var angle = -getCodeScanLabelRoll(canvas);
 		if(!angle) return result;
+		logCodeScanStep('Straightening tilted label');
 		var transform = getCodeScanRollTransform(canvas.width, canvas.height, angle);
 		var aligned = transform.image(canvas);
 		var tiltedOptions = Object.assign({}, options);
@@ -1099,8 +1140,14 @@ async function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allow
 			var crop = useCardCrop ? card : {
 				x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
 			};
+			if(codeScanState.debug) {
+				var readMode = useCardCrop ? 'card crop' : segmentation === '11' ? 'sparse code text' : 'code box';
+				logCodeScanStep('Reading ' + readMode + (rotation ? ' at ' + rotation + '°' : ''));
+			}
 			var words = await ocrCodeScanBand(canvas, crop, worker, useCardCrop ? 1600 : live ? 240 : 480, rotation, segmentation);
 			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+			if(live && !live.isCurrent()) return;
+			logCodeScanStep('Matching words to Wolo dictionary');
 			var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
 			if(!match || match.regions.container !== box) continue;
 			if(rotation) {
@@ -1260,6 +1307,7 @@ function enrichCodeScanMetadata(canvas, match) {
 				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 				if(band.role === 'above' && headingRows >= 2) return;
 				if(band.role === 'below' && addressRows >= 2) return;
+				logCodeScanStep(band.role === 'above' ? 'Reading title and segment' : 'Reading address lines');
 				return ocrCodeScanBand(canvas, band, worker).then(function(words) {
 					extra = extra.concat(words);
 					if(band.role === 'above') headingRows = headingRowCount(extra, match);
@@ -1269,6 +1317,7 @@ function enrichCodeScanMetadata(canvas, match) {
 		});
 		return chain.then(function() { return extra; });
 	}).then(function(words) {
+		logCodeScanStep('Finished reading label details');
 		return finish(codeScanOcrMatch.fillLabelMetadata(match, words));
 	}).catch(function() {
 		return finish(match);
@@ -1280,6 +1329,7 @@ function handleCodeScanLiveOcrResult(result, frame) {
 	var boxes = result.data && result.data.debugBoxes || [];
 	var previous = codeScanState.recognizedFrame;
 	if(!match || !match.regions.container) {
+		logCodeScanStep('No Wolo Code match in this frame');
 		// One soft or blurred frame should not erase a recent read.
 		if(previous && (codeScanState.showRegions || !codeScanState.missedMatchFrame)) {
 			codeScanState.missedMatchFrame = true;
@@ -1308,6 +1358,8 @@ function handleCodeScanLiveOcrResult(result, frame) {
 	var sameLabel = previous && previous.match.words.slice(-3).join(' ') === words &&
 		codeScanOcrMatch.bboxIoU(previous.match.regions.container, match.regions.container) >= CODE_SCAN_BBOX_IOU_MIN;
 	codeScanState.stableMatchCount = sameLabel ? codeScanState.stableMatchCount + 1 : 1;
+	logCodeScanStep(match.highConfidence || codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES ?
+		'Confirmed Wolo Code' : 'Candidate found. Checking next frame');
 	if(codeScanState.shutterPressed) return;
 	if(match.highConfidence) captureCodeScanDetection();
 	else if(codeScanState.stableMatchCount >= CODE_SCAN_STABLE_MATCHES) {
@@ -1355,6 +1407,7 @@ function captureCodeScanManually(event) {
 	if(!video || !canvas || video.readyState < 2)
 		return;
 	if(!captureCodeScanFullRes(video, canvas)) return;
+	logCodeScanStep('Captured still image');
 	resetCodeScanLiveZoom();
 	saveCodeScanSourceFromCanvas(canvas, true);
 	resetCodeScanZoom(true);
@@ -1440,6 +1493,7 @@ function processCodeScanCapture() {
 		else setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session)) return;
+		logCodeScanStep('Still image recognition failed');
 		codeScanState.processing = false;
 		if(codeScanState.active)
 			showCodeScanReview(null);
@@ -1447,6 +1501,7 @@ function processCodeScanCapture() {
 }
 
 function showCodeScanReview(match, manualEntry) {
+	if(!manualEntry) logCodeScanStep(match ? 'Wolo Code ready for review' : 'No Wolo Code read. Review manually');
 	populateCodeScanMetadata(match);
 	codeScanState.reviewMatch = match;
 	var review = codeScanOcrMatch.splitMatchForReview(match);
@@ -1773,6 +1828,7 @@ function rescanCodeScan(event) {
 		event.preventDefault();
 	if(!codeScanState.active)
 		return;
+	logCodeScanStep('Restarting scan');
 	invalidateCodeScanSession();
 	codeScanState.hasCaptured = false;
 	resetCodeScanMatchState();
@@ -1782,8 +1838,9 @@ function rescanCodeScan(event) {
 		startCodeScanCamera();
 		return;
 	}
-	setCodeScanViewportVisible(false);
+	setCodeScanViewportVisible(codeScanState.debug);
 	setCodeScanCaptureVisible(false);
+	logCodeScanStep('Live camera unsupported');
 	setCodeScanStatus('Live camera is not supported here. Use a photo of the label or type the code instead.');
 }
 
@@ -1846,6 +1903,7 @@ function handleCodeScanPhotoInput(event) {
 	clearCodeScanCandidateHighlight();
 	setCodeScanWoloFoundCue(false);
 	setCodeScanStatus('Reading photo on your device...');
+	logCodeScanStep('Decoding gallery photo');
 	prepareCodeScanWorker().catch(function() {});
 	recognizeCodeScanPhoto(file).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
@@ -1861,7 +1919,8 @@ function handleCodeScanPhotoInput(event) {
 		codeScanState.hasCaptured = false;
 		if(codeScanState.active) {
 			setCodeScanFrozenPreview(false);
-			setCodeScanViewportVisible(false);
+			setCodeScanViewportVisible(codeScanState.debug);
+			logCodeScanStep('Gallery photo recognition failed');
 			setCodeScanCropControlsVisible(false);
 			setCodeScanPhase('live');
 			setCodeScanLiveControlsVisible(true);
@@ -2448,6 +2507,7 @@ function applyCodeScanCrop() {
 	setCodeScanPhase('processing');
 	setCodeScanStatus('Reading label on your device...');
 	// Reframing changes candidate preference, never clips the card to the guide.
+	logCodeScanStep('Rechecking reframed image');
 	recognizeCodeScanCanvas(source, focus).then(function(result) {
 		if(!isCurrentCodeScanSession(session)) return;
 		if(revision !== codeScanState.cropRevision) { setCodeScanPhase('review'); return; }
@@ -2458,12 +2518,14 @@ function applyCodeScanCrop() {
 		}
 		else {
 			setCodeScanPhase('review');
+			logCodeScanStep('No match in reframed image');
 			drawCodeScanMatchRegions(null, canvas, result.data && result.data.debugBoxes || []);
 			setCodeScanStatus('Could not read the code box. Try another photo or edit the words.');
 		}
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session)) return;
 		setCodeScanPhase('review');
+		logCodeScanStep('Reframed image recognition failed');
 		setCodeScanStatus('Recognition failed. Try again or edit the words.');
 	});
 }

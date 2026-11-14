@@ -196,6 +196,28 @@ test('late capture completion cannot change a reopened dialog or its processing 
 	}
 });
 
+test('live OCR loads during the camera request and starts when both are ready', async () => {
+	for(const cameraFirst of [true, false]) {
+		const c = scanner(), camera = deferred(), creation = deferred(), w = worker();
+		let starts = 0, frames = 0;
+		c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
+		c.navigator = { mediaDevices: { getUserMedia: () => camera.promise } };
+		c.getCodeScanVideo = () => ({ play: async () => {} });
+		c.runCodeScanFrame = () => frames++;
+		c.startCodeScanCamera();
+		await flush();
+		assert.equal(starts, 1);
+		assert.equal(frames, 0);
+		if(cameraFirst) camera.resolve({}); else creation.resolve(w);
+		await flush();
+		assert.equal(frames, 0);
+		if(cameraFirst) creation.resolve(w); else camera.resolve({});
+		await flush();
+		assert.equal(starts, 1);
+		assert.equal(frames, 1);
+	}
+});
+
 test('camera requests from an earlier session stop their tracks without attaching', async () => {
 	const c = scanner(), request = deferred();
 	let stopped = 0;

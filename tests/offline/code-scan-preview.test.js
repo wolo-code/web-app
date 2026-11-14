@@ -175,6 +175,20 @@ test('live debug skips portrait and square candidates and reads landscape frames
  assert.deepEqual(rotations, [0]);
 });
 
+test('live OCR tries the previous label first when confirming a read', async () => {
+ const { context } = scanner();
+ const first = { x0: 110, y0: 160, x1: 290, y1: 220 };
+ const second = { x0: 80, y0: 270, x1: 280, y1: 330 };
+ const previousBox = { ...second, x0: second.x0 - 5 };
+ const reads = [];
+ context.detectCodeScanContainers = () => [first, second];
+ context.codeScanState.worker = { setParameters: async () => {} };
+ context.ocrCodeScanBand = async (_image, band) => { reads.push(band.y0); return []; };
+ const live = { previousBox, isCurrent: () => true, showBoxes: () => {} };
+ await context.recognizeCodeScanCanvas({ width: 400, height: 400 }, null, { live });
+ assert.deepEqual(reads, [274, 164]);
+});
+
 test('manual shutter OCR rotates the fresh still and maps recognized regions back', async () => {
  const { context } = scanner();
  const matcher = context.codeScanOcrMatch;

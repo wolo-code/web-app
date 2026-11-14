@@ -112,8 +112,7 @@ function stopCodeScanShutterSound() {
 }
 
 var CODE_SCAN_FRAME_INTERVAL_MS = 250;
-
-
+var CODE_SCAN_CONFIRM_INTERVAL_MS = 70;
 var CODE_SCAN_STABLE_MATCHES = 2;
 var CODE_SCAN_BBOX_IOU_MIN = 0.55;
 var CODE_SCAN_TESSERACT_BASE = '/tesseract';
@@ -430,7 +429,7 @@ function setCodeScanDetectionMode(mode) {
 		setCodeScanStatus(getCodeScanInitialStatus());
 }
 
-function scheduleCodeScanFrame() {
+function scheduleCodeScanFrame(delay) {
 	clearCodeScanTimer();
 	if(!codeScanState.active || !isCodeScanVisible() || codeScanState.hasCaptured) {
 		if(codeScanState.active && !codeScanState.hasCaptured)
@@ -439,7 +438,7 @@ function scheduleCodeScanFrame() {
 	}
 	if(codeScanState.phase !== 'live')
 		return;
-	codeScanState.scanTimer = setTimeout(runCodeScanFrame, CODE_SCAN_FRAME_INTERVAL_MS);
+	codeScanState.scanTimer = setTimeout(runCodeScanFrame, delay || CODE_SCAN_FRAME_INTERVAL_MS);
 }
 
 function getCodeScanVideo() {
@@ -483,6 +482,9 @@ function startCodeScanCamera() {
 	function current() {
 		return isCurrentCodeScanSession(session) && request === codeScanState.cameraRequest && !document.hidden && !codeScanState.hasCaptured;
 	}
+	// Load the worker while the browser starts the camera. Camera readiness owns the visible status.
+	var workerReady = prepareCodeScanWorker(true);
+	workerReady.catch(function() {});
 	navigator.mediaDevices.getUserMedia({
 		video: {
 			facingMode: {ideal: 'environment'},
@@ -508,10 +510,12 @@ function startCodeScanCamera() {
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanFrozenPreview(false);
-		setCodeScanStatus(getCodeScanInitialStatus());
-		prepareCodeScanWorker().then(function() {
-			if(current() && codeScanState.phase === 'live')
+		setCodeScanStatus(codeScanState.worker ? getCodeScanInitialStatus() : 'Loading on-device scanner...');
+		workerReady.then(function() {
+			if(current() && codeScanState.phase === 'live') {
+				setCodeScanStatus(getCodeScanInitialStatus());
 				runCodeScanFrame();
+			}
 		}).catch(function(error) { if(current()) handleCodeScanWorkerError(error); });
 	}).catch(function(error) { if(current()) handleCodeScanCameraError(error); });
 }
@@ -596,13 +600,13 @@ function disposeCodeScanWorker(worker) {
 	try { Promise.resolve(worker.terminate()).catch(function() {}); } catch(error) {}
 }
 
-function prepareCodeScanWorker() {
+function prepareCodeScanWorker(quiet) {
 	if(codeScanState.worker)
 		return Promise.resolve(codeScanState.worker);
 	if(codeScanState.workerPromise) return codeScanState.workerPromise;
 	var epoch = codeScanState.workerEpoch;
 	var pendingWorker;
-	if(codeScanState.phase !== 'review') setCodeScanStatus('Loading on-device scanner...');
+	if(!quiet && codeScanState.phase !== 'review') setCodeScanStatus('Loading on-device scanner...');
 	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		return Tesseract.createWorker('eng', 1, {
@@ -677,6 +681,7 @@ function handleCodeScanCameraError(error) {
 	setCodeScanStatus(message);
 	showNotification(message);
 	stopCodeScanCamera();
+	terminateCodeScanWorker();
 }
 
 function handleCodeScanWorkerError() {
@@ -694,7 +699,7 @@ function runCodeScanFrame() {
 	}
 	var video = getCodeScanVideo();
 	if(!video || video.readyState < 2) {
-		scheduleCodeScanFrame();
+		scheduleCodeScanFrame(CODE_SCAN_CONFIRM_INTERVAL_MS);
 		return;
 	}
 	var frame = document.createElement('canvas');
@@ -705,6 +710,7 @@ function runCodeScanFrame() {
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
 		return recognizeCodeScanCanvas(frame, null, {
 			live: {
+				previousBox: codeScanState.recognizedFrame && codeScanState.recognizedFrame.match.regions.container,
 				isCurrent: function() {
 					return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
 				},
@@ -724,7 +730,7 @@ function runCodeScanFrame() {
 			return;
 		}
 		handleCodeScanLiveOcrResult(result, frame);
-		scheduleCodeScanFrame();
+		scheduleCodeScanFrame(codeScanState.recognizedFrame ? CODE_SCAN_CONFIRM_INTERVAL_MS : CODE_SCAN_FRAME_INTERVAL_MS);
 	}).catch(function() {
 		if(!isCurrentCodeScanSession(session) || codeScanState.phase !== 'live') return;
 		codeScanState.processing = false;
@@ -1018,7 +1024,16 @@ async function recognizeCodeScanImage(canvas, focus, options, worker, containers
 	if(live) {
 		boxes = boxes.filter(function(box) {
 			return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0);
-		}).slice(0, 2);
+		});
+		if(live.previousBox) {
+			// Try the previously read region first on its confirmation frame.
+			var overlap = function(box) {
+				var iou = codeScanOcrMatch.bboxIoU(box, live.previousBox);
+				return iou >= CODE_SCAN_BBOX_IOU_MIN ? iou : 0;
+			};
+			boxes.sort(function(a, b) { return overlap(b) - overlap(a); });
+		}
+		boxes = boxes.slice(0, 2);
 		var debugBoxes = boxes.slice(0, 1);
 		var card = debugBoxes.length && codeScanOcrMatch.findLabelCard(containers, debugBoxes[0]);
 		if(card && card.x1 - card.x0 > card.y1 - card.y0) debugBoxes.push(card);
@@ -1162,7 +1177,7 @@ async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation) {
 		input = new Uint8Array(await blob.arrayBuffer());
 	}
 	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-	var result = await worker.recognize(input);
+	var result = await worker.recognize(input, {}, { text: false, hocr: false, tsv: false });
 	if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
 	var words = result.data && result.data.words || [];
 	return words.map(function(word) {

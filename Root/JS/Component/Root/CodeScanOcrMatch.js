@@ -585,7 +585,9 @@
 			words: matched,
 			code: matched.join(' '),
 			cityWordCount: cityTokens.length,
-			highConfidence: best.exact && best.confidence >= 85 && !!cityRow && cityRow.words.every(function(word) { return word.confidence >= 85; }),
+			highConfidence: best.exact && (cityRow ?
+				best.confidence >= 85 && cityRow.words.every(function(word) { return word.confidence >= 85; }) :
+				best.confidence >= 90),
 			metadata: optional.metadata,
 			regions: Object.assign({ card: card, container: best.container, city: cityRow ? cityRow.bbox : null, code: codeBox }, optional.regions)
 		};

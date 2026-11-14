@@ -163,6 +163,9 @@ test('optional unreadable metadata and city do not prevent review of three words
 	assert.equal(result.code, 'mail nebula flower');
 	assert.deepEqual(result.metadata, { title: '', segment: '', address_line_1: '', address_line_2: '', address: '' });
 	assert.equal(result.regions.city, null);
+	assert.equal(result.highConfidence, true);
+	const uncertain = codeWords(); uncertain[1].confidence = 89;
+	assert.equal(match(uncertain).highConfidence, false);
 	const badCode = codeWords(); badCode[1].confidence = 20;
 	assert.equal(match(badCode), null);
 });
@@ -302,11 +305,6 @@ test('band text fills a blank title, segment, and address and does not replace t
 	assert.equal(kept.metadata.segment, '');
 });
 
-test('address line 2 on its own has no leading blank paragraph', () => {
-	assert.equal(matcher.formatScanAddress({ address_line_1: '', address_line_2: 'Flat 4B' }), 'Flat 4B');
-	assert.equal(matcher.formatScanAddress({ address_line_1: '  ', address_line_2: ' Flat 4B ' }), 'Flat 4B');
-});
-
 test('blank detail OCR rows do not take the first address slot', () => {
 	const found = match(codeWords());
 	const address = word('12 Main Road', 120, 387, 340, 403);
@@ -316,6 +314,11 @@ test('blank detail OCR rows do not take the first address slot', () => {
 	assert.equal(found.metadata.address, address.text);
 	assert.deepEqual(found.regions.address_line_1, address.bbox);
 	assert.equal(found.regions.address_line_2, null);
+});
+
+test('address line 2 on its own has no leading blank paragraph', () => {
+	assert.equal(matcher.formatScanAddress({ address_line_1: '', address_line_2: 'Flat 4B' }), 'Flat 4B');
+	assert.equal(matcher.formatScanAddress({ address_line_1: '  ', address_line_2: ' Flat 4B ' }), 'Flat 4B');
 });
 
 test('reframing prefers the code near the image focus without restricting recognition to a guide', () => {

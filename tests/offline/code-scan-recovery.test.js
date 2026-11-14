@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
+const codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
 
 const flush = () => new Promise(resolve => setImmediate(resolve));
 function deferred() {
@@ -38,6 +39,23 @@ function scanner({ useRecognition = false } = {}) {
 }
 function worker() {
 	return { setParameters: async () => {}, recognize: async () => ({ data: {} }), terminate() { this.terminated = true; } };
+}
+
+function mockLivePreview(context) {
+	let nextFrame = 0;
+	const frames = new Map(), draws = [], classes = new Set(['hide']);
+	const viewport = { clientWidth: 360, clientHeight: 420, classList: { toggle() {} } };
+	const canvas = { parentElement: viewport, classList: { add: name => classes.add(name), remove: name => classes.delete(name) },
+		getContext: () => ({ drawImage: (...args) => draws.push(args) }) };
+	const getElementById = context.document.getElementById;
+	context.document.getElementById = id => id === 'code_scan_live_canvas' ? canvas : getElementById(id);
+	context.window.requestAnimationFrame = callback => { frames.set(++nextFrame, callback); return nextFrame; };
+	context.window.cancelAnimationFrame = id => frames.delete(id);
+	return { canvas, classes, draws, frames, viewport, paint(time) {
+		const [id, callback] = frames.entries().next().value;
+		frames.delete(id);
+		callback(time);
+	} };
 }
 
 test('concurrent initialization shares the LSTM worker without another setup round trip', async () => {
@@ -196,19 +214,15 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		let starts = 0, frames = 0;
 		c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
 		c.navigator = { mediaDevices: { getUserMedia: () => camera.promise } };
-		const dimensions = new Map();
-		const video = {
-			classList: new Set(), play: async () => {},
-			videoWidth: 1080, videoHeight: 1920,
-			style: { setProperty: (name, value) => dimensions.set(name, value) }
-		};
+		const preview = mockLivePreview(c);
+		const video = { play: async () => {} };
 		c.getCodeScanVideo = () => video;
 		c.runCodeScanFrame = () => frames++;
 		c.startCodeScanCamera();
 		await flush();
 		assert.equal(starts, 1);
 		assert.equal(frames, 0);
-		assert.equal(video.classList.has('code_scan_video_ready'), false);
+		assert.equal(preview.frames.size, 0);
 		if(cameraFirst) camera.resolve({}); else creation.resolve(w);
 		await flush();
 		assert.equal(frames, 0);
@@ -216,8 +230,7 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		await flush();
 		assert.equal(starts, 1);
 		assert.equal(frames, 1);
-		assert.equal(video.classList.has('code_scan_video_ready'), true);
-		assert.equal(dimensions.get('--code-scan-video-ratio'), '0.5625');
+		assert.equal(preview.frames.size, 1);
 	}
 });
 
@@ -302,10 +315,8 @@ test('Flashlight tracks the current camera and resets when it stops', async () =
 		stop() { this.readyState = 'ended'; }
 	};
 	c.document.getElementById = id => id === 'code_scan_flashlight' ? button : null;
-	const video = {
-		classList: { add() {}, remove() {} }, style: { removeProperty() {} },
-		play: async () => {}, pause() {}, cloneNode() {}, replaceWith() {}
-	};
+	mockLivePreview(c);
+	const video = { play: async () => {}, pause() {}, cloneNode() {}, replaceWith() {} };
 	c.getCodeScanVideo = () => video;
 	c.prepareCodeScanWorker = async () => worker();
 	c.runCodeScanFrame = () => {};
@@ -371,17 +382,10 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	const c = scanner(), pending = deferred();
 	let requests = 0, stopped = 0, paused = 0, frames = 0;
 	const stream = () => ({ getTracks: () => [{ stop: () => stopped++ }] });
-	const preview = () => {
-		const style = new Map();
-		const classes = new Set();
-		return {
-			classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name) },
-			style: { setProperty: (key, value) => style.set(key, value), removeProperty: key => style.delete(key) },
-			play: async () => {}, pause: () => paused++, cloneNode: preview, replaceWith: fresh => { video = fresh; },
-			readRatio: () => style.get('--code-scan-video-ratio')
-		};
-	};
-	let video = preview();
+	const preview = mockLivePreview(c);
+	const createVideo = () => ({ play: async () => {}, pause: () => paused++,
+		cloneNode: () => createVideo(), replaceWith: fresh => { video = fresh; } });
+	let video = createVideo();
 	const firstVideo = video;
 	c.getCodeScanVideo = () => video;
 	c.isCodeScanVisible = () => true;
@@ -405,26 +409,21 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	assert.equal(requests, 2);
 	assert.equal(frames, 1);
 	assert.ok(video.srcObject);
-	video.videoWidth = 720;
-	video.videoHeight = 1280;
-	video.onresize();
-	assert.equal(video.readRatio(), '0.5625');
+	assert.equal(preview.frames.size, 1);
 	c.document.hidden = true;
 	c.suspendCodeScanMedia();
 	assert.equal(stopped, 2);
 	assert.equal(paused, 2);
 	assert.equal(firstVideo.srcObject, null);
-	assert.equal(firstVideo.onresize, null);
-	assert.equal(firstVideo.readRatio(), undefined);
 	assert.notEqual(video, firstVideo);
-	assert.equal(video.readRatio(), undefined);
+	assert.equal(preview.frames.size, 0);
 	c.document.hidden = false;
 	c.resumeCodeScanCamera();
 	await flush();
 	assert.equal(requests, 3);
 	assert.equal(frames, 2);
 	assert.ok(video.srcObject);
-	assert.ok(video.classList.contains('code_scan_video_ready'));
+	assert.equal(preview.frames.size, 1);
 	c.document.hidden = true;
 	c.suspendCodeScanMedia();
 	c.codeScanState.phase = 'review';
@@ -432,6 +431,46 @@ test('hiding the scanner releases live media and only resumes an interrupted liv
 	c.document.hidden = false;
 	c.resumeCodeScanCamera();
 	assert.equal(requests, 3);
+});
+
+test('Rescan fills the Viewfinder with the new camera crop after Label Edit View', async () => {
+	const c = scanner(), preview = mockLivePreview(c);
+	c.codeScanOcrMatch = { ...codeScanOcrMatch, isCodeScanSupported: () => true };
+	c.prepareCodeScanWorker = async () => worker();
+	c.runCodeScanFrame = () => {};
+	c.document.querySelector = selector => selector === '.code_scan_viewport' ? preview.viewport : null;
+	let stopped = 0;
+	c.navigator = { mediaDevices: { getUserMedia: async () => ({ getTracks: () => [{ stop: () => stopped++ }] }) } };
+	const createVideo = (width, height) => ({ readyState: 2, videoWidth: width, videoHeight: height,
+		play: async () => {}, pause() {}, cloneNode: () => createVideo(720, 1280), replaceWith: fresh => { video = fresh; } });
+	let video = createVideo(1280, 720);
+	c.getCodeScanVideo = () => video;
+	c.startCodeScanCamera();
+	await flush();
+	preview.paint(0);
+	assert.deepEqual(preview.draws[0].slice(-4), [0, 0, 360, 420]);
+	c.beginCodeScanCapture({});
+	assert.equal(c.codeScanState.phase, 'review');
+	assert.equal(stopped, 1);
+	assert.equal(preview.frames.size, 0);
+	assert.ok(preview.classes.has('hide'));
+	assert.equal(preview.canvas.width, 0);
+	c.rescanCodeScan();
+	await flush();
+	assert.equal(c.codeScanState.phase, 'live');
+	assert.ok(preview.classes.has('hide'));
+	preview.paint(0);
+	assert.deepEqual(preview.draws[1], [video, 0, 220, 720, 840, 0, 0, 360, 420]);
+	assert.ok(!preview.classes.has('hide'));
+	c.setCodeScanLiveZoom(2);
+	preview.paint(34);
+	assert.deepEqual(preview.draws[2], [video, 180, 430, 360, 420, 0, 0, 360, 420]);
+	preview.viewport.clientWidth = 420;
+	preview.viewport.clientHeight = 360;
+	video.videoWidth = 1280;
+	video.videoHeight = 720;
+	preview.paint(68);
+	assert.deepEqual(preview.draws[3], [video, 430, 180, 420, 360, 0, 0, 420, 360]);
 });
 
 test('oversized images and synchronous canvas failures reject instead of hanging', async () => {

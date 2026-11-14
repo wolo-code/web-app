@@ -20,6 +20,7 @@ var codeScanState = {
 	session: 0,
 	cameraRequest: 0,
 	cameraState: 'idle',
+	previewFrame: null,
 	scanTimer: null,
 	processing: false,
 	stableMatchCount: 0,
@@ -366,10 +367,36 @@ function getCodeScanVideo() {
 	return document.getElementById('code_scan_video');
 }
 
-function sizeCodeScanVideo(video) {
-	if(!video.videoWidth || !video.videoHeight) return;
-	// Size the video box for portrait Safari and keep object-fit: cover while dimensions change.
-	video.style.setProperty('--code-scan-video-ratio', String(video.videoWidth / video.videoHeight));
+function startCodeScanLivePreview(video) {
+	var canvas = document.getElementById('code_scan_live_canvas');
+	var context = canvas && canvas.getContext('2d');
+	if(!context) throw new Error('Camera preview unavailable');
+	var viewport = canvas.parentElement;
+	var lastDraw = -Infinity;
+	// Draw from the decoded frame so the browser's video layer cannot letterbox the Viewfinder.
+	function draw(timestamp) {
+		codeScanState.previewFrame = window.requestAnimationFrame(draw);
+		if(video.readyState < 2 || timestamp - lastDraw < 32) return;
+		var width = viewport.clientWidth;
+		var height = viewport.clientHeight;
+		if(!width || !height) return;
+		var crop = getCodeScanVideoSourceRect(video, viewport);
+		if(!crop.sw || !crop.sh) return;
+		var density = Math.min(window.devicePixelRatio || 1, 2);
+		width = Math.round(width * density);
+		height = Math.round(height * density);
+		if(canvas.width !== width) canvas.width = width;
+		if(canvas.height !== height) canvas.height = height;
+		try {
+			context.drawImage(video, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, width, height);
+		} catch(error) {
+			handleCodeScanCameraError(error);
+			return;
+		}
+		if(lastDraw === -Infinity) canvas.classList.remove('hide');
+		lastDraw = timestamp;
+	}
+	codeScanState.previewFrame = window.requestAnimationFrame(draw);
 }
 
 function getCodeScanVideoTrack() {
@@ -460,20 +487,18 @@ function startCodeScanCamera() {
 			return;
 		}
 		codeScanState.stream = stream;
-		video.onresize = function() { sizeCodeScanVideo(video); };
 		video.srcObject = stream;
 		return video.play();
 	}).then(function() {
 		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
-		sizeCodeScanVideo(video);
-		video.classList.add('code_scan_video_ready');
 		setCodeScanFlashlightAvailable(getCodeScanVideoTrack());
 		logCodeScanStep('Camera ready', startedAt);
 		setCodeScanViewportVisible(true);
 		setCodeScanLiveControlsVisible(true);
 		setCodeScanFrozenPreview(false);
+		startCodeScanLivePreview(video);
 		setCodeScanStatus(getCodeScanInitialStatus());
 		workerReady.then(function() {
 			if(current() && codeScanState.phase === 'live') {
@@ -489,6 +514,14 @@ function stopCodeScanCamera() {
 	codeScanState.cameraState = 'idle';
 	codeScanState.cameraAvailable = false;
 	setCodeScanFlashlightAvailable(null);
+	if(codeScanState.previewFrame !== null) {
+		window.cancelAnimationFrame(codeScanState.previewFrame);
+		codeScanState.previewFrame = null;
+		var canvas = document.getElementById('code_scan_live_canvas');
+		canvas.classList.add('hide');
+		canvas.width = 0;
+		canvas.height = 0;
+	}
 	var video = getCodeScanVideo();
 	if(codeScanState.stream) {
 		codeScanState.stream.getTracks().forEach(function(track) {
@@ -498,15 +531,9 @@ function stopCodeScanCamera() {
 	}
 	if(video) {
 		var hadStream = !!video.srcObject;
-		video.classList.remove('code_scan_video_ready');
-		video.onresize = null;
 		video.pause();
 		video.srcObject = null;
-		if(hadStream) {
-			// Reusing the video element can retain the previous camera's rendering geometry on iOS.
-			video.style.removeProperty('--code-scan-video-ratio');
-			video.replaceWith(video.cloneNode(false));
-		}
+		if(hadStream) video.replaceWith(video.cloneNode(false));
 	}
 }
 
@@ -713,8 +740,8 @@ function runCodeScanFrame() {
 	});
 }
 
-function getCodeScanVideoSourceRect(video) {
-	var viewport = document.querySelector('.code_scan_viewport');
+function getCodeScanVideoSourceRect(video, viewport) {
+	viewport = viewport || document.querySelector('.code_scan_viewport');
 	var vw = viewport ? viewport.clientWidth : 0;
 	var vh = viewport ? viewport.clientHeight : 0;
 	var cw = video ? video.videoWidth : 0;
@@ -1750,6 +1777,7 @@ function rescanCodeScan(event) {
 	resetCodeScanUi();
 	setCodeScanPhotoFallbackVisible(true);
 	if(codeScanOcrMatch.isCodeScanSupported()) {
+		setCodeScanStatus('Requesting camera...');
 		startCodeScanCamera();
 		return;
 	}
@@ -2119,11 +2147,8 @@ function zoomOutCodeScan() {
 
 function setCodeScanLiveZoom(zoom) {
 	codeScanState.cropRevision += 1;
-	var video = getCodeScanVideo();
 	var clampedZoom = Math.max(1, Math.min(4, typeof zoom === 'number' ? zoom : 1));
 	codeScanState.liveZoom = Math.round(clampedZoom * 100) / 100;
-	if(video)
-		video.style.transform = codeScanState.liveZoom > 1 ? 'scale(' + codeScanState.liveZoom + ')' : '';
 	updateCodeScanLiveZoomIndicator();
 	resetCodeScanMatchState();
 	clearCodeScanCandidateHighlight();
@@ -2136,9 +2161,6 @@ function setCodeScanLiveZoom(zoom) {
 
 function resetCodeScanLiveZoom() {
 	codeScanState.liveZoom = 1;
-	var video = getCodeScanVideo();
-	if(video)
-		video.style.transform = '';
 	updateCodeScanLiveZoomIndicator();
 }
 

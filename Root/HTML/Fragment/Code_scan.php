@@ -12,6 +12,7 @@
 		<div class='code_scan_preview'>
 			<div class='code_scan_viewport'>
 				<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
+				<canvas id='code_scan_live_canvas' class='hide' aria-hidden='true'></canvas>
 				<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
 				<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'></div>
 				<div class='code_scan_regions' aria-hidden='true'>

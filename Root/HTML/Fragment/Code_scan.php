@@ -94,11 +94,13 @@
 		</div>
 	</div>
 	<div id='code_scan_review_actions' class='code_scan_review_actions hide' role='group' aria-label='Review controls'>
+		<div id='code_scan_review_leading' class='code_scan_review_leading'>
+			<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
+				<span class='image'><?php includeSVG('', 'Save'); ?></span>
+			</button>
+		</div>
 		<button id='code_scan_details_toggle' class='code_scan_icon_button' type='button' aria-label='Show address details' title='Address details' aria-expanded='false' aria-controls='code_scan_heading_details code_scan_details'>
 			<span class='image'><?php includeSVG('', 'Address'); ?></span>
-		</button>
-		<button id='code_scan_save' class='code_scan_icon_button' type='button' aria-label='Save to address book' title='Save to address book' disabled>
-			<span class='image'><?php includeSVG('', 'Save'); ?></span>
 		</button>
 		<button id='code_scan_apply_crop' class='code_scan_crop_button code_scan_apply_crop' type='button' aria-label='Go' title='Use address' disabled>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>

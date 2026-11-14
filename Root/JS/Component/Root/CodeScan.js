@@ -117,6 +117,7 @@ function initCodeScan() {
 	window.addEventListener('resize', redrawCodeScanReviewRegions);
 	var previewCanvas = getCodeScanCanvas();
 	if(previewCanvas) previewCanvas.addEventListener('transitionend', redrawCodeScanReviewRegions);
+	bindControl('code_scan_video', 'resize', function(event) { sizeCodeScanVideo(event.currentTarget); });
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(photoInput) {
 		photoInput.addEventListener('change', handleCodeScanPhotoInput);
@@ -356,6 +357,12 @@ function getCodeScanVideo() {
 	return document.getElementById('code_scan_video');
 }
 
+function sizeCodeScanVideo(video) {
+	if(!video.videoWidth || !video.videoHeight) return;
+	// Size the video itself to cover the Viewfinder, including in iOS portrait mode.
+	video.style.setProperty('--code-scan-video-ratio', String(video.videoWidth / video.videoHeight));
+}
+
 function getCodeScanCanvas() {
 	return document.getElementById('code_scan_canvas');
 }
@@ -416,6 +423,7 @@ function startCodeScanCamera() {
 		if(!current())
 			return;
 		codeScanState.cameraAvailable = true;
+		sizeCodeScanVideo(video);
 		video.classList.add('code_scan_video_ready');
 		logCodeScanStep('Camera ready', startedAt);
 		setCodeScanViewportVisible(true);
@@ -1965,10 +1973,10 @@ function setCodeScanManualEntry(manualEntry) {
 	var dialog = document.getElementById('code_scan_message');
 	if(dialog) dialog.classList.toggle('code_scan_manual_entry', manualEntry);
 	var rescan = document.getElementById('code_scan_rescan');
-	var actions = document.getElementById('code_scan_review_actions');
-	var parent = manualEntry ? actions : dialog;
-	if(parent && rescan && rescan.parentNode !== parent)
-		parent.prepend(rescan);
+	var leading = document.getElementById('code_scan_review_leading');
+	if(!rescan || !dialog || !leading) return;
+	if(manualEntry) leading.append(rescan);
+	else if(rescan.parentNode !== dialog) dialog.prepend(rescan);
 }
 
 function setCodeScanCropControlsVisible(visible) {

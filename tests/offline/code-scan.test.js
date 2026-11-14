@@ -96,10 +96,7 @@ test('scan entry points and on-device OCR UI are wired', () => {
 	assert.match(css, /\.code_scan_apply_crop/);
 	assert.match(css, /\.code_scan_crop_rescan/);
 	assert.match(css, /\.code_scan_review_input[\s\S]*border-bottom:\s*1px/);
-	const reviewControls = fragment.match(/id='code_scan_review_actions'[^>]*>([\s\S]*?)<\/div>/)?.[1];
-	assert.match(reviewControls, /id='code_scan_details_toggle'/);
-	assert.match(reviewControls, /id='code_scan_save'/);
-	assert.match(reviewControls, /id='code_scan_apply_crop'/);
+	assert.match(fragment, /id='code_scan_review_actions'[\s\S]*id='code_scan_save'[\s\S]*id='code_scan_details_toggle'[\s\S]*id='code_scan_apply_crop'/);
 	assert.match(css, /\.code_scan_review_actions\s*\{[^}]*flex:\s*0 0 auto/);
 });
 

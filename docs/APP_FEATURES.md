@@ -187,7 +187,7 @@ Offline release manifest: Native publishing generates the precache list from eac
 
 The Top Bar Loader stays visible through the Input Icon Guide’s full closing fade.
 
-Progress, word validation and save feedback overlay the frozen Viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Gallery and Typing share the live control row. The Bottom Controls Panel keeps Address Details, Save, and Go visible while the fields scroll. Rescan joins the panel when Typing opens Label Edit View. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
+Progress, word validation and save feedback overlay the frozen Viewfinder, leaving more room for the label fields. Messages appear above the controls during live capture and manual entry. Gallery and Typing share the live control row. The Bottom Controls Panel keeps Save on the left, Address Details in the center, and Go on the right while the fields scroll. Rescan joins the panel when Typing opens Label Edit View. The camera artwork fills more of its circular button, and Bookmarks uses the matching dark-mode disc background.
 
 Scanner review: A List icon button to the left of the editable city opens recognized, recent, IP and selected city choices; selecting a city updates the scanner review only. City and Word labels use a faded accent, recognized values use larger type, and Address details and bookmark Save sit below the label fields.
 
@@ -212,7 +212,7 @@ City-list icon placement: The scanner review icon sits 4 px higher. In Map View,
 
 The previous-city popup shares the scanner city-list styling: white/light or deep-blue/dark surface, accent-colored full-width rows, subtle separators, and matching hover/press feedback.
 
-Zoom Controls sit in a horizontal row below the Viewfinder. Reset Zoom sits between Zoom Out and Zoom In. It shows a magnifying glass at 100% and the current percentage at higher zoom levels. Press it to return to 100%. Each control shows a circle on hover, press or keyboard focus. The chequered background fills the Viewfinder while the camera starts and behind the image. Both share the same rounded outer edge.
+Zoom Controls sit in a horizontal row below the Viewfinder. Reset Zoom sits between Zoom Out and Zoom In. It shows a magnifying glass at 100% and the current percentage at higher zoom levels. Press it to return to 100%. Each control shows a circle on hover, press or keyboard focus. The chequered background fills the Viewfinder while the camera starts and behind the image. Both share the same rounded outer edge. In portrait and landscape, the live video is sized to fill the Viewfinder using the camera frame dimensions.
 
 Scanner review validation: All three words must match the Wolo word list, ignoring case and surrounding spaces. Empty and possible word prefixes stay neutral gray. A nonempty entry with no matching word prefix turns red and shakes; a three-second popup names the wrong word when it first becomes impossible. There is no persistent inline error message. Go and Save stay disabled until all three words are complete and valid. City uses the same underline as the three word fields.
 

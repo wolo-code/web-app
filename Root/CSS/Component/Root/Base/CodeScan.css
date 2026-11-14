@@ -154,11 +154,23 @@
 #code_scan_video {
 	display: block;
 	height: 100%;
+	left: 50%;
 	object-fit: cover;
+	position: absolute;
+	top: 50%;
 	transform-origin: center center;
 	transition: transform 120ms ease-out;
+	translate: -50% -50%;
 	visibility: hidden;
 	width: 100%;
+}
+
+@supports (width: 1cqw) {
+	#code_scan_video {
+		height: max(100cqh, calc(100cqw / var(--code-scan-video-ratio, 1)));
+		object-fit: fill;
+		width: max(100cqw, calc(100cqh * var(--code-scan-video-ratio, 1)));
+	}
 }
 
 #code_scan_video.code_scan_video_ready {
@@ -323,27 +335,16 @@
 	color: #69B7CF;
 }
 
-.code_scan_apply_crop {
-	background: #69B7CF;
-	border: none;
-	border-radius: 50%;
-	color: #fff;
-	cursor: pointer;
-	height: 36px;
-	padding: 0;
-	transition: opacity 150ms ease, transform 150ms ease, background 150ms ease;
-	width: 36px;
+.code_scan_apply_crop,
+html.dark-mode .code_scan_apply_crop {
+	background: #fff;
+	border: 1px solid #69B7CF;
+	color: #2a6f86;
 }
 
-.code_scan_apply_crop:hover:not(:disabled) {
-	background: #5aa6be;
-	opacity: 0.92;
-	transform: scale(1.06);
-}
-
-.code_scan_apply_crop:disabled {
-	cursor: not-allowed;
-	opacity: 0.55;
+.code_scan_apply_crop:hover:not(:disabled),
+html.dark-mode .code_scan_apply_crop:hover:not(:disabled) {
+	background: #eaf6fa;
 }
 
 .code_scan_live_controls {
@@ -460,18 +461,21 @@
 
 .code_scan_review_actions {
 	align-items: center;
-	display: flex;
+	display: grid;
 	flex: 0 0 auto;
-	gap: 12px;
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	justify-items: center;
 	padding: 8px 14px 14px;
 }
 
-.code_scan_review_actions > button {
-	flex: 0 0 auto;
+.code_scan_review_leading {
+	display: flex;
+	gap: 6px;
+	justify-self: start;
 }
 
 .code_scan_review_actions > .code_scan_apply_crop {
-	margin-inline-start: auto;
+	justify-self: end;
 }
 
 .code_scan_footer_actions {
@@ -554,11 +558,6 @@ html.dark-mode .code_scan_zoom_button {
 
 html.dark-mode .code_scan_zoom_level {
 	color: #b8c5cc;
-}
-
-html.dark-mode .code_scan_apply_crop {
-	background: #69B7CF;
-	color: #fff;
 }
 
 .code_scan_live_zoom_indicator {
@@ -810,7 +809,7 @@ html.dark-mode .code_scan_review_field { color: rgb(105 183 207 / 60%); }
 }
 .code_scan_details textarea { resize: vertical; line-height: 1.5; white-space: pre-wrap; }
 .code_scan_address_parts { display: grid; gap: 1em; margin-top: 20px; }
-.code_scan_review_actions > button:focus-visible,
+.code_scan_review_actions button:focus-visible,
 .code_scan_dialog > :is(.message_dialog_close, .code_scan_crop_rescan):focus-visible {
 	outline: 2px solid #69B7CF;
 	outline-offset: -2px;

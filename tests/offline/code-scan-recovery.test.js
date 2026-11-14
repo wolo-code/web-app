@@ -196,7 +196,12 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		let starts = 0, frames = 0;
 		c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
 		c.navigator = { mediaDevices: { getUserMedia: () => camera.promise } };
-		const video = { classList: new Set(), play: async () => {} };
+		const dimensions = new Map();
+		const video = {
+			classList: new Set(), play: async () => {},
+			videoWidth: 1080, videoHeight: 1920,
+			style: { setProperty: (name, value) => dimensions.set(name, value) }
+		};
 		c.getCodeScanVideo = () => video;
 		c.runCodeScanFrame = () => frames++;
 		c.startCodeScanCamera();
@@ -212,6 +217,7 @@ test('live OCR loads during the camera request and starts when both are ready', 
 		assert.equal(starts, 1);
 		assert.equal(frames, 1);
 		assert.equal(video.classList.has('code_scan_video_ready'), true);
+		assert.equal(dimensions.get('--code-scan-video-ratio'), '0.5625');
 	}
 });
 

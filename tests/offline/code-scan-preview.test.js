@@ -13,6 +13,7 @@ function scanner() {
  context.extractSpatialMatch = context.extractMatchFromOcrResult;
  context.extractMatchFromOcrResult = result => result.data?.scanMatch || result.match || null;
  context.codeScanOcrMatch = require('../../Root/JS/Component/Root/CodeScanOcrMatch.js');
+ context.detectFromPixels = context.detectCodeScanContainers;
  context.detectCodeScanContainers = () => [];
  context.getCodeScanLabelRoll = () => 0;
  context.codeScanState.active = true;
@@ -201,6 +202,44 @@ test('a failed card-first OCR read searches outside the card without rereading i
  const result = await context.recognizeCodeScanCanvas(canvas, null, { live });
  assert.deepEqual(reads, [465, 106]);
  assert.equal(result.data.scanMatch.regions.container, outside);
+});
+
+test('a close-up reads all four code markers with the outer card clipped', async () => {
+ const { context, canvas } = scanner();
+ canvas.width = 400;
+ canvas.height = 240;
+ const data = new Uint8ClampedArray(canvas.width * canvas.height * 4).fill(255);
+ function paint(x, y, width, height, shade) {
+  for(let row = y; row < y + height; row++) for(let col = x; col < x + width; col++) {
+   data.set([shade, shade, shade, 255], 4 * (row * canvas.width + col));
+  }
+ }
+ // Only the long sides of the card appear in the close-up.
+ paint(0, 0, 15, 240, 180);
+ paint(386, 0, 14, 240, 180);
+ for(const y of [54, 183]) for(const x of [32, 338]) paint(x, y, 30, 3, 70);
+ for(const x of [32, 365]) for(const y of [54, 156]) paint(x, y, 3, 30, 70);
+ canvas.getContext = () => ({ getImageData: () => ({ data }) });
+ context.detectCodeScanContainers = context.detectFromPixels;
+ const vocabulary = ['mail', 'nebula', 'flower'];
+ context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
+ context.extractMatchFromOcrResult = context.extractSpatialMatch;
+ context.codeScanState.worker = { setParameters: async () => {} };
+ const reads = [];
+ context.ocrCodeScanBand = async (_image, crop) => {
+  reads.push(crop);
+  return vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 75 + i * 85, y0: 125, x1: 140 + i * 85, y1: 151 } }));
+ };
+ const live = { isCurrent: () => true, showBoxes: () => {} };
+ for(const options of [{ live }, { allowRotation: true }, undefined]) {
+  reads.length = 0;
+  const result = await context.recognizeCodeScanCanvas(canvas, null, options);
+  assert.equal(result.data.scanMatch.code, 'mail nebula flower');
+  assert.equal(result.data.scanMatch.regions.card, null);
+  assert.equal(result.data.debugBoxes.length, 1);
+  assert.equal(reads.length, 1);
+  assert.ok(reads[0].x0 > 32 && reads[0].x1 < 368 && reads[0].y0 > 54 && reads[0].y1 < 186);
+ }
 });
 
 test('live recognition detects across the full viewport and skips OCR without a frame', async () => {

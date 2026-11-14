@@ -98,16 +98,16 @@ test('still recognition reads a bounded code crop before any sparse full-photo O
  const vocabulary = ['mail', 'nebula', 'flower'];
  context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
  context.extractMatchFromOcrResult = context.extractSpatialMatch;
- context.codeScanState.worker = { setParameters: async params => calls.push(params.tessedit_pageseg_mode) };
- context.ocrCodeScanBand = async (input, crop, _worker, maxHeight) => {
+ context.codeScanState.worker = {};
+ context.ocrCodeScanBand = async (input, crop, _worker, maxHeight, _rotation, mode) => {
   assert.equal(input, canvas);
   assert.equal(maxHeight, 480);
   assert.ok(crop.x0 > 90 && crop.x1 < 370 && crop.y0 > 225 && crop.y1 < 330);
-  calls.push('crop');
+  calls.push(mode || '6', 'crop');
   return vocabulary.map((text, i) => ({ text, confidence: 95, bbox: { x0: 120 + i * 50, y0: 270, x1: 165 + i * 50, y1: 300 } }));
  };
  const result = await context.recognizeCodeScanCanvas(canvas);
- assert.deepEqual(calls, ['detect', '6', 'crop', '11']);
+ assert.deepEqual(calls, ['detect', '6', 'crop']);
  assert.equal(result.data.labelContainers, containers);
  assert.equal(result.data.scanMatch.regions.container, containers[0]);
 });
@@ -118,12 +118,11 @@ test('still recognition retries a missed code crop within its enclosing card', a
  const card = { x0: 60, y0: 60, x1: 400, y1: 465 };
  const vocabulary = ['mail', 'nebula', 'flower'];
  const calls = [];
- let mode;
  context.detectCodeScanContainers = () => [box, card];
  context.wordList = { includes: word => vocabulary.includes(word), curList: vocabulary };
  context.extractMatchFromOcrResult = context.extractSpatialMatch;
- context.codeScanState.worker = { setParameters: async params => { mode = params.tessedit_pageseg_mode; } };
- context.ocrCodeScanBand = async (input, crop, _worker, maxHeight) => {
+ context.codeScanState.worker = {};
+ context.ocrCodeScanBand = async (input, crop, _worker, maxHeight, _rotation, mode = '6') => {
   const isCard = crop === card;
   assert.equal(input, canvas);
   assert.equal(maxHeight, isCard ? 1600 : 480);
@@ -501,8 +500,8 @@ test('capture reads scaled bands when the code pass missed title, segment, and a
   crop = { x, y, width, height };
  } }) });
  context.codeScanState.worker = {
-  setParameters: async params => { modes.push(params.tessedit_pageseg_mode); },
-  recognize: async target => {
+  recognize: async (target, params) => {
+   modes.push(params.tessedit_pageseg_mode);
    const band = bands.find(item => Math.round(item.x0) === crop.x && Math.round(item.y0) === crop.y);
    seen.push(band && band.role);
    const scale = target.height < 360 ? 4 : 3;
@@ -515,7 +514,7 @@ test('capture reads scaled bands when the code pass missed title, segment, and a
  };
  const detailed = await context.enrichCodeScanMetadata(canvas, match);
  assert.deepEqual(seen, ['above', 'below']);
- assert.deepEqual(modes, ['6', '11']);
+ assert.deepEqual(modes, ['6', '6']);
  assert.equal(detailed.code, 'bengaluru mail nebula flower');
  assert.equal(detailed.metadata.title, 'Ram');
  assert.equal(detailed.metadata.segment, 'Main door');

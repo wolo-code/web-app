@@ -538,13 +538,13 @@ function prepareCodeScanWorker(quiet) {
 		return Promise.resolve(codeScanState.worker);
 	if(codeScanState.workerPromise) return codeScanState.workerPromise;
 	var epoch = codeScanState.workerEpoch;
-	var pendingWorker;
 	if(!quiet && codeScanState.phase !== 'review') setCodeScanStatus('Loading on-device scanner...');
 	var loading = loadCodeScanTesseractScript().then(function(Tesseract) {
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 		return Tesseract.createWorker('eng', 1, {
 			workerPath: CODE_SCAN_TESSERACT_BASE + '/worker.min.js',
 			langPath: CODE_SCAN_TESSERACT_BASE + '/lang',
+			cachePath: 'wolo-lstm',
 			corePath: CODE_SCAN_TESSERACT_BASE + '/tesseract-core.wasm.min.js',
 			logger: function() {},
 			errorHandler: function(error) {
@@ -556,17 +556,10 @@ function prepareCodeScanWorker(quiet) {
 			disposeCodeScanWorker(worker);
 			throw codeScanCancelledError();
 		}
-		pendingWorker = worker;
-		return worker.setParameters({
-			tessedit_pageseg_mode: '11'
-		}).then(function() {
-			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-			codeScanState.worker = worker;
-			return worker;
-		});
+		codeScanState.worker = worker;
+		return worker;
 	});
 	codeScanState.workerPromise = waitForCodeScanWorker(loading, CODE_SCAN_LOAD_TIMEOUT_MS).catch(function(error) {
-		if(pendingWorker && pendingWorker !== codeScanState.worker) disposeCodeScanWorker(pendingWorker);
 		if(epoch === codeScanState.workerEpoch) terminateCodeScanWorker();
 		throw error;
 	});
@@ -1071,7 +1064,7 @@ function rotateCodeScanMatch(match, canvas, rotation) {
 	return Object.assign({}, match, { regions: regions });
 }
 
-function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotation, segmentation, useCardCrop) {
+async function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotation, segmentation, useCardCrop) {
 	var data = result.data;
 	if(!boxes.length || (live && !live.isCurrent())) return result;
 	var candidates = boxes.map(function(box) {
@@ -1081,37 +1074,33 @@ function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, allowRotati
 	if(useCardCrop) candidates = candidates.filter(function(candidate) { return candidate.card; });
 	if(!candidates.length) return result;
 	var epoch = codeScanState.workerEpoch;
-	return worker.setParameters({ tessedit_pageseg_mode: segmentation || '6' }).then(async function() {
-		// Only a fresh shutter photo may try the opposite orientation.
-		for(var reverse of (allowRotation ? [false, true] : [false])) {
-			for(var candidate of candidates) {
-				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-				if(live && !live.isCurrent()) return;
-				var sideways = candidate.sideways;
-				var rotation = (sideways ? 90 : 0) + (reverse ? 180 : 0);
-				var orientation = { width: sideways ? canvas.height : canvas.width, height: sideways ? canvas.width : canvas.height };
-				var box = codeScanOcrMatch.rotateLabelBox(candidate.box, canvas.width, canvas.height, rotation);
-				var card = codeScanOcrMatch.rotateLabelBox(candidate.card, canvas.width, canvas.height, rotation);
-				var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
-				var crop = useCardCrop ? card : {
-					x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
-				};
-				var words = await ocrCodeScanBand(canvas, crop, worker, useCardCrop ? 1600 : live ? 240 : 480, rotation);
-				if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-				var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
-				if(!match || match.regions.container !== box) continue;
-				if(rotation) {
-					match = rotateCodeScanMatch(match, orientation, 360 - rotation);
-					match.rotation = rotation;
-				}
-				data.scanMatch = match;
-				return;
+	// Only a fresh shutter photo may try the opposite orientation.
+	for(var reverse of (allowRotation ? [false, true] : [false])) {
+		for(var candidate of candidates) {
+			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+			if(live && !live.isCurrent()) return;
+			var sideways = candidate.sideways;
+			var rotation = (sideways ? 90 : 0) + (reverse ? 180 : 0);
+			var orientation = { width: sideways ? canvas.height : canvas.width, height: sideways ? canvas.width : canvas.height };
+			var box = codeScanOcrMatch.rotateLabelBox(candidate.box, canvas.width, canvas.height, rotation);
+			var card = codeScanOcrMatch.rotateLabelBox(candidate.card, canvas.width, canvas.height, rotation);
+			var inset = Math.max(2, Math.round((box.y1 - box.y0) * 0.06));
+			var crop = useCardCrop ? card : {
+				x0: box.x0 + inset, y0: box.y0 + inset, x1: box.x1 - inset, y1: box.y1 - inset
+			};
+			var words = await ocrCodeScanBand(canvas, crop, worker, useCardCrop ? 1600 : live ? 240 : 480, rotation, segmentation);
+			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+			var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
+			if(!match || match.regions.container !== box) continue;
+			if(rotation) {
+				match = rotateCodeScanMatch(match, orientation, 360 - rotation);
+				match.rotation = rotation;
 			}
+			data.scanMatch = match;
+			return result;
 		}
-	}).then(function() {
-		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-		return worker.setParameters({ tessedit_pageseg_mode: '11' });
-	}).then(function() { return result; });
+	}
+	return result;
 }
 
 function extractMatchFromOcrResult(result) {
@@ -1123,7 +1112,7 @@ function detailBandScale(height) {
 	return height < 100 ? 4 : 3;
 }
 
-async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation) {
+async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation, segmentation) {
 	worker = worker || codeScanState.worker;
 	var epoch = codeScanState.workerEpoch;
 	var sideways = rotation % 180 === 90;
@@ -1170,7 +1159,7 @@ async function ocrCodeScanBand(canvas, band, worker, maxHeight, rotation) {
 		input = new Uint8Array(await blob.arrayBuffer());
 	}
 	if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-	var result = await worker.recognize(input, {}, { text: false, hocr: false, tsv: false });
+	var result = await worker.recognize(input, { tessedit_pageseg_mode: segmentation || '6' }, { text: false, hocr: false, tsv: false });
 	if(!result || typeof result !== 'object') throw new Error('Invalid scanner result');
 	var words = result.data && result.data.words || [];
 	return words.map(function(word) {
@@ -1197,19 +1186,6 @@ function headingRowCount(words, match) {
 function addressLineCount(words, match) {
 	var read = codeScanOcrMatch.readLabelMetadata(words, match.regions.container, match.regions.card);
 	return (read.metadata.address_line_1 ? 1 : 0) + (read.metadata.address_line_2 ? 1 : 0);
-}
-
-function withCodeScanDetailSegmentation(work) {
-	return runCodeScanWorkerTask(async function(worker) {
-		if(typeof worker.setParameters !== 'function') return [];
-		var epoch = codeScanState.workerEpoch;
-		await worker.setParameters({ tessedit_pageseg_mode: '6' });
-		try {
-			return await work(worker);
-		} finally {
-			if(epoch === codeScanState.workerEpoch) await worker.setParameters({ tessedit_pageseg_mode: '11' });
-		}
-	});
 }
 
 function enrichCodeScanMetadata(canvas, match) {
@@ -1256,7 +1232,7 @@ function enrichCodeScanMetadata(canvas, match) {
 		syntheticCard = true;
 	}
 	if(!match.regions.card) return Promise.resolve(match);
-	if(!codeScanState.worker || typeof codeScanState.worker.setParameters !== 'function') return Promise.resolve(finish(match));
+	if(!codeScanState.worker || typeof codeScanState.worker.recognize !== 'function') return Promise.resolve(finish(match));
 	if(keys.every(function(key) { return match.metadata && match.metadata[key]; })) return Promise.resolve(finish(match));
 	bands = codeScanOcrMatch.detailScanBands(match.regions.container, match.regions.card);
 	if(!bands.length) return Promise.resolve(finish(match));
@@ -1264,7 +1240,7 @@ function enrichCodeScanMetadata(canvas, match) {
 	headingRows = 0;
 	addressRows = 0;
 	var epoch = codeScanState.workerEpoch;
-	return withCodeScanDetailSegmentation(function(worker) {
+	return runCodeScanWorkerTask(function(worker) {
 		var chain = Promise.resolve();
 		bands.forEach(function(band) {
 			chain = chain.then(function() {
@@ -1475,7 +1451,7 @@ function showCodeScanReview(match, manualEntry) {
 	populateCodeScanCityChoices(review.city);
 	updateCodeScanReviewValidity();
 	drawCodeScanMatchRegions(match, getCodeScanCanvas(), match ? [] : codeScanState.regionBoxes);
-	setCodeScanStatus(manualEntry ? '' : 'Check the city and words. Address details are optional.');
+	setCodeScanStatus(manualEntry || !match ? '' : 'verify the wolo code below');
 }
 
 function setCodeScanDetailsExpanded(expanded) {
@@ -2460,7 +2436,6 @@ function applyCodeScanCrop() {
 		var match = extractMatchFromOcrResult(result);
 		if(match) {
 			showCodeScanReview(match);
-			setCodeScanStatus('Label recognized. Check the city and words.');
 			fillCodeScanReviewDetails(match);
 		}
 		else {

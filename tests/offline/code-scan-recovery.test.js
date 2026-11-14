@@ -40,18 +40,23 @@ function worker() {
 	return { setParameters: async () => {}, recognize: async () => ({ data: {} }), terminate() { this.terminated = true; } };
 }
 
-test('concurrent initialization shares one worker and one parameter setup', async () => {
+test('concurrent initialization shares the LSTM worker without another setup round trip', async () => {
 	const c = scanner(), creation = deferred(), w = worker();
-	let starts = 0, setups = 0;
-	w.setParameters = async () => { setups++; };
-	c.window.Tesseract = { createWorker: () => { starts++; return creation.promise; } };
+	let starts = 0;
+	w.setParameters = () => assert.fail('segmentation belongs to an individual read');
+	c.window.Tesseract = { createWorker: (lang, mode, options) => {
+		starts++;
+		assert.equal(lang, 'eng');
+		assert.equal(mode, 1);
+		assert.equal(options.cachePath, 'wolo-lstm');
+		return creation.promise;
+	} };
 	const first = c.prepareCodeScanWorker(), second = c.prepareCodeScanWorker();
 	assert.equal(first, second);
 	await flush();
 	creation.resolve(w);
 	assert.equal(await first, w);
 	assert.equal(starts, 1);
-	assert.equal(setups, 1);
 	assert.equal(c.timers.size, 0);
 });
 
@@ -107,16 +112,21 @@ test('closing during OCR image encoding prevents posting to the terminated worke
 	assert.equal(w.terminated, true);
 });
 
-test('worker initialization timeout and parameter failures release resources for retry', async () => {
+test('worker initialization timeouts and failures allow retry and dispose late workers', async () => {
 	for(const timeout of [false, true]) {
 		const c = scanner(), w = worker();
-		w.setParameters = () => timeout ? new Promise(() => {}) : Promise.reject(new Error('bad parameters'));
-		c.window.Tesseract = { createWorker: async () => w };
-		const failed = assert.rejects(c.prepareCodeScanWorker(), /parameters|timed out/);
+		const creation = deferred();
+		c.window.Tesseract = { createWorker: () => creation.promise };
+		const failed = assert.rejects(c.prepareCodeScanWorker(), /initialization|timed out/);
 		await flush();
 		if(timeout) c.expire(c.CODE_SCAN_LOAD_TIMEOUT_MS);
+		else creation.reject(new Error('initialization failed'));
 		await failed;
-		assert.equal(w.terminated, true);
+		if(timeout) {
+			creation.resolve(w);
+			await flush();
+			assert.equal(w.terminated, true);
+		}
 		assert.equal(c.codeScanState.workerPromise, null);
 		const replacement = worker();
 		c.window.Tesseract.createWorker = async () => replacement;
@@ -152,20 +162,19 @@ test('worker errors settle pending recognition even if the library never rejects
 	assert.equal(c.codeScanState.worker, null);
 });
 
-test('detail segmentation and another recognition never overlap', async () => {
+test('an optional detail read and another recognition never overlap', async () => {
 	const c = scanner(), w = worker(), detail = deferred(), calls = [];
-	w.setParameters = async params => calls.push(params.tessedit_pageseg_mode);
 	w.recognize = async () => { calls.push('recognize'); return { data: {} }; };
 	c.codeScanState.worker = w;
-	const first = c.withCodeScanDetailSegmentation(async input => {
+	const first = c.runCodeScanWorkerTask(async input => {
 		assert.equal(input, w); calls.push('details'); await detail.promise;
 	});
 	const second = c.recognizeCodeScanCanvas({ width: 20, height: 20 });
 	await flush();
-	assert.deepEqual(calls, ['6', 'details']);
+	assert.deepEqual(calls, ['details']);
 	detail.resolve();
 	await Promise.all([first, second]);
-	assert.deepEqual(calls, ['6', 'details', '11', 'recognize']);
+	assert.deepEqual(calls, ['details', 'recognize']);
 });
 
 test('termination cancels running and queued recognition without calling the old worker again', async () => {

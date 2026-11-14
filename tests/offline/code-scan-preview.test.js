@@ -22,6 +22,53 @@ function scanner() {
  return { context, canvas };
 }
 
+test('a trapezoidal code border reaches OCR through perspective correction before roll', async () => {
+ const { context, canvas } = scanner();
+ // A continuous printed frame with converging sides, centered in the viewfinder.
+ canvas.width = 360;
+ canvas.height = 240;
+ const pixels = new Uint8ClampedArray(canvas.width * canvas.height * 4).fill(255);
+ for(let y = 55; y <= 165; y++) {
+  const left = 65 + (y - 55) * 0.24;
+  const right = 295 - (y - 55) * 0.24;
+  for(let x = Math.ceil(left); x <= right; x++) {
+   if(y > 58 && y < 162 && x > left + 3 && x < right - 3) continue;
+   const index = (y * canvas.width + x) * 4;
+   pixels.fill(0, index, index + 3);
+  }
+ }
+ function imageData(data, stride, left, top, width, height) {
+  const crop = new Uint8ClampedArray(width * height * 4);
+  for(let y = 0; y < height; y++) {
+   const offset = ((top + y) * stride + left) * 4;
+   crop.set(data.subarray(offset, offset + width * 4), y * width * 4);
+  }
+  return { width, height, data: crop };
+ }
+ canvas.getContext = () => ({ getImageData: (...args) => imageData(pixels, canvas.width, ...args) });
+ context.document.createElement = () => {
+  let output;
+  const target = { getContext: () => ({
+   createImageData: (width, height) => ({ width, height, data: new Uint8ClampedArray(width * height * 4) }),
+   putImageData: image => { output = image; },
+   getImageData: (...args) => imageData(output.data, target.width, ...args)
+  }) };
+  return target;
+ };
+ context.detectCodeScanContainers = context.detectFromPixels;
+ context.runCodeScanWorkerTask = work => work({});
+ context.getCodeScanLabelRoll = () => assert.fail('perspective correction should find the code before roll');
+ context.ocrCodeScanBand = async input => {
+  assert.notEqual(input, canvas);
+  return [{ text: 'apple berry cherry' }];
+ };
+ context.extractMatchFromOcrResult = result => ({ regions: { container: result.data.labelContainers[0] } });
+ const result = await context.recognizeCodeScanCanvas(canvas, null, { live: { isCurrent: () => true, showBoxes() {} } });
+ const box = result.data.scanMatch.regions.container;
+ assert.ok(Math.abs(box.x0 - 65) < 6 && Math.abs(box.x1 - 295) < 6);
+ assert.ok(Math.abs(box.y0 - 55) < 6 && Math.abs(box.y1 - 165) < 6);
+});
+
 test('gallery photos preserve native resolution for the preview, source and recognition', async () => {
  for(const [width, height] of [[4032, 3024], [3024, 4032]]) {
   const { context, canvas } = scanner(); let draw;

@@ -912,6 +912,14 @@ function detectCodeScanContainers(canvas, bounds, search) {
 		var result = codeScanOcrMatch.detectLabelRegions(image, detectionCanvas.width, detectionCanvas.height,
 			{ x: (focus.x - x0) / sx, y: (focus.y - y0) / sy });
 		if(result.searchFullImage) search.findRemaining = function() { return toSource(result.searchFullImage()); };
+		search.perspectiveSeeds = toSource(result.perspectiveSeeds || []);
+		search.findCorners = function(box) {
+			var corners = codeScanOcrMatch.findLabelQuadrilateral(image, {
+				x0: (box.x0 - x0) / sx, y0: (box.y0 - y0) / sy,
+				x1: (box.x1 - x0) / sx, y1: (box.y1 - y0) / sy
+			});
+			return corners && corners.map(function(point) { return { x: x0 + point.x * sx, y: y0 + point.y * sy }; });
+		};
 		return toSource(result.rectangles);
 	}
 	return toSource(codeScanOcrMatch.detectLabelRectangles(image, detectionCanvas.width, detectionCanvas.height));
@@ -1005,6 +1013,101 @@ function restoreCodeScanRollMatch(match, transform, angle) {
 	return Object.assign({}, match, { regions: regions, roll: { angle: angle, match: match } });
 }
 
+function getCodeScanPerspectiveTransform(canvas, corners) {
+	var project = codeScanOcrMatch.labelPerspectiveProjector(corners);
+	if(!project) return null;
+	function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+	var width = Math.max(distance(corners[0], corners[1]), distance(corners[3], corners[2]));
+	var height = Math.max(distance(corners[0], corners[3]), distance(corners[1], corners[2]));
+	var scale = Math.min(1, 1600 / Math.max(width, height));
+	width = Math.round(width * scale);
+	height = Math.round(height * scale);
+	var padding = 8;
+	function point(x, y) { return project((x - padding) / width, (y - padding) / height); }
+	return {
+		box: function(box) {
+			if(!box) return box;
+			var points = [point(box.x0, box.y0), point(box.x1, box.y0), point(box.x1, box.y1), point(box.x0, box.y1)];
+			var xs = points.map(function(p) { return p.x; });
+			var ys = points.map(function(p) { return p.y; });
+			return Object.assign({}, box, {
+				x0: Math.max(0, Math.min.apply(null, xs)), y0: Math.max(0, Math.min.apply(null, ys)),
+				x1: Math.min(canvas.width, Math.max.apply(null, xs)), y1: Math.min(canvas.height, Math.max.apply(null, ys))
+			});
+		},
+		image: function() {
+			var target = document.createElement('canvas');
+			target.width = width + 2 * padding;
+			target.height = height + 2 * padding;
+			var ctx = target.getContext('2d');
+			var output = ctx.createImageData(target.width, target.height);
+			var bounds = this.box({ x0: 0, y0: 0, x1: target.width, y1: target.height });
+			var left = Math.floor(bounds.x0), topRow = Math.floor(bounds.y0);
+			var sourceWidth = Math.ceil(bounds.x1) - left;
+			var sourceHeight = Math.ceil(bounds.y1) - topRow;
+			var source = canvas.getContext('2d').getImageData(left, topRow, sourceWidth, sourceHeight).data;
+			output.data.fill(255);
+			for(var y = 0; y < target.height; y++) {
+				for(var x = 0; x < target.width; x++) {
+					var p = point(x, y);
+					var sx = Math.floor(p.x) - left, sy = Math.floor(p.y) - topRow;
+					if(sx < 0 || sy < 0 || sx + 1 >= sourceWidth || sy + 1 >= sourceHeight) continue;
+					var dx = p.x - (sx + left), dy = p.y - (sy + topRow);
+					var top = (sy * sourceWidth + sx) * 4;
+					var bottom = top + sourceWidth * 4;
+					var index = (y * target.width + x) * 4;
+					for(var channel = 0; channel < 3; channel++) {
+						var upper = source[top + channel] * (1 - dx) + source[top + channel + 4] * dx;
+						var lower = source[bottom + channel] * (1 - dx) + source[bottom + channel + 4] * dx;
+						output.data[index + channel] = upper * (1 - dy) + lower * dy;
+					}
+				}
+			}
+			ctx.putImageData(output, 0, 0);
+			return target;
+		}
+	};
+}
+
+function restoreCodeScanPerspectiveMatch(match, transform, corners, wholeCard) {
+	var regions = {};
+	Object.keys(match.regions).forEach(function(key) { regions[key] = transform.box(match.regions[key]); });
+	return Object.assign({}, match, { regions: regions, perspective: wholeCard ? { corners: corners, match: match } : null });
+}
+
+async function tryCodeScanPerspective(canvas, focus, options, worker, search, result) {
+	if(!search.findCorners) return null;
+	var live = options && options.live;
+	var codeBox = result.data.codeBoxes[0];
+	var card = codeBox && codeScanOcrMatch.findLabelCard(result.data.labelContainers, codeBox);
+	focus = focus || { x: canvas.width / 2, y: canvas.height / 2 };
+	var seeds = search.perspectiveSeeds || [];
+	card = card || codeScanOcrMatch.findPortraitCard(result.data.labelContainers, focus) || codeScanOcrMatch.findPortraitCard(seeds, focus);
+	var codeSeed = codeScanOcrMatch.getLabelCodeBoxes(seeds, focus).find(function(box) {
+		return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0) && focus.x >= box.x0 && focus.x <= box.x1 && focus.y >= box.y0 && focus.y <= box.y1;
+	});
+	for(var box of [card, codeBox || codeSeed]) {
+		if(!box || (live && !live.isCurrent())) continue;
+		var corners = search.findCorners(box);
+		if(!corners) continue;
+		var transform = getCodeScanPerspectiveTransform(canvas, corners);
+		if(!transform) continue;
+		logCodeScanStep(box === card ? 'Correcting card perspective' : 'Correcting code frame perspective');
+		var aligned = transform.image();
+		var alignedOptions = Object.assign({}, options);
+		if(live) alignedOptions.live = {
+			isCurrent: live.isCurrent,
+			showBoxes: function() {}
+		};
+		var corrected = await recognizeCodeScanImage(aligned, null, alignedOptions, worker, detectCodeScanContainers(aligned));
+		if(!corrected.data.scanMatch) continue;
+		result.data.scanMatch = restoreCodeScanPerspectiveMatch(corrected.data.scanMatch, transform, corners, box === card);
+		result.data.debugBoxes = corrected.data.debugBoxes.map(transform.box);
+		return result;
+	}
+	return null;
+}
+
 function recognizeCodeScanCanvas(canvas, focus, options) {
 	return runCodeScanWorkerTask(async function(worker) {
 		var live = options && options.live;
@@ -1032,7 +1135,11 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 			if(fallback.data.scanMatch) return fallback;
 			if(live && !live.isCurrent()) return result;
+			if(!result.data.codeBoxes.length && fallback.data.codeBoxes.length) result = fallback;
 		}
+		var corrected = await tryCodeScanPerspective(canvas, focus, options, worker, search, result);
+		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
+		if(corrected || (live && !live.isCurrent())) return result;
 		var angle = -getCodeScanLabelRoll(canvas);
 		if(!angle) return result;
 		logCodeScanStep('Straightening tilted label');
@@ -1255,6 +1362,16 @@ function addressLineCount(words, match) {
 }
 
 function enrichCodeScanMetadata(canvas, match) {
+	if(canvas && match && match.perspective) {
+		var perspective = match.perspective;
+		var correction = getCodeScanPerspectiveTransform(canvas, perspective.corners);
+		var rectified = Object.assign({}, perspective.match, {
+			regions: Object.assign({}, perspective.match.regions), metadata: Object.assign({}, match.metadata)
+		});
+		return enrichCodeScanMetadata(correction.image(), rectified).then(function(detailed) {
+			return restoreCodeScanPerspectiveMatch(detailed, correction, perspective.corners, true);
+		});
+	}
 	if(canvas && match && match.roll) {
 		var angle = match.roll.angle;
 		var transform = getCodeScanRollTransform(canvas.width, canvas.height, angle);

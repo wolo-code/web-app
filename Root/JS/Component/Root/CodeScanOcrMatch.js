@@ -243,6 +243,7 @@
 		var verticalSums = new Uint32Array(width * (height + 1));
 		var segments = [];
 		var rectangles = [];
+		var perspectiveSeeds = [];
 		var minWidth = Math.max(50, Math.round(width * 0.12));
 		var minLeg = Math.max(8, Math.round(width * 0.008));
 		var minHeight = Math.max(25, Math.round(height * 0.04));
@@ -352,6 +353,13 @@
 				if(middleBottom <= middleTop) return;
 				var left = findSide(Math.min(top.x0, bottom.x0) - corner, Math.min(top.x0, bottom.x0) + 3, middleTop, middleBottom, true);
 				var right = findSide(Math.max(top.x1, bottom.x1) - 3, Math.max(top.x1, bottom.x1) + corner, middleTop, middleBottom);
+				// Keep paired horizontal borders as search hints when their sides
+				// converge. OCR still requires four fitted edges and a verified box.
+				if((!left || !right) && perspectiveSeeds.length < 24 && h >= minHeight &&
+					Math.min(w, bottom.x1 - bottom.x0) >= Math.max(w, bottom.x1 - bottom.x0) * 0.7) {
+					var seed = { x0: (top.x0 + bottom.x0) / 2, x1: (top.x1 + bottom.x1) / 2, y0: top.top, y1: bottom.bottom + 1 };
+					if(!perspectiveSeeds.some(function(previous) { return bboxIoU(previous, seed) > 0.85; })) perspectiveSeeds.push(seed);
+				}
 				if(!left || !right || right.x - left.x < minWidth) return;
 				if(!cornerConnected(left.x, top.top, top.x0 - left.x, 1, 1) ||
 					!cornerConnected(right.x, top.top, right.x - top.x1, -1, 1) ||
@@ -416,13 +424,90 @@
 			}).slice(0, 200);
 			findMarkers(localStrokes, Math.max(50, Math.round(cardWidth * 0.12)), Math.max(25, Math.round(cardHeight * 0.04)), local);
 			if(local.some(function(box) { return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0) && findLabelCard([card], box); }))
-				return { rectangles: [card].concat(local), searchFullImage: searchFullImage };
+				return { rectangles: [card].concat(local), searchFullImage: searchFullImage, perspectiveSeeds: perspectiveSeeds };
 		}
-		return { rectangles: searchFullImage() };
+		return { rectangles: searchFullImage(), perspectiveSeeds: perspectiveSeeds };
 	}
 
 	function detectLabelRectangles(imageData, width, height) {
 		return detectLabelRegions(imageData, width, height).rectangles;
+	}
+
+	// Recover four border lines near a detected box. Sample the middle of each
+	// edge so rounded corners and small breaks do not pull the line inward.
+	function findLabelQuadrilateral(image, box) {
+		var width = image.width;
+		var height = image.height;
+		var pixels = image.data;
+		function fitEdge(start, end, edge, depth, vertical) {
+			var span = end - start;
+			var middle = (start + end) / 2;
+			var radius = Math.min(28, Math.max(3, Math.round(depth * 0.10)));
+			var limit = Math.min(span * 0.28, radius * 3);
+			var best = null;
+			for(var offset = -radius; offset <= radius; offset++) {
+				for(var drift = -12; drift <= 12; drift++) {
+					var slope = drift * limit / (12 * span);
+					var hits = 0;
+					var sections = 0;
+					for(var sample = 0; sample < 24; sample++) {
+						var along = start + span * (0.14 + sample * 0.72 / 23);
+						var across = Math.round(edge + offset + slope * (along - middle));
+						along = Math.round(along);
+						var x = vertical ? across : along;
+						var y = vertical ? along : across;
+						if(x < 2 || y < 2 || x >= width - 2 || y >= height - 2) continue;
+						var pixel = (y * width + x) * 4;
+						var stride = vertical ? 4 : width * 4;
+						for(var channel = 0; channel < 3; channel++) {
+							if(Math.abs(pixels[pixel + channel + 2 * stride] - pixels[pixel + channel - 2 * stride]) >= 24) {
+								hits++;
+								sections |= 1 << Math.floor(sample / 6);
+								break;
+							}
+						}
+					}
+					var score = hits - 0.2 * Math.abs(offset) - 0.02 * Math.abs(drift);
+					if(hits >= 18 && sections === 15 && (!best || score > best.score))
+						best = { slope: slope, intercept: edge + offset - slope * middle, score: score };
+				}
+			}
+			return best;
+		}
+		function intersect(horizontal, vertical) {
+			var x = (vertical.intercept + vertical.slope * horizontal.intercept) / (1 - horizontal.slope * vertical.slope);
+			return { x: x, y: horizontal.intercept + horizontal.slope * x };
+		}
+		var w = box.x1 - box.x0;
+		var h = box.y1 - box.y0;
+		if(w < 40 || h < 24) return null;
+		var top = fitEdge(box.x0, box.x1, box.y0, h, false);
+		var bottom = fitEdge(box.x0, box.x1, box.y1 - 1, h, false);
+		var left = fitEdge(box.y0, box.y1, box.x0, w, true);
+		var right = fitEdge(box.y0, box.y1, box.x1 - 1, w, true);
+		if(!top || !bottom || !left || !right || [top, bottom, left, right].every(function(edge) { return Math.abs(edge.slope) < 0.025; })) return null;
+		var corners = [intersect(top, left), intersect(top, right), intersect(bottom, right), intersect(bottom, left)];
+		if(corners.some(function(point) { return point.x < 0 || point.x >= width || point.y < 0 || point.y >= height; })) return null;
+		if(Math.min(corners[1].x - corners[0].x, corners[2].x - corners[3].x) < w * 0.6 ||
+			Math.min(corners[3].y - corners[0].y, corners[2].y - corners[1].y) < h * 0.6) return null;
+		return corners;
+	}
+
+	// Project normalized rectangle coordinates into the original quadrilateral.
+	function labelPerspectiveProjector(corners) {
+		var p0 = corners[0], p1 = corners[1], p2 = corners[2], p3 = corners[3];
+		var dx1 = p1.x - p2.x, dx2 = p3.x - p2.x, dx3 = p0.x - p1.x + p2.x - p3.x;
+		var dy1 = p1.y - p2.y, dy2 = p3.y - p2.y, dy3 = p0.y - p1.y + p2.y - p3.y;
+		var determinant = dx1 * dy2 - dx2 * dy1;
+		if(Math.abs(determinant) < 1) return null;
+		var g = (dx3 * dy2 - dx2 * dy3) / determinant;
+		var h = (dx1 * dy3 - dx3 * dy1) / determinant;
+		var a = p1.x - p0.x + g * p1.x, b = p3.x - p0.x + h * p3.x;
+		var d = p1.y - p0.y + g * p1.y, e = p3.y - p0.y + h * p3.y;
+		return function(u, v) {
+			var scale = 1 + g * u + h * v;
+			return { x: (a * u + b * v + p0.x) / scale, y: (d * u + e * v + p0.y) / scale };
+		};
 	}
 
 	function findPortraitCard(rectangles, focus) {
@@ -1004,6 +1089,8 @@
 		matchOcrRegionsToWoloCode: matchOcrRegionsToWoloCode,
 		detectLabelRectangles: detectLabelRectangles,
 		detectLabelRegions: detectLabelRegions,
+		findLabelQuadrilateral: findLabelQuadrilateral,
+		labelPerspectiveProjector: labelPerspectiveProjector,
 		estimateLabelRoll: estimateLabelRoll,
 		detailScanBands: detailScanBands,
 		readLabelMetadata: extractLabelMetadata,

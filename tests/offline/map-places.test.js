@@ -487,6 +487,42 @@ test('pin adjustment preserves the camera, keeps the route order, and encodes on
 	assert.match(context.getMapRouteURL(true), /from=1%2C2\.02&to=2%2C2$/);
 });
 
+test('ending pin adjustment again does not throw or leave the marker hidden', () => {
+	const {context, document, show} = loadMap();
+	document.body = document.getElementById('body');
+	document.body.classList.contains = name => document.body.classList.values.has(name);
+	let released = 0;
+	const crosshair = context.mapPinCrosshair = {
+		style: {},
+		hasPointerCapture() { return true; },
+		releasePointerCapture() {
+			released++;
+			context.finishMapPinAdjustment();
+		}
+	};
+	const surface = document.getElementById('map');
+	Object.assign(surface, {clientWidth: 320, clientHeight: 480});
+	context.map.getDiv = () => surface;
+	context.google.maps.Point = function(x, y) { Object.assign(this, {x, y}); };
+	context.mapPinProjectionOverlay = {getProjection: () => ({
+		fromLatLngToContainerPixel: position => ({x: position.lng() * 50, y: position.lat() * 50}),
+		fromContainerPixelToLatLng: ({x, y}) => ({lat: () => y / 50, lng: () => x / 50})
+	})};
+	context.encode = () => {};
+	show(1);
+	const entry = context.getMapPlace(context.marker);
+	assert.doesNotThrow(() => context.finishMapPinAdjustment());
+	assert.equal(context.startMapPinAdjustment(entry), true);
+	context.mapPinAdjustment.drag = {id: 1, x: 0, y: 0};
+	context.finishMapPinAdjustment();
+	assert.equal(released, 1);
+	assert.equal(entry.marker.getVisible(), true);
+	assert.equal(crosshair.hidden, true);
+	assert.equal(context.mapPinAdjustment, null);
+	context.finishMapPinAdjustment();
+	assert.equal(entry.marker.getVisible(), true);
+});
+
 test('holding Go adds a card and the release click does not replace either marker', () => {
  const {context, document, show} = loadMap();
  const source = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/Map.js'), 'utf8');

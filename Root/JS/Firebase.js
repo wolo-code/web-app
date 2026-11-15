@@ -91,6 +91,10 @@ function isFirebaseIndexedDbClosingError(error) {
 		else if(typeof error == 'string')
 			message = error;
 	}
+	if(typeof isIndexedDbUserDeletedError == 'function' && isIndexedDbUserDeletedError(error))
+		return true;
+	if(message.indexOf('Database deleted by request of the user') != -1)
+		return true;
 	return message.indexOf('database connection is closing') != -1 && (!error.name || error.name == 'InvalidStateError');
 }
 
@@ -119,7 +123,10 @@ function isFirebaseUiMissingError(error) {
 }
 
 function recoverFirebaseIndexedDbConnection(error) {
-	if(typeof Sentry != 'undefined')
+	var userDeleted = (typeof isIndexedDbUserDeletedError == 'function' && isIndexedDbUserDeletedError(error))
+		|| (error && error.message && String(error.message).indexOf('Database deleted by request of the user') != -1)
+		|| (typeof error == 'string' && error.indexOf('Database deleted by request of the user') != -1);
+	if(!userDeleted && typeof Sentry != 'undefined')
 		Sentry.captureException(error);
 	if(typeof sessionStorage != 'undefined' && sessionStorage.firebase_indexeddb_recovery == 'reloading')
 		return true;

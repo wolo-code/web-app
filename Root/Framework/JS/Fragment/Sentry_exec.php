@@ -17,7 +17,8 @@ Sentry.init({
 		'installations/request-failed',
 		/installations\//i,
 		/firebaseui/i,
-		/firebase ui/i
+		/firebase ui/i,
+		'Database deleted by request of the user'
 	],
 	denyUrls: [
 		/beacon\.min\.js/,

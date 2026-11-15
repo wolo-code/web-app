@@ -3,6 +3,76 @@
 var OFFLINE_DB_NAME = 'wolo-offline';
 var OFFLINE_DB_VERSION = 1;
 var offlineDbPromise = null;
+var offlineDbConnection = null;
+
+function offlineDbErrorMessage(error) {
+	if (typeof error == 'string') {
+		return error;
+	}
+	if (error && error.message) {
+		return String(error.message);
+	}
+	return '';
+}
+
+function offlineDbWasDeleted(error) {
+	if (typeof isIndexedDbUserDeletedError == 'function') {
+		return isIndexedDbUserDeletedError(error);
+	}
+	return offlineDbErrorMessage(error).indexOf('Database deleted by request of the user') != -1;
+}
+
+function isRecoverableOfflineDbError(error) {
+	var message = offlineDbErrorMessage(error);
+	return offlineDbWasDeleted(error) || message.indexOf('database connection is closing') != -1;
+}
+
+function stopIndexedDbErrorEvent(event) {
+	if (event && typeof event.preventDefault == 'function') {
+		event.preventDefault();
+	}
+}
+
+function resetOfflineDb() {
+	var db = offlineDbConnection;
+	offlineDbConnection = null;
+	offlineDbPromise = null;
+	if (!db) {
+		return;
+	}
+	db.onversionchange = null;
+	db.onclose = null;
+	db.onerror = null;
+	try {
+		db.close();
+	} catch (error) {}
+}
+
+function runOfflineDb(operation) {
+	return operation().catch(function(error) {
+		if (!isRecoverableOfflineDbError(error)) {
+			return Promise.reject(error);
+		}
+		resetOfflineDb();
+		return operation();
+	});
+}
+
+function bindOfflineDb(db) {
+	offlineDbConnection = db;
+	db.onversionchange = function() {
+		resetOfflineDb();
+	};
+	db.onclose = function() {
+		if (offlineDbConnection === db) {
+			offlineDbConnection = null;
+			offlineDbPromise = null;
+		}
+	};
+	db.onerror = function(event) {
+		stopIndexedDbErrorEvent(event);
+	};
+}
 
 function openOfflineDb() {
 	if (offlineDbPromise) {
@@ -11,8 +81,14 @@ function openOfflineDb() {
 	if (typeof indexedDB === 'undefined') {
 		return Promise.reject(new Error('IndexedDB unavailable'));
 	}
-	offlineDbPromise = new Promise(function(resolve, reject) {
-		var request = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+	var promise = new Promise(function(resolve, reject) {
+		var request;
+		try {
+			request = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+		} catch (error) {
+			reject(error);
+			return;
+		}
 		request.onupgradeneeded = function(event) {
 			var db = event.target.result;
 			if (!db.objectStoreNames.contains('wordList')) {
@@ -32,55 +108,71 @@ function openOfflineDb() {
 			}
 		};
 		request.onsuccess = function(event) {
-			resolve(event.target.result);
+			var db = event.target.result;
+			bindOfflineDb(db);
+			resolve(db);
 		};
-		request.onerror = function() {
+		request.onerror = function(event) {
+			stopIndexedDbErrorEvent(event);
 			reject(request.error || new Error('Failed to open offline database'));
 		};
 	});
-	return offlineDbPromise;
+	offlineDbPromise = promise;
+	promise.catch(function() {
+		if (offlineDbPromise === promise) {
+			offlineDbPromise = null;
+		}
+	});
+	return promise;
 }
 
 function withStore(storeName, mode, onStore) {
-	return openOfflineDb().then(function(db) {
-		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, mode);
-			var store = tx.objectStore(storeName);
-			var value;
-			try {
-				value = onStore(store);
-			} catch (error) {
-				reject(error);
-				return;
-			}
-			tx.oncomplete = function() {
-				resolve(value);
-			};
-			tx.onerror = function() {
-				reject(tx.error || new Error('IndexedDB transaction failed'));
-			};
-			tx.onabort = function() {
-				reject(tx.error || new Error('IndexedDB transaction aborted'));
-			};
+	return runOfflineDb(function() {
+		return openOfflineDb().then(function(db) {
+			return new Promise(function(resolve, reject) {
+				var tx = db.transaction(storeName, mode);
+				var store = tx.objectStore(storeName);
+				var value;
+				try {
+					value = onStore(store);
+				} catch (error) {
+					reject(error);
+					return;
+				}
+				tx.oncomplete = function() {
+					resolve(value);
+				};
+				tx.onerror = function(event) {
+					stopIndexedDbErrorEvent(event);
+					reject(tx.error || new Error('IndexedDB transaction failed'));
+				};
+				tx.onabort = function(event) {
+					stopIndexedDbErrorEvent(event);
+					reject(tx.error || new Error('IndexedDB transaction aborted'));
+				};
+			});
 		});
 	});
 }
 
 function offlineStoreGet(storeName, key) {
-	return openOfflineDb().then(function(db) {
-		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, 'readonly');
-			var request = tx.objectStore(storeName).get(key);
-			var value;
-			request.onsuccess = function() {
-				value = request.result;
-			};
-			tx.oncomplete = function() {
-				resolve(value);
-			};
-			tx.onerror = function() {
-				reject(tx.error || request.error || new Error('IndexedDB get failed'));
-			};
+	return runOfflineDb(function() {
+		return openOfflineDb().then(function(db) {
+			return new Promise(function(resolve, reject) {
+				var tx = db.transaction(storeName, 'readonly');
+				var request = tx.objectStore(storeName).get(key);
+				var value;
+				request.onsuccess = function() {
+					value = request.result;
+				};
+				tx.oncomplete = function() {
+					resolve(value);
+				};
+				tx.onerror = function(event) {
+					stopIndexedDbErrorEvent(event);
+					reject(tx.error || request.error || new Error('IndexedDB get failed'));
+				};
+			});
 		});
 	});
 }
@@ -92,20 +184,23 @@ function offlineStorePut(storeName, key, value) {
 }
 
 function offlineStoreGetAll(storeName) {
-	return openOfflineDb().then(function(db) {
-		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, 'readonly');
-			var request = tx.objectStore(storeName).getAll();
-			var value = [];
-			request.onsuccess = function() {
-				value = request.result || [];
-			};
-			tx.oncomplete = function() {
-				resolve(value);
-			};
-			tx.onerror = function() {
-				reject(tx.error || request.error || new Error('IndexedDB getAll failed'));
-			};
+	return runOfflineDb(function() {
+		return openOfflineDb().then(function(db) {
+			return new Promise(function(resolve, reject) {
+				var tx = db.transaction(storeName, 'readonly');
+				var request = tx.objectStore(storeName).getAll();
+				var value = [];
+				request.onsuccess = function() {
+					value = request.result || [];
+				};
+				tx.oncomplete = function() {
+					resolve(value);
+				};
+				tx.onerror = function(event) {
+					stopIndexedDbErrorEvent(event);
+					reject(tx.error || request.error || new Error('IndexedDB getAll failed'));
+				};
+			});
 		});
 	});
 }
@@ -190,29 +285,36 @@ function getCachedCityCenter(id) {
 }
 
 function scanCityDetail(matchFn) {
-	return openOfflineDb().then(function(db) {
-		return new Promise(function(resolve, reject) {
-			var tx = db.transaction('cityDetail', 'readonly');
-			var request = tx.objectStore('cityDetail').openCursor();
-			var matches = [];
-			request.onsuccess = function(event) {
-				var cursor = event.target.result;
-				if (!cursor) {
-					return;
-				}
-				var city = cursor.value;
-				if (city && matchFn(city, cursor.key)) {
-					city.id = cursor.key;
-					matches.push(city);
-				}
-				cursor.continue();
-			};
-			tx.oncomplete = function() {
-				resolve(matches);
-			};
-			tx.onerror = function() {
-				reject(tx.error || request.error || new Error('IndexedDB city scan failed'));
-			};
+	return runOfflineDb(function() {
+		return openOfflineDb().then(function(db) {
+			return new Promise(function(resolve, reject) {
+				var tx = db.transaction('cityDetail', 'readonly');
+				var request = tx.objectStore('cityDetail').openCursor();
+				var matches = [];
+				request.onsuccess = function(event) {
+					var cursor = event.target.result;
+					if (!cursor) {
+						return;
+					}
+					try {
+						var city = cursor.value;
+						if (city && matchFn(city, cursor.key)) {
+							city.id = cursor.key;
+							matches.push(city);
+						}
+						cursor.continue();
+					} catch (error) {
+						reject(error);
+					}
+				};
+				tx.oncomplete = function() {
+					resolve(matches);
+				};
+				tx.onerror = function(event) {
+					stopIndexedDbErrorEvent(event);
+					reject(tx.error || request.error || new Error('IndexedDB city scan failed'));
+				};
+			});
 		});
 	});
 }

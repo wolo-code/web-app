@@ -194,6 +194,15 @@ function deferExceptionPrompt(callback) {
 		setTimeout(callback, 0);
 }
 
+function isIndexedDbUserDeletedError(error) {
+	var message = '';
+	if(typeof error == 'string')
+		message = error;
+	else if(error && error.message)
+		message = String(error.message);
+	return message.indexOf('Database deleted by request of the user') != -1;
+}
+
 function isIgnorableServiceWorkerError(error) {
 	var name = error && error.name ? String(error.name) : '';
 	var message = '';
@@ -217,6 +226,8 @@ function isIgnorableServiceWorkerError(error) {
 
 function showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error) {
 	if(isIgnorableServiceWorkerError(error) || isIgnorableServiceWorkerError(errorMsg))
+		return;
+	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(errorMsg))
 		return;
 
 	var exception = normalizeException(errorMsg, url, lineNumber, columnNumber, error);
@@ -310,13 +321,16 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber, columnNumber
 	if(message.indexOf('installations/') != -1 || message.indexOf('Installations:') != -1
 		|| message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1)
 		return true;
+	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(errorMsg) || isIndexedDbUserDeletedError(message))
+		return true;
 	showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error);
 	return false;
 }
 
 window.addEventListener('unhandledrejection', function myRejectionHandler(event) {
 	var reason = event.reason || 'Unhandled promise rejection';
-	if(isIgnorableServiceWorkerError(reason) || isIgnorableServiceWorkerError(reason && reason.message)) {
+	if(isIgnorableServiceWorkerError(reason) || isIgnorableServiceWorkerError(reason && reason.message)
+		|| isIndexedDbUserDeletedError(reason) || isIndexedDbUserDeletedError(reason && reason.message)) {
 		if(event && typeof event.preventDefault == 'function')
 			event.preventDefault();
 		return;

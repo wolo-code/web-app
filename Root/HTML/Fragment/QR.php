@@ -22,7 +22,7 @@
 		</div>
 		<div id='qr_title_container' class='center'>
 			<input id='qr_title_main' type='text' placeholder="&nbsp;&nbsp;Title – e.g. Home">
-			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Segment – e.g. Main gate">
+			<input id='qr_title_segment' type='text' placeholder="&nbsp;&nbsp;Section – e.g. Main gate">
 		</div>
 		<div id='qr_wcode'>
 			<div id='qr_wcode_container'>

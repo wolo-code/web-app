@@ -57,7 +57,7 @@
 			<div id='account_dialog_options' class='hide'>
 				<div id='save_title_container'>
 					<input id='save_title_main' type='text' placeholder="Title – e.g. Home" aria-label='Title'>
-					<input id='save_title_segment' type='text' placeholder="Segment – e.g. Main gate" aria-label='Segment'>
+					<input id='save_title_segment' type='text' placeholder="Section – e.g. Main gate" aria-label='Section'>
 				</div>
 				<div id='save_address_container'>
 					<div class='save-address-first-row'>

@@ -1,4 +1,6 @@
 #external_message {
+	box-sizing: border-box;
+	width: min(300px, calc(100vw - 32px));
 	border-radius: 10px;
 }
 
@@ -48,6 +50,8 @@
 }
 
 #external_wcode_container {
+	box-sizing: border-box;
+	width: 100%;
 	max-width: 260px;
 	color: #69b7cf;
 	padding-left: 12px;
@@ -78,7 +82,9 @@
 	display: grid;
 	grid-template-rows: minmax(0, 1fr);
 	place-items: center;
-	width: min(100%, 244px);
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 244px;
 	/* Reserve four address lines, including the text padding. */
 	block-size: calc(5em + 4px);
 	margin: 12px auto 10px;
@@ -117,4 +123,23 @@
 
 #external_controls_container {
 	margin-top: 0;
+}
+
+#external_proceed {
+	transition: background-color 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+
+#external_proceed:disabled,
+#external_proceed.button_active:disabled {
+	background: #e8e8e8 !important;
+	border-color: #d6d6d6 !important;
+	color: #9e9e9e !important;
+	cursor: default;
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+#external_proceed:disabled .front_arrow_white > svg > g > g > path,
+#external_proceed.button_active:disabled .front_arrow_white > svg > g > g > path {
+	fill: #a8a8a8 !important;
 }

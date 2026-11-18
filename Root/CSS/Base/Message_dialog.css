@@ -72,6 +72,8 @@
 	max-height: none;
 	/* Reserve the Close button's 44px height and 20px gap. */
 	padding-bottom: 64px;
+	box-sizing: border-box;
+	width: min(300px, calc(100vw - 32px));
 }
 
 .overlay > div:has(> #qr_container:not(.hide)) {

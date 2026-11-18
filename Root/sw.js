@@ -95,7 +95,6 @@ self.addEventListener('fetch', function(event) {
 	}
 
 	if (url.origin !== self.location.origin && isNetworkOnlyRequest(url)) {
-		event.respondWith(fetch(request));
 		return;
 	}
 
@@ -163,6 +162,14 @@ function networkFirstShell(request) {
 					return cached;
 				}
 				return findShellFallback();
+			}).catch(function() {
+				return findShellFallback();
+			});
+		}).catch(function() {
+			return new Response('Offline', {
+				status: 503,
+				statusText: 'Offline',
+				headers: { 'Content-Type': 'text/plain' }
 			});
 		});
 }
@@ -180,6 +187,21 @@ function findShellFallback() {
 	}).catch(function() {
 		return caches.open(STATIC_CACHE).then(function(staticCache) {
 			return tryShellPaths(staticCache, 0);
+		});
+	}).then(function(response) {
+		if (response) {
+			return response;
+		}
+		return new Response('Offline', {
+			status: 503,
+			statusText: 'Offline',
+			headers: { 'Content-Type': 'text/plain' }
+		});
+	}).catch(function() {
+		return new Response('Offline', {
+			status: 503,
+			statusText: 'Offline',
+			headers: { 'Content-Type': 'text/plain' }
 		});
 	});
 }
@@ -210,7 +232,22 @@ function networkFirstStatic(request) {
 		}
 		return response;
 	}).catch(function() {
-		return caches.match(request);
+		return caches.match(request).then(function(cached) {
+			if (cached) {
+				return cached;
+			}
+			return new Response('Offline', {
+				status: 503,
+				statusText: 'Offline',
+				headers: { 'Content-Type': 'text/plain' }
+			});
+		}).catch(function() {
+			return new Response('Offline', {
+				status: 503,
+				statusText: 'Offline',
+				headers: { 'Content-Type': 'text/plain' }
+			});
+		});
 	});
 }
 
@@ -225,7 +262,10 @@ function cacheFirstTile(request) {
 				}
 				return response;
 			}).catch(function() {
-				return cached;
+				return cached || new Response('', {
+					status: 503,
+					statusText: 'Offline'
+				});
 			});
 
 			if (cached) {
@@ -233,6 +273,13 @@ function cacheFirstTile(request) {
 				return cached;
 			}
 			return networkPromise;
+		});
+	}).catch(function() {
+		return fetch(request).catch(function() {
+			return new Response('', {
+				status: 503,
+				statusText: 'Offline'
+			});
 		});
 	});
 }

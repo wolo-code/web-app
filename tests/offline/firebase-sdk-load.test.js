@@ -310,7 +310,7 @@ test('a closing IndexedDB connection waits until the page is visible again', () 
 
 test('window.onerror recovers a closing IndexedDB connection without the crash dialog', () => {
 	const source = read('Root/JS/Base/Script.js');
-	const start = source.indexOf('function isIndexedDbClosingError');
+	const start = source.indexOf('function isIndexedDbUserDeletedError');
 	const sandbox = {
 		pendingExceptionLogs: [],
 		recovered: [],

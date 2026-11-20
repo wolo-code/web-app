@@ -93,7 +93,8 @@ function isFirebaseIndexedDbClosingError(error) {
 	}
 	var closing = message.indexOf('database connection is closing') != -1
 		|| message.indexOf('database connection is closed') != -1;
-	return closing && (!error || !error.name || error.name == 'InvalidStateError');
+	return message.indexOf('Database deleted by request of the user') != -1
+		|| (closing && (!error || !error.name || error.name == 'InvalidStateError'));
 }
 
 function isFirebaseInstallationError(error) {

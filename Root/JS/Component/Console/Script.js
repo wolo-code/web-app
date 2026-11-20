@@ -32,6 +32,10 @@ function initApp() {
 		}
 		var user = result.user;
 	}).catch(function(error) {
+		if(typeof isFirebaseIndexedDbClosingError == 'function' && isFirebaseIndexedDbClosingError(error)) {
+			recoverFirebaseIndexedDbConnection(error);
+			return;
+		}
 		var errorCode = error.code;
 		var errorMessage = error.message;
 		// The email of the user's account used.

@@ -145,7 +145,9 @@ function showInitialWoloLinkPreview(link) {
 	document.getElementById('external_wcode_code').textContent = link.words.slice(-3).join(' ');
 	addClassIfPresent(document.getElementById('external_address'), 'hide');
 	removeClassIfPresent(document.getElementById('external_address_loader'), 'hide');
-	document.getElementById('external_proceed').disabled = true;
+	var proceed = document.getElementById('external_proceed');
+	if(proceed)
+		proceed.disabled = true;
 	if(redirect) {
 		dialog.classList.add('redirect-pending');
 		document.getElementById('external_redirect_status').textContent = 'Opening external map…';

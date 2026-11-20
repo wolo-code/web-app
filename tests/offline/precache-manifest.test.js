@@ -43,3 +43,39 @@ test('precache manifest generator discovers hashed bundles from public index', (
 
 	fs.rmSync(publicDir, { recursive: true, force: true });
 });
+
+test('precache generator publishes directory index JSON at the flat .json URL', () => {
+	const publicDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wolo-json-alias-'));
+	const temporaryManifest = path.join(publicDir, 'manifest-output.json');
+	const paper = { title: 'Technical Paper', content: '<p>Paper</p>' };
+	fs.mkdirSync(path.join(publicDir, 'paper'), { recursive: true });
+	fs.mkdirSync(path.join(publicDir, 'menu'), { recursive: true });
+	fs.mkdirSync(path.join(publicDir, 'about'), { recursive: true });
+	fs.writeFileSync(path.join(publicDir, 'index.html'), '<!doctype html>');
+	fs.writeFileSync(path.join(publicDir, 'paper', 'index.json'), JSON.stringify(paper));
+	fs.writeFileSync(path.join(publicDir, 'menu', 'index.json'), JSON.stringify({ title: 'Menu' }));
+	fs.writeFileSync(path.join(publicDir, 'menu.json'), '<!DOCTYPE html><html></html>');
+	fs.writeFileSync(path.join(publicDir, 'about', 'index.json'), JSON.stringify({ title: 'Directory' }));
+	fs.writeFileSync(path.join(publicDir, 'about.json'), JSON.stringify({ title: 'Flat' }));
+	fs.mkdirSync(path.join(publicDir, 'labels'), { recursive: true });
+	fs.writeFileSync(path.join(publicDir, 'labels', 'index.json'), '<!doctype html>');
+
+	const result = spawnSync(process.execPath, [
+		'scripts/generate-precache-manifest.js',
+		'--public-dir', publicDir,
+		'--output', temporaryManifest
+	], {
+		cwd: repoRoot,
+		encoding: 'utf8'
+	});
+	assert.equal(result.status, 0, result.stderr || result.stdout);
+
+	assert.deepEqual(JSON.parse(fs.readFileSync(path.join(publicDir, 'paper.json'), 'utf8')), paper);
+	assert.equal(JSON.parse(fs.readFileSync(path.join(publicDir, 'menu.json'), 'utf8')).title, 'Menu');
+	assert.equal(JSON.parse(fs.readFileSync(path.join(publicDir, 'about.json'), 'utf8')).title, 'Flat');
+	assert.equal(fs.existsSync(path.join(publicDir, 'labels.json')), false);
+	const generated = JSON.parse(fs.readFileSync(temporaryManifest, 'utf8'));
+	assert.ok(generated.assets.includes('/paper.json'));
+
+	fs.rmSync(publicDir, { recursive: true, force: true });
+});

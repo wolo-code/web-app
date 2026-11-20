@@ -14,10 +14,14 @@ function external_close() {
 }
 
 function external_proceed_external() {
+	if(!external_latLng)
+		return;
 	window.location.assign(getIntentURL(external_latLng, external_wolo_code_string));
 }
 
 function external_proceed_internal() {
+	if(!external_latLng)
+		return;
 	ensureMapViewForLocation();
 	external_hide();
 }

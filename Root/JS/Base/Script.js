@@ -203,6 +203,32 @@ function isIndexedDbUserDeletedError(error) {
 	return message.indexOf('Database deleted by request of the user') != -1;
 }
 
+function isIndexedDbClosingError(error) {
+	if(typeof isFirebaseIndexedDbClosingError == 'function')
+		return isFirebaseIndexedDbClosingError(error);
+	var message = '';
+	var name = '';
+	if(error) {
+		if(error.name)
+			name = error.name;
+		if(error.message)
+			message = String(error.message);
+		else if(typeof error == 'string')
+			message = error;
+	}
+	var closing = message.indexOf('database connection is closing') != -1
+		|| message.indexOf('database connection is closed') != -1;
+	return closing && (!name || name == 'InvalidStateError');
+}
+
+function recoverIndexedDbClosingError(error) {
+	if(!isIndexedDbClosingError(error))
+		return false;
+	if(typeof recoverFirebaseIndexedDbConnection == 'function')
+		recoverFirebaseIndexedDbConnection(error);
+	return true;
+}
+
 function isIgnorableServiceWorkerError(error) {
 	var name = error && error.name ? String(error.name) : '';
 	var message = '';
@@ -227,7 +253,8 @@ function isIgnorableServiceWorkerError(error) {
 function showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error) {
 	if(isIgnorableServiceWorkerError(error) || isIgnorableServiceWorkerError(errorMsg))
 		return;
-	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(errorMsg))
+	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(errorMsg)
+		|| recoverIndexedDbClosingError(error) || recoverIndexedDbClosingError(errorMsg))
 		return;
 
 	var exception = normalizeException(errorMsg, url, lineNumber, columnNumber, error);
@@ -321,7 +348,8 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber, columnNumber
 	if(message.indexOf('installations/') != -1 || message.indexOf('Installations:') != -1
 		|| message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1)
 		return true;
-	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(errorMsg) || isIndexedDbUserDeletedError(message))
+	if(isIndexedDbUserDeletedError(error) || isIndexedDbUserDeletedError(message)
+		|| recoverIndexedDbClosingError(error || message))
 		return true;
 	showErrorPrompt(errorMsg, url, lineNumber, columnNumber, error);
 	return false;
@@ -330,7 +358,12 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber, columnNumber
 window.addEventListener('unhandledrejection', function myRejectionHandler(event) {
 	var reason = event.reason || 'Unhandled promise rejection';
 	if(isIgnorableServiceWorkerError(reason) || isIgnorableServiceWorkerError(reason && reason.message)
-		|| isIndexedDbUserDeletedError(reason) || isIndexedDbUserDeletedError(reason && reason.message)) {
+		|| isIndexedDbUserDeletedError(reason)) {
+		if(event && typeof event.preventDefault == 'function')
+			event.preventDefault();
+		return;
+	}
+	if(recoverIndexedDbClosingError(reason)) {
 		if(event && typeof event.preventDefault == 'function')
 			event.preventDefault();
 		return;

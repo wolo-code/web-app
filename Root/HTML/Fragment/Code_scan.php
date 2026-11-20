@@ -62,7 +62,7 @@
 				<label class='code_scan_review_field' for='code_scan_title'>Title
 					<input id='code_scan_title' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
 				</label>
-				<label class='code_scan_review_field' for='code_scan_segment'>Segment
+				<label class='code_scan_review_field' for='code_scan_segment'>Section
 					<input id='code_scan_segment' class='code_scan_review_input' type='text' autocomplete='off' placeholder='Optional'>
 				</label>
 			</div>

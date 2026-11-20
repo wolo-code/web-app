@@ -237,6 +237,9 @@ function stopMapPinNudging() {
 function finishMapPinAdjustment(restoreFocus = true) {
 	stopMapPinNudging();
 	var adjustment = mapPinAdjustment;
+	// Cancel, Escape, and map teardown can all end the same gesture. A second
+	// call has nothing left to release, and reading drag here opens the exception dialog.
+	if(!adjustment) return;
 	mapPinAdjustment = null;
 	if(adjustment.drag && mapPinCrosshair.hasPointerCapture(adjustment.drag.id))
 		mapPinCrosshair.releasePointerCapture(adjustment.drag.id);

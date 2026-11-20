@@ -539,6 +539,18 @@ html.dark-mode #invalid_code_message .invalid_code_actions button svg {
 	color: #ffffff;
 }
 
+html.dark-mode #external_proceed:disabled,
+html.dark-mode #external_proceed.button_active:disabled {
+	background: #252538 !important;
+	border-color: #383852 !important;
+	color: #666688 !important;
+}
+
+html.dark-mode #external_proceed:disabled .front_arrow_white > svg > g > g > path,
+html.dark-mode #external_proceed.button_active:disabled .front_arrow_white > svg > g > g > path {
+	fill: #555577 !important;
+}
+
 html.dark-mode #account_dialog_logout_button {
 	background: transparent;
 	box-shadow: none;

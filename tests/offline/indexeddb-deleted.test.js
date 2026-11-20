@@ -226,7 +226,7 @@ test('auth IndexedDB deletion reloads once and is not reported', () => {
 	closing.name = 'InvalidStateError';
 	assert.equal(api.isFirebaseIndexedDbClosingError(closing), true);
 	api.recoverFirebaseIndexedDbConnection(closing);
-	assert.equal(api.Sentry.captured.length, 1);
+	assert.equal(api.Sentry.captured.length, 0);
 	assert.equal(api.isFirebaseIndexedDbClosingError(new TypeError('boom')), false);
 });
 

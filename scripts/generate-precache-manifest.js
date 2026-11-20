@@ -66,6 +66,57 @@ function collectHashedBundles(html) {
 	return assets;
 }
 
+function leadingText(filePath) {
+	const fd = fs.openSync(filePath, 'r');
+	try {
+		const buf = Buffer.alloc(64);
+		const n = fs.readSync(fd, buf, 0, buf.length, 0);
+		return buf.slice(0, n).toString('utf8').trimStart().toLowerCase();
+	} finally {
+		fs.closeSync(fd);
+	}
+}
+
+function isJsonDocument(filePath) {
+	const lead = leadingText(filePath);
+	return lead.startsWith('{') || lead.startsWith('[');
+}
+
+function isHtmlDocument(filePath) {
+	return leadingText(filePath).startsWith('<!doctype') || leadingText(filePath).startsWith('<html');
+}
+
+// Apache rewrites a missing /page.json to /page/index.json. Firebase Hosting
+// has no equivalent, so that URL is the app shell and JSON.parse throws.
+function materializeDirectoryJsonAliases(dir) {
+	if (!fs.existsSync(dir)) {
+		return;
+	}
+	const walk = (current) => {
+		for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+			if (entry.isDirectory()) {
+				walk(path.join(current, entry.name));
+			}
+		}
+		if (current === dir) {
+			return;
+		}
+		const indexJson = path.join(current, 'index.json');
+		if (!fs.existsSync(indexJson) || !isJsonDocument(indexJson)) {
+			return;
+		}
+		const aliasPath = path.join(path.dirname(current), path.basename(current) + '.json');
+		if (fs.existsSync(aliasPath)) {
+			const stat = fs.statSync(aliasPath);
+			if (!stat.isFile() || !isHtmlDocument(aliasPath)) {
+				return;
+			}
+		}
+		fs.copyFileSync(indexJson, aliasPath);
+	};
+	walk(dir);
+}
+
 function collectPublicAssets() {
 	if (!fs.existsSync(publicDir)) {
 		return [];
@@ -96,6 +147,7 @@ function uniqueSorted(items) {
 }
 
 function main() {
+	materializeDirectoryJsonAliases(publicDir);
 	const assets = [...DEFAULT_ASSETS];
 	const indexHtml = readText(path.join(publicDir, 'index.html'));
 	assets.push(...collectHashedBundles(indexHtml));

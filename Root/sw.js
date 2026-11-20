@@ -136,11 +136,47 @@ function precacheAssets(assets) {
 	});
 }
 
+function isHtmlResponse(response) {
+	var type = response && response.headers && response.headers.get('content-type');
+	return !!type && type.indexOf('text/html') !== -1;
+}
+
+function isSameOriginJsonPath(url) {
+	return url.origin === self.location.origin && /\.json$/i.test(url.pathname);
+}
+
+function directoryIndexJsonUrl(requestUrl) {
+	var url = new URL(requestUrl);
+	url.pathname = url.pathname.replace(/\.json$/i, '/index.json');
+	return url.toString();
+}
+
+function rememberStaticResponse(request, response) {
+	var url = new URL(request.url);
+	if (!response || !response.ok || response.status === 206) {
+		return;
+	}
+	if (isSameOriginJsonPath(url) && isHtmlResponse(response)) {
+		return;
+	}
+	var copy = response.clone();
+	caches.open(STATIC_CACHE).then(function(cache) {
+		return cache.put(request, copy);
+	}).catch(function() {});
+}
+
 function cacheAsset(cache, asset) {
 	var url = new URL(asset, self.location.origin).toString();
 	return fetch(url, { credentials: 'same-origin' }).then(function(response) {
-		if (response && response.ok && response.status !== 206) {
+		if (response && response.ok && response.status !== 206 && !isHtmlResponse(response)) {
 			return cache.put(url, response);
+		}
+		if (response && isSameOriginJsonPath(new URL(url)) && isHtmlResponse(response)) {
+			return fetch(directoryIndexJsonUrl(url), { credentials: 'same-origin' }).then(function(alias) {
+				if (alias && alias.ok && alias.status !== 206 && !isHtmlResponse(alias)) {
+					return cache.put(url, alias);
+				}
+			});
 		}
 	}).catch(function() {});
 }
@@ -224,12 +260,19 @@ function tryShellPaths(cache, index) {
 
 function networkFirstStatic(request) {
 	return fetch(request).then(function(response) {
-		if (response && response.ok && response.status !== 206) {
-			var copy = response.clone();
-			caches.open(STATIC_CACHE).then(function(cache) {
-				return cache.put(request, copy);
-			}).catch(function() {});
+		var url = new URL(request.url);
+		if (isSameOriginJsonPath(url) && isHtmlResponse(response)) {
+			return fetch(directoryIndexJsonUrl(request.url), { credentials: 'same-origin' }).then(function(alias) {
+				if (alias && alias.ok && alias.status !== 206 && !isHtmlResponse(alias)) {
+					rememberStaticResponse(request, alias);
+					return alias;
+				}
+				return response;
+			}).catch(function() {
+				return response;
+			});
 		}
+		rememberStaticResponse(request, response);
 		return response;
 	}).catch(function() {
 		return caches.match(request).then(function(cached) {

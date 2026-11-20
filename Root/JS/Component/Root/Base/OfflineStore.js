@@ -3,6 +3,52 @@
 var OFFLINE_DB_NAME = 'wolo-offline';
 var OFFLINE_DB_VERSION = 1;
 var offlineDbPromise = null;
+var offlineDb = null;
+
+function isIndexedDbClosingError(error) {
+	var message = '';
+	var name = '';
+	if (error) {
+		if (error.name)
+			name = error.name;
+		if (error.message)
+			message = String(error.message);
+		else if (typeof error == 'string')
+			message = error;
+	}
+	var closing = message.indexOf('database connection is closing') != -1
+		|| message.indexOf('database connection is closed') != -1;
+	return closing && (!name || name == 'InvalidStateError');
+}
+
+function invalidateOfflineDb(db) {
+	if (db) {
+		db.onclose = null;
+		db.onversionchange = null;
+	}
+	if (offlineDb === db)
+		offlineDb = null;
+	offlineDbPromise = null;
+	if (db && typeof db.close == 'function') {
+		try {
+			db.close();
+		} catch (error) {}
+	}
+}
+
+function watchOfflineDb(db) {
+	offlineDb = db;
+	db.onversionchange = function() {
+		invalidateOfflineDb(db);
+	};
+	db.onclose = function() {
+		if (offlineDb === db) {
+			offlineDb = null;
+			offlineDbPromise = null;
+		}
+	};
+	return db;
+}
 
 function openOfflineDb() {
 	if (offlineDbPromise) {
@@ -11,8 +57,14 @@ function openOfflineDb() {
 	if (typeof indexedDB === 'undefined') {
 		return Promise.reject(new Error('IndexedDB unavailable'));
 	}
-	offlineDbPromise = new Promise(function(resolve, reject) {
-		var request = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+	var promise = new Promise(function(resolve, reject) {
+		var request;
+		try {
+			request = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+		} catch (error) {
+			reject(error);
+			return;
+		}
 		request.onupgradeneeded = function(event) {
 			var db = event.target.result;
 			if (!db.objectStoreNames.contains('wordList')) {
@@ -32,20 +84,48 @@ function openOfflineDb() {
 			}
 		};
 		request.onsuccess = function(event) {
-			resolve(event.target.result);
+			resolve(watchOfflineDb(event.target.result));
 		};
 		request.onerror = function() {
 			reject(request.error || new Error('Failed to open offline database'));
 		};
 	});
+	var opened = promise.then(function(db) {
+		return db;
+	}, function(error) {
+		if (offlineDbPromise === opened)
+			offlineDbPromise = null;
+		throw error;
+	});
+	offlineDbPromise = opened;
 	return offlineDbPromise;
 }
 
-function withStore(storeName, mode, onStore) {
+function withOfflineDb(operation, allowRetry) {
 	return openOfflineDb().then(function(db) {
+		try {
+			return Promise.resolve(operation(db)).catch(function(error) {
+				if (allowRetry !== false && isIndexedDbClosingError(error)) {
+					invalidateOfflineDb(db);
+					return withOfflineDb(operation, false);
+				}
+				throw error;
+			});
+		} catch (error) {
+			if (allowRetry !== false && isIndexedDbClosingError(error)) {
+				invalidateOfflineDb(db);
+				return withOfflineDb(operation, false);
+			}
+			return Promise.reject(error);
+		}
+	});
+}
+
+function withStore(storeName, mode, onStore) {
+	return withOfflineDb(function(db) {
+		var tx = db.transaction(storeName, mode);
+		var store = tx.objectStore(storeName);
 		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, mode);
-			var store = tx.objectStore(storeName);
 			var value;
 			try {
 				value = onStore(store);
@@ -67,10 +147,10 @@ function withStore(storeName, mode, onStore) {
 }
 
 function offlineStoreGet(storeName, key) {
-	return openOfflineDb().then(function(db) {
+	return withOfflineDb(function(db) {
+		var tx = db.transaction(storeName, 'readonly');
+		var request = tx.objectStore(storeName).get(key);
 		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, 'readonly');
-			var request = tx.objectStore(storeName).get(key);
 			var value;
 			request.onsuccess = function() {
 				value = request.result;
@@ -92,10 +172,10 @@ function offlineStorePut(storeName, key, value) {
 }
 
 function offlineStoreGetAll(storeName) {
-	return openOfflineDb().then(function(db) {
+	return withOfflineDb(function(db) {
+		var tx = db.transaction(storeName, 'readonly');
+		var request = tx.objectStore(storeName).getAll();
 		return new Promise(function(resolve, reject) {
-			var tx = db.transaction(storeName, 'readonly');
-			var request = tx.objectStore(storeName).getAll();
 			var value = [];
 			request.onsuccess = function() {
 				value = request.result || [];
@@ -190,10 +270,10 @@ function getCachedCityCenter(id) {
 }
 
 function scanCityDetail(matchFn) {
-	return openOfflineDb().then(function(db) {
+	return withOfflineDb(function(db) {
+		var tx = db.transaction('cityDetail', 'readonly');
+		var request = tx.objectStore('cityDetail').openCursor();
 		return new Promise(function(resolve, reject) {
-			var tx = db.transaction('cityDetail', 'readonly');
-			var request = tx.objectStore('cityDetail').openCursor();
 			var matches = [];
 			request.onsuccess = function(event) {
 				var cursor = event.target.result;

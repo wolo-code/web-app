@@ -83,3 +83,13 @@ test('bundled word list has the final v4 words; unpublished drafts are not alias
 	}
 	for (const draft of ['capsule', 'diagram', 'textile', 'emblem']) assert.equal(wordList.indexOf(draft), -1, draft);
 });
+test('bundled word lists encode scooter and decode earlier words at index 436', () => {
+	for (const file of ['Database/WordList.json', 'Root/Files/offline-data/WordList.json', 'Root/offline-data/WordList.json']) {
+		const wordList = new WordList(loadJson(file));
+		assert.equal(wordList.getWord(436), 'scooter', file);
+		assert.equal(wordList.indexOf('scooter'), 436, file);
+		for (const alias of ['jeep', 'pretzel', 'taco']) {
+			assert.equal(wordList.indexOf(alias), 436, file);
+		}
+	}
+});

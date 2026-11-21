@@ -295,7 +295,22 @@ dialog.city_region_manual h2 {
 	font-size: 1.35em;
 }
 
-.city_region_manual_actions {
+.city_region_out_of_range {
+	margin: 16px 0 0;
+	text-align: center;
+	color: #666;
+}
+
+html.dark-mode .city_region_out_of_range {
+	color: #b5b5b5;
+}
+
+.city_region_out_of_range:empty,
+.city_region_manual_hint:empty {
+	display: none;
+}
+
+.city_region_manual_actions:not([hidden]) {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: flex-end;

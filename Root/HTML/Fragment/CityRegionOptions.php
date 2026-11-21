@@ -16,9 +16,14 @@
 			<p class='city_region_manual_hint'<?php if($cityRegionMenuId === 'nearby') echo " aria-live='polite'"; ?>>Choose a region and enter its anchor index</p>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_name'>Region or country</label>
 			<select id='<?php echo $cityRegionMenuId; ?>_region_name' class='city_region_name'></select>
+		<?php if($cityRegionMenuId === 'nearby') { ?>
+			<div class='city_region_index_fields'>
+		<?php } ?>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_index'>Anchor index</label>
 			<input id='<?php echo $cityRegionMenuId; ?>_region_index' class='city_region_index' type='number' min='1' step='1' inputmode='numeric' required>
 		<?php if($cityRegionMenuId === 'nearby') { ?>
+					</div>
+					<p class='city_region_out_of_range' role='status'></p>
 					<div class='city_region_manual_actions'>
 						<button type='submit' class='city_region_use'>Use regional code <span aria-hidden='true'>&rarr;</span></button>
 					</div>

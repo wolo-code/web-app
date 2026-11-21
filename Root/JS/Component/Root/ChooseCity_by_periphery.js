@@ -20,25 +20,36 @@ function showChooseCity_by_periphery_List() {
 	var container = document.getElementById('choose_city_by_periphery_message_list');
 	var choices = [];
 	var seen = new Set();
+	var current = typeof code_city !== 'undefined' && code_city && !isRegionAnchor(code_city) && code_city;
 	if(typeof code_city !== 'undefined' && code_city) {
-		if(!isRegionAnchor(code_city))
-			choices.push({city: code_city, status: 'Current', select: hideChooseCity_by_periphery_Message});
 		for(let key in chooseCity_by_periphery_gpid) {
 			var city = chooseCity_by_periphery_gpid[key].city;
-			seen.add(city.gp_id);
-			if(city.gp_id == code_city.gp_id ||
-				(city.administrative_level_2 == null && city.administrative_level_1 != null))
+			if(city.administrative_level_2 == null && city.administrative_level_1 != null)
 				continue;
+			seen.add(city.gp_id);
 			choices.push({city: city, key: key, status: 'Nearby', select: chooseCity_by_periphery_gpid_Continue});
 		}
 	}
 	for(let key in chooseCity_by_periphery_List) {
 		var city = chooseCity_by_periphery_List[key] && chooseCity_by_periphery_List[key].city;
-		if(!city || seen.has(city.gp_id) || isChooseCityCurrentCodeCity(city))
+		if(!city || seen.has(city.gp_id))
 			continue;
 		choices.push({city: city, key: key, status: 'Nearby', select: chooseCity_by_periphery_Continue});
 		if(city.gp_id)
 			seen.add(city.gp_id);
+	}
+	if(current) {
+		var currentIndex = choices.findIndex(function(choice) {
+			return isChooseCityCurrentCodeCity(choice.city) ||
+				(current.gp_id && choice.city.gp_id === current.gp_id);
+		});
+		var currentChoice = {city: current, status: 'Current', select: hideChooseCity_by_periphery_Message};
+		if(currentIndex === -1)
+			choices.push(currentChoice);
+		else {
+			choices[currentIndex].status = 'Current';
+			choices[currentIndex].select = hideChooseCity_by_periphery_Message;
+		}
 	}
 	renderCityChoices(container, choices);
 }

@@ -28,17 +28,15 @@ function renderCityRegionMenu(id, mode) {
 	if(!panel) return;
 	var point = mode === 'matching' ? null : cityRegionMenuPosition();
 	var current = mode !== 'matching' && typeof code_city !== 'undefined' && isRegionAnchor(code_city) && regionAnchorFromId(code_city.id);
-	var choices = regionAnchorsForPosition(current && point ? current.center : point);
+	var choices = regionAnchorsForPosition(point);
 	var cities = mode === 'nearby' ? panel.parentElement.querySelector('.city_region_cities') : null;
 	if(cities) {
-		panel.parentElement.insertBefore(current ? panel : cities, current ? cities : panel);
 		panel.querySelector('.city_region_choices').open = !!current;
 		cities.open = !current;
-		if(current) {
-			choices = [{anchor: current}].concat(choices.filter(function(choice) {
-				return choice.anchor.id !== current.id;
-			}));
-		}
+		if(current && !choices.some(function(choice) { return choice.anchor.id === current.id; }))
+			choices.push({anchor: current});
+	} else if(current && point) {
+		choices = regionAnchorsForPosition(current.center);
 	}
 	var list = panel.querySelector('.city_region_list');
 	var manual = panel.querySelector('.city_region_manual');
@@ -81,7 +79,7 @@ function renderCityRegionMenu(id, mode) {
 		if(cities) event.preventDefault();
 		if(event && event.stopPropagation) event.stopPropagation();
 		setLimit();
-		if(!input.reportValidity()) return;
+		if(input.disabled || !input.reportValidity()) return;
 		var region = allWoloRegions().find(function(entry) { return entry.key === select.value; });
 		var anchor = region && regionAnchor(region, Number(input.value));
 		if(!anchor) return;
@@ -91,12 +89,19 @@ function renderCityRegionMenu(id, mode) {
 	}
 	if(cities) {
 		var hint = manual.querySelector('.city_region_manual_hint');
-		var defaultHint = hint.textContent;
+		var indexFields = manual.querySelector('.city_region_index_fields');
+		var outOfRange = manual.querySelector('.city_region_out_of_range');
+		var actions = manual.querySelector('.city_region_manual_actions');
 		function suggestIndex() {
 			setLimit();
 			var suggestion = suggestedRegion();
+			var outside = !!manualPoint && !suggestion;
+			indexFields.hidden = outside;
+			input.disabled = outside;
+			actions.hidden = outside;
+			outOfRange.textContent = outside ? 'The current location is out of range for the selected region.' : '';
 			input.value = suggestion ? suggestion.anchor.id.split(':').pop() : '';
-			hint.textContent = suggestion ? 'Suggested index for the map pin' : defaultHint;
+			hint.textContent = outside ? '' : suggestion ? 'Suggested index for the map pin' : 'Choose a region and enter its anchor index';
 		}
 		select.onchange = suggestIndex;
 		panel.querySelector('.city_region_manual_open').onclick = function() {

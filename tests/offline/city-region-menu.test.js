@@ -23,7 +23,7 @@ function runtime() {
 	const panels = new Map(), nodes = new Map(), events = [];
 	for(const id of ['nearby', 'matching', 'history']) {
 		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close', 'manual_hint']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
+		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close', 'manual_hint', 'index_fields', 'out_of_range', 'manual_actions']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
 		const panel = { querySelector: key => children.get(key), children };
 		if(id === 'nearby') {
 			const manual = children.get('.city_region_manual');
@@ -116,23 +116,24 @@ test('empty previous-city menus remain enabled and still expose region/proposal 
 	assert(rendered && opened);
 });
 
-test('nearby picker opens the active reference section and pins the current region first', () => {
+test('nearby picker opens the active section and highlights the region in place', () => {
 	const { api, panels } = runtime();
 	const panel = panels.get('nearby_region_menu');
 	const cities = panel.parentElement.querySelector('.city_region_cities');
 	const regionDetails = panel.children.get('.city_region_choices');
 	const list = panel.children.get('.city_region_list');
-	const active = api.regionAnchorFromId('region:v1:country-npl:1');
+	api.renderCityRegionMenu('nearby', 'nearby');
+	const order = list.children.map(button => button.textContent);
+	const active = api.regionAnchorsForPosition(api.code_postition).at(-1).anchor;
 
 	api.code_city = active;
-	api.code_postition = null;
 	api.renderCityRegionMenu('nearby', 'nearby');
-	assert.equal(panel.parentElement.sections[0], panel);
+	assert.equal(panel.parentElement.sections[0], cities);
 	assert.equal(regionDetails.open, true);
 	assert.equal(cities.open, false);
-	assert.equal(list.children[0].attributes['aria-pressed'], 'true');
-	assert.match(list.children[0].html, /wolo_region_index/);
-	assert.equal(list.children[0].children.length, 0);
+	assert.deepEqual(list.children.map(button => button.textContent), order);
+	assert.equal(list.children.at(-1).attributes['aria-pressed'], 'true');
+	assert.match(list.children.at(-1).html, /wolo_region_index/);
 	assert.equal(list.children.filter(button => button.attributes['aria-pressed'] === 'true').length, 1);
 
 	api.code_city = { id: 'city' };
@@ -140,6 +141,28 @@ test('nearby picker opens the active reference section and pins the current regi
 	assert.equal(panel.parentElement.sections[0], cities);
 	assert.equal(regionDetails.open, false);
 	assert.equal(cities.open, true);
+});
+
+test('nearby picker highlights a selected city without changing its position', () => {
+	const { api } = runtime();
+	vm.runInContext(read('ChooseCity_by_periphery.js'), api);
+	const first = { id: '1', gp_id: 'first' };
+	const second = { id: '2', gp_id: 'second' };
+	const addressCity = { gp_id: 'second' };
+	api.chooseCity_by_periphery_gpid = [{ city: addressCity }];
+	api.chooseCity_by_periphery_List = [{ city: first }, { city: second }];
+	let choices;
+	api.renderCityChoices = (_, rows) => { choices = rows; };
+
+	api.code_city = first;
+	api.showChooseCity_by_periphery_List();
+	assert.deepEqual(Array.from(choices, choice => choice.city.gp_id), ['second', 'first']);
+	assert.deepEqual(Array.from(choices, choice => choice.status), ['Nearby', 'Current']);
+
+	api.code_city = second;
+	api.showChooseCity_by_periphery_List();
+	assert.deepEqual(Array.from(choices, choice => choice.city.gp_id), ['second', 'first']);
+	assert.deepEqual(Array.from(choices, choice => choice.status), ['Current', 'Nearby']);
 });
 
 test('nearby manual region dialog can close or submit an anchor', () => {
@@ -182,8 +205,18 @@ test('nearby manual region dialog suggests the covering index and keeps the map 
 	select.value = 'country-usa';
 	select.onchange();
 	assert.equal(input.value, '');
+	assert.equal(input.disabled, true);
+	assert.equal(children.get('.city_region_index_fields').hidden, true);
+	assert.equal(children.get('.city_region_manual_actions').hidden, true);
+	assert.match(children.get('.city_region_out_of_range').textContent, /out of range/);
+	children.get('.city_region_manual').querySelector('form').onsubmit({ preventDefault() {} });
+	assert.deepEqual(events, []);
 	select.value = 'country-npl';
 	select.onchange();
+	assert.equal(input.disabled, false);
+	assert.equal(children.get('.city_region_index_fields').hidden, false);
+	assert.equal(children.get('.city_region_manual_actions').hidden, false);
+	assert.equal(children.get('.city_region_out_of_range').textContent, '');
 	const { anchor } = api.regionAnchorsForPosition(api.code_postition).find(choice => choice.region.key === select.value);
 	assert.notEqual(input.value, '1');
 	assert.equal(input.value, anchor.id.split(':').pop());

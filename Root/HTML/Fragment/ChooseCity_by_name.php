@@ -6,11 +6,6 @@
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='choose_city_by_name_message_prompt' class='message_dialog_body'>
-		<p>
-			There are multiple cities with this name.<br>
-			Please select the correct one:
-		</p>
-		<div id='choose_city_by_name_message_list' class='choose_city_message_list'></div>
 		<?php $cityRegionMenuId = 'matching'; require __DIR__ . '/CityRegionOptions.php'; ?>
 	</div>
 </div>

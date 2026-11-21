@@ -6,7 +6,7 @@
 		<span class='image'><?php includeSVG('', 'Close'); ?></span>
 	</div>
 	<div id='decode_city_history_message_prompt' class='message_dialog_body'>
-		<div id='decode_city_history_message_list' class='choose_city_message_list'></div>
+		<?php $cityRegionMenuId = 'history'; require __DIR__ . '/CityRegionOptions.php'; ?>
 		<div id='decode_city_history_delete' class='hide'>
 			<p>
 				Remove <span id='decode_city_history_delete_name'></span> from this list?
@@ -16,6 +16,5 @@
 				<button id='decode_city_history_delete_cancel' class='border' type='button'>Cancel</button>
 			</div>
 		</div>
-		<?php $cityRegionMenuId = 'history'; require __DIR__ . '/CityRegionOptions.php'; ?>
 	</div>
 </div>

@@ -1,40 +1,36 @@
-<?php $cityRegionMenuId = htmlspecialchars($cityRegionMenuId, ENT_QUOTES, 'UTF-8'); ?>
-<div id='<?php echo $cityRegionMenuId; ?>_region_menu' class='city_region_menu'>
-	<details class='city_region_choices'>
-		<summary><?php echo $cityRegionMenuId === 'nearby' ? 'Regions' : 'Use a regional code'; ?></summary>
-		<div class='city_region_list'></div>
-		<?php if($cityRegionMenuId === 'nearby') { ?>
-			<button type='button' class='city_region_manual_open' aria-haspopup='dialog'><span aria-hidden='true'>+</span> Choose a regional reference</button>
-			<dialog class='city_region_manual' aria-labelledby='nearby_region_manual_title'>
-				<form>
-					<h2 id='nearby_region_manual_title'>Choose a regional reference</h2>
-					<button type='button' class='city_region_manual_close' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
-		<?php } else { ?>
-			<details class='city_region_manual'>
-				<summary>Choose a regional reference</summary>
-		<?php } ?>
-			<p class='city_region_manual_hint'<?php if($cityRegionMenuId === 'nearby') echo " aria-live='polite'"; ?>>Choose a region and enter its anchor index</p>
-			<label for='<?php echo $cityRegionMenuId; ?>_region_name'>Region or country</label>
-			<select id='<?php echo $cityRegionMenuId; ?>_region_name' class='city_region_name'></select>
-		<?php if($cityRegionMenuId === 'nearby') { ?>
-			<div class='city_region_index_fields'>
-		<?php } ?>
-			<label for='<?php echo $cityRegionMenuId; ?>_region_index'>Anchor index</label>
-			<input id='<?php echo $cityRegionMenuId; ?>_region_index' class='city_region_index' type='number' min='1' step='1' inputmode='numeric' required>
-		<?php if($cityRegionMenuId === 'nearby') { ?>
-					</div>
-					<p class='city_region_out_of_range' role='status'></p>
-					<div class='city_region_manual_actions'>
-						<button type='submit' class='city_region_use'>Use regional code <span aria-hidden='true'>&rarr;</span></button>
-					</div>
-				</form>
-			</dialog>
-		<?php } else { ?>
-				<button type='button' class='city_region_use'>Use regional code <span aria-hidden='true'>&rarr;</span></button>
-			</details>
-		<?php } ?>
-	</details>
-	<?php if($cityRegionMenuId !== 'nearby') { ?>
-		<button type='button' class='city_region_propose'><span aria-hidden='true'>+</span> Propose a city</button>
-	<?php } ?>
+<?php
+$cityRegionCityLists = [
+	'nearby' => 'choose_city_by_periphery_message_list',
+	'history' => 'decode_city_history_message_list',
+	'matching' => 'choose_city_by_name_message_list',
+];
+?>
+<div id='<?= $cityRegionMenuId ?>_region_menu' class='city_region_picker'>
+	<div class='city_region_tabs' role='tablist' aria-label='Location type'>
+		<button id='<?= $cityRegionMenuId ?>_city_tab' type='button' role='tab' aria-selected='true' aria-controls='<?= $cityRegionMenuId ?>_city_panel'><span>Cities</span></button>
+		<span aria-hidden='true'>|</span>
+		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Regions</span></button>
+	</div>
+	<div id='<?= $cityRegionMenuId ?>_city_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_city_tab'>
+		<input type='search' class='city_region_search' placeholder='Search cities' aria-label='Search cities' autocomplete='off' spellcheck='false'>
+		<p class='city_region_search_status' role='status'></p>
+		<div class='city_region_defaults'>
+			<?php if($cityRegionMenuId === 'matching') { ?>
+				<p>There are multiple cities with this name. Select the correct one:</p>
+			<?php } ?>
+			<div id='<?= $cityRegionCityLists[$cityRegionMenuId] ?>' class='choose_city_message_list'></div>
+		</div>
+		<div class='city_region_search_results'></div>
+	</div>
+	<div id='<?= $cityRegionMenuId ?>_region_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_region_tab' hidden>
+		<input type='search' class='city_region_search' placeholder='Search regions or countries' aria-label='Search regions or countries' autocomplete='off' spellcheck='false'>
+		<p class='city_region_search_status' role='status'></p>
+		<div class='city_region_defaults'>
+			<?php if($cityRegionMenuId === 'history') { ?>
+				<div id='decode_region_history_message_list' class='choose_city_message_list'></div>
+			<?php } ?>
+			<div class='city_region_list'></div>
+		</div>
+		<div class='city_region_search_results city_region_list'></div>
+	</div>
 </div>

@@ -225,7 +225,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 						finish(null, codeWords);
 					else
 						getCityCenterFromId(city, function(city) { finish(city, codeWords); });
-				}, fromUrl ? function() { finish(null, codeWords); } : undefined);
+				}, fromUrl ? function() { finish(null, codeWords); } : undefined, codeWords);
 			}
 			else if (words.length == 3) {
 				

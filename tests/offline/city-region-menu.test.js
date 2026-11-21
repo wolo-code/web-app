@@ -6,228 +6,163 @@ const vm = require('node:vm');
 const test = require('node:test');
 const read = file => fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root', file), 'utf8');
 
-function node(tag = '') {
-	const classes = new Set();
-	return { tag, children: [], listeners: {}, attributes: {}, value: '',
-		classList: { add(c) { classes.add(c); }, remove(c) { classes.delete(c); }, contains(c) { return classes.has(c); }, toggle(c, enabled) { enabled ? classes.add(c) : classes.delete(c); } },
-		set textContent(value) { this.children = []; this.text = value; }, get textContent() { return this.text; },
-		set innerHTML(value) { this.children = []; this.html = value; this.text = value.replace(/<[^>]*>/g, ''); },
-		appendChild(child) { this.children.push(child); if(this.tag === 'select' && this.children.length === 1) this.value = child.value; },
+function node() {
+	return {
+		children: [], listeners: {}, attributes: {}, value: '',
+		set textContent(value) { this.children = []; this.text = value; },
+		get textContent() { return this.text; },
+		set innerHTML(value) { this.textContent = value.replace(/<[^>]*>/g, ''); },
+		appendChild(child) { this.children.push(child); },
 		setAttribute(key, value) { this.attributes[key] = value; },
-		addEventListener(name, fn) { this.listeners[name] = fn; },
-		reportValidity() { const value = Number(this.value); return !!this.value && Number.isInteger(value) && value >= 1 && value <= Number(this.max); }
+		addEventListener(name, callback) { this.listeners[name] = callback; },
+		click() { this.listeners.click(); },
+		focus() { this.focused = true; },
+		setSelectionRange(start, end) { this.selection = [start, end]; },
+		dispatchEvent() {}
 	};
 }
 
-function runtime() {
-	const panels = new Map(), nodes = new Map(), events = [];
-	for(const id of ['nearby', 'matching', 'history']) {
-		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close', 'manual_hint', 'index_fields', 'out_of_range', 'manual_actions']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
-		const panel = { querySelector: key => children.get(key), children };
-		if(id === 'nearby') {
-			const manual = children.get('.city_region_manual');
-			const form = {};
-			manual.querySelector = key => key === 'form' ? form : children.get(key);
-			manual.showModal = () => { manual.open = true; };
-			manual.close = () => { manual.open = false; };
-			const cities = { querySelector: key => children.get(key) };
-			panel.parentElement = {
-				sections: [cities, panel],
-				querySelector: key => key === '.city_region_cities' ? cities : null,
-				insertBefore(first, second) { this.sections = [first, second]; }
-			};
-		}
-		panels.set(id + '_region_menu', panel);
+function runtime(mode = 'nearby') {
+	const nodes = {}, events = [], requests = [];
+	const dialog = {};
+	const tabs = { querySelector: selector => selector };
+	const picker = { querySelector: () => tabs, closest: () => dialog };
+	nodes[mode + '_region_menu'] = picker;
+	function panel() {
+		const parts = {};
+		for(const name of ['search', 'defaults', 'search_results', 'search_status'])
+			parts['.city_region_' + name] = node();
+		parts['.city_region_defaults .city_region_list'] = node();
+		parts['.choose_city_message_list'] = { children: [{}] };
+		return { parts, querySelector: key => parts[key] };
 	}
-	const api = { document: { createElement: node, getElementById(id) { return panels.get(id) || nodes.get(id) || null; } },
+	const city = nodes[mode + '_city_panel'] = panel();
+	const region = nodes[mode + '_region_panel'] = panel();
+	const input = nodes.decode_input = node();
+	const api = {
+		document: { createElement: node, getElementById: id => nodes[id] },
 		code_postition: { lat: 28.21, lng: 83.99 }, code_city: null,
-		hideChooseCity_by_periphery_Message() { events.push('close-nearby'); }, hideChooseCityMessage() { events.push('close-matching'); },
-		hideDecodeCityHistoryMessage() { events.push('close-history'); }, showCityProposal() { events.push('propose'); },
+		selected_decode_city: null, chooseCityCodeWords: null, encode_session_id: Symbol(),
+		hideChooseCity_by_periphery_Message() { events.push('close-nearby'); },
+		hideChooseCityMessage() { events.push('close-matching'); },
+		hideDecodeCityHistoryMessage() { events.push('close-history'); },
 		encode_(anchor, position) { events.push({ encoded: anchor, position }); },
-		setDecodeCity(anchor) { events.push({ selected: anchor }); }, focusSelectedDecodeCityOnMap() {},
-		chooseCityCallback(anchor) { events.push({ resolved: anchor }); }, isDecodeView() { return false; } };
+		setDecodeCity(anchor) { events.push({ selected: anchor }); },
+		focusSelectedDecodeCityOnMap() {},
+		isDecodeView: () => false,
+		toggleDecodeView: () => events.push('open-input'),
+		popLoader: () => events.push('pop-loader'),
+		Event, setTimeout, clearTimeout,
+		wordList: ['one', 'two', 'three'],
+		showNotification: message => events.push(message),
+		bindCityRegionTabs: () => selected => { picker.activeTab = selected; },
+		getDecodeCityHistory: () => [],
+		getVisibleOverlayDialog: () => dialog,
+		normalizeCityLookupToken: value => value.toLowerCase(),
+		getCitiesFromNameId: (query, callback) => requests.push({query, callback}),
+		getCityCenterFromId: (city, callback) => callback({...city, center: {lat: 1, lng: 2}}),
+		cityCoversPosition: () => false,
+		renderCityChoices: (container, rows) => { container.rows = rows; }
+	};
 	vm.createContext(api);
-	for(const file of ['RegionRegistry.js', 'CountryRegistry.js', 'RegionAnchors.js', 'CityRegionMenu.js']) vm.runInContext(read(file), api);
-	return { api, panels, nodes, events };
+	for(const file of ['RegionRegistry.js', 'CountryRegistry.js', 'RegionAnchors.js', 'CityRegionMenu.js'])
+		vm.runInContext(read(file), api);
+	function search(panel, value) {
+		const field = panel.parts['.city_region_search'];
+		field.value = value;
+		field.oninput();
+		return panel.parts['.city_region_search_results'];
+	}
+	return {api, picker, city, region, input, events, requests, search};
 }
 
-test('each city menu offers regional choices and opens the existing proposal workflow', () => {
-	for(const mode of ['nearby', 'matching', 'history']) {
-		const r = runtime();
-		r.api.renderCityRegionMenu(mode, mode);
-		const panel = r.panels.get(mode + '_region_menu');
-		if(mode !== 'matching') {
-			const button = panel.children.get('.city_region_list').children.find(button => /^Nepal /.test(button.textContent));
-			assert(button);
-			r.api.code_postition = { lat: 0, lng: 0 };
-			button.listeners.click();
-			assert.equal(r.events[1].encoded.id.split(':')[2], 'country-npl');
-			assert.equal(r.events[1].position.lat, 28.21);
-		}
-		let stopped = false;
-		panel.children.get('.city_region_propose').onclick({ stopPropagation() { stopped = true; } });
-		assert(stopped, 'the originating menu click must not dismiss the new proposal dialog');
-		assert.deepEqual(r.events.slice(-2), ['close-' + mode, 'propose']);
-	}
+test('map picker opens on the active region and selects a covering region without moving the pin', () => {
+	const {api, picker, region, events, search} = runtime();
+	api.code_city = api.regionAnchorsForPosition(api.code_postition).at(-1).anchor;
+	api.renderCityRegionMenu('nearby', 'nearby');
+	assert.equal(picker.activeTab, 'button:last-child');
+	const defaults = region.parts['.city_region_defaults .city_region_list'];
+	assert.equal(defaults.children.filter(button => button.attributes['aria-current'] === 'true').length, 1);
+
+	const results = search(region, 'NPL');
+	const nepal = results.children.find(button => /^Nepal /.test(button.textContent));
+	assert.ok(nepal);
+	nepal.click();
+	assert.equal(events[1].encoded.id.split(':')[2], 'country-npl');
+	assert.equal(events[1].position.lat, 28.21);
 });
 
-test('manual region/index selection works without a map position and validates bounds', () => {
-	const r = runtime();
-	r.api.code_postition = null;
-	r.api.isDecodeView = () => true;
-	r.api.renderCityRegionMenu('history', 'history');
-	const children = r.panels.get('history_region_menu').children;
-	assert.equal(children.get('.city_region_manual').open, true);
-	const select = children.get('.city_region_name'), index = children.get('.city_region_index');
-	select.value = 'country-npl'; select.onchange();
-	index.value = '999999'; children.get('.city_region_use').onclick();
-	assert.equal(r.events.length, 0);
-	index.value = '1'; children.get('.city_region_use').onclick();
-	assert.equal(r.events[1].selected.id, 'region:v1:country-npl:1');
+test('selecting a region outside the pin opens Wolo Code Input with the index position focused', () => {
+	const {api, region, input, events, search} = runtime();
+	input.value = 'Kathmandu one two three';
+	api.renderCityRegionMenu('nearby', 'nearby');
+	search(region, 'Iceland').children[0].click();
+	assert.deepEqual(events.slice(0, 2), ['close-nearby', 'open-input']);
+	assert.equal(input.value, 'Iceland  one two three');
+	assert.deepEqual(input.selection, [8, 8]);
+	assert.equal(input.focused, true);
 });
 
-test('matching-name resolution uses an explicit regional anchor instead of an unrelated previous map point', () => {
-	const r = runtime();
-	r.api.renderCityRegionMenu('matching', 'matching');
-	const children = r.panels.get('matching_region_menu').children;
-	assert.equal(children.get('.city_region_list').children.length, 0);
-	children.get('.city_region_name').value = 'country-npl';
-	children.get('.city_region_index').value = '1';
-	children.get('.city_region_use').onclick();
-	assert.equal(r.events[1].resolved.id, 'region:v1:country-npl:1');
+test('matching-name resolution preserves its three code words when switching to a region', () => {
+	const {api, region, input, events, search} = runtime('matching');
+	api.chooseCityCodeWords = ['one', 'two', 'three'];
+	api.renderCityRegionMenu('matching', 'matching');
+	const nepal = search(region, 'Nepal').children.find(button => button.textContent === 'Nepal');
+	assert.ok(nepal);
+	nepal.click();
+	assert.deepEqual(events.slice(0, 3), ['close-matching', 'pop-loader', 'open-input']);
+	assert.equal(input.value, 'Nepal  one two three');
 });
 
-test('empty previous-city menus remain enabled and still expose region/proposal actions', () => {
-	const r = runtime();
-	vm.runInContext(read('City.js'), r.api);
+test('city search ignores stale results and selects the registered city with its resolved center', async () => {
+	const {api, city, events, requests, search} = runtime('history');
+	api.isDecodeView = () => true;
+	api.renderCityRegionMenu('history', 'history');
+	const results = search(city, 'Ka');
+	await new Promise(resolve => setTimeout(resolve, 220));
+	search(city, 'Pok');
+	await new Promise(resolve => setTimeout(resolve, 220));
+	assert.deepEqual(requests.map(request => request.query), ['ka', 'pok']);
+	requests[1].callback({pkr: {name: 'Pokhara'}});
+	requests[0].callback({ktm: {name: 'Kathmandu'}});
+	assert.equal(results.rows[0].city.name, 'Pokhara');
+	results.rows[0].select();
+	assert.equal(events[1].selected.id, 'pkr');
+	assert.equal(events[1].selected.center.lat, 1);
+});
+
+test('empty previous-city menus remain enabled and still open the searchable picker', () => {
+	const {api} = runtime('history');
+	vm.runInContext(read('City.js'), api);
 	const toggles = [node(), node()];
-	r.api.getDecodeCityHistory = () => [];
-	r.api.getDecodeCityHistoryToggles = () => toggles;
-	r.api.syncDecodeCityHistoryControl();
+	toggles.forEach(toggle => { toggle.classList = { add() {}, remove() {} }; });
+	api.getDecodeCityHistory = () => [];
+	api.getDecodeCityHistoryToggles = () => toggles;
+	api.syncDecodeCityHistoryControl();
 	assert(toggles.every(toggle => toggle.disabled === false));
 	let rendered = false, opened = false;
-	r.api.initDecodeCityHistoryDeleteControls = () => {};
-	r.api.hideDecodeCityHistoryDeletePrompt = () => {};
-	r.api.renderDecodeCityHistoryList = () => {};
-	r.api.renderCityRegionMenu = id => { rendered = id === 'history'; };
-	r.api.showOverlay = () => { opened = true; };
-	r.api.showDecodeCityHistoryMessage();
+	api.initDecodeCityHistoryDeleteControls = () => {};
+	api.hideDecodeCityHistoryDeletePrompt = () => {};
+	api.renderDecodeCityHistoryList = () => {};
+	api.renderCityRegionMenu = id => { rendered = id === 'history'; };
+	api.showOverlay = () => { opened = true; };
+	api.showDecodeCityHistoryMessage();
 	assert(rendered && opened);
 });
 
-test('nearby picker opens the active section and highlights the region in place', () => {
-	const { api, panels } = runtime();
-	const panel = panels.get('nearby_region_menu');
-	const cities = panel.parentElement.querySelector('.city_region_cities');
-	const regionDetails = panel.children.get('.city_region_choices');
-	const list = panel.children.get('.city_region_list');
-	api.renderCityRegionMenu('nearby', 'nearby');
-	const order = list.children.map(button => button.textContent);
-	const active = api.regionAnchorsForPosition(api.code_postition).at(-1).anchor;
-
-	api.code_city = active;
-	api.renderCityRegionMenu('nearby', 'nearby');
-	assert.equal(panel.parentElement.sections[0], cities);
-	assert.equal(regionDetails.open, true);
-	assert.equal(cities.open, false);
-	assert.deepEqual(list.children.map(button => button.textContent), order);
-	assert.equal(list.children.at(-1).attributes['aria-pressed'], 'true');
-	assert.match(list.children.at(-1).html, /wolo_region_index/);
-	assert.equal(list.children.filter(button => button.attributes['aria-pressed'] === 'true').length, 1);
-
-	api.code_city = { id: 'city' };
-	api.renderCityRegionMenu('nearby', 'nearby');
-	assert.equal(panel.parentElement.sections[0], cities);
-	assert.equal(regionDetails.open, false);
-	assert.equal(cities.open, true);
-});
-
 test('nearby picker highlights a selected city without changing its position', () => {
-	const { api } = runtime();
+	const {api} = runtime();
 	vm.runInContext(read('ChooseCity_by_periphery.js'), api);
-	const first = { id: '1', gp_id: 'first' };
-	const second = { id: '2', gp_id: 'second' };
-	const addressCity = { gp_id: 'second' };
-	api.chooseCity_by_periphery_gpid = [{ city: addressCity }];
-	api.chooseCity_by_periphery_List = [{ city: first }, { city: second }];
+	const first = {id: '1', gp_id: 'first'};
+	const second = {id: '2', gp_id: 'second'};
+	api.chooseCity_by_periphery_gpid = [{city: {gp_id: 'second'}}];
+	api.chooseCity_by_periphery_List = [{city: first}, {city: second}];
 	let choices;
 	api.renderCityChoices = (_, rows) => { choices = rows; };
-
 	api.code_city = first;
 	api.showChooseCity_by_periphery_List();
-	assert.deepEqual(Array.from(choices, choice => choice.city.gp_id), ['second', 'first']);
 	assert.deepEqual(Array.from(choices, choice => choice.status), ['Nearby', 'Current']);
-
 	api.code_city = second;
 	api.showChooseCity_by_periphery_List();
-	assert.deepEqual(Array.from(choices, choice => choice.city.gp_id), ['second', 'first']);
 	assert.deepEqual(Array.from(choices, choice => choice.status), ['Current', 'Nearby']);
-});
-
-test('nearby manual region dialog can close or submit an anchor', () => {
-	const { api, panels, events } = runtime();
-	api.renderCityRegionMenu('nearby', 'nearby');
-	const children = panels.get('nearby_region_menu').children;
-	const manual = children.get('.city_region_manual');
-	const open = children.get('.city_region_manual_open');
-	open.onclick();
-	assert.equal(manual.open, true);
-	children.get('.city_region_manual_close').onclick();
-	assert.equal(manual.open, false);
-	assert.deepEqual(events, []);
-
-	open.onclick();
-	const select = children.get('.city_region_name');
-	select.value = 'country-npl';
-	const input = children.get('.city_region_index');
-	const submit = manual.querySelector('form').onsubmit;
-	const event = { preventDefault() {} };
-	input.value = '999999';
-	submit(event);
-	assert.equal(manual.open, true);
-	assert.deepEqual(events, []);
-	input.value = '1';
-	submit(event);
-	assert.equal(manual.open, false);
-	assert.equal(events[1].encoded.id, 'region:v1:country-npl:1');
-	assert.equal(events[1].position, events[1].encoded.center);
-});
-
-test('nearby manual region dialog suggests the covering index and keeps the map pin', () => {
-	const { api, panels, events } = runtime();
-	api.renderCityRegionMenu('nearby', 'nearby');
-	const children = panels.get('nearby_region_menu').children;
-	const select = children.get('.city_region_name');
-	const input = children.get('.city_region_index');
-	children.get('.city_region_manual_open').onclick();
-	assert.ok(input.value, 'opening the dialog should suggest a covering reference');
-	const [covering, outside] = select.children;
-	assert.equal(covering.label, 'Covers the map pin');
-	assert.equal(outside.label, 'Out of range');
-	assert.equal(outside.className, 'city_region_unavailable');
-	assert(covering.children.some(option => option.value === 'country-npl'));
-	assert(outside.children.some(option => option.value === 'country-usa' && !option.disabled));
-	select.value = 'country-usa';
-	select.onchange();
-	assert.deepEqual(select.children, [covering, outside]);
-	assert.equal(input.value, '');
-	assert.equal(input.disabled, true);
-	assert.equal(children.get('.city_region_index_fields').hidden, true);
-	assert.equal(children.get('.city_region_manual_actions').hidden, true);
-	assert.match(children.get('.city_region_out_of_range').textContent, /out of range/);
-	children.get('.city_region_manual').querySelector('form').onsubmit({ preventDefault() {} });
-	assert.deepEqual(events, []);
-	select.value = 'country-npl';
-	select.onchange();
-	assert.equal(input.disabled, false);
-	assert.equal(children.get('.city_region_index_fields').hidden, false);
-	assert.equal(children.get('.city_region_manual_actions').hidden, false);
-	assert.equal(children.get('.city_region_out_of_range').textContent, '');
-	const { anchor } = api.regionAnchorsForPosition(api.code_postition).find(choice => choice.region.key === select.value);
-	assert.notEqual(input.value, '1');
-	assert.equal(input.value, anchor.id.split(':').pop());
-	children.get('.city_region_manual').querySelector('form').onsubmit({ preventDefault() {} });
-	assert.equal(events[1].encoded.id, anchor.id);
-	assert.deepEqual(events[1].position, api.regionPosition(api.code_postition));
 });

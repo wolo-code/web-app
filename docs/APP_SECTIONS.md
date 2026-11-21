@@ -10,9 +10,9 @@ Hold a marker for half a second. Keep holding and drag to place the draft crossh
 
 ## Country and regional choices in city selectors
 
-The nearby, matching-name, and previous-city dialogs include the shared `CityRegionOptions.php` panel. **Use a regional code** lists relevant country/region anchors and provides manual region/index entry. **Propose a city** opens the existing proposal form. Empty previous-city history no longer disables the menu. The map selector expands the active Cities or Regions section and highlights the current reference in place. In the **Choose city or region** dialog, **Choose a regional reference** opens a dialog of the same name with a top-right **Close** (×) button. The dialog suggests an editable anchor index for the map pin when the selected region covers it. Using that index keeps the pin in place. The **Region or country** list shows **Covers the map pin** first, followed by selectable gray options under **Out of range**. When the selected region does not cover the map pin, a centered gray message replaces the **Anchor index** controls.
+The nearby, matching-name, and previous-city dialogs share the **Cities** and **Regions** tabs in `CityRegionOptions.php`. The tabs use the centered pipe, fading underline, and keyboard controls of **Info Full View**. **Search cities** looks up registered cities and **Search regions or countries** filters the region registry by name and alias. The current reference is highlighted when available, and previous cities and regional references appear in their respective tabs.
 
-Regional references show an outlined numeric index badge immediately after the name in the Use a regional code list. The manual region/country selector and anchor-index input are indented 16px beneath their labels and have underline-only borders, followed by a left-aligned filled **Use regional code** button. The outlined **Propose a city** button aligns to the right. Regional indices use clear monospace digits here, in the map info window, and in Label view and its print/download output; minimal PDF labels use Courier for the index.
+In **Choose city or region**, selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
 
 
 The Address Panel omits the Code reference selector and Propose a city button.
@@ -21,7 +21,7 @@ The Address Panel omits the Code reference selector and Propose a city button.
 
 | Section | Controls | Behavior |
 | --- | --- | --- |
-| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Open from city selectors. Name is required; country and selected location are optional. |
+| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Name is required; country and selected location are optional. |
 | City proposal confirmation | `#no_city_request_id`, `#no_city_email_details` | Displays an acknowledged request ID, opens an editable email draft, and retains a fallback email link. Closing does not cancel an already submitted request. |
 
 
@@ -104,7 +104,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | --- | --- | --- | --- | --- |
 | Map canvas | Terrain Map Canvas | `#map`, Google Maps `ROADMAP` | Full viewport | Standard map surface for selection, pan, zoom, and place context. |
 | Search field | Place Search Input | `#pac-input` | Top-left, inside `#map_search_bar` | Accepts place names and Wolo Codes while in the map flow and stays focused so typing can begin immediately, except during Input Icon Guide, when the field is blurred and the caret is hidden. CSS shows DIGIPIN and plus-code values in uppercase while the field is `:valid`; other input stays lowercase. |
-| Previous city control | Map Previous City Button | `#map_city_history_toggle`, `#map_search_cluster` | Immediately left of Place Search Input, outside the search field, flush with no gap | Opens the same Input Previous City Popup used on Wolo Code Input View. On Map View the control is a 5px-rounded rectangle. Remains enabled without previous cities so regional selection and city proposals stay available. Choosing a city sets decode city context, zooms out to the viewport-fill overview if needed, then pans to that city center and animates zoom-in to city-scope (the ~32.8 km encode coverage). |
+| Previous city control | Map Previous City Button | `#map_city_history_toggle`, `#map_search_cluster` | Immediately left of Place Search Input, outside the search field, flush with no gap | Opens the same Input Previous City Popup used on Wolo Code Input View. On Map View the control is a 5px-rounded rectangle. Remains enabled without previous cities so city and region search stay available. Choosing a city sets decode city context, zooms out to the viewport-fill overview if needed, then pans to that city center and animates zoom-in to city-scope (the ~32.8 km encode coverage). |
 | Search affordance | Search Icon | `#search_icon` | Inside left edge of Place Search Input | Visual cue for the map search field before input focus. |
 | Search suggestions | Map Input Suggestions | `#map_input_suggestion_result` | Top-left, above or near Place Search Input | Shows suggestions for the map search field. |
 | Submit control | Map Proceed Button | `#decode_button` | Immediately right of Place Search Input | Resolves the current map search or code input. |

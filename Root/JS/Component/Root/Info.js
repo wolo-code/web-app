@@ -5,7 +5,10 @@ function hideInfo() {
 
 function bindInfoFormatTabs() {
 	const tabList = document.getElementById('info_format_tabs');
-	if (!tabList) return;
+	if (tabList) bindCityRegionTabs(tabList);
+}
+
+function bindCityRegionTabs(tabList) {
 
 	const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
 	function updateTabPeak() {
@@ -51,6 +54,7 @@ function bindInfoFormatTabs() {
 			tabs[nextIndex].focus();
 		});
 	});
+	return selectTab;
 }
 
 function showInfo() {

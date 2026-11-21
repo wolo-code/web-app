@@ -195,7 +195,7 @@ function getDecodeCityHistoryToggles() {
 function syncDecodeCityHistoryControl() {
 	decode_city_history = getDecodeCityHistory();
 
-	var disabled = false; // Region selection and city proposals also work without history.
+	var disabled = false; // City and region search work without history.
 	var toggles = getDecodeCityHistoryToggles();
 	for(var i = 0; i < toggles.length; i++)
 		toggles[i].disabled = disabled;
@@ -237,10 +237,15 @@ function renderDecodeCityHistoryList() {
 
 	clearDecodeCityHistoryList();
 	container.classList.remove('hide');
+	var regionList = document.getElementById('decode_region_history_message_list');
 	for(var i = 0; i < decode_city_history.length; i++) {
 		var row = document.createElement('div');
+		row.className = 'decode_city_history_row';
 		var city = decode_city_history[i];
-		if(typeof isRegionAnchor === 'function' && isRegionAnchor(city))
+		var regional = typeof isRegionAnchor === 'function' && isRegionAnchor(city);
+		if(selected_decode_city && getDecodeCityHistoryKey(city) === getDecodeCityHistoryKey(selected_decode_city))
+			row.setAttribute('aria-current', 'true');
+		if(regional)
 			row.innerHTML = getRegionReferenceHTML(city, getDecodeCityDisplayName(city));
 		else
 			row.innerText = getDecodeCityDisplayName(city);
@@ -248,7 +253,7 @@ function renderDecodeCityHistoryList() {
 		row.title = 'Press and hold to remove';
 		row.addEventListener('contextmenu', preventDecodeCityHistoryContextMenu);
 		addLongpressListener(row, chooseDecodeCityFromHistory, showDeleteDecodeCityOption);
-		container.appendChild(row);
+		(regional && regionList ? regionList : container).appendChild(row);
 	}
 }
 
@@ -256,6 +261,9 @@ function clearDecodeCityHistoryList() {
 	var container = document.getElementById('decode_city_history_message_list');
 	if(container)
 		container.innerHTML = '';
+	var regions = document.getElementById('decode_region_history_message_list');
+	if(regions)
+		regions.innerHTML = '';
 }
 
 function preventDecodeCityHistoryContextMenu(e) {
@@ -318,11 +326,17 @@ function showDeleteDecodeCityOption(e) {
 	pending_delete_decode_city_index = index;
 	name.innerText = getDecodeCityDisplayName(city);
 	list.classList.add('hide');
+	var picker = document.getElementById('history_region_menu');
+	if(picker)
+		picker.hidden = true;
 	prompt.classList.remove('hide');
 }
 
 function hideDecodeCityHistoryDeletePrompt() {
 	pending_delete_decode_city_index = null;
+	var picker = document.getElementById('history_region_menu');
+	if(picker)
+		picker.hidden = false;
 	var prompt = document.getElementById('decode_city_history_delete');
 	var list = document.getElementById('decode_city_history_message_list');
 	if(prompt)
@@ -681,7 +695,7 @@ function buildCityNameQueryList(city_name_part) {
 	return query_list;
 }
 
-function getCityFromName(group, name, callback, onFailure) {
+function getCityFromName(group, name, callback, onFailure, codeWords) {
 	var city_name_part = group.concat([name]).map(function(part) { return normalizeCityLookupToken(part); });
 	if(typeof regionAnchorFromName === 'function') {
 		var regional = regionAnchorFromName(city_name_part.join(' '));
@@ -699,10 +713,10 @@ function getCityFromName(group, name, callback, onFailure) {
 		}
 	}
 	var variants = getCityFromNameVariants(city_name_part).map(buildCityNameQueryList);
-	getCityFromNameVariantsQuery(variants, 0, callback, onFailure);
+	getCityFromNameVariantsQuery(variants, 0, callback, onFailure, codeWords);
 }
 
-function getCityFromNameVariantsQuery(variants, variantIndex, callback, onFailure) {
+function getCityFromNameVariantsQuery(variants, variantIndex, callback, onFailure, codeWords) {
 	if(variantIndex >= variants.length) {
 		if (isOfflineMode()) {
 			showNotification('City not available offline. Open this city once while online.');
@@ -712,11 +726,11 @@ function getCityFromNameVariantsQuery(variants, variantIndex, callback, onFailur
 		return;
 	}
 	getCityFromNameQuery(variants[variantIndex], 0, callback, function() {
-		getCityFromNameVariantsQuery(variants, variantIndex + 1, callback, onFailure);
-	});
+		getCityFromNameVariantsQuery(variants, variantIndex + 1, callback, onFailure, codeWords);
+	}, codeWords);
 }
 
-function getCityFromNameQuery(query_list, index, callback, onFailure) {
+function getCityFromNameQuery(query_list, index, callback, onFailure, codeWords) {
 	if(index >= query_list.length) {
 		if(typeof onFailure === 'function')
 			onFailure();
@@ -738,12 +752,12 @@ function getCityFromNameQuery(query_list, index, callback, onFailure) {
 				filtered.forEach(function(city) {
 					list[city.id] = city;
 				});
-				chooseCity(list, filtered.map(function(city) { return city.id; }), callback);
+				chooseCity(list, filtered.map(function(city) { return city.id; }), callback, codeWords);
 			} else {
-				getCityFromNameQuery(query_list, index + 1, callback, onFailure);
+				getCityFromNameQuery(query_list, index + 1, callback, onFailure, codeWords);
 			}
 		}).catch(function() {
-			getCityFromNameQuery(query_list, index + 1, callback, onFailure);
+			getCityFromNameQuery(query_list, index + 1, callback, onFailure, codeWords);
 		});
 		return;
 	}
@@ -756,7 +770,7 @@ function getCityFromNameQuery(query_list, index, callback, onFailure) {
 		let matchList;
 		matchList = matchCityByGroup(list, query.group, query.name);
 		if(matchList.length == 0)
-			getCityFromNameQuery(query_list, index+1, callback, onFailure);
+			getCityFromNameQuery(query_list, index+1, callback, onFailure, codeWords);
 		else {
 			if(matchList.length == 1) {
 				let i = matchList[0];
@@ -765,11 +779,11 @@ function getCityFromNameQuery(query_list, index, callback, onFailure) {
 				callback(city);
 			}
 			else	
-				chooseCity(list, matchList, callback);
+				chooseCity(list, matchList, callback, codeWords);
 		}
 	}).catch(function() {
 		popLoader();
-		getCityFromNameQuery(query_list, index + 1, callback, onFailure);
+		getCityFromNameQuery(query_list, index + 1, callback, onFailure, codeWords);
 	});
 }
 
@@ -850,33 +864,40 @@ function getCityCenterFromId(city, callback, options) {
 	}, getCachedCenter).then(finish);
 }
 
-function getCitiesFromNameId(name_id, callback) {
-	if(typeof regionAnchorFromName === 'function') {
+function getCitiesFromNameId(name_id, callback, options) {
+	var picker = options && options.picker;
+	if(!picker && typeof regionAnchorFromName === 'function') {
 		var anchor = regionAnchorFromName(name_id);
 		if(anchor) { var regional = {}; regional[anchor.id] = anchor; callback(regional); return; }
 	}
-	if(!database || typeof database.ref != 'function') {
+	if(!database || typeof database.ref != 'function' || (picker && isOfflineMode())) {
 		if(typeof findCachedCitiesByNameId != 'function') {
 			callback(null);
 			return;
 		}
-		findCachedCitiesByNameId(name_id).then(function(matches) {
+		var cached = picker ? scanCityDetail(function(city) {
+			return normalizeCityLookupToken(city.name_id || city.name).startsWith(name_id);
+		}) : findCachedCitiesByNameId(name_id);
+		cached.then(function(matches) {
 			var list = {};
-			(matches || []).forEach(function(city) {
+			(picker ? matches.slice(0, 10) : matches || []).forEach(function(city) {
 				if(city && city.id)
 					list[city.id] = city;
 			});
 			callback(Object.keys(list).length ? list : null);
 		}).catch(function() {
-			callback(null);
+			callback(null, true);
 		});
 		return;
 	}
 	var ref = database.ref('CityDetail');
-	pushLoader();
-	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value', function(snapshot) {
-		popLoader();
+	if(!picker) pushLoader();
+	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value').then(function(snapshot) {
+		if(!picker) popLoader();
 		callback(snapshot.val());
+	}, function() {
+		if(!picker) popLoader();
+		callback(null, true);
 	});
 }
 

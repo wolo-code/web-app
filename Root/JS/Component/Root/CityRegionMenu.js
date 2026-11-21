@@ -70,6 +70,10 @@ function renderCityRegionMenu(id, mode) {
 		var region = allWoloRegions().find(function(entry) { return entry.key === select.value; });
 		input.max = region ? region.count : 1;
 	}
+	var manualPoint, suggestions = [];
+	function suggestedRegion() {
+		return suggestions.find(function(choice) { return choice.region.key === select.value; });
+	}
 	select.onchange = setLimit;
 	input.value = '';
 	setLimit();
@@ -82,10 +86,27 @@ function renderCityRegionMenu(id, mode) {
 		var anchor = region && regionAnchor(region, Number(input.value));
 		if(!anchor) return;
 		if(cities) manual.close();
-		useCityMenuRegion(anchor, mode, null);
+		var suggestion = suggestedRegion();
+		useCityMenuRegion(anchor, mode, suggestion && suggestion.anchor.id === anchor.id ? manualPoint : null);
 	}
 	if(cities) {
+		var hint = manual.querySelector('.city_region_manual_hint');
+		var defaultHint = hint.textContent;
+		function suggestIndex() {
+			setLimit();
+			var suggestion = suggestedRegion();
+			input.value = suggestion ? suggestion.anchor.id.split(':').pop() : '';
+			hint.textContent = suggestion ? 'Suggested index for the map pin' : defaultHint;
+		}
+		select.onchange = suggestIndex;
 		panel.querySelector('.city_region_manual_open').onclick = function() {
+			manualPoint = cityRegionMenuPosition();
+			suggestions = regionAnchorsForPosition(manualPoint);
+			var initial = suggestions.find(function(choice) {
+				return current && choice.anchor.id === current.id;
+			}) || suggestions[0];
+			if(initial) select.value = initial.region.key;
+			suggestIndex();
 			manual.showModal();
 		};
 		manual.querySelector('.city_region_manual_close').onclick = function() {

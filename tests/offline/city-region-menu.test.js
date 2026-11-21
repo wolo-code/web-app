@@ -23,7 +23,7 @@ function runtime() {
 	const panels = new Map(), nodes = new Map(), events = [];
 	for(const id of ['nearby', 'matching', 'history']) {
 		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
+		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close', 'manual_hint']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
 		const panel = { querySelector: key => children.get(key), children };
 		if(id === 'nearby') {
 			const manual = children.get('.city_region_manual');
@@ -168,4 +168,26 @@ test('nearby manual region dialog can close or submit an anchor', () => {
 	submit(event);
 	assert.equal(manual.open, false);
 	assert.equal(events[1].encoded.id, 'region:v1:country-npl:1');
+	assert.equal(events[1].position, events[1].encoded.center);
+});
+
+test('nearby manual region dialog suggests the covering index and keeps the map pin', () => {
+	const { api, panels, events } = runtime();
+	api.renderCityRegionMenu('nearby', 'nearby');
+	const children = panels.get('nearby_region_menu').children;
+	const select = children.get('.city_region_name');
+	const input = children.get('.city_region_index');
+	children.get('.city_region_manual_open').onclick();
+	assert.ok(input.value, 'opening the dialog should suggest a covering reference');
+	select.value = 'country-usa';
+	select.onchange();
+	assert.equal(input.value, '');
+	select.value = 'country-npl';
+	select.onchange();
+	const { anchor } = api.regionAnchorsForPosition(api.code_postition).find(choice => choice.region.key === select.value);
+	assert.notEqual(input.value, '1');
+	assert.equal(input.value, anchor.id.split(':').pop());
+	children.get('.city_region_manual').querySelector('form').onsubmit({ preventDefault() {} });
+	assert.equal(events[1].encoded.id, anchor.id);
+	assert.deepEqual(events[1].position, api.regionPosition(api.code_postition));
 });

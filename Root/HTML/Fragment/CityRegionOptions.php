@@ -13,7 +13,7 @@
 			<details class='city_region_manual'>
 				<summary>Choose a regional reference</summary>
 		<?php } ?>
-			<p class='city_region_manual_hint'>Choose a region and enter its anchor index.</p>
+			<p class='city_region_manual_hint'<?php if($cityRegionMenuId === 'nearby') echo " aria-live='polite'"; ?>>Choose a region and enter its anchor index</p>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_name'>Region or country</label>
 			<select id='<?php echo $cityRegionMenuId; ?>_region_name' class='city_region_name'></select>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_index'>Anchor index</label>

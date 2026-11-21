@@ -57,13 +57,32 @@ function renderCityRegionMenu(id, mode) {
 	if(!cities) manual.open = choices.length === 0;
 	var select = panel.querySelector('.city_region_name');
 	var input = panel.querySelector('.city_region_index');
-	select.textContent = '';
-	allWoloRegions().slice().sort(function(a, b) { return a.name.localeCompare(b.name); }).forEach(function(region) {
+	var regions = allWoloRegions().sort(function(a, b) { return a.name.localeCompare(b.name); });
+	function addRegionOption(parent, region) {
 		var option = document.createElement('option');
 		option.value = region.key;
 		option.textContent = region.name;
-		select.appendChild(option);
-	});
+		parent.appendChild(option);
+	}
+	function populateRegionOptions(coveringChoices) {
+		select.textContent = '';
+		if(!coveringChoices) {
+			regions.forEach(function(region) { addRegionOption(select, region); });
+			return;
+		}
+		var covering = document.createElement('optgroup');
+		covering.label = 'Covers the map pin';
+		var outside = document.createElement('optgroup');
+		outside.label = 'Out of range';
+		outside.className = 'city_region_unavailable';
+		var coveringKeys = new Set(coveringChoices.map(function(choice) { return choice.region.key; }));
+		regions.forEach(function(region) {
+			addRegionOption(coveringKeys.has(region.key) ? covering : outside, region);
+		});
+		if(covering.children.length) select.appendChild(covering);
+		if(outside.children.length) select.appendChild(outside);
+	}
+	populateRegionOptions();
 	function setLimit() {
 		var region = allWoloRegions().find(function(entry) { return entry.key === select.value; });
 		input.max = region ? region.count : 1;
@@ -107,6 +126,7 @@ function renderCityRegionMenu(id, mode) {
 		panel.querySelector('.city_region_manual_open').onclick = function() {
 			manualPoint = cityRegionMenuPosition();
 			suggestions = regionAnchorsForPosition(manualPoint);
+			populateRegionOptions(manualPoint ? suggestions : null);
 			var initial = suggestions.find(function(choice) {
 				return current && choice.anchor.id === current.id;
 			}) || suggestions[0];

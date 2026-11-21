@@ -295,14 +295,21 @@ dialog.city_region_manual h2 {
 	font-size: 1.35em;
 }
 
+.city_region_unavailable,
+.city_region_manual .city_region_unavailable option,
 .city_region_out_of_range {
-	margin: 16px 0 0;
-	text-align: center;
 	color: #666;
 }
 
+html.dark-mode .city_region_unavailable,
+html.dark-mode .city_region_manual .city_region_unavailable option,
 html.dark-mode .city_region_out_of_range {
 	color: #b5b5b5;
+}
+
+.city_region_out_of_range {
+	margin: 16px 0 0;
+	text-align: center;
 }
 
 .city_region_out_of_range:empty,

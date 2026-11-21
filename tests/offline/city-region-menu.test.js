@@ -202,8 +202,15 @@ test('nearby manual region dialog suggests the covering index and keeps the map 
 	const input = children.get('.city_region_index');
 	children.get('.city_region_manual_open').onclick();
 	assert.ok(input.value, 'opening the dialog should suggest a covering reference');
+	const [covering, outside] = select.children;
+	assert.equal(covering.label, 'Covers the map pin');
+	assert.equal(outside.label, 'Out of range');
+	assert.equal(outside.className, 'city_region_unavailable');
+	assert(covering.children.some(option => option.value === 'country-npl'));
+	assert(outside.children.some(option => option.value === 'country-usa' && !option.disabled));
 	select.value = 'country-usa';
 	select.onchange();
+	assert.deepEqual(select.children, [covering, outside]);
 	assert.equal(input.value, '');
 	assert.equal(input.disabled, true);
 	assert.equal(children.get('.city_region_index_fields').hidden, true);

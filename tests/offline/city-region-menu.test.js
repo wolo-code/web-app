@@ -50,6 +50,7 @@ function runtime(mode = 'nearby') {
 		setDecodeCity(anchor) { events.push({ selected: anchor }); },
 		focusSelectedDecodeCityOnMap() {},
 		isDecodeView: () => false,
+		isOfflineMode: () => false,
 		toggleDecodeView: () => events.push('open-input'),
 		popLoader: () => events.push('pop-loader'),
 		Event, setTimeout, clearTimeout,
@@ -129,6 +130,46 @@ test('city search ignores stale results and selects the registered city with its
 	results.rows[0].select();
 	assert.equal(events[1].selected.id, 'pkr');
 	assert.equal(events[1].selected.center.lat, 1);
+});
+
+test('city searches share requests and reuse complete prefixes across picker openings', () => {
+	const {api, requests} = runtime();
+	const results = [];
+	const render = (matches, error) => results.push({matches, error});
+	const immediate = load => load();
+
+	api.lookupCityRegionCities('Po', render, immediate);
+	api.lookupCityRegionCities('PO', render, immediate);
+	assert.equal(requests.length, 1);
+	requests[0].callback({pkr: {name_id: 'pokhara'}, por: {name_id: 'porto'}});
+	assert.equal(results.length, 2);
+
+	api.lookupCityRegionCities('Pok', render, () => assert.fail('Cached prefix should render immediately'));
+	assert.deepEqual(Object.keys(results.at(-1).matches), ['pkr']);
+	api.lookupCityRegionCities('Po', render, () => assert.fail('Cached query should render immediately'));
+	assert.deepEqual(Object.keys(results.at(-1).matches), ['pkr', 'por']);
+});
+
+test('city search keeps offline and online caches separate and retries failed queries', () => {
+	const {api, requests} = runtime();
+	const render = () => {};
+	const immediate = load => load();
+	api.lookupCityRegionCities('Ka', render, immediate);
+	requests[0].callback(null, true);
+	api.lookupCityRegionCities('Ka', render, immediate);
+	requests[1].callback({ktm: {name_id: 'kathmandu'}});
+	api.isOfflineMode = () => true;
+	api.lookupCityRegionCities('Ka', render, immediate);
+	assert.equal(requests.length, 3);
+});
+
+test('city search does not reuse a broad result set that reached the query limit', () => {
+	const {api, requests} = runtime();
+	const immediate = load => load();
+	api.lookupCityRegionCities('Po', () => {}, immediate);
+	requests[0].callback(Object.fromEntries(Array.from({length: 10}, (_, i) => [i, {name_id: 'porto ' + i}])));
+	api.lookupCityRegionCities('Pok', () => {}, immediate);
+	assert.deepEqual(requests.map(request => request.query), ['po', 'pok']);
 });
 
 test('empty previous-city menus remain enabled and still open the searchable picker', () => {

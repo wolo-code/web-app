@@ -1,10 +1,17 @@
+.overlay > div:has(> .choose_city_message:not(.hide)) {
+	margin: clamp(12px, 10vh, 96px) auto auto;
+	margin-block-start: clamp(12px, 10dvh, 96px);
+}
+
 .choose_city_message {
 	position: relative;
 	max-height: 80vh;
 	max-height: 80dvh;
 	display: flex;
 	flex-direction: column;
-	max-width: 360px;
+	box-sizing: border-box;
+	width: min(360px, calc(100vw - 32px));
+	min-width: 0;
 	margin: auto;
 	font-family: 'Abel';
 	background-color: #FFFFFF;
@@ -156,6 +163,7 @@ html.dark-mode .city_choice_heading {
 .choose_city_message > .message_dialog_body {
 	min-height: 0;
 	overflow-y: auto;
+	scrollbar-gutter: stable;
 	flex: 0 1 auto;
 }
 
@@ -173,16 +181,24 @@ html.dark-mode .city_choice_heading {
 }
 
 .city_region_search {
+	appearance: none;
 	box-sizing: border-box;
 	width: 100%;
 	min-height: 44px;
 	margin-block-end: 12px;
-	padding: 8px 10px;
-	border: 1px solid rgb(105 183 207 / 55%);
-	border-radius: 8px;
+	padding: 8px 2px;
+	border: 0;
+	border-bottom: 1px solid currentColor;
+	border-radius: 0;
 	background: transparent;
 	color: inherit;
 	font: inherit;
+}
+
+.city_region_search:focus {
+	outline: none;
+	border-bottom-color: #69b7cf;
+	box-shadow: 0 1px #69b7cf;
 }
 
 .city_region_search::placeholder {

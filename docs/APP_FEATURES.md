@@ -10,7 +10,7 @@
 ## Country regions and city menu actions
 
 - Country-level regions extend the registry with 257 country/territory namespaces, for 578 active named regions. Existing physical-region indices remain unchanged. Conflicting names gain a Region qualifier (e.g. Australia Region); unambiguous admin-0 three-letter codes are accepted as aliases.
-- The nearby, matching-name, and previous-city pickers share **Cities** and **Regions** tabs styled like **Info Full View**. Searches find registered cities by name and regions or countries by name or alias. The picker works with empty history.
+- The nearby, matching-name, and previous-city pickers share **Cities** and **Regions** tabs styled like **Info Full View**. Searches find registered cities by name and regions or countries by name or alias. The picker works with empty history. Recent city queries reuse a short-lived cache, and region search uses a prepared name and alias index.
 - A region covering the map pin uses its calculated anchor and keeps the pin in place. Selecting a region without a calculated anchor opens the **Wolo Code Input** with the region name filled in and the cursor ready for the index. Previously used indexed references are available under **Regions**.
 - Calculated and previous regional references retain the outlined monospace index badge. Map info windows and printed or downloaded labels also use monospace digits.
 

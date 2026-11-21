@@ -4,13 +4,14 @@
 		<summary><?php echo $cityRegionMenuId === 'nearby' ? 'Regions' : 'Use a regional code'; ?></summary>
 		<div class='city_region_list'></div>
 		<?php if($cityRegionMenuId === 'nearby') { ?>
-			<button type='button' class='city_region_manual_open' aria-haspopup='dialog'><span aria-hidden='true'>+</span> Enter a region and index</button>
+			<button type='button' class='city_region_manual_open' aria-haspopup='dialog'><span aria-hidden='true'>+</span> Choose a regional reference</button>
 			<dialog class='city_region_manual' aria-labelledby='nearby_region_manual_title'>
 				<form>
-					<h2 id='nearby_region_manual_title'>Enter a region and index</h2>
+					<h2 id='nearby_region_manual_title'>Choose a regional reference</h2>
+					<button type='button' class='city_region_manual_close' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
 		<?php } else { ?>
 			<details class='city_region_manual'>
-				<summary>Enter a region and index</summary>
+				<summary>Choose a regional reference</summary>
 		<?php } ?>
 			<p class='city_region_manual_hint'>Choose a region and enter its anchor index.</p>
 			<label for='<?php echo $cityRegionMenuId; ?>_region_name'>Region or country</label>
@@ -19,7 +20,6 @@
 			<input id='<?php echo $cityRegionMenuId; ?>_region_index' class='city_region_index' type='number' min='1' step='1' inputmode='numeric' required>
 		<?php if($cityRegionMenuId === 'nearby') { ?>
 					<div class='city_region_manual_actions'>
-						<button type='button' class='city_region_manual_cancel'>Cancel</button>
 						<button type='submit' class='city_region_use'>Use regional code <span aria-hidden='true'>&rarr;</span></button>
 					</div>
 				</form>

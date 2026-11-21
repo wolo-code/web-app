@@ -88,7 +88,7 @@ function renderCityRegionMenu(id, mode) {
 		panel.querySelector('.city_region_manual_open').onclick = function() {
 			manual.showModal();
 		};
-		manual.querySelector('.city_region_manual_cancel').onclick = function() {
+		manual.querySelector('.city_region_manual_close').onclick = function() {
 			manual.close();
 		};
 		manual.querySelector('form').onsubmit = applyManualRegion;

@@ -23,7 +23,7 @@ function runtime() {
 	const panels = new Map(), nodes = new Map(), events = [];
 	for(const id of ['nearby', 'matching', 'history']) {
 		const children = new Map();
-		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_cancel']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
+		for(const name of ['list', 'manual', 'name', 'index', 'use', 'propose', 'choices', 'manual_open', 'manual_close']) children.set('.city_region_' + name, node(name === 'name' ? 'select' : ''));
 		const panel = { querySelector: key => children.get(key), children };
 		if(id === 'nearby') {
 			const manual = children.get('.city_region_manual');
@@ -142,7 +142,7 @@ test('nearby picker opens the active reference section and pins the current regi
 	assert.equal(cities.open, true);
 });
 
-test('nearby manual region dialog can cancel or submit an anchor', () => {
+test('nearby manual region dialog can close or submit an anchor', () => {
 	const { api, panels, events } = runtime();
 	api.renderCityRegionMenu('nearby', 'nearby');
 	const children = panels.get('nearby_region_menu').children;
@@ -150,7 +150,7 @@ test('nearby manual region dialog can cancel or submit an anchor', () => {
 	const open = children.get('.city_region_manual_open');
 	open.onclick();
 	assert.equal(manual.open, true);
-	children.get('.city_region_manual_cancel').onclick();
+	children.get('.city_region_manual_close').onclick();
 	assert.equal(manual.open, false);
 	assert.deepEqual(events, []);
 

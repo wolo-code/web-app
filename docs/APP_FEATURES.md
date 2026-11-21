@@ -1,5 +1,11 @@
 # App Features
 
+## GIS integration documentation
+
+| Feature | Current implementation signal | Notes |
+| --- | --- | --- |
+| GIS Integration Guide | `/gis_integration`, `/gis-integration-guide.pdf` | Client-facing site page and PDF describe the SDK-first integration plan, coordinate links, GIS evaluation steps, and current interface limits. |
+
 ## Map camera navigation
 
 - Bounds-based zoom uses the full projected area, the map canvas size, and the same padding as the final fit, preventing a zoom-in overshoot followed by a zoom-out correction. Dateline-crossing bounds and the viewport minimum zoom are respected. OpenStreetMap uses the same native zoom ceiling for automatic fits and manual zoom.
@@ -10,7 +16,7 @@
 ## Country regions and city menu actions
 
 - Country-level regions extend the registry with 257 country/territory namespaces, for 578 active named regions. Existing physical-region indices remain unchanged. Conflicting names gain a Region qualifier (e.g. Australia Region); unambiguous admin-0 three-letter codes are accepted as aliases.
-- The nearby, matching-name, and previous-city pickers share **Cities** and **Regions** tabs styled like **Info Full View**. Searches find registered cities by name and regions or countries by name or alias. The picker works with empty history. Recent city queries reuse a short-lived cache, and region search uses a prepared name and alias index.
+- The nearby, matching-name, and previous-city pickers share **City** and **Region** tabs styled like **Info Full View**. Searches find registered cities by name and regions or countries by name or alias. Search inputs use a lighter shade of gray underline (`#ccc`). The picker works with empty history. Recent city queries reuse a short-lived cache, and region search uses a prepared name and alias index. Selecting a city or region in previous-city choices animates map zoom to that scope without altering the point marker or Wolo Code, and sticks so reopening the picker displays the respective tab and active item.
 - A region covering the map pin uses its calculated anchor and keeps the pin in place. Selecting a region without a calculated anchor opens the **Wolo Code Input** with the region name filled in and the cursor ready for the index. Previously used indexed references are available under **Regions**.
 - Calculated and previous regional references retain the outlined monospace index badge. Map info windows and printed or downloaded labels also use monospace digits.
 

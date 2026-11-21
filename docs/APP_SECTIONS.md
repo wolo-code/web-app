@@ -1,5 +1,12 @@
 # App Section Names
 
+## GIS Integration Guide
+
+| Part | Use this name | Current implementation signal | Purpose |
+| --- | --- | --- | --- |
+| Client guide page | GIS Integration Guide | `/gis_integration` site component | Explains Wolo's SDK-first GIS integration plan, coordinate handling, evaluation checklist, and current package and production-integration limits. |
+| PDF download | GIS Integration Guide PDF | `/gis-integration-guide.pdf` | Printable copy of the client guide, linked from the page and published as a static resource. |
+
 ## Map View: camera navigation
 
 The Terrain Map Canvas and alternate map sources keep manual pan and zoom in control: wheel, touch, drag, double-click, and camera-key input cancel automatic location focus, including its delayed final fit and chrome pan. New location selections, map-source changes, and entering Wolo Code Input View discard earlier camera callbacks. Bounds focus uses the full projected bounds and actual map dimensions with consistent padding, including across the dateline, so it does not zoom in too far before fitting back out. Focusing the current center works without a pan event, and camera limits stop animation cleanly.
@@ -10,7 +17,7 @@ Hold a marker for half a second. Keep holding and drag to place the draft crossh
 
 ## Country and regional choices in city selectors
 
-The nearby, matching-name, and previous-city dialogs share the **Cities** and **Regions** tabs in `CityRegionOptions.php`. The tabs use the centered pipe, fading underline, and keyboard controls of **Info Full View**. **Search cities** looks up registered cities and **Search regions or countries** filters the region registry by name and alias. The current reference is highlighted when available, and previous cities and regional references appear in their respective tabs. Both search fields use underline-only styling. Switching tabs keeps the picker’s top, width, and shared controls fixed as its height adapts.
+The nearby, matching-name, and previous-city dialogs share the **City** and **Region** tabs in `CityRegionOptions.php`. The tabs use the centered pipe, fading underline, and keyboard controls of **Info Full View**. **Search cities** looks up registered cities and **Search regions or countries** filters the region registry by name and alias. The current reference is highlighted when available, and previous cities and regional references appear in their respective tabs. Both search fields use underline-only styling with a lighter shade of gray (`#ccc`). Switching tabs keeps the picker’s top, width, and shared controls fixed as its height adapts. Selecting a city or region in the previous-city dialog focuses the map to city or region scope with animated zoom without changing the point marker or Wolo Code, and reopening the dialog retains the respective tab and active item.
 
 In **Choose city or region**, selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
 
@@ -21,7 +28,7 @@ The Address Panel omits the Code reference selector and Propose a city button.
 
 | Section | Controls | Behavior |
 | --- | --- | --- |
-| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_include_location` | Name is required; country and selected location are optional. |
+| City Proposal Modal View | `#no_city_message`, `#no_city_name`, `#no_city_country`, `#no_city_location` | City name and map location are required; country or territory is optional. |
 | City proposal confirmation | `#no_city_request_id`, `#no_city_email_details` | Displays an acknowledged request ID, opens an editable email draft, and retains a fallback email link. Closing does not cancel an already submitted request. |
 
 
@@ -49,7 +56,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Printable/shareable label dialog | QR Label View | `#qr_container` | Overlay dialog for editing, previewing, downloading, printing, and saving the selected Wolo Code label. |
 | Logged-in address book dialog | Account Address Book View | `#account_dialog_container`, `#account_dialog` | Account dialog reached from the Account Button after login; lists saved Wolo Code addresses. |
 | App information dialog | Info Modal View | `#info_message`, `#info_intro`, `#info_full`, `#info_links` | Overlay dialog explaining Wolo Code format, usage steps, app links, and policy/contact details. |
-| Add city dialog | Add City Modal View | `#no_city_message`, `NoCity.php` | City proposal form with optional location; acknowledged request ID and editable email draft. Follows light and dark theme. |
+| Add city dialog | Add City Modal View | `#no_city_message`, `NoCity.php` | City proposal form with mandatory map location; acknowledged request ID and editable email draft. Follows light and dark theme. |
 
 ## Cookie Consent View
 

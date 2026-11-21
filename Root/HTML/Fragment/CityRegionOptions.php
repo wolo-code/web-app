@@ -7,9 +7,9 @@ $cityRegionCityLists = [
 ?>
 <div id='<?= $cityRegionMenuId ?>_region_menu' class='city_region_picker'>
 	<div class='city_region_tabs' role='tablist' aria-label='Location type'>
-		<button id='<?= $cityRegionMenuId ?>_city_tab' type='button' role='tab' aria-selected='true' aria-controls='<?= $cityRegionMenuId ?>_city_panel'><span>Cities</span></button>
+		<button id='<?= $cityRegionMenuId ?>_city_tab' type='button' role='tab' aria-selected='true' aria-controls='<?= $cityRegionMenuId ?>_city_panel'><span>City</span></button>
 		<span aria-hidden='true'>|</span>
-		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Regions</span></button>
+		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Region</span></button>
 	</div>
 	<div id='<?= $cityRegionMenuId ?>_city_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_city_tab'>
 		<input type='search' class='city_region_search' placeholder='Search cities' aria-label='Search cities' autocomplete='off' spellcheck='false'>

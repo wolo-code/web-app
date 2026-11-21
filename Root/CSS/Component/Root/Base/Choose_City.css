@@ -249,11 +249,15 @@ html.dark-mode .decode_city_history_remove:hover {
 	margin-block-end: 12px;
 	padding: 8px 2px;
 	border: 0;
-	border-bottom: 1px solid currentColor;
+	border-bottom: 1px solid #ccc;
 	border-radius: 0;
 	background: transparent;
 	color: inherit;
 	font: inherit;
+}
+
+html.dark-mode .city_region_search {
+	border-bottom-color: #666;
 }
 
 .city_region_search:focus {

@@ -89,7 +89,10 @@ function closeCityRegionMenu(mode) {
 
 function useCityMenuRegion(anchor, mode, point) {
 	closeCityRegionMenu(mode);
-	if(!isDecodeView())
+	if(mode === 'history') {
+		setDecodeCity(anchor, 'history', true);
+		focusSelectedDecodeCityOnMap(anchor);
+	} else if(!isDecodeView())
 		encode_(anchor, point);
 	else
 		setDecodeCity(anchor, 'history', true);
@@ -146,14 +149,28 @@ function renderCityRegionMenu(id, mode) {
 	var cityPanel = document.getElementById(id + '_city_panel');
 	var regionPanel = document.getElementById(id + '_region_panel');
 	var decodeView = isDecodeView();
-	var current = mode === 'history' && decodeView ? selected_decode_city :
-		mode !== 'matching' && typeof code_city !== 'undefined' && code_city;
+	var current = mode === 'history' ? (selected_decode_city || (typeof code_city !== 'undefined' && code_city)) :
+		((typeof code_city !== 'undefined' && code_city) || selected_decode_city);
 	var currentRegion = isRegionAnchor(current) && regionAnchorFromId(current.id);
 	var point = mode === 'matching' || decodeView ? null : cityRegionMenuPosition();
 	var suggested = regionAnchorsForPosition(point);
-	var anchorByRegion = new Map(suggested.map(function(choice) { return [choice.region.key, choice.anchor]; }));
-	var list = regionPanel.querySelector('.city_region_defaults .city_region_list');
 	var history = mode === 'history' ? getDecodeCityHistory() : [];
+	var anchorByRegion = new Map();
+	history.forEach(function(entry) {
+		var anchor = isRegionAnchor(entry) && regionAnchorFromId(entry.id);
+		if(anchor) {
+			var key = anchor.id.split(':')[2];
+			anchorByRegion.set(key, anchor);
+		}
+	});
+	if(currentRegion) {
+		var currentKey = currentRegion.id.split(':')[2];
+		anchorByRegion.set(currentKey, currentRegion);
+	}
+	suggested.forEach(function(choice) {
+		anchorByRegion.set(choice.region.key, choice.anchor);
+	});
+	var list = regionPanel.querySelector('.city_region_defaults .city_region_list');
 	var matchingWords = mode === 'matching' ? chooseCityCodeWords : null;
 	picker.closest('.choose_city_message').citySearchSelection = null;
 

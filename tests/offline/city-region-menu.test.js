@@ -48,7 +48,7 @@ function runtime(mode = 'nearby') {
 		hideDecodeCityHistoryMessage() { events.push('close-history'); },
 		encode_(anchor, position) { events.push({ encoded: anchor, position }); },
 		setDecodeCity(anchor) { events.push({ selected: anchor }); },
-		focusSelectedDecodeCityOnMap() {},
+		focusSelectedDecodeCityOnMap(anchor) { events.push({ focused: anchor }); },
 		isDecodeView: () => false,
 		isOfflineMode: () => false,
 		toggleDecodeView: () => events.push('open-input'),
@@ -206,4 +206,44 @@ test('nearby picker highlights a selected city without changing its position', (
 	api.code_city = second;
 	api.showChooseCity_by_periphery_List();
 	assert.deepEqual(Array.from(choices, choice => choice.status), ['Current', 'Nearby']);
+});
+
+test('history picker retains active tab and selected item when reopening with a chosen region or city', () => {
+	const {api, picker, region} = runtime('history');
+	const nepalAnchor = api.regionAnchorFromId('region:v1:country-npl:35');
+	assert.ok(nepalAnchor);
+
+	// Select a region in history
+	api.selected_decode_city = nepalAnchor;
+	api.getDecodeCityHistory = () => [nepalAnchor];
+	api.renderCityRegionMenu('history', 'history');
+	assert.equal(picker.activeTab, 'button:last-child');
+
+	// Select a city in history
+	const city = { id: 'ktm', name: 'Kathmandu' };
+	api.selected_decode_city = city;
+	api.getDecodeCityHistory = () => [city];
+	api.renderCityRegionMenu('history', 'history');
+	assert.equal(picker.activeTab, 'button:first-child');
+});
+
+test('selecting a region in history mode focuses the map without re-encoding marker position', () => {
+	const {api, events} = runtime('history');
+	const nepalAnchor = api.regionAnchorFromId('region:v1:country-npl:35');
+
+	api.useCityMenuRegion(nepalAnchor, 'history', api.code_postition);
+	assert.equal(events.some(e => e.encoded), false);
+	assert.equal(events.some(e => e.selected && e.selected.id === nepalAnchor.id), true);
+	assert.equal(events.some(e => e.focused && e.focused.id === nepalAnchor.id), true);
+});
+
+test('city and region selector markup defines City and Region tabs and lighter gray underline', () => {
+	const php = fs.readFileSync(path.join(__dirname, '../../Root/HTML/Fragment/CityRegionOptions.php'), 'utf8');
+	assert.match(php, /><span>City<\/span></);
+	assert.match(php, /><span>Region<\/span></);
+	assert.doesNotMatch(php, /><span>Cities<\/span></);
+	assert.doesNotMatch(php, /><span>Regions<\/span></);
+
+	const css = fs.readFileSync(path.join(__dirname, '../../Root/CSS/Component/Root/Base/Choose_City.css'), 'utf8');
+	assert.match(css, /\.city_region_search[\s\S]*?border-bottom:\s*1px\s+solid\s+#ccc;/);
 });

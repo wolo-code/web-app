@@ -21,30 +21,6 @@
 	padding-inline: 6px;
 }
 
-.choose_city_message_list div {
-	background-color: #69B7CF;
-	color: #ffffff;
-	font-size: larger;
-	border-radius: 5px;
-	padding: 2px 0 2px 8px;
-	border: 1px solid #69B7CF;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	user-select: none;
-}
-
-.choose_city_message_list div.longpress {
-	opacity: .75;
-}
-
-.choose_city_message_list div:hover {
-	cursor: pointer;
-}
-
-.choose_city_message_list div:not(:last-child) {
-	margin-bottom: 10px;
-}
-
 .city_choice_list {
 	list-style: none;
 	margin: 0;
@@ -112,7 +88,7 @@ html.dark-mode .city_choice_heading {
 	border-block-start-width: 1px;
 }
 
-.choose_city_message :is(.city_choice_button, .city_region_option) {
+.choose_city_message :is(.city_choice_button, .city_region_option, .decode_city_history_row) {
 	display: flex;
 	align-items: center;
 	gap: 12px;
@@ -128,9 +104,13 @@ html.dark-mode .city_choice_heading {
 	text-align: start;
 	overflow-wrap: anywhere;
 	cursor: pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
-.city_choice_name {
+.city_choice_name,
+.decode_city_history_name {
 	min-width: 0;
 	flex: 1;
 }
@@ -146,18 +126,99 @@ html.dark-mode .city_choice_heading {
 	opacity: .8;
 }
 
-.choose_city_message :is(.city_choice_button, .city_region_option):hover {
+.choose_city_message :is(.city_choice_button, .city_region_option, .decode_city_history_row):hover {
 	background: rgb(105 183 207 / 12%);
 }
 
-.choose_city_message :is(.city_choice_button[aria-current='true'], .city_region_option[aria-current='true']) {
+.choose_city_message :is(.city_choice_button[aria-current='true'], .city_region_option[aria-current='true'], .decode_city_history_row[aria-current='true']) {
 	background: rgb(105 183 207 / 26%);
 	border-color: #69b7cf;
 }
 
-.choose_city_message :is(.city_choice_button, .city_region_option):focus-visible {
+.choose_city_message :is(.city_choice_button, .city_region_option, .decode_city_history_row):focus-visible,
+.choose_city_message .decode_city_history_row:focus-within {
 	outline: 2px solid #69b7cf;
 	outline-offset: 1px;
+}
+
+.decode_city_history_row.longpress {
+	opacity: .75;
+}
+
+.decode_city_history_row:not(:last-child) {
+	margin-block-end: 8px;
+}
+
+#decode_region_history_message_list:not(:empty) {
+	margin-block-end: 8px;
+}
+
+.decode_city_history_remove {
+	flex: 0 0 auto;
+	min-inline-size: 28px;
+	min-block-size: 28px;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	padding: 0;
+	margin: 0;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease;
+}
+
+.decode_city_history_row:hover .decode_city_history_remove,
+.decode_city_history_row:focus-within .decode_city_history_remove {
+	opacity: 0.75;
+	pointer-events: auto;
+}
+
+.decode_city_history_remove:hover {
+	opacity: 1;
+	background: rgb(217 84 98 / 15%);
+	color: #d95462;
+}
+
+.decode_city_history_remove:focus-visible {
+	opacity: 1;
+	pointer-events: auto;
+	outline: 2px solid #69b7cf;
+	outline-offset: 1px;
+}
+
+@media (hover: none) {
+	.decode_city_history_remove {
+		opacity: 0.75;
+		pointer-events: auto;
+	}
+}
+
+@media (pointer: coarse) {
+	.decode_city_history_remove {
+		min-inline-size: 36px;
+		min-block-size: 36px;
+		width: 36px;
+		height: 36px;
+		font-size: 22px;
+	}
+}
+
+html.dark-mode .decode_city_history_remove:hover {
+	background: rgb(255 107 107 / 20%);
+	color: #ff6b6b;
+}
+
+#decode_city_history_delete {
+	padding: 0 6px;
 }
 
 .choose_city_message > .message_dialog_body {
@@ -233,32 +294,4 @@ html.dark-mode .city_choice_heading {
 	vertical-align: baseline;
 }
 
-#decode_region_history_message_list .decode_city_history_name {
-	flex: 1;
-	min-width: 0;
-	overflow-wrap: anywhere;
-}
 
-#decode_region_history_message_list > .decode_city_history_row {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	background: transparent;
-	color: inherit;
-	border-color: rgb(105 183 207 / 45%);
-}
-
-#decode_region_history_message_list .decode_city_history_remove {
-	flex: 0 0 44px;
-	min-height: 44px;
-	border: 0;
-	background: transparent;
-	color: inherit;
-	font: inherit;
-	cursor: pointer;
-}
-
-.decode_city_history_row[aria-current='true'] {
-	outline: 2px solid currentColor;
-	outline-offset: -3px;
-}

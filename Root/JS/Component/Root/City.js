@@ -242,15 +242,50 @@ function renderDecodeCityHistoryList() {
 		var row = document.createElement('div');
 		row.className = 'decode_city_history_row';
 		var city = decode_city_history[i];
+		var displayName = getDecodeCityDisplayName(city);
 		var regional = typeof isRegionAnchor === 'function' && isRegionAnchor(city);
 		if(selected_decode_city && getDecodeCityHistoryKey(city) === getDecodeCityHistoryKey(selected_decode_city))
 			row.setAttribute('aria-current', 'true');
+
+		var name = document.createElement('span');
+		name.className = 'decode_city_history_name';
 		if(regional)
-			row.innerHTML = getRegionReferenceHTML(city, getDecodeCityDisplayName(city));
+			name.innerHTML = getRegionReferenceHTML(city, displayName);
 		else
-			row.innerText = getDecodeCityDisplayName(city);
+			name.innerText = displayName;
+		row.appendChild(name);
+
+		var remove_btn = document.createElement('button');
+		remove_btn.type = 'button';
+		remove_btn.className = 'decode_city_history_remove';
+		remove_btn.textContent = '\u00d7';
+		remove_btn.title = 'Remove ' + displayName;
+		remove_btn.setAttribute('aria-label', 'Remove ' + displayName);
+		remove_btn.data_id = i;
+
+		remove_btn.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+		remove_btn.addEventListener('pointerup', function(e) { e.stopPropagation(); });
+		remove_btn.addEventListener('pointercancel', function(e) { e.stopPropagation(); });
+		remove_btn.addEventListener('touchstart', function(e) { e.stopPropagation(); });
+		remove_btn.addEventListener('touchend', function(e) { e.stopPropagation(); });
+		remove_btn.addEventListener('contextmenu', function(e) { e.stopPropagation(); e.preventDefault(); });
+		remove_btn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			var index = parseInt(e.currentTarget.data_id, 10);
+			removeDecodeCityByIndex(index);
+		});
+		row.appendChild(remove_btn);
+
 		row.data_id = i;
-		row.title = 'Press and hold to remove';
+		row.title = displayName;
+		row.setAttribute('role', 'button');
+		row.tabIndex = 0;
+		row.addEventListener('keydown', function(e) {
+			if((e.key === 'Enter' || e.key === ' ') && e.target === row) {
+				e.preventDefault();
+				chooseDecodeCityFromHistory(e);
+			}
+		});
 		row.addEventListener('contextmenu', preventDecodeCityHistoryContextMenu);
 		addLongpressListener(row, chooseDecodeCityFromHistory, showDeleteDecodeCityOption);
 		(regional && regionList ? regionList : container).appendChild(row);
@@ -349,11 +384,11 @@ function cancelDeleteDecodeCity() {
 	hideDecodeCityHistoryDeletePrompt();
 }
 
-function confirmDeleteDecodeCity() {
-	if(pending_delete_decode_city_index == null)
-		return;
+function removeDecodeCityByIndex(index) {
+	if(typeof decode_city_history === 'undefined' || !decode_city_history)
+		decode_city_history = getDecodeCityHistory();
 
-	var removed = decode_city_history[pending_delete_decode_city_index];
+	var removed = decode_city_history[index];
 	if(!removed) {
 		hideDecodeCityHistoryDeletePrompt();
 		return;
@@ -380,6 +415,15 @@ function confirmDeleteDecodeCity() {
 
 	hideDecodeCityHistoryDeletePrompt();
 	renderDecodeCityHistoryList();
+}
+
+function confirmDeleteDecodeCity() {
+	if(pending_delete_decode_city_index == null)
+		return;
+
+	var index = pending_delete_decode_city_index;
+	pending_delete_decode_city_index = null;
+	removeDecodeCityByIndex(index);
 }
 
 function initDecodeCityHistoryDeleteControls() {

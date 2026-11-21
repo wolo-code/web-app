@@ -9,14 +9,14 @@
 		<p>
 			Suggest a city for Wolo. After submission, an email draft opens so you can add detailed information.
 		</p>
-		<label for='no_city_name'>City name</label>
+		<label for='no_city_name'>City name *</label>
 		<input id='no_city_name' type='text' required maxlength='160' autocomplete='address-level2' placeholder='e.g. Pokhara'>
-		<label for='no_city_country'>Country or region (optional)</label>
+		<label for='no_city_country'>Country or territory</label>
 		<input id='no_city_country' type='text' maxlength='160' autocomplete='country-name' placeholder='e.g. Nepal'>
-		<label class='city_proposal_location'><input id='no_city_include_location' type='checkbox'> Include selected map location</label>
+		<label id='no_city_location_label'>Location *</label>
 		<p id='no_city_location'>No map location selected</p>
 		<div class="center message_dialog_control">
-			<button id='no_city_submit_yes' class='border' type='button'>Submit request</button>
+			<button id='no_city_submit_yes' class='border' type='button'>Submit</button>
 			<button id='no_city_submit_no' class='border' type='button'>Cancel</button>
 		</div>
 	</div>

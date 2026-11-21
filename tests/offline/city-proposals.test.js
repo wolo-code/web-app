@@ -34,6 +34,7 @@ function runtime() {
 test('proposal is persisted once, then the acknowledged request ID appears in draft subject and fallback link', async () => {
 	const r = runtime();
 	r.api.showCityProposal();
+	assert.equal(r.node('no_city_location').textContent, 'Nearby: 28.200000, 83.980000');
 	const submitting = r.api.noCity_add();
 	r.api.noCity_add();
 	await Promise.resolve();
@@ -77,19 +78,56 @@ test('rejected writes never open an email or announce success; users can retry',
 	assert(!r.notifications.includes('City request submitted'));
 });
 
-test('city-only proposals do not borrow an unrelated map location, and offline submission does not write', async () => {
+test('proposals require a selected map location and offline submission does not write', async () => {
 	const r = runtime();
 	r.api.latLng_p = null;
 	r.api.showCityProposal();
+	assert.equal(r.node('no_city_location').textContent, 'No map location selected');
 	const submitting = r.api.noCity_add();
-	await Promise.resolve();
-	assert.equal(r.writes[0]['/CityRequest/-request-123'].lat_lng, null);
-	r.resolveWrite();
-	await submitting;
+	assert.equal(submitting, undefined);
+	assert.equal(r.writes.length, 0);
+	assert.equal(r.drafts.length, 0);
+	assert(r.notifications.includes('Select a location on the map before proposing a city'));
 	const offline = runtime();
 	offline.api.isOfflineMode = () => true;
 	offline.api.noCity_add();
 	assert.equal(offline.writes.length, 0);
 	assert.equal(offline.drafts.length, 0);
+});
+
+test('propose a city dialog markup and styles match UX requirements', () => {
+	const html = read('Root/HTML/Fragment/NoCity.php');
+	const css = read('Root/CSS/Component/Root/Base/No_City.css');
+
+	// Mandatory fields indicated by *; optional indicator removed.
+	assert.match(html, /<label for='no_city_name'>City name \*<\/label>/);
+	assert.match(html, /<label id='no_city_location_label'>Location \*<\/label>/);
+	assert.doesNotMatch(html, /optional/i);
+
+	// Map location is mandatory: no optional include checkbox.
+	assert.doesNotMatch(html, /no_city_include_location/);
+	assert.doesNotMatch(html, /Include selected map location/);
+
+	// Country label uses territory instead of region to avoid conflicting with regional codes.
+	assert.match(html, /<label for='no_city_country'>Country or territory<\/label>/);
+	assert.doesNotMatch(html, /Country or region/);
+
+	// Submit button text is 'Submit', not 'Submit request'.
+	assert.match(html, /<button id='no_city_submit_yes' class='border' type='button'>Submit<\/button>/);
+	assert.doesNotMatch(html, /Submit request/);
+
+	// Text input boxes use flat underline styling only (border: 0, border-bottom).
+	assert.match(css, /#no_city_message input\[type='text'\]\s*\{[^}]*border:\s*0;/);
+	assert.match(css, /#no_city_message input\[type='text'\]\s*\{[^}]*border-bottom:\s*1px solid #999;/);
+	assert.match(css, /#no_city_message input\[type='text'\]\s*\{[^}]*border-radius:\s*0;/);
+
+	// Close button has equal top and right offsets.
+	assert.match(css, /#no_city_message #no_city_message_close\s*\{[^}]*top:\s*16px;\s*right:\s*16px;/);
+
+	// Location text is indented slightly under the Location label.
+	assert.match(css, /#no_city_location\s*\{[^}]*padding-left:\s*8px;/);
+
+	// Submit and cancel buttons have a comfortable gap between them.
+	assert.match(css, /#no_city_message \.message_dialog_control\s*\{[^}]*gap:\s*18px;/);
 });
 

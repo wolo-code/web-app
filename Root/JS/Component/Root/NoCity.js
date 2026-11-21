@@ -6,10 +6,10 @@ function showCityProposal(event) {
 	if(event && event.stopPropagation) event.stopPropagation();
 	if(!cityProposalInFlight && !cityProposalRequest) {
 		cityProposalLocation = regionPosition(typeof code_postition !== 'undefined' && code_postition) || regionPosition(typeof latLng_p !== 'undefined' && latLng_p);
-		var include = document.getElementById('no_city_include_location');
-		include.checked = !!cityProposalLocation;
-		include.disabled = !cityProposalLocation;
-		document.getElementById('no_city_location').textContent = cityProposalLocation ? cityProposalLocation.lat.toFixed(6) + ', ' + cityProposalLocation.lng.toFixed(6) : 'No map location selected';
+		var locationEl = document.getElementById('no_city_location');
+		if(locationEl) {
+			locationEl.textContent = cityProposalLocation ? 'Nearby: ' + cityProposalLocation.lat.toFixed(6) + ', ' + cityProposalLocation.lng.toFixed(6) : 'No map location selected';
+		}
 		noCity_hideLoader();
 	}
 	showNoCityMessage();
@@ -35,7 +35,7 @@ function cityProposalEmailHref(requestId, data) {
 	var link = document.getElementById('no_city_email_details');
 	var recipient = (link.getAttribute('data-u') || 'support') + '@' + (link.getAttribute('data-d') || 'wolo.codes');
 	var subject = 'Wolo add city request ' + requestId;
-	var body = 'Request ID: ' + requestId + '\r\nCity: ' + data.city_name + '\r\nCountry / region: ' + (data.country || '') + '\r\n';
+	var body = 'Request ID: ' + requestId + '\r\nCity: ' + data.city_name + '\r\nCountry / territory: ' + (data.country || '') + '\r\n';
 	if(data.lat_lng) body += 'Proposed location: ' + data.lat_lng.lat + ', ' + data.lat_lng.lng + '\r\n';
 	if(data.address) body += 'Address: ' + data.address + '\r\n';
 	body += '\r\nAdditional details (suggested center, local names, coverage, or supporting links):\r\n';
@@ -50,17 +50,20 @@ function noCity_add() {
 	if(cityProposalInFlight) return;
 	var name = document.getElementById('no_city_name');
 	if(!name.reportValidity()) return;
+	var cityName = name.value.trim();
+	if(!cityName) { name.focus(); return; }
+	if(!cityProposalLocation) {
+		showNotification('Select a location on the map before proposing a city');
+		return;
+	}
 	if(typeof isOfflineMode === 'function' && isOfflineMode()) {
 		showNotification('Requesting a city needs an internet connection');
 		return;
 	}
-	var cityName = name.value.trim();
-	if(!cityName) { name.focus(); return; }
-	var include = document.getElementById('no_city_include_location').checked;
 	var data = {
 		city_name: cityName,
 		country: document.getElementById('no_city_country').value.trim(),
-		lat_lng: include ? cityProposalLocation : null,
+		lat_lng: cityProposalLocation,
 		gp_id: '', address: '', source: 'user-proposal'
 	};
 	var addressPosition = regionPosition(typeof latLng_p !== 'undefined' && latLng_p);

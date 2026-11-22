@@ -14,6 +14,36 @@
 				<video id='code_scan_video' playsinline autoplay muted aria-hidden='true'></video>
 				<canvas id='code_scan_live_canvas' class='hide' aria-hidden='true'></canvas>
 				<canvas id='code_scan_canvas' class='hide' aria-hidden='true'></canvas>
+				<div id='code_scan_preview_frame' class='code_scan_preview_frame hide' aria-hidden='true'>
+					<div class='code_scan_viewfinder_corners' aria-hidden='true'>
+						<span class='code_scan_corner code_scan_corner_tl'></span>
+						<span class='code_scan_corner code_scan_corner_tr'></span>
+						<span class='code_scan_corner code_scan_corner_bl'></span>
+						<span class='code_scan_corner code_scan_corner_br'></span>
+					</div>
+					<div class='code_scan_sample_card'>
+						<div class='code_scan_sample_beam' aria-hidden='true'></div>
+						<div class='code_scan_sample_header'>
+							<span class='code_scan_sample_city code_scan_shimmer'></span>
+						</div>
+						<div class='code_scan_sample_code_box'>
+							<span class='code_scan_sample_bracket code_scan_sample_bracket_tl'></span>
+							<span class='code_scan_sample_bracket code_scan_sample_bracket_tr'></span>
+							<span class='code_scan_sample_bracket code_scan_sample_bracket_bl'></span>
+							<span class='code_scan_sample_bracket code_scan_sample_bracket_br'></span>
+							<div class='code_scan_sample_words'>
+								<span class='code_scan_sample_word code_scan_shimmer'></span>
+								<span class='code_scan_sample_dot'>&bull;</span>
+								<span class='code_scan_sample_word code_scan_shimmer'></span>
+								<span class='code_scan_sample_dot'>&bull;</span>
+								<span class='code_scan_sample_word code_scan_shimmer'></span>
+							</div>
+						</div>
+						<div class='code_scan_sample_footer'>
+							<span class='code_scan_sample_line code_scan_shimmer'></span>
+						</div>
+					</div>
+				</div>
 				<div id='code_scan_fixed_guide' class='code_scan_fixed_guide' aria-hidden='true'></div>
 				<div class='code_scan_regions' aria-hidden='true'>
 					<div id='code_scan_detected_boxes'></div>

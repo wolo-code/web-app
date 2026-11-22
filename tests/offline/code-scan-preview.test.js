@@ -672,3 +672,72 @@ test('zoom and pan debounce crop OCR and wait for an in-flight read to finish', 
  context.codeScanState.phase = 'review'; run();
  assert.equal(scans, 1);
 });
+
+test('scanner displays preview frame with viewfinder corners and shimmers on entry without blocking camera start', () => {
+	const { context } = scanner();
+	const classes = new Set(['hide']);
+	const previewFrame = {
+		classList: {
+			add: c => classes.add(c),
+			remove: c => classes.delete(c),
+			toggle: (c, force) => {
+				if(force === undefined) {
+					if(classes.has(c)) classes.delete(c); else classes.add(c);
+				} else if(force) {
+					classes.add(c);
+				} else {
+					classes.delete(c);
+				}
+			},
+			contains: c => classes.has(c)
+		}
+	};
+	const liveCanvasClasses = new Set(['hide']);
+	const liveCanvas = {
+		parentElement: { clientWidth: 360, clientHeight: 240 },
+		classList: {
+			add: c => liveCanvasClasses.add(c),
+			remove: c => liveCanvasClasses.delete(c),
+			contains: c => liveCanvasClasses.has(c)
+		},
+		getContext: () => ({ drawImage: () => {} })
+	};
+	context.document.getElementById = id => {
+		if(id === 'code_scan_preview_frame') return previewFrame;
+		if(id === 'code_scan_live_canvas') return liveCanvas;
+		if(id === 'code_scan_message') return { classList: { remove() {}, add() {}, toggle() {}, contains: () => false } };
+		return null;
+	};
+	context.document.querySelector = selector => selector === '.code_scan_viewport' ? { classList: { toggle() {} } } : null;
+	context.document.body = { classList: { contains: () => false } };
+	context.getCodeScanCanvas = () => ({ style: {}, classList: { toggle() {} } });
+	context.wordList = ['apple', 'berry', 'cherry'];
+	context.codeScanOcrMatch = { isCodeScanSupported: () => true };
+	context.showNotification = () => {};
+	let cameraStarted = false;
+	context.startCodeScanCamera = () => { cameraStarted = true; };
+	context.showOverlay = () => {};
+	context.openCodeScan();
+
+	// Preview frame is visible immediately on entry
+	assert.equal(previewFrame.classList.contains('hide'), false);
+	// Camera readiness was triggered immediately without being blocked
+	assert.equal(cameraStarted, true);
+
+	// First live preview frame clears the preview frame and shows live canvas
+	let frameCallback = null;
+	context.window.requestAnimationFrame = cb => { frameCallback = cb; return 1; };
+	context.window.cancelAnimationFrame = () => {};
+	context.getCodeScanVideoSourceRect = () => ({ sx: 0, sy: 0, sw: 360, sh: 240 });
+	context.startCodeScanLivePreview({ readyState: 2 });
+	assert.ok(frameCallback);
+	frameCallback(100);
+	assert.equal(liveCanvas.classList.contains('hide'), false);
+	assert.equal(previewFrame.classList.contains('hide'), true);
+
+	// Resetting, manual entry, or camera errors re-hide preview frame
+	context.setCodeScanPreviewFrameVisible(true);
+	assert.equal(previewFrame.classList.contains('hide'), false);
+	context.handleCodeScanCameraError(new Error('no camera'));
+	assert.equal(previewFrame.classList.contains('hide'), true);
+});

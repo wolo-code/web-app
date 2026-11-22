@@ -201,11 +201,13 @@ function openCodeScan(event, debug) {
 	setCodeScanDetectionMode('fixed');
 	if(codeScanOcrMatch.isCodeScanSupported()) {
 		setCodeScanStatus('Requesting camera...');
+		setCodeScanPreviewFrameVisible(true);
 		startCodeScanCamera();
 		return;
 	}
 	prepareCodeScanWorker().catch(function() {});
 	codeScanState.cameraAvailable = false;
+	setCodeScanPreviewFrameVisible(false);
 	setCodeScanViewportVisible(codeScanState.debug);
 	logCodeScanStep('Live camera unsupported');
 	setCodeScanStatus('Live camera is not supported here. Use a photo of the label or type the code instead.');
@@ -217,6 +219,7 @@ function openCodeScanPhotoPicker(event) {
 	var photoInput = document.getElementById('code_scan_photo_input');
 	if(!photoInput)
 		return;
+	setCodeScanPreviewFrameVisible(false);
 	prepareCodeScanWorker().catch(function() {});
 	photoInput.value = '';
 	photoInput.click();
@@ -226,6 +229,7 @@ function openCodeScanManualEntry(event) {
 	if(event && event.preventDefault)
 		event.preventDefault();
 	if(!codeScanState.active || codeScanState.phase !== 'live') return;
+	setCodeScanPreviewFrameVisible(false);
 	invalidateCodeScanSession();
 	resetCodeScanMatchState();
 	showCodeScanReview(null, true);
@@ -291,6 +295,7 @@ function resetCodeScanUi() {
 	setCodeScanReviewVisible(false);
 	clearCodeScanCandidateHighlight();
 	setCodeScanWoloFoundCue(false);
+	setCodeScanPreviewFrameVisible(false);
 	setCodeScanStatus(getCodeScanInitialStatus());
 	codeScanState.originalSourceCanvas = null;
 	codeScanState.sourceCanvas = null;
@@ -393,7 +398,10 @@ function startCodeScanLivePreview(video) {
 			handleCodeScanCameraError(error);
 			return;
 		}
-		if(lastDraw === -Infinity) canvas.classList.remove('hide');
+		if(lastDraw === -Infinity) {
+			canvas.classList.remove('hide');
+			setCodeScanPreviewFrameVisible(false);
+		}
 		lastDraw = timestamp;
 	}
 	codeScanState.previewFrame = window.requestAnimationFrame(draw);
@@ -442,6 +450,7 @@ function suspendCodeScanMedia() {
 	if(codeScanState.cameraState !== 'active') return;
 	invalidateCodeScanSession();
 	codeScanState.cameraState = 'suspended';
+	setCodeScanPreviewFrameVisible(false);
 	resetCodeScanMatchState();
 	clearCodeScanCandidateHighlight();
 	setCodeScanWoloFoundCue(false);
@@ -451,6 +460,7 @@ function resumeCodeScanCamera() {
 	if(document.hidden || codeScanState.cameraState !== 'suspended' || !codeScanState.active ||
 		!isCodeScanVisible() || codeScanState.phase !== 'live' || codeScanState.hasCaptured) return;
 	setCodeScanStatus('Requesting camera...');
+	setCodeScanPreviewFrameVisible(true);
 	startCodeScanCamera();
 }
 
@@ -670,6 +680,7 @@ function handleCodeScanCameraError(error) {
 	else if(error && error.name === 'NotReadableError')
 		message = 'Camera is unavailable. Use a photo of the label or type the code instead.';
 	codeScanState.cameraAvailable = false;
+	setCodeScanPreviewFrameVisible(false);
 	setCodeScanViewportVisible(codeScanState.debug);
 	logCodeScanStep('Camera error: ' + (error && error.name || 'unavailable'));
 	setCodeScanStatus(message);
@@ -1499,6 +1510,7 @@ function showCodeScanReview(match, manualEntry) {
 	if(!manualEntry) logCodeScanStep(match ? 'Wolo Code ready for review' : 'No Wolo Code read. Review manually');
 	codeScanState.debugPaused = true;
 	setCodeScanDetailsLoading(false);
+	setCodeScanPreviewFrameVisible(false);
 	populateCodeScanMetadata(match);
 	codeScanState.reviewMatch = match;
 	var review = codeScanOcrMatch.splitMatchForReview(match);
@@ -1841,6 +1853,7 @@ function rescanCodeScan(event) {
 	setCodeScanPhotoFallbackVisible(true);
 	if(codeScanOcrMatch.isCodeScanSupported()) {
 		setCodeScanStatus('Requesting camera...');
+		setCodeScanPreviewFrameVisible(true);
 		startCodeScanCamera();
 		return;
 	}
@@ -2092,6 +2105,12 @@ function setCodeScanWoloFoundCue(active) {
 	var viewport = document.querySelector('.code_scan_viewport');
 	if(viewport)
 		viewport.classList.toggle('code_scan_wolo_found', !!active);
+}
+
+function setCodeScanPreviewFrameVisible(visible) {
+	var frame = document.getElementById('code_scan_preview_frame');
+	if(frame)
+		frame.classList.toggle('hide', !visible);
 }
 
 function setCodeScanViewportVisible(visible) {
@@ -2489,9 +2508,9 @@ function setCodeScanPhotoFallbackVisible(visible) {
 function setCodeScanFrozenPreview(frozen) {
 	var viewport = document.querySelector('.code_scan_viewport');
 	var canvas = getCodeScanCanvas();
-	if(viewport)
+	if(viewport && viewport.classList)
 		viewport.classList.toggle('code_scan_viewport_frozen', !!frozen);
-	if(canvas)
+	if(canvas && canvas.classList)
 		canvas.classList.toggle('hide', !frozen);
 }
 

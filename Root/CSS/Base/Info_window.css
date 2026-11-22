@@ -53,14 +53,18 @@
 
 .gm-style .gm-style-iw-d,
 .gm-style-iw-d {
-	overflow: hidden !important;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+	max-height: min(320px, calc(100dvh - 120px));
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 }
 
-@media (max-width: 320px), (max-height: 360px) {
-	.gm-style .gm-style-iw-d,
-	.gm-style-iw-d {
-		overflow: auto !important;
-	}
+.gm-style .gm-style-iw-d::-webkit-scrollbar,
+.gm-style-iw-d::-webkit-scrollbar {
+	display: none;
+	width: 0;
+	height: 0;
 }
 
 button.gm-ui-hover-effect {

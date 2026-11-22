@@ -480,11 +480,12 @@ test('map infowindow omits DIGIPIN; address panel labels DIGIPIN and plus code',
 	assert.match(addressHtml, /Plus code/);
 });
 
-test('map infowindow wolo tile hides scrollbars except on tiny screens', () => {
+test('map infowindow scrolls overflowing content with hidden scrollbars', () => {
 	const infoWindowCss = read('Root/CSS/Base/Info_window.css');
-	assert.match(infoWindowCss, /\.gm-style-iw-d\s*\{[^}]*overflow:\s*hidden\s*!important/);
-	assert.match(infoWindowCss, /@media[^{]*max-width:\s*320px[^{]*max-height:\s*360px/);
-	assert.match(infoWindowCss, /@media[^{]*\{[\s\S]*\.gm-style-iw-d\s*\{[^}]*overflow:\s*auto\s*!important/);
+	assert.match(infoWindowCss, /\.gm-style-iw-d\s*\{[^}]*overflow-y:\s*auto\s*!important/);
+	assert.match(infoWindowCss, /\.gm-style-iw-d\s*\{[^}]*max-height:/);
+	assert.match(infoWindowCss, /\.gm-style-iw-d\s*\{[^}]*scrollbar-width:\s*none/);
+	assert.doesNotMatch(infoWindowCss, /@media[^{]*max-width:\s*320px[^{]*max-height:\s*360px/);
 });
 
 test('unrecognized-code dialog and decode input tip are wired', () => {

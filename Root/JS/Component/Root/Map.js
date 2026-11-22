@@ -5,6 +5,53 @@ var myLocDot;
 var poiPlace;
 var mapPlaces = [];
 var mapSelectionVersion = 0;
+
+function getPlaceSubpremise(place) {
+	if(!place || !place.address_components)
+		return '';
+	for(var i = 0; i < place.address_components.length; i++) {
+		var component = place.address_components[i];
+		if(component.types && component.types.indexOf('subpremise') !== -1)
+			return component.long_name || component.short_name || '';
+	}
+	return '';
+}
+
+function applyPoiPlaceLabelPrefill(selectionVersion) {
+	if(!poiPlace)
+		return;
+	if(typeof selectionVersion === 'number' && selectionVersion !== mapSelectionVersion)
+		return;
+	var updated = false;
+	if(!current_title) {
+		var name = String(poiPlace.name || '').trim();
+		if(name) {
+			current_title = name;
+			updated = true;
+		}
+	}
+	if(!current_segment) {
+		var subpremise = String(getPlaceSubpremise(poiPlace) || '').trim();
+		if(subpremise) {
+			current_segment = subpremise;
+			updated = true;
+		}
+	}
+	if(updated && typeof setAddressPanelHeading === 'function') {
+		var panel = typeof getAddressPanel === 'function' ? getAddressPanel() : null;
+		if(panel && panel.classList && !panel.classList.contains('hide'))
+			setAddressPanelHeading(current_title, current_segment);
+	}
+}
+
+function attachMapPoiPlace(place, selectionVersion) {
+	if(!place)
+		return;
+	if(typeof selectionVersion === 'number' && selectionVersion !== mapSelectionVersion)
+		return;
+	poiPlace = place;
+	applyPoiPlaceLabelPrefill(selectionVersion);
+}
 var mapFitPlacesSelectionVersion = null;
 var mapPinAdjustment = null;
 var keepAdjustedPinCamera = false;
@@ -545,6 +592,7 @@ function initMap() {
 			focus___(pos);
 			encode(pos);
 			clearAddress();
+			attachMapPoiPlace(places[0], mapSelectionVersion);
 			getAddress(pos);
 		}
 		else {
@@ -563,7 +611,7 @@ function initMap() {
 					title: place.name,
 					position: place.geometry.location
 				});
-				var entry = {marker: resultMarker, name: place.name, result: true};
+				var entry = {marker: resultMarker, name: place.name, place: place, result: true};
 				bindMapPlaceMarker(resultMarker, function(event) {
 					loadMapPlace(entry, !!(event && event.domEvent && event.domEvent.shiftKey));
 				});
@@ -911,17 +959,23 @@ function searchMapWithQuery(query) {
 		if(!place || !place.geometry || !place.geometry.location) {
 			return false;
 		}
+		var selectionVersion = mapSelectionVersion;
 		var pos = resolveLatLng(place.geometry.location);
 		keepAddressPanelOpen = true;
 		focus___(pos);
 		encode(pos);
 		clearAddress();
 		latLng_p = pos;
+		attachMapPoiPlace(place, selectionVersion);
+		if(place.formatted_address) {
+			address = place.formatted_address;
+			refreshAddress();
+		}
 		getAddress(pos);
 		showAddress();
 		return true;
 	};
-	service.findPlaceFromQuery({query: query, fields: ['name', 'geometry']}, function(results, status) {
+	service.findPlaceFromQuery({query: query, fields: ['name', 'geometry', 'formatted_address', 'address_components']}, function(results, status) {
 		if(session !== encode_session_id)
 			return;
 		if(status === 'OK' && results && results[0] && applyResult(results[0])) {
@@ -969,6 +1023,8 @@ function loadMapPlace(entry, keepMapCard) {
 	}
 	cleanUp(false, keepMapCard);
 	marker = entry.marker;
+	if(entry.place)
+		attachMapPoiPlace(entry.place, mapSelectionVersion);
 	infoWindow_setContent(MESSAGE_LOADING);
 	var position = resolveLatLng(marker.getPosition());
 	focus___(position);
@@ -1280,6 +1336,7 @@ function cleanUp(full = false, keepMapCard = false) {
 	current_segment = null;
 	current_address = null;
 	current_address_lines = null;
+	poiPlace = null;
 }
 
 function activateMapType() {

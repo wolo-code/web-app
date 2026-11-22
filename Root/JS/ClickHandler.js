@@ -36,9 +36,15 @@ ClickEventHandler.prototype.getPlaceInformation = function(placeId) {
 		return;
 	}
 	var selectionVersion = typeof mapSelectionVersion === 'number' ? mapSelectionVersion : null;
-	this.placesService.getDetails({placeId: placeId}, function(place, status) {
+	this.placesService.getDetails({
+		placeId: placeId,
+		fields: ['name', 'formatted_address', 'address_components']
+	}, function(place, status) {
 		if(status === 'OK' && (selectionVersion === null || selectionVersion === mapSelectionVersion)) {
-			poiPlace = place;
+			if(typeof attachMapPoiPlace === 'function')
+				attachMapPoiPlace(place, selectionVersion);
+			else
+				poiPlace = place;
 			address = place.formatted_address;
 			refreshAddress();
 		}

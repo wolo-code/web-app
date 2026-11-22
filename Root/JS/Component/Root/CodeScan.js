@@ -360,7 +360,7 @@ function scheduleCodeScanFrame(delay) {
 	}
 	if(codeScanState.phase !== 'live')
 		return;
-	codeScanState.scanTimer = setTimeout(runCodeScanFrame, delay || CODE_SCAN_FRAME_INTERVAL_MS);
+	codeScanState.scanTimer = setTimeout(runCodeScanFrame, delay === undefined ? CODE_SCAN_FRAME_INTERVAL_MS : delay);
 }
 
 function getCodeScanVideo() {
@@ -697,6 +697,7 @@ function runCodeScanFrame() {
 		return;
 	}
 	var frame = document.createElement('canvas');
+	var superseded = false;
 	codeScanState.processing = true;
 	var startedAt = codeScanState.debug ? performance.now() : undefined;
 	// Use the full visible camera image. The Scan Frame is a visual overlay.
@@ -704,6 +705,7 @@ function runCodeScanFrame() {
 		if(!isCurrentCodeScanSession(session)) throw codeScanCancelledError();
 		logCodeScanStep('Reading camera frame');
 		if(!captureCodeScanFullRes(video, frame)) throw new Error('Camera frame unavailable');
+		var checkScene = makeCodeScanSceneCheck(video, frame);
 		var previous = codeScanState.recognizedFrame;
 		var sameSize = previous && previous.frame.width === frame.width && previous.frame.height === frame.height;
 		return recognizeCodeScanCanvas(frame, null, {
@@ -712,6 +714,13 @@ function runCodeScanFrame() {
 				previousCard: sameSize && !codeScanState.missedMatchFrame ? previous.match.regions.card : null,
 				isCurrent: function() {
 					return isCurrentCodeScanSession(session) && codeScanState.phase === 'live' && revision === codeScanState.cropRevision;
+				},
+				shouldYield: function() {
+					if(!superseded && checkScene()) {
+						superseded = true;
+						logCodeScanStep('Retrying on a fresh camera frame');
+					}
+					return superseded;
 				},
 				showBoxes: function(boxes) {
 					if(codeScanState.showRegions && !codeScanState.recognizedFrame)
@@ -727,6 +736,10 @@ function runCodeScanFrame() {
 			return;
 		}
 		logCodeScanStep('Camera frame processed', startedAt);
+		if(superseded) {
+			scheduleCodeScanFrame(0);
+			return;
+		}
 		handleCodeScanLiveOcrResult(result, frame);
 		scheduleCodeScanFrame(codeScanState.recognizedFrame ? CODE_SCAN_CONFIRM_INTERVAL_MS : CODE_SCAN_FRAME_INTERVAL_MS);
 	}).catch(function() {
@@ -738,6 +751,46 @@ function runCodeScanFrame() {
 		if(codeScanState.active && codeScanState.phase === 'live' && !codeScanState.hasCaptured)
 			scheduleCodeScanFrame();
 	});
+}
+
+function makeCodeScanSceneCheck(video, frame) {
+	var checkedTime = video.currentTime;
+	var context;
+	var original;
+	function sample(source, x, y, width, height) {
+		context.drawImage(source, x, y, width, height, 0, 0, 48, 32);
+		return context.getImageData(0, 0, 48, 32).data;
+	}
+	return function() {
+		if(video.readyState < 2 || video.currentTime === checkedTime) return false;
+		checkedTime = video.currentTime;
+		var rect = getCodeScanVideoSourceRect(video);
+		if(!rect.sw || !rect.sh) return false;
+		if(rect.sw !== frame.width || rect.sh !== frame.height) return true;
+		try {
+			if(!context) {
+				var thumbnail = document.createElement('canvas');
+				thumbnail.width = 48;
+				thumbnail.height = 32;
+				context = thumbnail.getContext('2d', { willReadFrequently: true });
+				original = sample(frame, 0, 0, frame.width, frame.height);
+			}
+			var current = sample(video, rect.sx, rect.sy, rect.sw, rect.sh);
+			var changed = 0;
+			for(var index = 0; index < current.length; index += 4) {
+				var red = current[index] - original[index];
+				var green = current[index + 1] - original[index + 1];
+				var blue = current[index + 2] - original[index + 2];
+				if(Math.abs(red * 2 + green * 5 + blue) >= 24 * 8) changed++;
+			}
+			// Ignore small changes from sensor noise or normal hand movement.
+			return changed >= 48 * 32 * 0.12;
+		} catch(error) {
+			// Sampling is optional. Keep the original recovery path if it fails.
+			context = null;
+			return false;
+		}
+	};
 }
 
 function getCodeScanVideoSourceRect(video, viewport) {
@@ -968,7 +1021,8 @@ async function tryCodeScanPerspective(canvas, focus, options, worker, search, re
 		return box.x1 - box.x0 >= 1.2 * (box.y1 - box.y0) && focus.x >= box.x0 && focus.x <= box.x1 && focus.y >= box.y0 && focus.y <= box.y1;
 	});
 	for(var box of [card, codeBox || codeSeed]) {
-		if(!box || (live && !live.isCurrent())) continue;
+		if(!box) continue;
+		if(codeScanShouldYield(live)) return null;
 		var corners = search.findCorners(box);
 		if(!corners) continue;
 		var transform = getCodeScanPerspectiveTransform(canvas, corners);
@@ -978,6 +1032,7 @@ async function tryCodeScanPerspective(canvas, focus, options, worker, search, re
 		var alignedOptions = Object.assign({}, options);
 		if(live) alignedOptions.live = {
 			isCurrent: live.isCurrent,
+			shouldYield: live.shouldYield,
 			showBoxes: function() {}
 		};
 		var corrected = await recognizeCodeScanImage(aligned, null, alignedOptions, worker, detectCodeScanContainers(aligned));
@@ -987,6 +1042,10 @@ async function tryCodeScanPerspective(canvas, focus, options, worker, search, re
 		return result;
 	}
 	return null;
+}
+
+function codeScanShouldYield(live) {
+	return live && (!live.isCurrent() || (live.shouldYield && live.shouldYield()));
 }
 
 function recognizeCodeScanCanvas(canvas, focus, options) {
@@ -1005,7 +1064,7 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		logCodeScanStep('Detected card and code regions', startedAt);
 		var result = await recognizeCodeScanImage(canvas, focus, options, worker, containers);
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-		if(result.data.scanMatch || (live && !live.isCurrent())) return result;
+		if(result.data.scanMatch || codeScanShouldYield(live)) return result;
 		if(search.findRemaining) {
 			// The card crop missed in OCR. Try other code boxes using the same edge scan.
 			logCodeScanStep('Searching for other code regions');
@@ -1017,12 +1076,12 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 			var fallback = await recognizeCodeScanImage(canvas, focus, options, worker, retry, remaining);
 			if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
 			if(fallback.data.scanMatch) return fallback;
-			if(live && !live.isCurrent()) return result;
+			if(codeScanShouldYield(live)) return result;
 			if(!result.data.codeBoxes.length && fallback.data.codeBoxes.length) result = fallback;
 		}
 		var corrected = await tryCodeScanPerspective(canvas, focus, options, worker, search, result);
 		if(epoch !== codeScanState.workerEpoch) throw codeScanCancelledError();
-		if(corrected || (live && !live.isCurrent())) return result;
+		if(corrected || codeScanShouldYield(live)) return result;
 		var angle = -getCodeScanLabelRoll(canvas);
 		if(!angle) return result;
 		logCodeScanStep('Straightening tilted label');
@@ -1031,6 +1090,7 @@ function recognizeCodeScanCanvas(canvas, focus, options) {
 		var tiltedOptions = Object.assign({}, options);
 		if(live) tiltedOptions.live = {
 			isCurrent: live.isCurrent,
+			shouldYield: live.shouldYield,
 			showBoxes: function(boxes) { if(boxes.length) live.showBoxes(boxes.map(transform.box)); }
 		};
 		var alignedResult = await recognizeCodeScanImage(aligned, focus && transform.point(focus), tiltedOptions, worker, detectCodeScanContainers(aligned));
@@ -1140,7 +1200,10 @@ async function recognizeCodeScanBoxes(canvas, result, worker, boxes, live, segme
 		var mode = useCardCrop ? 'card crop' : segmentation === '11' ? 'sparse code text' : 'code box';
 		logCodeScanStep('OCR read ' + mode, startedAt);
 		var match = extractMatchFromOcrResult({ data: { words: words, labelContainers: card ? [box, card] : [box] } });
-		if(!match || match.regions.container !== box) continue;
+		if(!match || match.regions.container !== box) {
+			if(codeScanShouldYield(live)) break;
+			continue;
+		}
 		data.scanMatch = match;
 		break;
 	}

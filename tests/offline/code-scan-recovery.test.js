@@ -519,6 +519,49 @@ test('pixel-read failures and invalid OCR responses reject and reset the worker'
 	}
 });
 
+test('live recovery skips extra OCR on a changed camera frame', async () => {
+	const source = { width: 600, height: 400 };
+	const boxes = [{ x0: 10, y0: 10, x1: 220, y1: 120 }, { x0: 250, y0: 10, x1: 460, y1: 120 }];
+	for(const changed of [true, false]) {
+		const c = scanner({ useRecognition: true });
+		c.codeScanOcrMatch = { findLabelCard: () => null };
+		c.extractMatchFromOcrResult = () => null;
+		let reads = 0;
+		c.ocrCodeScanBand = async () => { reads++; return []; };
+		await c.recognizeCodeScanBoxes(source, { data: { labelContainers: boxes } }, worker(), boxes, {
+			isCurrent: () => true,
+			shouldYield: () => changed
+		});
+		assert.equal(reads, changed ? 1 : 2);
+	}
+});
+
+test('scene sampling ignores unchanged video timestamps and small pixel changes', () => {
+	const c = scanner();
+	const video = { readyState: 2, currentTime: 1 };
+	const source = { width: 600, height: 400 };
+	let drawn, samples = 0, liveShade = 90;
+	c.getCodeScanVideoSourceRect = () => ({ sx: 0, sy: 0, sw: 600, sh: 400 });
+	c.document.createElement = () => ({ getContext: () => ({
+		drawImage: image => { drawn = image; },
+		getImageData: (_x, _y, width, height) => {
+			samples++;
+			return { data: new Uint8ClampedArray(width * height * 4).fill(drawn === video ? liveShade : 80) };
+		}
+	}) });
+	const changed = c.makeCodeScanSceneCheck(video, source);
+	assert.equal(changed(), false);
+	assert.equal(samples, 0);
+	video.currentTime++;
+	assert.equal(changed(), false);
+	assert.equal(samples, 2);
+	liveShade = 120;
+	assert.equal(changed(), false);
+	video.currentTime++;
+	assert.equal(changed(), true);
+	assert.equal(samples, 3);
+});
+
 test('a small-roll retry reads the straightened box and restores source coordinates', async () => {
 	const c = scanner();
 	const source = { width: 600, height: 400 };

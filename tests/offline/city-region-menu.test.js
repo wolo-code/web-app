@@ -247,3 +247,10 @@ test('city and region selector markup defines City and Region tabs and lighter g
 	const css = fs.readFileSync(path.join(__dirname, '../../Root/CSS/Component/Root/Base/Choose_City.css'), 'utf8');
 	assert.match(css, /\.city_region_search[\s\S]*?border-bottom:\s*1px\s+solid\s+#ccc;/);
 });
+
+test('city and region tabs have equal bottom padding to modal window edge', () => {
+	const css = fs.readFileSync(path.join(__dirname, '../../Root/CSS/Component/Root/Base/Choose_City.css'), 'utf8');
+	assert.doesNotMatch(css, /\.city_region_list\s*\{[^}]*margin-block-end/);
+	assert.match(css, /\.city_region_list:empty\s*\{\s*display:\s*none;\s*\}/);
+	assert.match(css, /#decode_region_history_message_list:not\(:empty\):has\(\+\s*\.city_region_list:not\(:empty\)\)/);
+});

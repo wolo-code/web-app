@@ -149,7 +149,7 @@ html.dark-mode .city_choice_heading {
 	margin-block-end: 8px;
 }
 
-#decode_region_history_message_list:not(:empty) {
+#decode_region_history_message_list:not(:empty):has(+ .city_region_list:not(:empty)) {
 	margin-block-end: 8px;
 }
 
@@ -278,7 +278,10 @@ html.dark-mode .city_region_search {
 .city_region_list {
 	display: grid;
 	gap: 8px;
-	margin-block-end: 12px;
+}
+
+.city_region_list:empty {
+	display: none;
 }
 
 .city_region_picker .choose_city_message_list {

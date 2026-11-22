@@ -1,4 +1,6 @@
 function showQR() {
+	if(typeof applyPoiPlaceLabelPrefill === 'function')
+		applyPoiPlaceLabelPrefill();
 	hideOverlay(document.getElementById('copy_wcode_message'));
 	if(current_title)
 		document.getElementById('qr_title_main').value = current_title;

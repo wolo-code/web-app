@@ -28,6 +28,7 @@ function extractFunction(source, name, stopMarker) {
 function loadFirebaseApi(options) {
 	const scripts = options && options.scripts ? options.scripts : {};
 	const appended = [];
+	const captured = [];
 	const sandbox = {
 		firebase: options && 'firebase' in options ? options.firebase : undefined,
 		database: null,
@@ -35,13 +36,21 @@ function loadFirebaseApi(options) {
 		geoFire: null,
 		FIREBASE_CONFIG: {},
 		Date,
-		Sentry: { captureException: function() {} },
+		Sentry: {
+			captureException: function(error) {
+				captured.push(error);
+			}
+		},
+		captured: captured,
+		reloads: 0,
+		listeners: [],
 		sessionStorage: {},
 		prompted: [],
 		notifications: [],
 		initLoadCalls: 0,
 		appended: appended,
 		document: {
+			visibilityState: 'visible',
 			querySelector: function(selector) {
 				if(selector.indexOf('firebase-app.js') !== -1)
 					return scripts.app || null;
@@ -56,11 +65,20 @@ function loadFirebaseApi(options) {
 				appendChild: function(node) {
 					appended.push(node);
 				}
+			},
+			addEventListener: function(type, handler) {
+				sandbox.listeners.push({ target: 'document', type: type, handler: handler });
 			}
 		},
 		window: {
-			addEventListener: function() {},
-			location: { reload: function() {} }
+			addEventListener: function(type, handler) {
+				sandbox.listeners.push({ target: 'window', type: type, handler: handler });
+			},
+			location: {
+				reload: function() {
+					sandbox.reloads += 1;
+				}
+			}
 		},
 		showErrorPrompt: function(error) {
 			sandbox.prompted.push(error);
@@ -249,4 +267,85 @@ test('service worker does not force Firebase SDK scripts onto the network', () =
 	assert.match(sw, /function isFirebaseSdkRequest/);
 	assert.match(sw, /if \(isFirebaseSdkRequest\(url\)\) \{\s*return;/);
 	assert.ok(!api.NETWORK_ONLY_HOSTS.includes('gstatic.com/firebasejs'));
+});
+
+function indexedDbClosingError() {
+	const error = new Error("Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.");
+	error.name = 'InvalidStateError';
+	return error;
+}
+
+test('a closing IndexedDB connection reloads once while the page is visible and is not sent to Sentry', () => {
+	const api = loadFirebaseApi();
+	const error = indexedDbClosingError();
+	api.firebaseResumeRecoveryInit();
+	assert.equal(api.isFirebaseIndexedDbClosingError(error), true);
+	assert.equal(api.recoverFirebaseIndexedDbConnection(error), true);
+	assert.equal(api.reloads, 1);
+	assert.equal(api.captured.length, 0);
+	assert.equal(api.recoverFirebaseIndexedDbConnection(error), true);
+	assert.equal(api.reloads, 1);
+	assert.doesNotMatch(read('Root/JS/Firebase.js'), /Sentry\.captureException/);
+	assert.match(read('Root/Framework/JS/Fragment/Sentry_exec.php'), /database connection is closing/);
+});
+
+test('a closing IndexedDB connection waits until the page is visible again', () => {
+	const api = loadFirebaseApi();
+	const error = indexedDbClosingError();
+	api.firebaseResumeRecoveryInit();
+	api.document.visibilityState = 'hidden';
+	api.recoverFirebaseIndexedDbConnection(error);
+	assert.equal(api.reloads, 0);
+	assert.equal(api.firebaseIndexedDbRecoveryPending, true);
+	const pagehide = api.listeners.find(listener => listener.type === 'pagehide');
+	pagehide.handler();
+	assert.equal(api.firebasePageUnloading, true);
+	api.document.visibilityState = 'visible';
+	const pageshow = api.listeners.find(listener => listener.type === 'pageshow');
+	pageshow.handler();
+	assert.equal(api.firebasePageUnloading, false);
+	assert.equal(api.reloads, 1);
+	assert.equal(api.captured.length, 0);
+});
+
+test('window.onerror recovers a closing IndexedDB connection without the crash dialog', () => {
+	const source = read('Root/JS/Base/Script.js');
+	const start = source.indexOf('function isIndexedDbUserDeletedError');
+	const sandbox = {
+		pendingExceptionLogs: [],
+		recovered: [],
+		reported: [],
+		document: { getElementById: function() { return null; } },
+		Sentry: {
+			captureException: function(error) {
+				sandbox.reported.push(error);
+			}
+		}
+	};
+	sandbox.recoverFirebaseIndexedDbConnection = function(error) {
+		sandbox.recovered.push(error);
+	};
+	sandbox.window = {
+		addEventListener: function(type, handler) {
+			if(type === 'unhandledrejection')
+				sandbox.rejectionHandler = handler;
+		}
+	};
+	vm.createContext(sandbox);
+	vm.runInContext(source.slice(start), sandbox);
+	const error = indexedDbClosingError();
+	assert.equal(sandbox.window.onerror('boom', '', 0, 0, error), true);
+	assert.equal(sandbox.recovered.length, 1);
+	assert.equal(sandbox.pendingExceptionLogs.length, 0);
+	assert.equal(sandbox.reported.length, 0);
+	let prevented = false;
+	sandbox.rejectionHandler({
+		reason: error,
+		preventDefault: function() {
+			prevented = true;
+		}
+	});
+	assert.equal(prevented, true);
+	assert.equal(sandbox.recovered.length, 2);
+	assert.equal(sandbox.reported.length, 0);
 });

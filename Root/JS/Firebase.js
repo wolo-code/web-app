@@ -91,7 +91,10 @@ function isFirebaseIndexedDbClosingError(error) {
 		else if(typeof error == 'string')
 			message = error;
 	}
-	return message.indexOf('database connection is closing') != -1 && (!error.name || error.name == 'InvalidStateError');
+	var closing = message.indexOf('database connection is closing') != -1
+		|| message.indexOf('database connection is closed') != -1;
+	return message.indexOf('Database deleted by request of the user') != -1
+		|| (closing && (!error || !error.name || error.name == 'InvalidStateError'));
 }
 
 function isFirebaseInstallationError(error) {
@@ -118,18 +121,64 @@ function isFirebaseUiMissingError(error) {
 	return message.indexOf('firebaseui') != -1 || message.indexOf('firebase ui') != -1;
 }
 
-function recoverFirebaseIndexedDbConnection(error) {
-	if(typeof Sentry != 'undefined')
-		Sentry.captureException(error);
-	if(typeof sessionStorage != 'undefined' && sessionStorage.firebase_indexeddb_recovery == 'reloading')
+var firebaseIndexedDbRecoveryPending = false;
+var firebasePageUnloading = false;
+var firebaseResumeRecoveryReady = false;
+var FIREBASE_INDEXEDDB_RECOVERY_COOLDOWN_MS = 30000;
+
+function isFirebasePageLeaving() {
+	if(firebasePageUnloading)
+		return true;
+	return typeof document != 'undefined' && document.visibilityState == 'hidden';
+}
+
+function reloadForIndexedDbRecovery() {
+	var now = Date.now();
+	var last = 0;
+	if(typeof sessionStorage != 'undefined' && sessionStorage.firebase_indexeddb_recovery_at)
+		last = Number(sessionStorage.firebase_indexeddb_recovery_at) || 0;
+	if(last && now - last < FIREBASE_INDEXEDDB_RECOVERY_COOLDOWN_MS)
 		return true;
 	if(typeof sessionStorage != 'undefined')
-		sessionStorage.firebase_indexeddb_recovery = 'reloading';
+		sessionStorage.firebase_indexeddb_recovery_at = String(now);
 	window.location.reload();
 	return true;
 }
 
+function recoverFirebaseIndexedDbConnection() {
+	if(isFirebasePageLeaving()) {
+		firebaseIndexedDbRecoveryPending = true;
+		return true;
+	}
+	firebaseIndexedDbRecoveryPending = false;
+	return reloadForIndexedDbRecovery();
+}
+
+function flushPendingIndexedDbRecovery() {
+	if(!firebaseIndexedDbRecoveryPending || isFirebasePageLeaving())
+		return;
+	recoverFirebaseIndexedDbConnection();
+}
+
 function firebaseResumeRecoveryInit() {
+	if(firebaseResumeRecoveryReady)
+		return;
+	firebaseResumeRecoveryReady = true;
+	window.addEventListener('pagehide', function() {
+		firebasePageUnloading = true;
+	}, true);
+	window.addEventListener('pageshow', function() {
+		firebasePageUnloading = false;
+		flushPendingIndexedDbRecovery();
+	}, true);
+	if(typeof document != 'undefined') {
+		document.addEventListener('visibilitychange', function() {
+			if(document.visibilityState == 'visible') {
+				firebasePageUnloading = false;
+				flushPendingIndexedDbRecovery();
+			}
+		});
+	}
 	window.addEventListener('error', function(event) {
 		if(isFirebaseUiMissingError(event.error || event.message)) {
 			event.preventDefault();
@@ -164,11 +213,6 @@ function firebaseResumeRecoveryInit() {
 			recoverFirebaseIndexedDbConnection(event.reason);
 		}
 	}, true);
-	if(typeof sessionStorage != 'undefined' && sessionStorage.firebase_indexeddb_recovery == 'reloading') {
-		setTimeout(function() {
-			delete sessionStorage.firebase_indexeddb_recovery;
-		}, 5000);
-	}
 }
 
 function firebaseInit() {

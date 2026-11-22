@@ -85,6 +85,9 @@ test('showErrorPrompt skips ignorable service worker aborts', () => {
 		}
 	};
 	vm.createContext(sandbox);
+	vm.runInContext(extractFunction(source, 'isIndexedDbUserDeletedError'), sandbox);
+	vm.runInContext(extractFunction(source, 'isIndexedDbClosingError'), sandbox);
+	vm.runInContext(extractFunction(source, 'recoverIndexedDbClosingError'), sandbox);
 	vm.runInContext(extractFunction(source, 'isIgnorableServiceWorkerError'), sandbox);
 	vm.runInContext(extractFunction(source, 'normalizeException'), sandbox);
 	vm.runInContext(extractFunction(source, 'reportExceptionPrompt'), sandbox);

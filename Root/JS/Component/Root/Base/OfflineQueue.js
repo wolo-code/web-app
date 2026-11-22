@@ -56,6 +56,10 @@ function updateOfflineQueueBadge() {
 			badge.textContent = '';
 			badge.classList.add('hide');
 		}
+	}).catch(function(error) {
+		if(typeof isRecoverableOfflineDbError == 'function' && isRecoverableOfflineDbError(error))
+			return;
+		return Promise.reject(error);
 	});
 }
 
@@ -93,6 +97,11 @@ function flushOfflineSaveQueue() {
 		}).finally(function() {
 			offlineQueueFlushing = false;
 		});
+	}).catch(function(error) {
+		offlineQueueFlushing = false;
+		if(typeof isRecoverableOfflineDbError == 'function' && isRecoverableOfflineDbError(error))
+			return;
+		return Promise.reject(error);
 	});
 }
 

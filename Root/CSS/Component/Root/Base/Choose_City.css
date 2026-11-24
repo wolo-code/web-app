@@ -228,6 +228,14 @@ html.dark-mode .decode_city_history_remove:hover {
 	flex: 0 1 auto;
 }
 
+:is(#decode_city_history_message, #choose_city_by_periphery_message) > .message_dialog_body {
+	padding-block-start: 8px;
+}
+
+:is(#decode_city_history_message, #choose_city_by_periphery_message) > .message_dialog_close {
+	z-index: 1;
+}
+
 .city_region_picker {
 	padding-inline: 6px;
 }

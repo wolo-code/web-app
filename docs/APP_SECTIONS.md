@@ -19,7 +19,7 @@ Hold a marker for half a second. Keep holding and drag to place the draft crossh
 
 The nearby, matching-name, and previous-city dialogs share the **City** and **Region** tabs in `CityRegionOptions.php`. The tabs use the centered pipe, fading underline, and keyboard controls of **Info Full View**. **Search cities** looks up registered cities and **Search regions or countries** filters the region registry by name and alias. The current reference is highlighted when available, and previous cities and regional references appear in their respective tabs. Both search fields use underline-only styling with a lighter shade of gray (`#ccc`). Switching tabs keeps the picker’s top, width, and shared controls fixed as its height adapts. Selecting a city or region in the previous-city dialog focuses the map to city or region scope with animated zoom without changing the point marker or Wolo Code, and reopening the dialog retains the respective tab and active item.
 
-In **Choose city or region**, selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
+The previous-city and nearby versions of **Choose city or region** open with the **City** and **Region** tabs at the top. Selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
 
 
 The Address Panel omits the Code reference selector and Propose a city button.

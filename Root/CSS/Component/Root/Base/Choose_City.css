@@ -233,14 +233,15 @@ html.dark-mode .decode_city_history_remove:hover {
 }
 
 :is(#decode_city_history_message, #choose_city_by_periphery_message) > .message_dialog_close {
+	right: 8px;
 	z-index: 1;
 }
 
 .city_region_anchor_icon {
 	position: absolute;
-	top: 8px;
-	/* The close glyph has about 4px more empty space inside its SVG. */
-	left: 24px;
+	/* Offset the SVG's internal padding to match the close glyph's visible insets. */
+	top: 11px;
+	left: 11.5px;
 	display: flex;
 	color: #69b7cf;
 	pointer-events: none;

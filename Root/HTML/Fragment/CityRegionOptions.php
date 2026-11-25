@@ -12,6 +12,7 @@ $cityRegionCityLists = [
 		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Region</span></button>
 	</div>
 	<div id='<?= $cityRegionMenuId ?>_city_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_city_tab'>
+		<div id='<?= $cityRegionMenuId ?>_current_city' class='choose_city_message_list city_region_current_city'></div>
 		<label class='city_region_search_field'>
 			<svg viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
 				<circle cx='10.5' cy='10.5' r='5.5'/>

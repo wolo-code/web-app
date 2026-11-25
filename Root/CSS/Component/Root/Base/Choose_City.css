@@ -334,10 +334,6 @@ html.dark-mode .city_region_search_field:focus-within {
 	padding-inline: 0;
 }
 
-.city_region_current_city:not(:empty) {
-	margin-block-end: 8px;
-}
-
 .city_region_option .wolo_region_index {
 	flex-shrink: 0;
 }

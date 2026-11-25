@@ -141,22 +141,6 @@ function useCityMenuSearchCity(city, mode) {
 	});
 }
 
-function getCityRegionCurrentReference(mode) {
-	var encoded = typeof code_city !== 'undefined' && code_city;
-	return mode === 'history' ? selected_decode_city || encoded : encoded || selected_decode_city;
-}
-
-function isCityRegionCurrentCity(current, city, id) {
-	return !!(current && city && (
-		(current.id && current.id === (id || city.id)) ||
-		(current.gp_id && current.gp_id === city.gp_id)
-	));
-}
-
-function renderCityRegionCurrentCity(container, city, select, key) {
-	renderCityChoices(container, city ? [{city: city, status: 'Current', select: select, key: key}] : []);
-}
-
 function renderCityRegionMenu(id, mode) {
 	var picker = document.getElementById(id + '_region_menu');
 	if(!picker) return;
@@ -165,7 +149,8 @@ function renderCityRegionMenu(id, mode) {
 	var cityPanel = document.getElementById(id + '_city_panel');
 	var regionPanel = document.getElementById(id + '_region_panel');
 	var decodeView = isDecodeView();
-	var current = getCityRegionCurrentReference(mode);
+	var current = mode === 'history' ? (selected_decode_city || (typeof code_city !== 'undefined' && code_city)) :
+		((typeof code_city !== 'undefined' && code_city) || selected_decode_city);
 	var currentRegion = isRegionAnchor(current) && regionAnchorFromId(current.id);
 	var point = mode === 'matching' || decodeView ? null : cityRegionMenuPosition();
 	var suggested = regionAnchorsForPosition(point);
@@ -216,28 +201,22 @@ function renderCityRegionMenu(id, mode) {
 		if(!history.some(function(entry) { return entry.id === choice.anchor.id; }))
 			addRegionButton(list, choice.region, choice.anchor);
 	});
-	var hasCityChoices = !!cityPanel.querySelector('.choose_city_message_list > *');
+	var hasCityChoices = !!cityPanel.querySelector('.choose_city_message_list').children.length;
 	selectTab(tabs.querySelector(currentRegion || (!hasCityChoices && mode === 'nearby') ? 'button:last-child' : 'button:first-child'));
 
 	bindCityRegionSearch(cityPanel, function(query, results, report, defer) {
 		lookupCityRegionCities(query, function(matches, error) {
 			report(function() {
-				var active = getCityRegionCurrentReference(mode);
-				var entries = Object.entries(matches || {});
-				var activeCity = active && !isRegionAnchor(active) && active;
-				var choices = entries.filter(function(entry) {
-					return !isCityRegionCurrentCity(activeCity, entry[1], entry[0]);
-				}).map(function(entry) {
+				var choices = Object.entries(matches || {}).map(function(entry) {
 					var city = Object.assign({}, entry[1], {id: entry[0]});
 					return {
 						city: city,
+						status: current && (current.id === city.id || current.gp_id && current.gp_id === city.gp_id) ? 'Current' : undefined,
 						select: function() { useCityMenuSearchCity(city, mode); }
 					};
 				});
 				renderCityChoices(results, choices);
-				if(error) return 'City search is unavailable. Try again.';
-				if(choices.length) return '';
-				return entries.length ? 'No other matching cities.' : 'No matching cities.';
+				return error ? 'City search is unavailable. Try again.' : choices.length ? '' : 'No matching cities.';
 			});
 		}, defer);
 	});

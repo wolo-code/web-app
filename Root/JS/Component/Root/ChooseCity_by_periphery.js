@@ -9,12 +9,18 @@ function showChooseCity_by_periphery_Message() {
 	showOverlay(document.getElementById('choose_city_by_periphery_message'));
 }
 
+function isChooseCityCurrentCodeCity(city) {
+	if(!city || typeof code_city == 'undefined' || !code_city) {
+		return false;
+	}
+	return city.id == code_city.id;
+}
+
 function showChooseCity_by_periphery_List() {
 	var container = document.getElementById('choose_city_by_periphery_message_list');
 	var choices = [];
 	var seen = new Set();
-	var current = getCityRegionCurrentReference('nearby');
-	var currentCity = current && !isRegionAnchor(current) && current;
+	var current = typeof code_city !== 'undefined' && code_city && !isRegionAnchor(code_city) && code_city;
 	if(typeof code_city !== 'undefined' && code_city) {
 		for(let key in chooseCity_by_periphery_gpid) {
 			var city = chooseCity_by_periphery_gpid[key].city;
@@ -32,10 +38,20 @@ function showChooseCity_by_periphery_List() {
 		if(city.gp_id)
 			seen.add(city.gp_id);
 	}
-	renderCityRegionCurrentCity(document.getElementById('nearby_current_city'), currentCity, hideChooseCity_by_periphery_Message);
-	renderCityChoices(container, choices.filter(function(choice) {
-		return !isCityRegionCurrentCity(currentCity, choice.city);
-	}));
+	if(current) {
+		var currentIndex = choices.findIndex(function(choice) {
+			return isChooseCityCurrentCodeCity(choice.city) ||
+				(current.gp_id && choice.city.gp_id === current.gp_id);
+		});
+		var currentChoice = {city: current, status: 'Current', select: hideChooseCity_by_periphery_Message};
+		if(currentIndex === -1)
+			choices.push(currentChoice);
+		else {
+			choices[currentIndex].status = 'Current';
+			choices[currentIndex].select = hideChooseCity_by_periphery_Message;
+		}
+	}
+	renderCityChoices(container, choices);
 }
 
 function hideChooseCity_by_periphery_Message() {
@@ -45,7 +61,6 @@ function hideChooseCity_by_periphery_Message() {
 
 function clearChooseCity_by_periphery_List() {
 	document.getElementById('choose_city_by_periphery_message_list').innerHTML = '';
-	document.getElementById('nearby_current_city').textContent = '';
 }
 
 function chooseCity_by_periphery(list, callback) {

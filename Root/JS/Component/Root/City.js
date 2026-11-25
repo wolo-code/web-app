@@ -238,22 +238,13 @@ function renderDecodeCityHistoryList() {
 	clearDecodeCityHistoryList();
 	container.classList.remove('hide');
 	var regionList = document.getElementById('decode_region_history_message_list');
-	var currentList = document.getElementById('history_current_city');
-	var current = getCityRegionCurrentReference('history');
-	var currentCity = current && !isRegionAnchor(current) && current;
 	for(var i = 0; i < decode_city_history.length; i++) {
 		var row = document.createElement('div');
 		row.className = 'decode_city_history_row';
 		var city = decode_city_history[i];
 		var displayName = getDecodeCityDisplayName(city);
 		var regional = typeof isRegionAnchor === 'function' && isRegionAnchor(city);
-		var isCurrentCity = !regional && currentCity && (
-			isCityRegionCurrentCity(currentCity, city) ||
-			getDecodeCityHistoryKey(city) === getDecodeCityHistoryKey(currentCity)
-		);
-		if(isCurrentCity && currentList.firstChild)
-			continue;
-		if(isCurrentCity || (regional && selected_decode_city && getDecodeCityHistoryKey(city) === getDecodeCityHistoryKey(selected_decode_city)))
+		if(selected_decode_city && getDecodeCityHistoryKey(city) === getDecodeCityHistoryKey(selected_decode_city))
 			row.setAttribute('aria-current', 'true');
 
 		var name = document.createElement('span');
@@ -290,26 +281,21 @@ function renderDecodeCityHistoryList() {
 		row.setAttribute('role', 'button');
 		row.tabIndex = 0;
 		row.addEventListener('keydown', function(e) {
-			if((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
+			if((e.key === 'Enter' || e.key === ' ') && e.target === row) {
 				e.preventDefault();
 				chooseDecodeCityFromHistory(e);
 			}
 		});
 		row.addEventListener('contextmenu', preventDecodeCityHistoryContextMenu);
 		addLongpressListener(row, chooseDecodeCityFromHistory, showDeleteDecodeCityOption);
-		(isCurrentCity ? currentList : regional && regionList ? regionList : container).appendChild(row);
+		(regional && regionList ? regionList : container).appendChild(row);
 	}
-	if(!currentList.firstChild)
-		renderCityRegionCurrentCity(currentList, currentCity, hideDecodeCityHistoryMessage);
 }
 
 function clearDecodeCityHistoryList() {
 	var container = document.getElementById('decode_city_history_message_list');
 	if(container)
 		container.innerHTML = '';
-	var current = document.getElementById('history_current_city');
-	if(current)
-		current.textContent = '';
 	var regions = document.getElementById('decode_region_history_message_list');
 	if(regions)
 		regions.innerHTML = '';

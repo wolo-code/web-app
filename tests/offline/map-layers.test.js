@@ -12,65 +12,92 @@ function read(filePath) {
 	return fs.readFileSync(path.join(repoRoot, filePath), 'utf8');
 }
 
-test('OSM high zoom falls back when tiles are missing', () => {
+test('OSM high zoom is capped at the native tile limit', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const focusJs = read('Root/JS/Component/Root/Focus.js');
 	assert.match(mapLayers, /OSM_NATIVE_MAX_ZOOM = 19/);
-	assert.match(mapLayers, /OSM_MAP_DATA_UNAVAILABLE_MESSAGE = 'Map data not yet available'/);
-	assert.match(mapLayers, /function getOsmFallbackZoom/);
-	assert.match(mapLayers, /function scheduleOsmZoomFallback/);
-	assert.match(mapLayers, /function watchOsmZoomFallback/);
-	assert.match(mapLayers, /bindOsmTileNode/);
-	assert.match(mapLayers, /zoom > OSM_NATIVE_MAX_ZOOM/);
 	assert.match(focusJs, /getActiveMapTypeMaxZoom/);
 	assert.match(focusJs, /OSM_NATIVE_MAX_ZOOM/);
-	assert.doesNotMatch(focusJs, /notifyOsmMapDataUnavailable/);
-	assert.match(mapLayers, /if\(tilesMissing\)\s*notifyOsmMapDataUnavailable/);
 });
 
-test('OSM retries missing tiles through consecutive zoom transitions and ignores old tiles', () => {
+function loadRasterTileFallback(layer, minZoom = 1) {
 	let zoom = 19;
 	let timerId = 0;
 	const timers = new Map();
+	const listeners = {};
+	const mapTypes = new Map();
+	const notices = [];
 	const context = {
-		map: { getZoom: () => zoom, setZoom: value => { zoom = value; } },
-		document: { body: { classList: { contains: name => name === 'osm' } } },
+		map: {
+			getZoom: () => zoom,
+			setZoom(value) { zoom = value; listeners.zoom_changed(); },
+			addListener(event, listener) { listeners[event] = listener; },
+			mapTypes
+		},
+		google: { maps: {
+			Size: function() {},
+			ImageMapType: function() { this.getTile = () => {}; }
+		} },
+		document: { body: { classList: { contains: name => name === layer } } },
 		navigator: { onLine: true },
+		getMinZoomToFillMapHeight: () => minZoom,
+		showNotification: message => notices.push(message),
 		setTimeout: fn => { timers.set(++timerId, fn); return timerId; },
 		clearTimeout: id => timers.delete(id)
 	};
 	vm.runInNewContext(read('Root/JS/Component/Root/MapLayers.js'), context);
+	context.initOsmMapType();
 	function runNextTimer() {
+		if(!timers.size) return;
 		const [id, fn] = timers.entries().next().value;
 		timers.delete(id);
 		fn();
 	}
-	function failTiles() {
-		for(let i = 0; i < 3; i++) context.onOsmTileError(zoom);
+	function tile(tileZoom = zoom, tileLayer = layer) {
+		const ownerDocument = {
+			createElement: tag => ({ tagName: tag.toUpperCase(), style: {}, addEventListener() {} })
+		};
+		return mapTypes.get(tileLayer).getTile({ x: 1, y: 1 }, tileZoom, ownerDocument);
 	}
-	failTiles();
-	runNextTimer();
-	assert.equal(zoom, 18);
-	failTiles();
-	// Fire the fallback before the previous transition's cooldown ends.
-	const pending = context.osmZoomFallbackTimer;
-	const retry = timers.get(pending);
-	timers.delete(pending);
-	retry();
-	assert.equal(zoom, 18);
-	runNextTimer();
-	runNextTimer();
-	assert.equal(zoom, 17);
-	context.onOsmTileError(19);
-	context.onOsmTileLoad(19);
-	assert.equal(context.osmTileErrorStreak, 0);
-	assert.equal(context.osmTileOkStreak, 0);
-	runNextTimer();
-	assert.equal(timers.size, 0);
-	failTiles();
-	zoom = 12; // A new navigation invalidates the pending fallback.
-	runNextTimer();
-	assert.equal(zoom, 12);
+	return { map: context.map, notices, runNextTimer, tile };
+}
+
+for(const layer of ['osm', 'esri']) {
+	test(`${layer} retries missing tiles through consecutive zoom levels and ignores stale tiles`, () => {
+		const api = loadRasterTileFallback(layer);
+		const oldTile = api.tile();
+		if(layer === 'esri') assert.equal(new URL(oldTile.src).searchParams.get('blankTile'), 'false');
+		for(let i = 0; i < 3; i++) api.tile().onerror();
+		api.runNextTimer();
+		assert.equal(api.map.getZoom(), 18);
+		for(let i = 0; i < 3; i++) api.tile().onerror();
+		api.runNextTimer();
+		assert.equal(api.map.getZoom(), 17);
+		for(let i = 0; i < 3; i++) {
+			oldTile.onerror();
+			api.tile(17, layer === 'esri' ? 'osm' : 'esri').onerror();
+		}
+		api.runNextTimer();
+		assert.equal(api.map.getZoom(), 17);
+		assert.deepEqual(api.notices, ['Map data not yet available']);
+		for(let i = 0; i < 3; i++) api.tile().onerror();
+		api.map.setZoom(12);
+		api.runNextTimer();
+		assert.equal(api.map.getZoom(), 12);
+	});
+}
+
+test('Esri skips fallback when tiles recover or the camera reaches its zoom floor', () => {
+	const api = loadRasterTileFallback('esri', 18);
+	for(let i = 0; i < 3; i++) api.tile().onerror();
+	for(let i = 0; i < 3; i++) api.tile().onload();
+	api.runNextTimer();
+	assert.equal(api.map.getZoom(), 19);
+	api.map.setZoom(18);
+	for(let i = 0; i < 3; i++) api.tile().onerror();
+	api.runNextTimer();
+	assert.equal(api.map.getZoom(), 18);
+	assert.deepEqual(api.notices, []);
 });
 
 test('entering OSM clamps a deeper zoom before changing the map type', () => {
@@ -89,7 +116,7 @@ test('entering OSM clamps a deeper zoom before changing the map type', () => {
 		showNotification: message => calls.push(['notification', message])
 	};
 	vm.runInNewContext(read('Root/JS/Component/Root/MapLayers.js'), context);
-	context.watchOsmZoomFallback();
+	context.watchRasterZoomFallback();
 	context.setGoogleMapTypeId('osm');
 	assert.deepEqual(calls, [['maxZoom', 19], ['zoom', 19], ['type', 'osm']]);
 	zoom = 20;
@@ -113,26 +140,6 @@ test('OSM and raster tiles do not steal map click or drag', () => {
 	assert.match(clickHandler, /isIgnorableMapClick/);
 	assert.match(rootCss, /right:\s*88px\s*!important/);
 	assert.doesNotMatch(rootCss, /gmp-internal-camera-control \{[\s\S]*transform:\s*translate/);
-});
-
-function loadOsmZoomFallbackApi() {
-	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
-	const start = mapLayers.indexOf('function getOsmFallbackZoom(');
-	const end = mapLayers.indexOf('function getActiveMapTypeMaxZoom(');
-	const sandbox = {
-		OSM_ZOOM_FALLBACK_MIN: 1
-	};
-	vm.createContext(sandbox);
-	vm.runInContext(mapLayers.slice(start, end), sandbox);
-	return sandbox;
-}
-
-test('getOsmFallbackZoom steps back to native max or previous zoom', () => {
-	const api = loadOsmZoomFallbackApi();
-	assert.equal(api.getOsmFallbackZoom(24, 19, false), 19);
-	assert.equal(api.getOsmFallbackZoom(19, 19, false), 19);
-	assert.equal(api.getOsmFallbackZoom(19, 19, true), 18);
-	assert.equal(api.getOsmFallbackZoom(1, 19, true), 1);
 });
 
 test('ensureMapViewForLocation leaves decode view for map layers', () => {

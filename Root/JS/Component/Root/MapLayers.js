@@ -38,20 +38,18 @@ var mapSourcePrefs = {
 };
 var OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 var OSM_NATIVE_MAX_ZOOM = 19;
-var OSM_ZOOM_FALLBACK_MIN = 1;
-var OSM_TILE_ERROR_FALLBACK_COUNT = 3;
-var OSM_MAP_DATA_UNAVAILABLE_MESSAGE = 'Map data not yet available';
+var RASTER_TILE_ERROR_FALLBACK_COUNT = 3;
+var RASTER_MAP_DATA_UNAVAILABLE_MESSAGE = 'Map data not yet available';
 var MAPKIT_SCRIPT_URL = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
 var TRANSPARENT_TILE_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-var ESRI_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
+// Ask Esri to return 404 for missing coverage so the image error handler can detect it.
+var ESRI_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}?blankTile=false';
 var MICROSOFT_TILE_URL = 'https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{q}?mkt=en-US&it=G,L&shading=hill&n=z';
 var rasterMapTypesInitialized = false;
-var osmZoomFallbackInitialized = false;
-var osmZoomFallbackTimer = 0;
-var osmZoomFallbackNotifiedAt = 0;
-var osmTileErrorStreak = 0;
-var osmTileOkStreak = 0;
-var osmFallbackApplying = false;
+var rasterZoomFallbackTimer = 0;
+var rasterZoomFallbackNotifiedAt = 0;
+var rasterTileErrorStreak = 0;
+var rasterTileOkStreak = 0;
 var appleMap = null;
 var appleMapkitReady = false;
 var appleMapkitLoading = false;
@@ -101,21 +99,6 @@ function isOsmMapLayerActive() {
 	return getCurrentMapLayer() === MAP_LAYER_OSM;
 }
 
-function getOsmFallbackZoom(currentZoom, nativeMaxZoom, tilesMissing) {
-	var zoom = Number(currentZoom);
-	var nativeMax = Number(nativeMaxZoom);
-	if(!(zoom >= 0) || !(nativeMax >= 0)) {
-		return currentZoom;
-	}
-	if(zoom > nativeMax) {
-		return nativeMax;
-	}
-	if(tilesMissing && zoom > OSM_ZOOM_FALLBACK_MIN) {
-		return zoom - 1;
-	}
-	return zoom;
-}
-
 function getActiveMapTypeMaxZoom() {
 	var mapType;
 	if(typeof map !== 'object' || !map || typeof map.getMapTypeId !== 'function') {
@@ -128,83 +111,67 @@ function getActiveMapTypeMaxZoom() {
 	return typeof DEFAULT_LOCATE_ZOOM === 'number' ? DEFAULT_LOCATE_ZOOM : OSM_NATIVE_MAX_ZOOM;
 }
 
-function notifyOsmMapDataUnavailable() {
+function notifyRasterMapDataUnavailable() {
 	var now = Date.now();
-	if(now - osmZoomFallbackNotifiedAt < 2500) {
+	if(now - rasterZoomFallbackNotifiedAt < 2500) {
 		return;
 	}
-	osmZoomFallbackNotifiedAt = now;
-	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
-		if(typeof notifyOfflineMapTilesMissing === 'function') {
-			notifyOfflineMapTilesMissing();
-		}
-		return;
-	}
+	rasterZoomFallbackNotifiedAt = now;
 	if(typeof showNotification === 'function') {
-		showNotification(OSM_MAP_DATA_UNAVAILABLE_MESSAGE);
+		showNotification(RASTER_MAP_DATA_UNAVAILABLE_MESSAGE);
 	}
 }
 
-function applyOsmFallbackZoom(tilesMissing) {
-	var current;
-	var next;
-	if(typeof map !== 'object' || !map || !isOsmMapLayerActive() || osmFallbackApplying) {
-		return;
+function resetRasterZoomFallback() {
+	if(rasterZoomFallbackTimer) {
+		clearTimeout(rasterZoomFallbackTimer);
+		rasterZoomFallbackTimer = 0;
 	}
-	current = map.getZoom();
-	next = getOsmFallbackZoom(current, OSM_NATIVE_MAX_ZOOM, tilesMissing);
-	if(next === current) {
-		return;
-	}
-	osmFallbackApplying = true;
-	osmTileErrorStreak = 0;
-	map.setZoom(next);
-	if(tilesMissing)
-		notifyOsmMapDataUnavailable();
-	setTimeout(function() {
-		osmFallbackApplying = false;
-	}, 350);
+	rasterTileErrorStreak = 0;
+	rasterTileOkStreak = 0;
 }
 
-function scheduleOsmZoomFallback(tilesMissing) {
-	var requestedZoom = map.getZoom();
-	if(osmZoomFallbackTimer) {
-		clearTimeout(osmZoomFallbackTimer);
+function isCurrentRasterTile(layer, zoom) {
+	return layer === getCurrentMapLayer() && zoom === map.getZoom();
+}
+
+function scheduleRasterZoomFallback(layer, zoom) {
+	if(rasterZoomFallbackTimer) {
+		return;
 	}
-	osmZoomFallbackTimer = setTimeout(function() {
-		osmZoomFallbackTimer = 0;
-		if(!isOsmMapLayerActive() || map.getZoom() !== requestedZoom) {
+	rasterZoomFallbackTimer = setTimeout(function() {
+		rasterZoomFallbackTimer = 0;
+		if(!isCurrentRasterTile(layer, zoom) || navigator.onLine === false ||
+			rasterTileErrorStreak < RASTER_TILE_ERROR_FALLBACK_COUNT) {
 			return;
 		}
-		if(osmFallbackApplying) {
-			scheduleOsmZoomFallback(tilesMissing);
-			return;
+		var minZoom = typeof getMinZoomToFillMapHeight === 'function' ? getMinZoomToFillMapHeight() : 1;
+		var nextZoom = Math.max(1, minZoom, zoom - 1);
+		if(nextZoom < zoom) {
+			map.setZoom(nextZoom);
+			notifyRasterMapDataUnavailable();
 		}
-		applyOsmFallbackZoom(tilesMissing);
 	}, 80);
 }
 
-function onOsmTileLoad(zoom) {
-	if(!isOsmMapLayerActive() || zoom !== map.getZoom()) {
+function onRasterTileLoad(layer, zoom) {
+	if(!isCurrentRasterTile(layer, zoom)) {
 		return;
 	}
-	osmTileOkStreak++;
-	if(osmTileOkStreak > 2) {
-		osmTileErrorStreak = 0;
+	rasterTileOkStreak++;
+	if(rasterTileOkStreak >= RASTER_TILE_ERROR_FALLBACK_COUNT) {
+		rasterTileErrorStreak = 0;
 	}
 }
 
-function onOsmTileError(zoom) {
-	if(!isOsmMapLayerActive() || zoom > OSM_NATIVE_MAX_ZOOM || zoom !== map.getZoom()) {
+function onRasterTileError(layer, zoom) {
+	if(!isCurrentRasterTile(layer, zoom) || navigator.onLine === false) {
 		return;
 	}
-	if(typeof navigator !== 'undefined' && navigator.onLine === false) {
-		return;
-	}
-	osmTileErrorStreak++;
-	osmTileOkStreak = 0;
-	if(osmTileErrorStreak >= OSM_TILE_ERROR_FALLBACK_COUNT) {
-		scheduleOsmZoomFallback(true);
+	rasterTileErrorStreak++;
+	rasterTileOkStreak = 0;
+	if(rasterTileErrorStreak >= RASTER_TILE_ERROR_FALLBACK_COUNT) {
+		scheduleRasterZoomFallback(layer, zoom);
 	}
 }
 
@@ -239,46 +206,12 @@ function disableRasterTileGestures(node) {
 	}
 }
 
-function bindOsmTileNode(node, zoom) {
-	var imgs;
-	var i;
-	if(!node) {
-		return;
-	}
-	if(node.tagName === 'IMG') {
-		imgs = [node];
-	}
-	else if(node.querySelectorAll) {
-		imgs = node.querySelectorAll('img');
-	}
-	else {
-		return;
-	}
-	for(i = 0; i < imgs.length; i++) {
-		if(imgs[i].__woloOsmBound) {
-			continue;
-		}
-		imgs[i].__woloOsmBound = true;
-		imgs[i].addEventListener('load', function() {
-			onOsmTileLoad(zoom);
-		});
-		imgs[i].addEventListener('error', function() {
-			onOsmTileError(zoom);
-		});
-	}
-}
-
-function watchOsmZoomFallback() {
-	if(osmZoomFallbackInitialized || typeof map !== 'object' || !map) {
-		return;
-	}
-	osmZoomFallbackInitialized = true;
+function watchRasterZoomFallback() {
 	map.addListener('zoom_changed', function() {
-		if(!isOsmMapLayerActive()) {
-			return;
+		resetRasterZoomFallback();
+		if(isOsmMapLayerActive()) {
+			clampOsmCameraZoom();
 		}
-		osmTileErrorStreak = 0;
-		clampOsmCameraZoom();
 	});
 	map.addListener('idle', function() {
 		if(isOsmMapLayerActive()) {
@@ -611,11 +544,40 @@ function activateAppleMapLayer() {
 }
 
 function setRasterMapType(id, name, template, maxZoom) {
+	if(id === MAP_LAYER_OSM || id === MAP_LAYER_ESRI) {
+		// Own these image nodes so tile failures are observable before Google removes failed tiles.
+		map.mapTypes.set(id, {
+			tileSize: new google.maps.Size(256, 256),
+			name: name,
+			alt: name,
+			maxZoom: maxZoom,
+			getTile: function(coord, zoom, ownerDocument) {
+				var url = zoom <= maxZoom ? rasterTileUrl(template, coord, zoom) : null;
+				if(!url) {
+					return ownerDocument.createElement('div');
+				}
+				var tile = ownerDocument.createElement('img');
+				tile.alt = '';
+				tile.width = 256;
+				tile.height = 256;
+				disableRasterTileGestures(tile);
+				tile.onload = function() { onRasterTileLoad(id, zoom); };
+				tile.onerror = function() {
+					tile.style.visibility = 'hidden';
+					onRasterTileError(id, zoom);
+				};
+				tile.src = url;
+				return tile;
+			},
+			releaseTile: function(tile) {
+				tile.onload = null;
+				tile.onerror = null;
+			}
+		});
+		return;
+	}
 	var mapType = new google.maps.ImageMapType({
 		getTileUrl: function(coord, zoom) {
-			if(id === MAP_LAYER_OSM && zoom > OSM_NATIVE_MAX_ZOOM) {
-				return null;
-			}
 			return rasterTileUrl(template, coord, zoom);
 		},
 		tileSize: new google.maps.Size(256, 256),
@@ -627,9 +589,6 @@ function setRasterMapType(id, name, template, maxZoom) {
 	mapType.getTile = function(coord, zoom, ownerDocument) {
 		var tile = originalGetTile(coord, zoom, ownerDocument);
 		disableRasterTileGestures(tile);
-		if(id === MAP_LAYER_OSM) {
-			bindOsmTileNode(tile, zoom);
-		}
 		return tile;
 	};
 	map.mapTypes.set(id, mapType);
@@ -650,7 +609,7 @@ function initOsmMapType() {
 	setRasterMapType(MAP_LAYER_ESRI, 'Esri', ESRI_TILE_URL, 19);
 	setRasterMapType(MAP_LAYER_MICROSOFT, 'Microsoft Maps', MICROSOFT_TILE_URL, 19);
 	rasterMapTypesInitialized = true;
-	watchOsmZoomFallback();
+	watchRasterZoomFallback();
 }
 
 function getCurrentMapLayer() {
@@ -767,6 +726,7 @@ function setGoogleMapTypeId(typeId) {
 	if(!isGoogleMapReady()) {
 		return false;
 	}
+	resetRasterZoomFallback();
 	// Set the camera limit before the new layer can request tiles.
 	map.setOptions({maxZoom: typeId === MAP_LAYER_OSM ? OSM_NATIVE_MAX_ZOOM : null});
 	if(typeId === MAP_LAYER_OSM) {
@@ -796,9 +756,7 @@ function setMapLayer(layer) {
 	}
 	else if(layer === MAP_LAYER_OSM) {
 		document.body.classList.add('osm');
-		if(setGoogleMapTypeId(MAP_LAYER_OSM)) {
-			watchOsmZoomFallback();
-		}
+		setGoogleMapTypeId(MAP_LAYER_OSM);
 	}
 	else if(layer === MAP_LAYER_APPLE) {
 		document.body.classList.add('apple');

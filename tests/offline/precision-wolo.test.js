@@ -8,7 +8,7 @@ const test = require('node:test');
 const root = path.join(__dirname, '../../Root');
 const input = '28.2101130, 83.9901909';
 const short = 'Nepal 45 judge task tsunami';
-const full = short + '.angle axle dinosaur';
+const full = short + ' . angle axle dinosaur';
 
 function runtime() {
 	const api = vm.createContext({
@@ -42,7 +42,7 @@ test('decimal entry, text decode and shared link recover the paper example', () 
 	api.execDecode(input);
 	assert.equal(api.getCodeFull_text(), full);
 	assert.equal(api.getWcodeFull_formatted().join(' '), '\\ ' + full + ' /');
-	assert.equal(api.card, 'judge task tsunami.angle axle dinosaur');
+	assert.equal(api.card, 'judge task tsunami . angle axle dinosaur');
 	assert.equal(api.getWoloMapLinkPath(), '/nepal-45.judge.task.tsunami?precision=angle.axle.dinosaur');
 	assert.deepEqual(Array.from(api.code_postition.precisionDecimals), input.split(', '));
 

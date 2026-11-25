@@ -28,12 +28,12 @@ function parseWoloDecimalPosition(text) {
 }
 
 function splitPrecisionWoloText(text) {
-	const parts = /^(.+?\s+[a-z]+\s+[a-z]+)\.([a-z]+(?:\s+[a-z]+)*)$/i.exec(text);
+	const parts = /^(.+?\s+[a-z]+\s+[a-z]+)\s*\.\s*([a-z]+(?:\s+[a-z]+)*)$/i.exec(text);
 	return parts ? {base: parts[1], words: parts[2].toLowerCase().split(/\s+/)} : null;
 }
 
 function precisionWoloText(baseWords, precisionWords) {
-	return baseWords.join(' ') + (precisionWords && precisionWords.length ? '.' + precisionWords.join(' ') : '');
+	return baseWords.join(' ') + (precisionWords && precisionWords.length ? ' . ' + precisionWords.join(' ') : '');
 }
 
 function woloPrecisionField(places) {

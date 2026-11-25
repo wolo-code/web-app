@@ -69,12 +69,13 @@
 
 #accuracy_container #proceed_container.hide {
 	display: inline-flex !important;
+	opacity: 1;
 	pointer-events: none;
 	visibility: hidden;
 }
 
 #accuracy_container.highlight #proceed_container.hide #proceed_label {
-	opacity: 0.12;
+	opacity: 0.18;
 	visibility: visible;
 }
 

@@ -271,6 +271,7 @@ function setupControls() {
 	bindControl('qr_address_line_2', 'input', onQRAddressInput);
 	bindControl('qr_address_split_toggle', 'click', toggleQRAddressSplit);
 	bindControl('decode_input', 'input', resizeInput);
+	addLongpressListener(document.getElementById('decode_input_button'), decode_input_from_form_external, decode_input_from_form_hold);
 	if(typeof syncProceedButtons == 'function') {
 		syncProceedButtons();
 	}

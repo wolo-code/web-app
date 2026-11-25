@@ -688,9 +688,12 @@ body.map-source-single #action_menu_map {
 	padding: 5px 10px;
 }
 
-#decode_input_city:hover,
+#decode_input_city:hover {
+	text-shadow: 0 0 6px rgb(105 183 207 / 65%);
+}
+
 #decode_input_city:focus-visible {
-	text-decoration: underline;
+	outline: 2px solid currentColor;
 }
 
 #decode_map_view_button {

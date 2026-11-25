@@ -228,7 +228,7 @@ html.dark-mode .decode_city_history_remove:hover {
 	scrollbar-width: thin;
 	flex: 0 1 auto;
 	padding-inline: 14px;
-	padding-block-end: 6px;
+	padding-block-end: 0;
 }
 
 :is(#decode_city_history_message, #choose_city_by_periphery_message) > .message_dialog_body {
@@ -259,9 +259,12 @@ html.dark-mode .decode_city_history_remove:hover {
 }
 
 .city_region_reference_info {
+	--reference-info-inset: 8px;
 	position: relative;
 	align-self: flex-end;
-	margin: 0 8px 4px;
+	margin-inline-end: var(--reference-info-inset);
+	margin-block-end: var(--reference-info-inset);
+	padding-block-start: 8px;
 	color: #35657a;
 }
 
@@ -278,35 +281,63 @@ html.dark-mode .decode_city_history_remove:hover {
 	cursor: help;
 }
 
+.city_region_reference_info:hover > button,
+.city_region_reference_info > button:focus-visible {
+	background: rgb(105 183 207 / 16%);
+}
+
 .city_region_reference_info > button:focus-visible {
 	outline: 2px solid #69b7cf;
 	outline-offset: 1px;
 }
 
 .city_region_reference_hint {
+	--hint-surface: #fff;
+	--hint-border: #d3dfe3;
+	--hint-secondary: #465863;
 	position: absolute;
 	inset-block-end: 100%;
 	inset-inline-end: 0;
 	z-index: 1;
 	visibility: hidden;
 	box-sizing: border-box;
-	width: min(260px, calc(100vw - 56px));
-	padding: 10px 12px;
-	border: 1px solid #d3dfe3;
-	border-radius: 8px;
-	background: #fff;
-	box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
-	color: #333;
-	font-size: .875rem;
-	line-height: 1.35;
+	width: min(286px, calc(100vw - 56px));
+	padding: 12px 14px;
+	border: 1px solid var(--hint-border);
+	border-radius: 10px;
+	background: var(--hint-surface);
+	box-shadow: 0 6px 20px rgb(0 0 0 / 16%);
+	color: #253640;
+	font: .8125rem/1.5 system-ui, sans-serif;
+}
+
+.city_region_reference_hint::after {
+	content: '';
+	position: absolute;
+	inset-block-end: -5px;
+	inset-inline-end: 9px;
+	box-sizing: border-box;
+	width: 9px;
+	height: 9px;
+	border-right: 1px solid var(--hint-border);
+	border-bottom: 1px solid var(--hint-border);
+	background: var(--hint-surface);
+	transform: rotate(45deg);
 }
 
 .city_region_reference_hint > p {
 	margin: 0;
 }
 
+.city_region_reference_hint > p:first-child {
+	font-weight: 600;
+}
+
 .city_region_reference_hint > p + p {
-	margin-block-start: 6px;
+	margin-block-start: 8px;
+	padding-block-start: 8px;
+	border-block-start: 1px solid var(--hint-border);
+	color: var(--hint-secondary);
 }
 
 .city_region_reference_info:hover > .city_region_reference_hint,
@@ -319,9 +350,10 @@ html.dark-mode .city_region_reference_info {
 }
 
 html.dark-mode .city_region_reference_hint {
-	border-color: #44445e;
-	background: #2a2a4a;
-	color: #eee;
+	--hint-surface: #26263c;
+	--hint-border: #494965;
+	--hint-secondary: #c8c8d8;
+	color: #f2f2f8;
 }
 
 #decode_city_history_message:has(#decode_city_history_delete:not(.hide)) > .city_region_reference_info {

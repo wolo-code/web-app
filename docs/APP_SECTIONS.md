@@ -23,7 +23,7 @@ The previous-city and nearby versions of **Choose city or region** open with the
 
 The **City** and **Region** tabs, search fields, and result lists stay centered in **Choose city or region** with equal side space as the scrollbar appears or disappears.
 
-Hover over or keyboard-focus the **Code Reference Info Icon** (`.city_region_reference_info > button`) at the bottom right of the nearby, matching-name, and previous-city pickers to reveal the **Code Reference Hint** (`.city_region_reference_hint`). The first paragraph ends with a full stop and explains that different references can give the same location different Wolo Codes. The final paragraph explains that geographic reference names imply no position on political boundaries or sovereignty and omits the closing full stop.
+Hover over or keyboard-focus the **Code Reference Info Icon** (`.city_region_reference_info > button`) at the bottom right of the nearby, matching-name, and previous-city pickers to reveal the **Code Reference Hint** (`.city_region_reference_hint`). The icon has equal bottom and side insets. The hint opens above it with a pointer and a divider. The first paragraph ends with a full stop and explains that different references can give the same location different Wolo Codes. The final paragraph explains that geographic reference names imply no position on political boundaries or sovereignty and omits the closing full stop.
 
 
 The Address Panel omits the Code reference selector and Propose a city button.

@@ -73,6 +73,11 @@
 	visibility: hidden;
 }
 
+#accuracy_container.highlight #proceed_container.hide #proceed_label {
+	opacity: 0.12;
+	visibility: visible;
+}
+
 #accuracy_container.awaiting-fix #accuracy_meter_unit {
 	visibility: hidden;
 }

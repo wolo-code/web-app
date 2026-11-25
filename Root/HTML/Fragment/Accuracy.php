@@ -8,7 +8,7 @@
 				<span id='proceed_button' class='control'>
 					<span id='proceed_label_length'><img alt='Proceed' class='proceed_label_icon' src="<?php getSVG('', 'ff'); ?>" ></span>
 					<span id='proceed_progress'></span>
-					<span id='proceed_label'><img alt='Proceed' class='proceed_label_icon' src="<?php getSVG('', 'ff'); ?>" ></span>
+					<span id='proceed_label' aria-hidden='true'><img alt='Proceed' class='proceed_label_icon' src="<?php getSVG('', 'ff'); ?>" ></span>
 				</span>
 			</span>
 		</span>

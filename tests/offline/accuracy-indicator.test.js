@@ -22,12 +22,14 @@ test('accuracy strip keeps a fixed layout and flattened proceed control', () => 
 	assert.doesNotMatch(css, /#accuracy_container\.highlight > div \{[^}]*padding-right/);
 	assert.match(css, /#accuracy_meter \{[\s\S]*width:\s*3ch/);
 	assert.match(css, /#accuracy_meter_unit \{[\s\S]*padding-left:\s*0\.25em/);
-	assert.match(css, /#accuracy_container #proceed_container\.hide \{[\s\S]*visibility:\s*hidden/);
+	assert.match(css, /#accuracy_container #proceed_container\.hide \{[^}]*pointer-events:\s*none;[^}]*visibility:\s*hidden/);
 	assert.match(css, /#accuracy_container #proceed_container\.hide \{[\s\S]*display:\s*inline-flex\s*!important/);
+	assert.match(css, /#accuracy_container\.highlight #proceed_container\.hide #proceed_label \{[^}]*opacity:\s*0\.12;[^}]*visibility:\s*visible/);
 	assert.match(css, /#proceed_button \{[\s\S]*box-shadow:\s*none/);
 	assert.match(css, /#proceed_button \{[\s\S]*background:\s*transparent/);
 	assert.match(css, /#proceed_button \{[\s\S]*height:\s*100%/);
 	assert.match(css, /#proceed_label \{[\s\S]*top:\s*0/);
+	assert.match(html, /id='proceed_label' aria-hidden='true'/);
 	assert.match(html, /class='proceed_label_icon'/);
 	assert.doesNotMatch(html, /id='proceed_label_icon'/);
 });

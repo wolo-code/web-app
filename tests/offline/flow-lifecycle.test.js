@@ -34,7 +34,18 @@ function locateApi() {
 	const watches = [];
 	const nodes = new Map();
 	const node = id => {
-		if (!nodes.has(id)) nodes.set(id, { classList: { add() {}, remove() {} }, style: {} });
+		if (!nodes.has(id)) {
+			const classes = new Set();
+			nodes.set(id, {
+				classList: {
+					add: name => classes.add(name),
+					remove: name => classes.delete(name),
+					contains: name => classes.has(name)
+				},
+				style: {},
+				setAttribute() {}
+			});
+		}
 		return nodes.get(id);
 	};
 	const api = {
@@ -54,6 +65,40 @@ function locateApi() {
 	vm.runInContext(read('JS/Base/Locate.js'), api);
 	return { api, watches };
 }
+
+test('location placeholders clear at the first fix and restart on a new watch', () => {
+	const { api, watches } = locateApi();
+	api.locate_button_pressed = false;
+	api.map = {};
+	api.percantageToColor = () => '#777';
+	api.accuCircle = {
+		getMap: () => api.map,
+		setMap() {}, setOptions() {}, setCenter() {}, setRadius() {}
+	};
+	api.myLocDot = { getMap: () => api.map, setMap() {}, setPosition() {} };
+	const indicator = api.document.getElementById('accuracy_container');
+	const meter = api.document.getElementById('accuracy_meter');
+	const proceed = api.document.getElementById('proceed_container');
+
+	api.locateExec();
+	assert.equal(indicator.classList.contains('awaiting-fix'), true);
+	assert.equal(proceed.classList.contains('hide'), true);
+
+	watches[0].success({ coords: { latitude: 12, longitude: 34, accuracy: 25 } });
+	assert.equal(indicator.classList.contains('awaiting-fix'), false);
+	assert.equal(meter.innerText, 25);
+	assert.equal(proceed.classList.contains('hide'), false);
+
+	api.clearLocating(true);
+	api.locateExec();
+	assert.equal(indicator.classList.contains('awaiting-fix'), true);
+	assert.equal(meter.innerText, '');
+	assert.equal(proceed.classList.contains('hide'), true);
+
+	api.clearLocating(true);
+	assert.equal(indicator.classList.contains('awaiting-fix'), false);
+	assert.equal(indicator.classList.contains('hide'), true);
+});
 
 test('queued geolocation results and errors cannot overwrite a completed result or a newer watch', () => {
 	const { api, watches } = locateApi();

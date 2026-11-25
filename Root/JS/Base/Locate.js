@@ -176,8 +176,13 @@ function locateExec(failure) {
 				accuCircle.setMap(null);
 			var watch_location_time_begin = new Date().getTime();
 			watch_location_timer = setTimeout(endWatchLocation, WATCH_LOCATION_MAX_TIMEOUT);
+			var accuracyContainer = document.getElementById('accuracy_container');
+			var accuracyMeter = document.getElementById('accuracy_meter');
+			accuracyMeter.innerText = '';
 			addClassIfPresent(document.getElementById('proceed_container'), 'hide');
-			removeClassIfPresent(document.getElementById('accuracy_container'), 'hide');
+			removeClassIfPresent(accuracyContainer, 'highlight');
+			addClassIfPresent(accuracyContainer, 'awaiting-fix');
+			removeClassIfPresent(accuracyContainer, 'hide');
 			document.getElementById('proceed_progress').style.transition = 'none';
 			document.getElementById('proceed_progress').style.width = "0%";
 			document.getElementById('proceed_progress').offsetWidth;
@@ -224,16 +229,17 @@ function locateExec(failure) {
 						accuCircle.setRadius(position.coords.accuracy);
 					}
 					if(position.coords.accuracy >= WATCH_LOCATION_POOR_ACCURACY) {
-						document.getElementById('accuracy_meter').innerText = "99+";
+						accuracyMeter.innerText = "99+";
 						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: #FF0000');
 					}
 					else {
-						document.getElementById('accuracy_meter').innerText = Math.round(position.coords.accuracy);
+						accuracyMeter.innerText = Math.round(position.coords.accuracy);
 						document.getElementById('accuracy_indicator').setAttribute('style', 'background-color: '+percantageToColor(100-position.coords.accuracy));
 					}
 					removeClassIfPresent(document.getElementById('proceed_container'), 'hide');
-					removeClassIfPresent(document.getElementById('accuracy_container'), 'highlight');
-					removeClassIfPresent(document.getElementById('accuracy_container'), 'hide');
+					removeClassIfPresent(accuracyContainer, 'awaiting-fix');
+					removeClassIfPresent(accuracyContainer, 'highlight');
+					removeClassIfPresent(accuracyContainer, 'hide');
 					if(!myLocDot) {
 						myLocDot = new google.maps.Marker({
 							clickable: false,
@@ -400,8 +406,10 @@ function clearLocating(hideAccuracyContainer) {
 	if(navigator.geolocation)
 		navigator.geolocation.clearWatch(watch_location_id);
 	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
+	var accuracyContainer = document.getElementById('accuracy_container');
+	removeClassIfPresent(accuracyContainer, 'awaiting-fix');
 	if(hideAccuracyContainer)
-		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
+		addClassIfPresent(accuracyContainer, 'hide');
 	locating = false;
 	resetPoorAccuracyStreak();
 	hideLocateWatchLoader();

@@ -20,6 +20,7 @@
 			<p><strong>Region</strong> names a region or country. The numeric <strong>index</strong> identifies the reference point within it.</p>
 		</div>
 	</div>
+	<p id='info_code_reference_note'>City and region names in Wolo Codes serve as geographic reference points only. Their use implies no position on political boundaries or sovereignty. The same location can have more than one valid Wolo Code because different references can cover the same spot.</p>
 	<p>The last <strong>three words</strong> pinpoint the location. They come from a <a class='link' href='https://wcodes.org/wordlist'>list</a> of 1,024 common words.</p>
 
 	<h2>

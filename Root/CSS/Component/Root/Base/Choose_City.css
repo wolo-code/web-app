@@ -255,6 +255,13 @@ html.dark-mode .decode_city_history_remove:hover {
 	min-height: 44px;
 }
 
+.city_region_picker .city_region_reference_hint {
+	margin: 0.5rem auto;
+	max-width: 32ch;
+	font-size: 0.875em;
+	text-align: center;
+}
+
 .city_region_picker[hidden],
 .city_region_picker [hidden] {
 	display: none;

@@ -21,6 +21,8 @@ The nearby, matching-name, and previous-city dialogs share the **City** and **Re
 
 The previous-city and nearby versions of **Choose city or region** open with the **City** and **Region** tabs at the top. The **Anchor Icon** and **Close Button** have matching visible insets from the top and their respective side edges. Selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
 
+The **Code Reference Hint** (`.city_region_reference_hint`) stays below the tabs in the nearby, matching-name, and previous-city pickers. It explains that different references can give the same location different Wolo Codes.
+
 
 The Address Panel omits the Code reference selector and Propose a city button.
 
@@ -233,6 +235,7 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 | Intro policy link | Info Intro Policy Link | `/policy` link inside `#info_intro` | Inside Info Intro View copy | Opens cookie and privacy policies. |
 | Intro proceed control | Info Intro Proceed Button | `#info_intro_close_button` | Bottom of Info Intro View | Closes the intro prompt and continues into the app. First-run Input Icon Guide starts only after this click. |
 | Full explanation view | Info Full View | `#info_full`, `#info_format_tabs` | Main body when full info is active | City and Region tabs show the two plain-text formats. The equal-width tabs keep a visible pipe centered above the fading rule. Both examples use inline “e.g.”, and the Region tab places “Mt. Everest” below its example, aligned with the right end of the fading rule. Shared panel sizing keeps the usage steps in place when switching tabs. |
+| Shared explanation | Info Code Reference Note | `#info_code_reference_note` | Below the City and Region format panels | Explains that city and region names serve as geographic references, that their use implies no position on political boundaries or sovereignty, and that one location can have multiple valid codes. |
 | Icon labels control | Info Icon Labels Button | `#info_show_icon_labels`, `showInfoIconGuide()` | Bottom-left of Info Modal View | **show guide** closes Info Modal View and shows Input Icon Guide overlay labels on the current view (Wolo Code Input View or Map View). Hover and keyboard focus do not underline the label. Hidden during Info Intro View and Info Links View; shown on Info Full View. |
 | Version indicator | Info Version Indicator | `#info_version_indicator`, `.info_version_under`, `toggleInfoVersionDisplay()` | Bottom-right of Info Modal View | Shows `v` plus the three-part `version` from `Vars.tsv` on the same bottom line as **show guide**. Hover or keyboard focus expands the label to `version.build` and shows elapsed time since the bake under the version. Hovering that stamp shows the UTC timestamp. A tap keeps the full version visible and shows local time under the version; hovering that stamp shows UTC. Times overlay below that line so the version stays put. Hidden on Info Links View. |
 | Wolo Code format line | Info Wolo Code Format | `#wcode_format` | Top of Info Full View | Shows `\ City Word 1 Word 2 Word 3 /`. |

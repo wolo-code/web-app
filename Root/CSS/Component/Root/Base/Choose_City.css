@@ -224,8 +224,10 @@ html.dark-mode .decode_city_history_remove:hover {
 .choose_city_message > .message_dialog_body {
 	min-height: 0;
 	overflow-y: auto;
-	scrollbar-gutter: stable;
+	scrollbar-gutter: stable both-edges;
+	scrollbar-width: thin;
 	flex: 0 1 auto;
+	padding-inline: 14px;
 	padding-block-end: 6px;
 }
 

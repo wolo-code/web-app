@@ -3,6 +3,7 @@
 // var initWCode_jumpToMap;
 // var initWCode_jump_ask;
 var pendingWoloLinkZoom;
+var pendingWoloLinkPrecision;
 var directWoloLinkEntry = false;
 var initialWoloLinkPreviewDismissed = false;
 
@@ -106,6 +107,24 @@ function getCanonicalWoloPathFromWords(words, suffix) {
 	return '/' + canonical + (suffix || '');
 }
 
+function getPrecisionWoloLinkPath(words, suffix, precisionWords, zoom) {
+	var path = getCanonicalWoloPathFromWords(words, suffix);
+	var params = new URLSearchParams();
+	if(precisionWords && precisionWords.length)
+		params.set('precision', precisionWords.join('.'));
+	if(Number.isFinite(zoom))
+		params.set('zoom', zoom);
+	var query = params.toString();
+	return query ? path + '?' + query : path;
+}
+
+function getWoloLinkPrecision(search) {
+	if(!search)
+		return null;
+	var precision = new URLSearchParams(search).get('precision');
+	return precision === null ? null : precision.toLowerCase().split('.');
+}
+
 function parseWoloPathWords(rawCodeString) {
 	var decoded = String(rawCodeString || '');
 	try {
@@ -142,7 +161,10 @@ function showInitialWoloLinkPreview(link) {
 	var dialog = document.getElementById('external_message');
 	var redirect = link.suffix === '/';
 	document.getElementById('external_wcode_city').textContent = link.words.slice(0, -3).join(' ');
-	document.getElementById('external_wcode_code').textContent = link.words.slice(-3).join(' ');
+	var precision = getWoloLinkPrecision(window.location.search);
+	document.getElementById('external_wcode_code').textContent = precision && typeof precisionWoloText === 'function'
+		? precisionWoloText(link.words.slice(-3), precision)
+		: link.words.slice(-3).join(' ');
 	addClassIfPresent(document.getElementById('external_address'), 'hide');
 	removeClassIfPresent(document.getElementById('external_address_loader'), 'hide');
 	var proceed = document.getElementById('external_proceed');
@@ -169,6 +191,7 @@ function urlDecode() {
 			init_map_mode = 'satellite';
 		pushLoader();
 		pendingWords = link.words;
+		pendingWoloLinkPrecision = getWoloLinkPrecision(window.location.search);
 		pendingWoloLinkRedirect = link.suffix === '/';
 		initWCode_jumpToMap = pendingWoloLinkRedirect;
 		if(initWCode_jumpToMap)
@@ -188,7 +211,8 @@ function urlDecode() {
 		if(qParam != null && qParam != '') {
 			toggleMapType();
 			var lat_lng = qParam.split(',');
-			pendingPosition = {lat: parseFloat(lat_lng[0]), lng: parseFloat(lat_lng[1])};
+			pendingPosition = (typeof parseWoloDecimalPosition === 'function' && parseWoloDecimalPosition(qParam)) ||
+				{lat: parseFloat(lat_lng[0]), lng: parseFloat(lat_lng[1])};
 		}
 		return false;
 	}

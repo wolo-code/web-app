@@ -177,7 +177,7 @@ function getCityGpId(address_components) {
 	return fallback;
 }
 
-function decode(words, decodeMarker, selectionVersion, fromUrl) {
+function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) {
 	pushLoader();
 	function finish(city, wcode) {
 		if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
@@ -195,7 +195,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 			);
 			return;
 		}
-		decode_continue(city, wcode);
+		decode_continue(city, wcode, precisionWords);
 	}
 	var city_words_length = words.length-3;
 
@@ -229,7 +229,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 			else if (words.length == 3) {
 				
 				if(selected_decode_city && selected_decode_city_source == 'ip') {
-					decodeWithIpCity(words, selectionVersion);
+					decodeWithIpCity(words, selectionVersion, precisionWords);
 				}
 				else if(selected_decode_city && selected_decode_city.center) {
 					finish(selected_decode_city, words);
@@ -240,7 +240,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 					
 					if(!locationAccessCheck()) {
 						if(geoIp_city_name && geoIp_city_name != '')
-							decodeWithIpCity(words, selectionVersion);
+							decodeWithIpCity(words, selectionVersion, precisionWords);
 					}
 					else {
 						
@@ -273,7 +273,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 							getCityFromPositionThenDecode(resolveLatLng(position), words, finish);
 						else {
 							if(!geoIp_city_name && geoIp_city_name != '')
-								decodeWithIpCity(words, selectionVersion);
+								decodeWithIpCity(words, selectionVersion, precisionWords);
 							else
 								showNotification(PURE_WCODE_CITY_FAILED);
 						}
@@ -293,17 +293,18 @@ function decode(words, decodeMarker, selectionVersion, fromUrl) {
 	}
 }
 
-function decode_continue(city, wcode) {
+function decode_continue(city, wcode, precisionWords) {
 	popLoader();
 	if(city != null)
-		decode_(city, wcode);
+		decode_(city, wcode, precisionWords);
 	else {
 		showInvalidCodeDialog((wcode && wcode.length) ? wcode.join(' ') : '');
 	}
 }
 
 var pendingIpDecodeSelection;
-function decodeWithIpCity(words, selectionVersion) {
+var pendingIpPrecisionWords;
+function decodeWithIpCity(words, selectionVersion, precisionWords) {
 	if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
 		popLoader();
 		return;
@@ -311,13 +312,14 @@ function decodeWithIpCity(words, selectionVersion) {
 	if(geoIp_city_name) {
 		popLoader();
 		if(geoIP_city)
-			decode_(geoIP_city, words);
+			decode_(geoIP_city, words, precisionWords);
 		else
-			decode([geoIp_city_name.toLowerCase()].concat(words), null, selectionVersion);
+			decode([geoIp_city_name.toLowerCase()].concat(words), null, selectionVersion, false, precisionWords);
 		showNotification(IP_CITY_DECODE);
 	}
 	else {
 		pendingWords_geo = words;
 		pendingIpDecodeSelection = selectionVersion;
+		pendingIpPrecisionWords = precisionWords;
 	}
 }

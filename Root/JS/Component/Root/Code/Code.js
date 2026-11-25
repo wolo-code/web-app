@@ -75,6 +75,13 @@ function encode_(city, position, locating_encode) {
 	}
 	code_city = city;
 	setDecodeCity(city, 'history', true);
+	if(position.precisionDecimals) {
+		// This position can be reused when choosing another locality reference.
+		position = Object.assign({}, position);
+		position.precisionWords = encodePrecisionWolo(city, cityBegin, code, position.precisionDecimals);
+		if(!position.precisionWords)
+			showNotification('This grid cannot preserve the coordinate pair. Use latitude and longitude directly.');
+	}
 	setCodeWords(code, city, position, locating_encode);
 }
 
@@ -87,7 +94,7 @@ function setCodeWords(code, city, position, locating_encode) {
 	setCode(city, message, position, locating_encode);
 }
 
-function decode_(city, code) {
+function decode_(city, code, precisionWords) {
 	if(typeof normalizeSavedWcode == 'function')
 		code = normalizeSavedWcode(code);
 	else if(code && code.length > 3)
@@ -98,8 +105,6 @@ function decode_(city, code) {
 			showNotification('Could not open saved address');
 		return;
 	}
-	code_city = city;
-	setDecodeCity(city, selected_decode_city_source || 'history', true);
 	var data = [];
 	data[0] = wordList.indexOf(code[0]);
 	data[1] = wordList.indexOf(code[1]);
@@ -109,14 +114,20 @@ function decode_(city, code) {
 			showNotification('Could not open saved address');
 		return;
 	}
-	var position = decode__(cityBegin, data);
-	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city)) {
+	var position = precisionWords ? decodePrecisionWolo(city, cityBegin, data, precisionWords) : decode__(cityBegin, data);
+	if(precisionWords && !position) {
+		showInvalidCodeDialog(precisionWoloText([city.name].concat(code), precisionWords), 'Invalid Precision Wolo Code');
+		return;
+	}
+	if(!precisionWords && typeof isRegionAnchor === 'function' && isRegionAnchor(city)) {
 		position = positionFromRegionGrid(city, position);
 		if(!position) {
 			showNotification('This code is outside the supported coordinate range');
 			return;
 		}
 	}
+	code_city = city;
+	setDecodeCity(city, selected_decode_city_source || 'history', true);
 	setCodeCoord(city, position, code);
 	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	addClassIfPresent(document.getElementById('wait_loader'), 'hide');
@@ -148,6 +159,7 @@ function decode__(city_begin, code) {
 }
 
 function setCodeCoord(city, position, code) {
+	var codeText = typeof precisionWoloText === 'function' ? precisionWoloText(code, position.precisionWords) : code.join(' ');
 	var linkZoom = typeof pendingWoloLinkZoom === 'undefined' ? undefined : pendingWoloLinkZoom;
 	if(linkZoom !== undefined)
 		pendingWoloLinkZoom = undefined;
@@ -161,16 +173,16 @@ function setCodeCoord(city, position, code) {
 	if(initWCode_jumpToMap) {
 		initWCode_jumpToMap = false;
 		if(redirect_isActive()) {
-			redirect_start(city.name, code.join(' '), position, showLocation);
+			redirect_start(city.name, codeText, position, showLocation);
 			getAddress(position);
 		}
 		else
-			window.location.replace(getIntentURL(position, city.name + ' ' + code.join(' ')));
+			window.location.replace(getIntentURL(position, city.name + ' ' + codeText));
 		return;
 	}
 	if(initWCode_jump_ask) {
 		initWCode_jump_ask = false;
-		external_show(position, city.name, code.join(' '));
+		external_show(position, city.name, codeText);
 	}
 	getAddress(position);
 	showLocation();

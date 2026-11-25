@@ -22,7 +22,7 @@ function initData() {
 	else if(pendingWords != null) {
 		initWCode_jump_ask = !pendingWoloLinkRedirect &&
 			(typeof initialWoloLinkPreviewDismissed === 'undefined' || !initialWoloLinkPreviewDismissed);
-		decode(pendingWords, null, null, true);
+		decode(pendingWords, null, null, true, typeof pendingWoloLinkPrecision === 'undefined' ? null : pendingWoloLinkPrecision);
 	}
 }
 

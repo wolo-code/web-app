@@ -17,7 +17,7 @@ function shareWCode() {
 	navigator.share( {
 		title: "Wolo",
 		text: "Wolo Code for: " + ' ' + share_address + ' ' + '|',
-		url: getCanonicalWoloPathFromWords(getCodeComplete(), '/')
+		url: getPrecisionWoloLinkPath(getCodeComplete(), '/', getActivePrecisionWoloWords())
 	} )
 	.catch((error) => console.log('Error sharing', error));
 }
@@ -77,9 +77,8 @@ function copyWcodeCode() {
 }
 
 function getWoloMapLinkPath() {
-	var codePath = getCanonicalWoloPathFromWords(getCodeComplete());
 	var zoom = typeof map !== 'undefined' && map ? map.getZoom() : undefined;
-	return Number.isFinite(zoom) ? codePath + '?zoom=' + zoom : codePath;
+	return getPrecisionWoloLinkPath(getCodeComplete(), '', getActivePrecisionWoloWords(), zoom);
 }
 
 function copyWcodeLink() {
@@ -90,7 +89,7 @@ function copyWcodeLink() {
 }
 
 function copyWcodeJumpLink() {
-	var code_url = location.hostname + getCanonicalWoloPathFromWords(getCodeComplete(), '/');
+	var code_url = location.hostname + getPrecisionWoloLinkPath(getCodeComplete(), '/', getActivePrecisionWoloWords());
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
 	hideCopyCodeMessage();
@@ -118,7 +117,7 @@ function shareWCodeLink() {
 }
 
 function gotoCoordinate() {
-	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + code_wcode.join(' '));
+	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + getCodeWithPrecision(code_wcode));
 	if(mapUrl.startsWith('https:')) {
 		// Restore the selected location even when Back reloads the page.
 		window.history.replaceState(window.history.state, '', getWoloMapLinkPath());

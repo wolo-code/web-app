@@ -137,7 +137,7 @@ function encodeRegionFallback(position, locating_encode) {
 	var preferred = typeof selected_decode_city !== 'undefined' && selected_decode_city;
 	var preferredKey = preferred && /^region:v1:([^:]+):/.exec(preferred.id || '');
 	var choice = preferredKey && choices.find(function(entry) { return entry.region.key === preferredKey[1]; });
-	encode_((choice || choices[0]).anchor, regionPosition(position), locating_encode);
+	encode_((choice || choices[0]).anchor, position.precisionDecimals ? position : regionPosition(position), locating_encode);
 	return true;
 }
 

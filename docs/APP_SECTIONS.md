@@ -73,6 +73,8 @@ Overlay Layer dismissal safely handles a missing dialog or no visible dialog, so
 
 ## Wolo Code Input View
 
+**Wolo Code Input** and **Place Search Input** accept a Precision Wolo Code or a comma-separated decimal latitude and longitude. The **Location Wolo Label View** shows the suffix when the grid can preserve the pair. Copying the code or sharing its link includes that suffix. **Address Preview** displays the suffix from a shared link.
+
 | Part | Use this name | Current implementation signal | Typical position | Purpose |
 | --- | --- | --- | --- | --- |
 | Full-screen input surface | Wolo Code Input Surface | `#decode_interface_overlay` | Full viewport | Covers the map with the plain input-focused state. |

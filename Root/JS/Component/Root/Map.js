@@ -811,6 +811,12 @@ function execDecode(code, decodeMarker) {
 		return;
 	}
 
+	var position = parseWoloDecimalPosition(trimmed);
+	if(position) {
+		steerToDecodedCoordinate(position);
+		return;
+	}
+
 	if(typeof digipin != 'undefined' && digipin.looksLikeDigipin(trimmed)) {
 		execDecodeDigipin(trimmed);
 		return;
@@ -822,6 +828,11 @@ function execDecode(code, decodeMarker) {
 	}
 
 	code = trimmed.toLowerCase();
+	var precision = splitPrecisionWoloText(code);
+	if(precision) {
+		decode(precision.base.split(/\s+/), decodeMarker, mapSelectionVersion, false, precision.words);
+		return;
+	}
 	var valid = true;
 	var splitChar;
 	if(code.indexOf(' ') != -1)

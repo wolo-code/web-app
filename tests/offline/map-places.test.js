@@ -58,7 +58,7 @@ function loadMap() {
 		watch_location_id: null, navigator: { geolocation: { clearWatch: noop } },
 		addClassIfPresent: noop, clearAddress: noop, refreshAddress: noop, hideAddress: noop, clearURL: noop
 	});
-	for (const file of ['Map.js', 'InfoWindow.js', 'PinAdjustment.js']) {
+	for (const file of ['Code/Precision.js', 'Map.js', 'InfoWindow.js', 'PinAdjustment.js']) {
 		const source = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root', file), 'utf8');
 		vm.runInContext(source, context);
 	}

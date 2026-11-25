@@ -1,5 +1,9 @@
 # App Features
 
+## Precision Wolo Code
+
+Enter decimal latitude and longitude separated by a comma in **Wolo Code Input** or **Place Search Input** to generate a Precision Wolo Code. The dot after the third grid word starts a suffix that preserves the decimal values at the greater of the two supplied precisions. Paste the code into either input to recover the position. The **Location Wolo Label View** includes the suffix in its copy and share actions. Shared links carry the suffix in the `precision` query parameter, and **Address Preview** displays it.
+
 ## GIS integration documentation
 
 | Feature | Current implementation signal | Notes |

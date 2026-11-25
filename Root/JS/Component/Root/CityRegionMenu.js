@@ -144,6 +144,14 @@ function useCityMenuSearchCity(city, mode) {
 function renderCityRegionMenu(id, mode) {
 	var picker = document.getElementById(id + '_region_menu');
 	if(!picker) return;
+	var referenceInfo = picker.closest('.choose_city_message').querySelector('.city_region_reference_info');
+	var referenceHint = referenceInfo.querySelector('.city_region_reference_hint');
+	referenceInfo.onpointerenter = referenceInfo.onfocusin = function() {
+		var bounds = referenceInfo.getBoundingClientRect();
+		var hintHeight = referenceHint.offsetHeight + 8;
+		var roomBelow = document.documentElement.clientHeight - bounds.bottom;
+		referenceInfo.classList.toggle('city_region_reference_info_below', bounds.top < hintHeight && roomBelow > bounds.top);
+	};
 	var tabs = picker.querySelector('.city_region_tabs');
 	var selectTab = tabs.selectCityRegionTab || (tabs.selectCityRegionTab = bindCityRegionTabs(tabs));
 	var cityPanel = document.getElementById(id + '_city_panel');

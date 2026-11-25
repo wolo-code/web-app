@@ -23,7 +23,7 @@ The previous-city and nearby versions of **Choose city or region** open with the
 
 The **City** and **Region** tabs, search fields, and result lists stay centered in **Choose city or region** with equal side space as the scrollbar appears or disappears.
 
-Hover over or keyboard-focus the **Code Reference Info Icon** (`.city_region_reference_info > button`) at the bottom right of the nearby, matching-name, and previous-city pickers to reveal the **Code Reference Hint** (`.city_region_reference_hint`). The icon has equal bottom and side insets. The hint opens above it with a pointer and a divider between two paragraphs that share the same typography and omit closing full stops. In the second paragraph, “Their use” starts a new line.
+Hover over or keyboard-focus the **Code Reference Info Icon** (`.city_region_reference_info > button`) at the bottom right of the nearby, matching-name, and previous-city pickers to reveal the **Code Reference Hint** (`.city_region_reference_hint`). The icon has equal bottom and side insets. The hint opens beside the trigger with a pointer, a centered **Code Reference Hint Icon**, and a divider between two paragraphs that share the same typography and omit closing full stops. In the second paragraph, “Their use” starts a new line.
 
 
 The Address Panel omits the Code reference selector and Propose a city button.

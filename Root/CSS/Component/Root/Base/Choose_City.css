@@ -260,29 +260,56 @@ html.dark-mode .decode_city_history_remove:hover {
 	display: none;
 }
 
+.city_region_search_field {
+	display: grid;
+	grid-template-columns: 18px minmax(0, 1fr);
+	align-items: center;
+	gap: 6px;
+	width: min(16rem, 90%);
+	margin: 0 auto 12px;
+	border-bottom: 1px solid #ccc;
+	cursor: text;
+}
+
+.city_region_search_field > svg {
+	width: 18px;
+	height: 18px;
+	opacity: .7;
+}
+
+html.dark-mode .city_region_search_field {
+	border-bottom-color: #666;
+}
+
+.city_region_search_field:has(.city_region_search:not(:placeholder-shown)),
+.city_region_search_field:focus-within {
+	width: 100%;
+}
+
+.city_region_search_field:focus-within,
+html.dark-mode .city_region_search_field:focus-within {
+	border-bottom-color: #69b7cf;
+	box-shadow: 0 1px #69b7cf;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.city_region_search_field {
+		transition: width 180ms ease;
+	}
+}
+
 .city_region_search {
 	appearance: none;
 	box-sizing: border-box;
 	width: 100%;
 	min-height: 44px;
-	margin-block-end: 12px;
 	padding: 8px 2px;
 	border: 0;
-	border-bottom: 1px solid #ccc;
 	border-radius: 0;
+	outline: none;
 	background: transparent;
 	color: inherit;
 	font: inherit;
-}
-
-html.dark-mode .city_region_search {
-	border-bottom-color: #666;
-}
-
-.city_region_search:focus {
-	outline: none;
-	border-bottom-color: #69b7cf;
-	box-shadow: 0 1px #69b7cf;
 }
 
 .city_region_search::placeholder {

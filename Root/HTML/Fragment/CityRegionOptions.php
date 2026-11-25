@@ -12,7 +12,13 @@ $cityRegionCityLists = [
 		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Region</span></button>
 	</div>
 	<div id='<?= $cityRegionMenuId ?>_city_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_city_tab'>
-		<input type='search' class='city_region_search' placeholder='Search cities' aria-label='Search cities' autocomplete='off' spellcheck='false'>
+		<label class='city_region_search_field'>
+			<svg viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
+				<circle cx='10.5' cy='10.5' r='5.5'/>
+				<path d='m15 15 5 5'/>
+			</svg>
+			<input type='search' class='city_region_search' placeholder='Search cities' aria-label='Search cities' autocomplete='off' spellcheck='false'>
+		</label>
 		<p class='city_region_search_status' role='status'></p>
 		<div class='city_region_defaults'>
 			<?php if($cityRegionMenuId === 'matching') { ?>
@@ -23,7 +29,13 @@ $cityRegionCityLists = [
 		<div class='city_region_search_results'></div>
 	</div>
 	<div id='<?= $cityRegionMenuId ?>_region_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_region_tab' hidden>
-		<input type='search' class='city_region_search' placeholder='Search regions or countries' aria-label='Search regions or countries' autocomplete='off' spellcheck='false'>
+		<label class='city_region_search_field'>
+			<svg viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>
+				<circle cx='10.5' cy='10.5' r='5.5'/>
+				<path d='m15 15 5 5'/>
+			</svg>
+			<input type='search' class='city_region_search' placeholder='Search regions or countries' aria-label='Search regions or countries' autocomplete='off' spellcheck='false'>
+		</label>
 		<p class='city_region_search_status' role='status'></p>
 		<div class='city_region_defaults'>
 			<?php if($cityRegionMenuId === 'history') { ?>

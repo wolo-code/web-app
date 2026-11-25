@@ -686,10 +686,22 @@ body.map-source-single #action_menu_map {
 	font: inherit;
 	margin: -5px 0;
 	padding: 5px 10px;
+	transition: text-shadow 180ms ease, transform 180ms ease;
 }
 
 #decode_input_city:hover {
 	text-shadow: 0 0 6px rgb(105 183 207 / 65%);
+	transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#decode_input_city {
+		transition: none;
+	}
+
+	#decode_input_city:hover {
+		transform: none;
+	}
 }
 
 #decode_input_city:focus-visible {

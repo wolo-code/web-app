@@ -224,7 +224,7 @@ function setupControls() {
 	bindControl('decode_map_view_button', 'click', toggleDecodeView);
 	bindControl('footer_author', 'click', showInfoLinks);
 	bindControl('no_city_message_close', 'click', hideNoCityMessage);
-	bindControl('locate_right_message_close', 'click', hideLocateRightMessage);
+	bindControl('locate_right_message_close', 'click', dismissLocateRightMessage);
 	bindControl('locate_right_message_yes', 'click', locateRight_grant);
 	bindControl('locate_right_message_no', 'click', locateRight_deny);
 	bindControl('invalid_code_message_close', 'click', hideInvalidCodeDialog);

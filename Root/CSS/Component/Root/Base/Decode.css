@@ -659,6 +659,25 @@ body.map-source-single #action_menu_map {
 	display: none;
 }
 
+#decode_city_hint {
+	max-width: min(340px, calc(100vw - 32px));
+	text-align: center;
+}
+
+#decode_city_status {
+	margin: 0;
+	text-wrap: balance;
+}
+
+#decode_city_status:not(:empty) {
+	margin-bottom: 8px;
+}
+
+#decode_city_status:not(:empty) + #decode_input_city {
+	color: inherit;
+	text-decoration: underline;
+}
+
 #decode_input_city {
 	background: transparent;
 	border: 0;

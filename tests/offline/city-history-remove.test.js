@@ -77,7 +77,6 @@ function loadCityEnvironment(initialHistory = []) {
 
 	let selectedCity = initialHistory[0] || null;
 	let selectedSource = initialHistory.length ? 'history' : null;
-	let ipCitySelected = false;
 	let overlayHidden = false;
 
 	const sandbox = {
@@ -93,11 +92,6 @@ function loadCityEnvironment(initialHistory = []) {
 		showOverlay: () => {},
 		hideOverlay: () => { overlayHidden = true; },
 		rememberCity: () => {},
-		selectIpDecodeCity: () => {
-			ipCitySelected = true;
-			selectedCity = { name: 'IP City' };
-			selectedSource = 'ip';
-		},
 		syncDecodeCitySourceButtons: () => {},
 		focusSelectedDecodeCityOnMap: () => {},
 		geoIp_city_name: 'Default IP City',
@@ -111,8 +105,9 @@ function loadCityEnvironment(initialHistory = []) {
 	vm.createContext(sandbox);
 	const cityJs = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/City.js'), 'utf8');
 	vm.runInContext(cityJs, sandbox);
+	sandbox.getDecodeIpCity = (name, done) => done({ name, id: 'ip-city', center: { lat: 0, lng: 0 } });
 
-	return { sandbox, nodes, storage, getIpSelected: () => ipCitySelected, getOverlayHidden: () => overlayHidden };
+	return { sandbox, nodes, storage, getOverlayHidden: () => overlayHidden };
 }
 
 test('renderDecodeCityHistoryList creates city name and right-side remove button', () => {
@@ -208,7 +203,7 @@ test('removing active decode city advances to next cached city or falls back to 
 		{ name: 'Kathmandu', id: 'np-ktm' },
 		{ name: 'Pokhara', id: 'np-pkr' }
 	];
-	const { sandbox, nodes, getIpSelected } = loadCityEnvironment(history);
+	const { sandbox, nodes } = loadCityEnvironment(history);
 
 	sandbox.decode_city_history = history;
 	sandbox.selected_decode_city = history[0];

@@ -127,7 +127,9 @@ function decode_(city, code, precisionWords) {
 		}
 	}
 	code_city = city;
-	setDecodeCity(city, selected_decode_city_source || 'history', true);
+	var sameReference = typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.id === city.id;
+	var source = sameReference ? selected_decode_city_source : 'history';
+	setDecodeCity(city, source, true);
 	setCodeCoord(city, position, code);
 	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	addClassIfPresent(document.getElementById('wait_loader'), 'hide');

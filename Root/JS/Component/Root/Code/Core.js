@@ -3,8 +3,6 @@
 // var wordList;
 // var current_city_gp_id;
 // var is_current_city;
-// const PURE_WCODE_CITY_PICKED;
-// const PURE_WCODE_CITY_FAILED;
 // var encode_session_id
 
 function encode(position, locating_encode) {
@@ -184,113 +182,75 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) 
 			popLoader();
 			return;
 		}
-		if(fromUrl && !getWoloAnchorBegin(city)) {
-			popLoader();
-			var reference = words.slice(0, -3).join(' ');
-			var indexed = /(?:^|[\s-])\d+$/.test(reference);
-			showInvalidCodeDialog(
-				reference,
-				indexed ? 'Region not found' : 'City not found',
-				indexed ? 'Check the region name and index in the link.' : 'Check the city name in the link.'
-			);
+		if(getWoloAnchorBegin(city)) {
+			decode_continue(city, wcode, precisionWords);
 			return;
 		}
-		decode_continue(city, wcode, precisionWords);
-	}
-	var city_words_length = words.length-3;
-
-	var valid;
-
-	if(words.length >= 3) {
-		valid = true;
-		for(var i = 0; i < 3; i++) {
-			if(typeof wordList != 'undefined' && wordList.includes(words[city_words_length+i]) != true) {
-				valid = false;
-				break;
-			}
+		popLoader();
+		var reference = words.slice(0, -3).join(' ');
+		if(!reference) {
+			showDecodeReferenceRequired();
+			return;
 		}
+		var indexed = /(?:^|[\s-])\d+$/.test(reference);
+		var source = fromUrl ? ' in the link' : ' in the code';
+		showInvalidCodeDialog(
+			reference,
+			indexed ? 'Region not found' : 'City not found',
+			(indexed ? 'Check the region name and index' : 'Check the city name') + source + '.'
+		);
 	}
-	else
-		valid = false;
-
-	if(valid) {
-
-			if(city_words_length > 0) {
-				var ipGroup = words.slice(0, city_words_length-1);
-				var ipCity = words.slice(city_words_length-1, city_words_length)[0];
-				var codeWords = words.slice(city_words_length);
-				getCityFromName(ipGroup, ipCity, function(city) {
-					if(city == null)
-						finish(null, codeWords);
-					else
-						getCityCenterFromId(city, function(city) { finish(city, codeWords); });
-				}, fromUrl ? function() { finish(null, codeWords); } : undefined, codeWords);
-			}
-			else if (words.length == 3) {
-				
-				if(selected_decode_city && selected_decode_city_source == 'ip') {
-					decodeWithIpCity(words, selectionVersion, precisionWords);
-				}
-				else if(selected_decode_city && selected_decode_city.center) {
-					finish(selected_decode_city, words);
-				}
-				else if(typeof(current_city_gp_id) != 'undefined' && current_city_gp_id != null)
-					getCityFromCityGp_idThenDecode(current_city_gp_id, words, finish);
-				else {
-					
-					if(!locationAccessCheck()) {
-						if(geoIp_city_name && geoIp_city_name != '')
-							decodeWithIpCity(words, selectionVersion, precisionWords);
-					}
-					else {
-						
-						var position;
-						if(myLocDot == null) {
-							var cityMarker = marker || decodeMarker;
-							if(cityMarker != null && cityMarker.position != null) {
-								position = cityMarker.position;
-								if(marker)
-									focus___(position);
-								showNotification(PURE_WCODE_CITY_PICKED);
-							}
-							else {
-								initLocate(false, function() {
-									getCoarseLocation(function(position) {
-										getCityFromPositionViaGMap(position, function(city) {
-											getCityCenterFromId(city, function() {
-												finish(city, words);
-											} );
-										}, handleLocationError) }, handleLocationError);
-									return;
-								});
-							}
-						}
-						else {
-							position = myLocDot.position;
-						}
-					
-						if(position != null)
-							getCityFromPositionThenDecode(resolveLatLng(position), words, finish);
-						else {
-							if(!geoIp_city_name && geoIp_city_name != '')
-								decodeWithIpCity(words, selectionVersion, precisionWords);
-							else
-								showNotification(PURE_WCODE_CITY_FAILED);
-						}
-							
-					}
-					
-				}
-				
-			}
-
-	}
-	else {
-		if(typeof popLoader == 'function') {
-			popLoader();
-		}
+	var cityWordsLength = words.length - 3;
+	var codeWords = words.slice(-3);
+	if(cityWordsLength < 0 || (typeof wordList !== 'undefined' && codeWords.some(word => !wordList.includes(word)))) {
+		popLoader();
 		showInvalidCodeDialog(words.join(' '));
+		return;
 	}
+	if(cityWordsLength > 0) {
+		var group = words.slice(0, cityWordsLength - 1);
+		var name = words[cityWordsLength - 1];
+		getCityFromName(group, name, function(city) {
+			getCityCenterFromId(city, function(resolved) { finish(resolved, codeWords); });
+		}, function() { finish(null, codeWords); }, codeWords);
+		return;
+	}
+	if(decodeCityIssue) {
+		popLoader();
+		showDecodeReferenceRequired(decodeCityIssue);
+		return;
+	}
+	if(decodeCityLookup) {
+		popLoader();
+		var inputId = document.body.classList.contains('decode') ? 'decode_input' : 'pac-input';
+		var input = document.getElementById(inputId);
+		var submittedValue = input && input.value;
+		decodeCityLookup.onResolved = function(city) {
+			if((selectionVersion == null || selectionVersion === mapSelectionVersion) && (!input || input.value === submittedValue))
+				decode_(city, codeWords, precisionWords);
+		};
+		return;
+	}
+	if(getWoloAnchorBegin(selected_decode_city)) {
+		finish(selected_decode_city, codeWords);
+		return;
+	}
+	if(typeof current_city_gp_id !== 'undefined' && current_city_gp_id != null) {
+		getCityFromCityGp_idThenDecode(current_city_gp_id, codeWords, finish);
+		return;
+	}
+	if(geoIp_city_name) {
+		decodeWithIpCity(codeWords, selectionVersion, precisionWords);
+		return;
+	}
+	finish(null, codeWords);
+}
+
+function showDecodeReferenceRequired(message) {
+	if(document.body.classList.contains('decode'))
+		setDecodeCityIssue(message || 'A city or region is needed to decode these words.');
+	else
+		showNotification('Enter the full Wolo Code or choose the reference used in the code');
 }
 
 function decode_continue(city, wcode, precisionWords) {
@@ -302,24 +262,15 @@ function decode_continue(city, wcode, precisionWords) {
 	}
 }
 
-var pendingIpDecodeSelection;
-var pendingIpPrecisionWords;
 function decodeWithIpCity(words, selectionVersion, precisionWords) {
-	if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
+	var lookup = decodeCityLookup;
+	getDecodeIpCity(geoIp_city_name, function(city, missing) {
 		popLoader();
-		return;
-	}
-	if(geoIp_city_name) {
-		popLoader();
-		if(geoIP_city)
-			decode_(geoIP_city, words, precisionWords);
+		if((selectionVersion != null && selectionVersion !== mapSelectionVersion) || lookup !== decodeCityLookup)
+			return;
+		if(city)
+			decode_(city, words, precisionWords);
 		else
-			decode([geoIp_city_name.toLowerCase()].concat(words), null, selectionVersion, false, precisionWords);
-		showNotification(IP_CITY_DECODE);
-	}
-	else {
-		pendingWords_geo = words;
-		pendingIpDecodeSelection = selectionVersion;
-		pendingIpPrecisionWords = precisionWords;
-	}
+			showDecodeReferenceRequired(detectedCityIssue(geoIp_city_name, missing));
+	});
 }

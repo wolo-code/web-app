@@ -11,6 +11,12 @@ function hideLocateRightMessage() {
 	hideOverlay(document.getElementById('locate_right_message'));
 }
 
+function dismissLocateRightMessage() {
+	hideLocateRightMessage();
+	if(selected_decode_city_source === 'geolocation' && decodeCityLookup)
+		setDecodeCityIssue('Location access is needed to detect your city.');
+}
+
 function locateRight_grant() {
 	setLocationAccess(true);
 	if(typeof locateRight_callback === 'function')
@@ -23,7 +29,7 @@ function locateRight_grant() {
 
 function locateRight_deny() {
 	popLoader();
-	hideLocateRightMessage();
+	dismissLocateRightMessage();
 	locateRight_DND_check();
 	if(!geoIp_city_name && geoIp_city_name != '')
 		getCityByIp();

@@ -47,19 +47,10 @@ function getCityByIp(retry_count, callback, loader_held) {
 							setDecodeCityFromIp(city_name);
 							if(typeof callback == 'function')
 								callback(city_name);
-							if(pendingWords_geo) {
-								var pending_words = pendingWords_geo;
-								pendingWords_geo = null;
-								decodeWithIpCity(pending_words, pendingIpDecodeSelection, pendingIpPrecisionWords);
-								pendingIpPrecisionWords = null;
-							}
 					}
 				}
-				else {
-					if(http.status == 416)
-						notInRange(position);
-					popLoader();
-				}
+				else
+					retryCityByIp(retry_count, callback, loader_held);
 			}
 			else if(loader_held)
 				popLoader();
@@ -87,24 +78,19 @@ function retryCityByIp(retry_count, callback, loader_held) {
 	var CITY_BY_IP_RETRY_DELAY = 750;
 
 	if(retry_count < MAX_CITY_BY_IP_RETRIES) {
+		var requestId = curGeoIpRequestId;
 		setTimeout(function() {
-			getCityByIp(retry_count + 1, callback, loader_held);
+			if(requestId === curGeoIpRequestId)
+				getCityByIp(retry_count + 1, callback, loader_held);
+			else if(loader_held)
+				popLoader();
 		}, CITY_BY_IP_RETRY_DELAY);
 	}
 	else {
 		if(loader_held)
 			popLoader();
 		geoIp_city_name = '';
-		failPendingIpCityDecode();
+		if(typeof callback == 'function')
+			callback(null);
 	}
-}
-
-function failPendingIpCityDecode() {
-	if(!pendingWords_geo)
-		return;
-
-	pendingWords_geo = null;
-	pendingIpPrecisionWords = null;
-	popLoader();
-	showNotification(PURE_WCODE_CITY_FAILED);
 }

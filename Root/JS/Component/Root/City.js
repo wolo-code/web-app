@@ -4,6 +4,8 @@
 var multiple_city;
 var multiple_country;
 var multiple_group;
+var decodeCityLookup;
+var decodeCityIssue = '';
 
 function getCityAccent(city) {
 	if(typeof city.accent != 'undefined')
@@ -29,79 +31,132 @@ function initDecodeCityContext() {
 		setDecodeCity(decode_city_history[0], 'history', false);
 		if(typeof seedCitiesFromHistory === 'function')
 			seedCitiesFromHistory(decode_city_history);
+		getCityByIp();
 	}
 	else
-		setDecodeCityLabel('');
-
-	getCityByIp(function() {
-		if(!selected_decode_city)
-			selectIpDecodeCity();
-	});
+		selectIpDecodeCity();
 }
 
 function setDecodeCityFromIp(city_name) {
 	geoIp_city_name = city_name;
-	if(selected_decode_city_source == 'ip' || !selected_decode_city)
+	if(selected_decode_city_source == 'ip' || !selected_decode_city_source)
 		selectIpDecodeCity();
 }
 
 function selectIpDecodeCity() {
+	var lookup = startDecodeCityLookup('ip');
 	if(!geoIp_city_name) {
-		getCityByIp();
+		getCityByIp(function(name) {
+			if(!name && decodeCityLookup === lookup)
+				setDecodeCityIssue(detectedCityIssue());
+		});
 		return;
 	}
 
-	selected_decode_city = {
-		name: geoIp_city_name
-	};
-	selected_decode_city_source = 'ip';
-	setDecodeCityLabel(geoIp_city_name);
+	var name = geoIp_city_name;
+	getDecodeIpCity(name, function(city, missing) {
+		if(decodeCityLookup !== lookup)
+			return;
+		if(city)
+			acceptDetectedDecodeCity(lookup, city, 'ip');
+		else
+			setDecodeCityIssue(detectedCityIssue(name, missing));
+	});
+}
+
+function startDecodeCityLookup(source) {
+	selected_decode_city = null;
+	selected_decode_city_source = source;
+	setDecodeCityIssue('');
+	setDecodeCityLabel('Loading...');
 	syncDecodeCitySourceButtons();
+	return decodeCityLookup = {};
+}
+
+function acceptDetectedDecodeCity(lookup, city, source) {
+	setDecodeCity(city, source, source === 'geolocation');
+	if(lookup.onResolved)
+		lookup.onResolved(city);
+}
+
+function getDecodeIpCity(name, callback) {
+	var nameId = normalizeCityLookupToken(name);
+	var offline = isOfflineMode();
+	getCitiesFromNameId(nameId, function(list, failed) {
+		var ids = Object.keys(list || {});
+		if(ids.length !== 1) {
+			callback(null, !failed && !offline && ids.length === 0);
+			return;
+		}
+		var city = list[ids[0]];
+		city.id = ids[0];
+		getCityCenterFromId(city, function(resolved) {
+			callback(getWoloAnchorBegin(resolved) ? resolved : null);
+		});
+	}, {exact: true});
 }
 
 function requestDecodeCityGeolocation() {
-	selected_decode_city = null;
-	selected_decode_city_source = 'geolocation';
-	setDecodeCityLabel('loading...');
-	syncDecodeCitySourceButtons();
-
+	var lookup = startDecodeCityLookup('geolocation');
 	initLocate(true, function(failure) {
-		function fail() {
-			selected_decode_city_source = null;
-			setDecodeCityLabel('');
-			syncDecodeCitySourceButtons();
-			if(typeof failure == 'function')
-				failure();
-			else
-				popLoader();
-			showNotification(PURE_WCODE_CITY_FAILED);
-		}
-
+		if(decodeCityLookup !== lookup)
+			return;
 		getCoarseLocation(function(position) {
+			if(decodeCityLookup !== lookup)
+				return;
 			getCityFromPositionViaGMap(position, function(city) {
+				if(decodeCityLookup !== lookup)
+					return;
 				getCityCenterFromId(city, function(city) {
-					setDecodeCity(city, 'geolocation', true);
+					if(decodeCityLookup !== lookup)
+						return;
+					if(getWoloAnchorBegin(city))
+					acceptDetectedDecodeCity(lookup, city, 'geolocation');
+					else
+						setDecodeCityIssue(detectedCityIssue());
 				});
-			}, fail);
-		}, fail);
+			}, function(name, missing) {
+				if(decodeCityLookup === lookup)
+					setDecodeCityIssue(detectedCityIssue(name, missing));
+			});
+		}, function() {
+			if(decodeCityLookup !== lookup)
+				return;
+			setDecodeCityIssue('Couldn’t detect your location.');
+			if(!locationAccessCheck() && typeof failure == 'function')
+				failure();
+		});
 	});
+}
+
+function detectedCityIssue(name, missing) {
+	return missing ? (name ? 'Wolo has no city reference for ' + name + '.' : 'Wolo has no city reference for this location.')
+		: 'Couldn’t verify the detected city.';
+}
+
+function setDecodeCityIssue(message) {
+	decodeCityIssue = message;
+	var status = document.getElementById('decode_city_status');
+	if(status)
+		status.textContent = message ? message + ' Choose the reference used in the code or paste the full Wolo Code.' : '';
+	if(message) {
+		decodeCityLookup = null;
+		setDecodeCityLabel('Choose city or region');
+	}
 }
 
 function setDecodeCity(city, source, save_history) {
 	if(!city)
 		return;
 
+	decodeCityLookup = null;
+	setDecodeCityIssue('');
 	selected_decode_city = city;
 	selected_decode_city_source = source;
 	rememberCity(city);
 
 	if(city.gp_id)
 		current_city_gp_id = city.gp_id;
-	if(source == 'ip') {
-		geoIP_city = city;
-		geoIp_city_name = city.name;
-	}
-
 	setDecodeCityLabel(getDecodeCityDisplayName(city));
 	if(save_history)
 		saveDecodeCity(city);
@@ -544,62 +599,14 @@ function getCityFromIdThenEncode(city_id, city_center, latLng) {
 	});
 }
 
-function getCityFromPositionThenDecode(latLng, wcode, finish) {
-	var nearCity = null;
-
-	if(!geoFireInit()) {
-		finish(null, wcode);
-		return;
-	}
-	var geoQuery = geoFire.query({
-		center: [latLng.lat, latLng.lng],
-		radius: CITY_RANGE_RADIUS
-	});
-
-	pushLoader();
-	geoQuery.on('ready', function() {
-		popLoader();
-		geoQuery.cancel();
-		if(!nearCity || nearCity.id == null)
-			finish(null, wcode);
-		else
-			getCityFromId(nearCity.id, function(city) {
-				if(!city) {
-					finish(null, wcode);
-					return;
-				}
-				city.center = nearCity.center;
-				finish(city, wcode);
-			}, {notify: false});
-	});
-
-	geoData = geoQuery.on('key_entered', function(key, location, distance) {
-		if(!nearCity || distance < nearCity.distance) {
-			nearCity = {
-				id:key,
-				center: {
-					lat: location[0],
-					lng: location[1]
-				},
-				distance: distance
-			};
-		}
-	});
-
-}
-
 function getCityFromCityGp_idThenDecode(city_gp_id, wcode, finish) {
 	function callback_success(city) {
-		getCityCenterFromId(city, function() {
-			finish(city, wcode);
-		} );
-	};
+		getCityCenterFromId(city, function(resolved) { finish(resolved, wcode); });
+	}
 	function callback_failure() {
 		finish(null, wcode);
-	};
-	var session_id;
-	session_id = dencode_session_id = Date.now();
-	getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, callback_failure )
+	}
+	getCityFromCityGp_id(city_gp_id, callback_success, callback_failure);
 }
 
 function isUsableCityId(id) {
@@ -913,13 +920,15 @@ function getCityCenterFromId(city, callback, options) {
 
 function getCitiesFromNameId(name_id, callback, options) {
 	var picker = options && options.picker;
-	if(!picker && typeof regionAnchorFromName === 'function') {
+	var exact = options && options.exact;
+	if(!picker && !exact && typeof regionAnchorFromName === 'function') {
 		var anchor = regionAnchorFromName(name_id);
 		if(anchor) { var regional = {}; regional[anchor.id] = anchor; callback(regional); return; }
 	}
-	if(!database || typeof database.ref != 'function' || (picker && isOfflineMode())) {
+	var databaseUnavailable = !database || typeof database.ref != 'function';
+	if(databaseUnavailable || ((picker || exact) && isOfflineMode())) {
 		if(typeof findCachedCitiesByNameId != 'function') {
-			callback(null);
+			callback(null, true);
 			return;
 		}
 		var cached = picker ? scanCityDetail(function(city) {
@@ -931,7 +940,7 @@ function getCitiesFromNameId(name_id, callback, options) {
 				if(city && city.id)
 					list[city.id] = city;
 			});
-			callback(Object.keys(list).length ? list : null);
+			callback(Object.keys(list).length ? list : null, databaseUnavailable);
 		}).catch(function() {
 			callback(null, true);
 		});
@@ -939,7 +948,9 @@ function getCitiesFromNameId(name_id, callback, options) {
 	}
 	var ref = database.ref('CityDetail');
 	if(!picker) pushLoader();
-	ref.orderByChild('name_id').startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10).once('value').then(function(snapshot) {
+	var query = ref.orderByChild('name_id');
+	query = exact ? query.equalTo(name_id) : query.startAt(name_id).endAt(name_id+'\uf8ff').limitToFirst(10);
+	query.once('value').then(function(snapshot) {
 		if(!picker) popLoader();
 		callback(snapshot.val());
 	}, function() {
@@ -984,8 +995,8 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 		forwardCityCallback(callback_success, [city]);
 	}
 
-	function finishFailure() {
-		forwardCityCallback(callback_failure);
+	function finishFailure(missing) {
+		forwardCityCallback(callback_failure, [missing === true]);
 	}
 
 	function fromCacheThen(fallback) {
@@ -1010,7 +1021,7 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 		});
 	}
 
-	if (isOfflineMode()) {
+	if (isOfflineMode() || !database) {
 		fromCacheThen(finishFailure);
 		return;
 	}
@@ -1025,7 +1036,7 @@ function getCityFromCityGp_id(city_gp_id, encode_session_id, callback_success, c
 			finishSuccess(city);
 		}
 		else {
-			fromCacheThen(finishFailure);
+			fromCacheThen(function() { finishFailure(true); });
 		}
 	}).catch(function() {
 		popLoader();

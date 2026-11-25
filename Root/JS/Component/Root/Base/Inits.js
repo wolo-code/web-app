@@ -17,8 +17,6 @@ var ADDRESS_COPIED_MESSAGE = "Address copied to clipboard";
 var SELECTED_TEXT_COPIED_MESSAGE = "Selected text copied";
 
 // Code\Core
-var PURE_WCODE_CITY_PICKED = "Since your city is not set - city was chosen from the last location";
-var PURE_WCODE_CITY_FAILED = "Since your city is not set - you must first choose the city or preceed the Wolo Code with city name";
 var IP_CITY_DECODE = "Current city determined using your connection - verify";
 var pendingPosition;
 var pendingWords;
@@ -27,7 +25,6 @@ var current_city_gp_id;
 var is_current_city;
 
 var encode_session_id;
-var dencode_session_id;
 
 // Code\Model
 var code_city;
@@ -108,8 +105,6 @@ var current_address_lines = null;
 // GeoIp
 var geoIp_country_code;
 var geoIp_city_name;
-var pendingWords_geo;
-var geoIP_city;
 var selected_decode_city;
 var selected_decode_city_source;
 var decode_city_history;

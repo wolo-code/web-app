@@ -459,20 +459,27 @@ function watch_location_notice() {
 }
 
 function getCityFromPositionViaGMap(position, callback_success, callback_failure) {
-	encode_session_id = Date.now();
-	var session_id = encode_session_id;
-	getAddress( {'lat':position.coords.latitude, 'lng':position.coords.longitude}, session_id, function(address_components) {
-			var city_gp_id = getCityGpId(address_components);
-			if(city_gp_id != null) {
-				getCityFromCityGp_id( city_gp_id, session_id, function(city) {
-						current_city_gp_id = city_gp_id;
-						setCurrentCity_status(true);
-						callback_success(city);
-				}, callback_failure );
-			}
-			else if(typeof callback_failure == 'function')
-				callback_failure();
-	} );
+	if(typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
+		callback_failure();
+		return;
+	}
+	var location = {lat: position.coords.latitude, lng: position.coords.longitude};
+	new google.maps.Geocoder().geocode({location: location}, function(results, status) {
+		if(status !== 'OK') {
+			callback_failure(null, status === 'ZERO_RESULTS');
+			return;
+		}
+		var cityGpId = getCityGpId(results);
+		if(!cityGpId) {
+			callback_failure(null, true);
+			return;
+		}
+		var result = results.find(item => item.place_id === cityGpId);
+		var component = (result.address_components || []).find(item => item.types.includes(result.types[0]));
+		getCityFromCityGp_id(cityGpId, callback_success, function(missing) {
+			callback_failure(component && component.long_name, missing);
+		});
+	});
 }
 
 function isBadGeoPosition(pos) {

@@ -2,7 +2,7 @@
 // var code_wcode;
 // var code_postition;
 
-function setCode(city, wcode, latLng) {
+function setCode(city, wcode, latLng, locating_encode) {
 	var mapEl = document.getElementById('map');
 	if(typeof code_city != 'undefined' && code_city.gp_id != null && city.gp_id != code_city.gp_id) {
 		removeClassIfPresent(mapEl, 'city_tally_true');
@@ -14,7 +14,8 @@ function setCode(city, wcode, latLng) {
 	}
 	code_wcode = wcode;
 	code_postition = latLng;
-	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
+	if(locating_encode !== true)
+		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, wcode.join(' '), latLng, city);
 	var entry = typeof getMapPlace === 'function' ? getMapPlace(marker) : null;
 	if(entry) entry.routeCode = getCanonicalWoloPathFromWords(getCodeComplete()).slice(1);

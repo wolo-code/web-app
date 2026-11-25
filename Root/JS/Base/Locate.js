@@ -408,7 +408,7 @@ function clearLocating(hideAccuracyContainer) {
 	addClassIfPresent(document.getElementById('proceed_container'), 'hide');
 	var accuracyContainer = document.getElementById('accuracy_container');
 	removeClassIfPresent(accuracyContainer, 'awaiting-fix');
-	if(hideAccuracyContainer)
+	if(hideAccuracyContainer || (accuracyContainer && accuracyContainer.classList.contains('highlight')))
 		addClassIfPresent(accuracyContainer, 'hide');
 	locating = false;
 	resetPoorAccuracyStreak();

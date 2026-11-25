@@ -12,10 +12,10 @@ function encode(position, locating_encode) {
 	clearCode();
 	if(typeof isOfflineMode === 'function' && isOfflineMode()) {
 		if(typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.center && !isRegionAnchor(selected_decode_city)) {
-			encode_(selected_decode_city, position);
+			encode_(selected_decode_city, position, locating_encode);
 			return;
 		}
-		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position)) return;
+		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position, locating_encode)) return;
 	}
 	// The regional code can be generated locally if city services stop responding.
 	var timeout = setTimeout(function() { finish(null); }, 20000);
@@ -29,7 +29,7 @@ function encode(position, locating_encode) {
 				current_city_gp_id = city.gp_id;
 			setCurrentCity_status(current_city_gp_id == city.gp_id);
 		}
-		encode_continue(city, position);
+		encode_continue(city, position, locating_encode);
 	}
 
 	getAddress(position, session_id, function(address_components) {
@@ -144,11 +144,10 @@ function setCurrentCity_status(status) {
 	}
 }
 
-function encode_continue(city, position) {
+function encode_continue(city, position, locating_encode) {
 	encode_session_id = Symbol();
-	var session_id = encode_session_id;
 	if(city == null) {
-		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position))
+		if(typeof encodeRegionFallback === 'function' && encodeRegionFallback(position, locating_encode))
 			return;
 		areaNotCovered(position);
 	}
@@ -158,7 +157,7 @@ function encode_continue(city, position) {
 			infoWindow_setContent(MESSAGE_LOADING);
 			pendingCity = false;
 		}
-		encode_(city, position, session_id);
+		encode_(city, position, locating_encode);
 	}
 }
 

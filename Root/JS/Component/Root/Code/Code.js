@@ -55,7 +55,7 @@ function cityCoversPosition(city, position) {
 	return !!begin && isValidWoloIndexCode(encode__(begin, position));
 }
 
-function encode_(city, position) {
+function encode_(city, position, locating_encode) {
 	if(!city || !city.center) {
 		areaNotCovered(position);
 		return;
@@ -68,23 +68,23 @@ function encode_(city, position) {
 	var gridPosition = typeof isRegionAnchor === 'function' && isRegionAnchor(city) ? regionGridPosition(city, position) : position;
 	const code = gridPosition ? encode__(cityBegin, gridPosition) : null;
 	if(!isValidWoloIndexCode(code)) {
-		if(typeof isRegionAnchor === 'function' && !isRegionAnchor(city) && encodeRegionFallback(position))
+		if(typeof isRegionAnchor === 'function' && !isRegionAnchor(city) && encodeRegionFallback(position, locating_encode))
 			return;
 		areaNotCovered(position);
 		return;
 	}
 	code_city = city;
 	setDecodeCity(city, 'history', true);
-	setCodeWords(code, city, position);
+	setCodeWords(code, city, position, locating_encode);
 }
 
-function setCodeWords(code, city, position) {
+function setCodeWords(code, city, position, locating_encode) {
 	var message = [];
 
 	for(const i of code)
 		message.push(wordList.getWord(i));
 
-	setCode(city, message, position);
+	setCode(city, message, position, locating_encode);
 }
 
 function decode_(city, code) {

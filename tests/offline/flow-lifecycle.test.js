@@ -231,6 +231,45 @@ test('Proceed ignores missing and obsolete fixes and uses the current watch posi
 	assert.deepEqual(positions, [position]);
 });
 
+test('an accepted GPS fix keeps the finalized proceed silhouette when its code renders', () => {
+	for (const acceptFix of ['proceedPosition', 'endWatchLocation']) {
+		const { api } = locateApi();
+		const position = { lat: 12, lng: 34 };
+		const city = { name_id: 'test', center: position };
+		const indicator = api.document.getElementById('accuracy_container');
+		const proceed = api.document.getElementById('proceed_container');
+		let completeLookup;
+		Object.assign(api, {
+			locating: true, initWCode: false, locate_button_pressed: false,
+			selfBoundsChangedCount: 1, MESSAGE_LOADING: '', pendingCity: false,
+			infoWindow_setContent() {}, showMarker() {}, clearAddress() {}, setDecodeCity() {},
+			getAddress(point, session, callback) {
+				if (callback) completeLookup = () => callback([]);
+			},
+			getCity_by_perifery_list(point, session, callback) {
+				callback([{ city, distance: 0 }]);
+			},
+			wordList: { getWord: index => String(index) },
+			getProperCityAccent: result => result.name_id,
+			setInfoWindowText() {}
+		});
+		for (const file of ['Core', 'Code', 'Model']) {
+			vm.runInContext(read(`JS/Component/Root/Code/${file}.js`), api);
+		}
+
+		api.noteWatchAccuracy(20, position);
+		api[acceptFix]();
+		assert.equal(indicator.classList.contains('highlight'), true);
+		assert.equal(proceed.classList.contains('hide'), true);
+		completeLookup();
+		assert.equal(api.code_postition, position);
+		assert.equal(indicator.classList.contains('hide'), false);
+
+		api.clearLocating(false);
+		assert.equal(indicator.classList.contains('hide'), true);
+	}
+});
+
 test('a locate watch that never gets a fix releases its loader and can be retried', () => {
 	const { api, watches } = locateApi();
 	let loaders = 0;

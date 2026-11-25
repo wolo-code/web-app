@@ -130,14 +130,14 @@ function positionFromRegionGrid(city, position) {
 	return { lat: (anchor.center.lat < 0 ? -1 : 1) * Math.max(-90, Math.min(90, position.lat)), lng: wrapRegionLongitude(position.lng) };
 }
 
-function encodeRegionFallback(position) {
+function encodeRegionFallback(position, locating_encode) {
 	var choices = regionAnchorsForPosition(position);
 	if(!choices.length) return false;
 	// Reuse a deliberately chosen region while it still contains this tile.
 	var preferred = typeof selected_decode_city !== 'undefined' && selected_decode_city;
 	var preferredKey = preferred && /^region:v1:([^:]+):/.exec(preferred.id || '');
 	var choice = preferredKey && choices.find(function(entry) { return entry.region.key === preferredKey[1]; });
-	encode_((choice || choices[0]).anchor, regionPosition(position));
+	encode_((choice || choices[0]).anchor, regionPosition(position), locating_encode);
 	return true;
 }
 

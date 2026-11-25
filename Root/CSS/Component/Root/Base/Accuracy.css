@@ -88,6 +88,7 @@
 	margin: auto;
 	pointer-events: none;
 	position: absolute;
+	transform: scaleX(0.85);
 }
 
 @keyframes accuracy-shimmer {

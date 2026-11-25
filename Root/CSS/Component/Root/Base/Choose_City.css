@@ -294,7 +294,6 @@ html.dark-mode .decode_city_history_remove:hover {
 .city_region_reference_hint {
 	--hint-surface: #fff;
 	--hint-border: #d3dfe3;
-	--hint-secondary: #465863;
 	position: absolute;
 	inset-block-end: 100%;
 	inset-inline-end: 0;
@@ -329,15 +328,10 @@ html.dark-mode .decode_city_history_remove:hover {
 	margin: 0;
 }
 
-.city_region_reference_hint > p:first-child {
-	font-weight: 600;
-}
-
 .city_region_reference_hint > p + p {
 	margin-block-start: 8px;
 	padding-block-start: 8px;
 	border-block-start: 1px solid var(--hint-border);
-	color: var(--hint-secondary);
 }
 
 .city_region_reference_info:hover > .city_region_reference_hint,
@@ -352,7 +346,6 @@ html.dark-mode .city_region_reference_info {
 html.dark-mode .city_region_reference_hint {
 	--hint-surface: #26263c;
 	--hint-border: #494965;
-	--hint-secondary: #c8c8d8;
 	color: #f2f2f8;
 }
 

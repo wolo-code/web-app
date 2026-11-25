@@ -24,7 +24,9 @@ function node() {
 
 function runtime(mode = 'nearby') {
 	const nodes = {}, events = [], requests = [];
-	const dialog = {};
+	const referenceHint = node();
+	const referenceInfo = { querySelector: selector => selector === '.city_region_reference_hint' ? referenceHint : null };
+	const dialog = { querySelector: selector => selector === '.city_region_reference_info' ? referenceInfo : null };
 	const tabs = { querySelector: selector => selector };
 	const picker = { querySelector: () => tabs, closest: () => dialog };
 	nodes[mode + '_region_menu'] = picker;

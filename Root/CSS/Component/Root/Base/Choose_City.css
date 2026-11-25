@@ -226,6 +226,7 @@ html.dark-mode .decode_city_history_remove:hover {
 	overflow-y: auto;
 	scrollbar-gutter: stable;
 	flex: 0 1 auto;
+	padding-block-end: 6px;
 }
 
 :is(#decode_city_history_message, #choose_city_by_periphery_message) > .message_dialog_body {
@@ -255,11 +256,74 @@ html.dark-mode .decode_city_history_remove:hover {
 	min-height: 44px;
 }
 
-.city_region_picker .city_region_reference_hint {
-	margin: 0.5rem auto;
-	max-width: 32ch;
-	font-size: 0.875em;
-	text-align: center;
+.city_region_reference_info {
+	position: relative;
+	align-self: flex-end;
+	margin: 0 8px 4px;
+	color: #35657a;
+}
+
+.city_region_reference_info > button {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	cursor: help;
+}
+
+.city_region_reference_info > button:focus-visible {
+	outline: 2px solid #69b7cf;
+	outline-offset: 1px;
+}
+
+.city_region_reference_hint {
+	position: absolute;
+	inset-block-end: 100%;
+	inset-inline-end: 0;
+	z-index: 1;
+	visibility: hidden;
+	box-sizing: border-box;
+	width: min(260px, calc(100vw - 56px));
+	padding: 10px 12px;
+	border: 1px solid #d3dfe3;
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+	color: #333;
+	font-size: .875rem;
+	line-height: 1.35;
+}
+
+.city_region_reference_hint > p {
+	margin: 0;
+}
+
+.city_region_reference_hint > p + p {
+	margin-block-start: 6px;
+}
+
+.city_region_reference_info:hover > .city_region_reference_hint,
+.city_region_reference_info > button:focus-visible + .city_region_reference_hint {
+	visibility: visible;
+}
+
+html.dark-mode .city_region_reference_info {
+	color: #a5cbd8;
+}
+
+html.dark-mode .city_region_reference_hint {
+	border-color: #44445e;
+	background: #2a2a4a;
+	color: #eee;
+}
+
+#decode_city_history_message:has(#decode_city_history_delete:not(.hide)) > .city_region_reference_info {
+	display: none;
 }
 
 .city_region_picker[hidden],

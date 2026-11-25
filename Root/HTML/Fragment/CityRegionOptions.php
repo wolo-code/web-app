@@ -11,7 +11,6 @@ $cityRegionCityLists = [
 		<span aria-hidden='true'>|</span>
 		<button id='<?= $cityRegionMenuId ?>_region_tab' type='button' role='tab' aria-selected='false' aria-controls='<?= $cityRegionMenuId ?>_region_panel' tabindex='-1'><span>Region</span></button>
 	</div>
-	<p class='city_region_reference_hint'>Different references can give the same location different Wolo Codes.</p>
 	<div id='<?= $cityRegionMenuId ?>_city_panel' role='tabpanel' aria-labelledby='<?= $cityRegionMenuId ?>_city_tab'>
 		<label class='city_region_search_field'>
 			<svg viewBox='0 0 24 24' aria-hidden='true' focusable='false' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'>

@@ -21,7 +21,7 @@ The nearby, matching-name, and previous-city dialogs share the **City** and **Re
 
 The previous-city and nearby versions of **Choose city or region** open with the **City** and **Region** tabs at the top. The **Anchor Icon** and **Close Button** have matching visible insets from the top and their respective side edges. Selecting a region that covers the map pin uses the pin's calculated index. Selecting another region pre-fills its name in the **Wolo Code Input** and positions the cursor for index entry. Calculated and previous regional references retain the outlined monospace index badge.
 
-The **Code Reference Hint** (`.city_region_reference_hint`) stays below the tabs in the nearby, matching-name, and previous-city pickers. It explains that different references can give the same location different Wolo Codes.
+Hover over or keyboard-focus the **Code Reference Info Icon** (`.city_region_reference_info > button`) at the bottom right of the nearby, matching-name, and previous-city pickers to reveal the **Code Reference Hint** (`.city_region_reference_hint`). It explains that different references can give the same location different Wolo Codes and that geographic reference names imply no position on political boundaries or sovereignty.
 
 
 The Address Panel omits the Code reference selector and Propose a city button.

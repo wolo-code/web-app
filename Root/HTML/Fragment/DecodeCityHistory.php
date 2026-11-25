@@ -15,4 +15,5 @@
 			</div>
 		</div>
 	</div>
+	<?php require __DIR__ . '/CityRegionReferenceHint.php'; ?>
 </div>

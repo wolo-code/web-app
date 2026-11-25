@@ -6,4 +6,5 @@
 	<div id='choose_city_by_periphery_message_prompt' class='message_dialog_body'>
 		<?php $cityRegionMenuId = 'nearby'; require __DIR__ . '/CityRegionOptions.php'; ?>
 	</div>
+	<?php require __DIR__ . '/CityRegionReferenceHint.php'; ?>
 </div>

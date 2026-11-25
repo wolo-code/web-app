@@ -273,6 +273,7 @@ function setupControls() {
 	}
 	bindControl('decode_city_geolocation', 'click', requestDecodeCityGeolocation);
 	bindControl('decode_city_ip', 'click', selectIpDecodeCity);
+	bindControl('decode_input_city', 'click', showDecodeCityHistoryMessage);
 	bindControl('decode_city_history_toggle', 'click', showDecodeCityHistoryMessage);
 	bindControl('map_city_history_toggle', 'click', showDecodeCityHistoryMessage);
 	if(typeof initDecodeCityHistoryDeleteControls == 'function')

@@ -110,8 +110,10 @@ function setDecodeCity(city, source, save_history) {
 
 function setDecodeCityLabel(label) {
 	var city_label = document.getElementById('decode_input_city');
-	if(city_label)
+	if(city_label) {
 		city_label.innerText = label || '\u00a0';
+		city_label.setAttribute('aria-label', label ? label + '. Choose city or region' : 'Choose city or region');
+	}
 }
 
 function getDecodeCityDisplayName(city) {
@@ -187,6 +189,7 @@ function getDecodeCityHistoryKey(city) {
 
 function getDecodeCityHistoryToggles() {
 	return [
+		document.getElementById('decode_input_city'),
 		document.getElementById('decode_city_history_toggle'),
 		document.getElementById('map_city_history_toggle')
 	].filter(Boolean);

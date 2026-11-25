@@ -80,7 +80,7 @@
 					<span class='decode_icon_caption' aria-hidden='true'>GPS city</span>
 				</button>
 			</div>
-			<div id='decode_input_city'>&nbsp;</div>
+			<button id='decode_input_city' type='button' title='Choose city or region' aria-label='Choose city or region' aria-controls='decode_city_history_message' aria-expanded='false'>&nbsp;</button>
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
 		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>

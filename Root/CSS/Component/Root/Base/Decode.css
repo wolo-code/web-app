@@ -660,7 +660,18 @@ body.map-source-single #action_menu_map {
 }
 
 #decode_input_city {
+	background: transparent;
+	border: 0;
 	color: #7f7f7f;
+	cursor: pointer;
+	font: inherit;
+	margin: -5px 0;
+	padding: 5px 10px;
+}
+
+#decode_input_city:hover,
+#decode_input_city:focus-visible {
+	text-decoration: underline;
 }
 
 #decode_map_view_button {

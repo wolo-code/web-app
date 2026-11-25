@@ -754,6 +754,8 @@ function decode_input_from_map(event) {
 }
 
 function decode_input_from_map_add() {
+	if(skipIconGuideAutoShow())
+		return;
 	decode_input_from_map({shiftKey: true});
 }
 

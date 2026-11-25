@@ -1,5 +1,6 @@
 var DECODE_ICON_GUIDE_STORAGE_KEY = 'wolo-decode-icon-guide-launches';
 var MAP_ICON_GUIDE_STORAGE_KEY = 'wolo-map-icon-guide-launches';
+var ICON_GUIDE_SKIP_STORAGE_KEY = 'wolo-icon-guide-skip';
 var DECODE_ICON_GUIDE_MAX_LAUNCHES = 2;
 var DECODE_ICON_GUIDE_HOLD_MS = getDecodeIconGuideHoldMs();
 var DECODE_ICON_GUIDE_FADE_MS = 400;
@@ -27,6 +28,7 @@ var decodeIconGuideSearchHome = null;
 var decodeIconGuideReplayHint = false;
 var decodeIconGuideShownOnDecode = false;
 var decodeIconGuideAwaitingIntro = false;
+var iconGuideAutoShowSkipped = false;
 
 function getDecodeIconGuideHoldMs() {
 	if(typeof WOLO_ICON_GUIDE_TIMEOUT_MS === 'number' && WOLO_ICON_GUIDE_TIMEOUT_MS > 0)
@@ -140,7 +142,30 @@ function markDecodeIconGuideConsumed() {
 }
 
 function shouldHintMapIconGuideReplay() {
-	return !decodeIconGuideForced && !isDecodeIconGuideView() && shouldShowMapIconGuide();
+	return !decodeIconGuideForced && !isIconGuideAutoShowSkipped() && !isDecodeIconGuideView() && shouldShowMapIconGuide();
+}
+
+function isIconGuideAutoShowSkipped() {
+	if(iconGuideAutoShowSkipped)
+		return true;
+	try {
+		return localStorage.getItem(ICON_GUIDE_SKIP_STORAGE_KEY) === '1';
+	}
+	catch(error) {
+		return false;
+	}
+}
+
+function skipIconGuideAutoShow() {
+	iconGuideAutoShowSkipped = true;
+	try {
+		localStorage.setItem(ICON_GUIDE_SKIP_STORAGE_KEY, '1');
+	}
+	catch(error) {}
+	decodeIconGuideReplayHint = false;
+	var wasVisible = decodeIconGuideVisible;
+	fadeDecodeIconGuide();
+	return wasVisible;
 }
 
 function showMapIconGuideReplayHint() {
@@ -668,7 +693,6 @@ function clearDecodeIconGuideTimers() {
 }
 
 function bindDecodeIconGuideDismiss() {
-	unbindDecodeIconGuideDismiss();
 	var scrim = document.getElementById('decode_icon_guide_scrim');
 	if(scrim)
 		scrim.addEventListener('click', onDecodeIconGuideDismiss);
@@ -680,6 +704,7 @@ function unbindDecodeIconGuideDismiss() {
 	if(scrim)
 		scrim.removeEventListener('click', onDecodeIconGuideDismiss);
 	document.removeEventListener('click', onDecodeIconGuideDismiss, true);
+	document.removeEventListener('keydown', onDecodeIconGuideDismiss, true);
 }
 
 function isDecodeIconGuideDismissEvent(event) {
@@ -688,6 +713,8 @@ function isDecodeIconGuideDismissEvent(event) {
 	var infoButton;
 	if(!event || event.isTrusted === false)
 		return false;
+	if(event.type === 'keydown')
+		return true;
 	if(event.type !== 'click')
 		return false;
 	if(typeof event.detail === 'number' && event.detail === 0)
@@ -703,9 +730,11 @@ function isDecodeIconGuideDismissEvent(event) {
 }
 
 function onDecodeIconGuideDismiss(event) {
-	if(!decodeIconGuideVisible || !decodeIconGuideReady || document.body.classList.contains('decode-icon-guide-fade'))
+	if(!decodeIconGuideVisible || document.body.classList.contains('decode-icon-guide-fade'))
 		return;
 	if(!isDecodeIconGuideDismissEvent(event))
+		return;
+	if(event.type === 'click' && !decodeIconGuideReady)
 		return;
 	if(event.cancelable)
 		event.preventDefault();
@@ -773,6 +802,7 @@ function beginDecodeIconGuideTimers() {
 	clearDecodeIconGuideTimers();
 	unbindDecodeIconGuideDismiss();
 	decodeIconGuideReady = false;
+	document.addEventListener('keydown', onDecodeIconGuideDismiss, true);
 	decodeIconGuideReadyTimer = setTimeout(function() {
 		decodeIconGuideReadyTimer = null;
 		if(!decodeIconGuideVisible || document.body.classList.contains('decode-icon-guide-fade'))
@@ -838,7 +868,7 @@ function syncDecodeIconGuide() {
 	}
 	else if(!directWoloLinkEntry)
 		recordMapIconGuideVisit();
-	autoShow = !directWoloLinkEntry && (decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide());
+	autoShow = !directWoloLinkEntry && !isIconGuideAutoShowSkipped() && (decodeView ? shouldShowDecodeIconGuide() : shouldShowMapIconGuide());
 	allow = (decodeIconGuideForced || autoShow || finishDecodeIconGuideFade) && !shouldHoldDecodeIconGuide();
 	if(allow && !isDecodeIconGuideConsumed() && !decodeIconGuideVisible)
 		startDecodeIconGuide();

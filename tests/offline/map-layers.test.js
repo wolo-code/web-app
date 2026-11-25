@@ -337,6 +337,52 @@ test('a manual Input Icon Guide stays visible through its fade during a view syn
 	assert.equal(classes.has('decode-icon-guide-fade'), false);
 });
 
+test('a key dismisses the guide during its click grace period and skipping persists across views', () => {
+	const storage = new Map();
+	const events = new Map();
+	let decodeView = true;
+	const ctx = {
+		directWoloLinkEntry: false,
+		Storage: function() {},
+		localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
+		isDecodeView: () => decodeView,
+		setTimeout: () => 1,
+		clearTimeout() {},
+		document: {
+			body: { classList: { contains: () => false } },
+			getElementById: () => null,
+			addEventListener: (name, handler, capture) => events.set(name, {handler, capture}),
+			removeEventListener: name => events.delete(name)
+		}
+	};
+	const guide = read('Root/JS/Component/Root/DecodeIconGuide.js');
+	const current = vm.createContext({...ctx});
+	vm.runInContext(guide, current);
+	current.decodeIconGuideVisible = true;
+	current.fadeDecodeIconGuide = () => { current.decodeIconGuideVisible = false; };
+	current.beginDecodeIconGuideTimers();
+	const {handler, capture} = events.get('keydown');
+	assert.equal(capture, true);
+	let prevented = false;
+	handler({type: 'keydown', key: 'a', cancelable: true, preventDefault() { prevented = true; }});
+	assert.equal(prevented, true);
+	assert.equal(current.decodeIconGuideVisible, false);
+	assert.equal(storage.size, 0);
+	current.skipIconGuideAutoShow();
+
+	const reloaded = vm.createContext({...ctx});
+	vm.runInContext(guide, reloaded);
+	const starts = [];
+	reloaded.startDecodeIconGuide = force => starts.push(force);
+	reloaded.recordDecodeIconGuideLaunch();
+	reloaded.syncDecodeIconGuide();
+	decodeView = false;
+	reloaded.syncDecodeIconGuide();
+	assert.deepEqual(starts, []);
+	reloaded.requestDecodeIconGuide();
+	assert.deepEqual(starts, [true]);
+});
+
 test('map source constants are declared before pref helpers and layer setters', () => {
 	const mapLayers = read('Root/JS/Component/Root/MapLayers.js');
 	const constantsPos = mapLayers.indexOf('var MAP_SOURCE_IDS');

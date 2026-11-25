@@ -528,6 +528,7 @@ test('holding Go adds a card and the release click does not replace either marke
  const source = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/Map.js'), 'utf8');
  assert.match(source, /addLongpressListener\(document.getElementById\('decode_button'\), decode_input_from_map, decode_input_from_map_add\)/);
  vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Base/LongPress.js'), 'utf8'), context);
+ vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/DecodeIconGuide.js'), 'utf8'), context);
  let hold;
  context.setTimeout = fn => {hold = fn; return 1;};
  const go = document.getElementById('decode_button');
@@ -549,4 +550,14 @@ test('holding Go adds a card and the release click does not replace either marke
  assert.equal(second.anchor.getTitle(), 'Place 2');
  assert.equal(context.initWCode_jumpToMap, false);
  assert.equal(document.getElementById('map_places_toggle').hidden, false);
+
+ context.decodeIconGuideVisible = true;
+ context.fadeDecodeIconGuide = () => { context.decodeIconGuideVisible = false; };
+ go.pointerdown({type: 'pointerdown', pointerType: 'touch', button: 0});
+ hold();
+ go.pointerup({type: 'pointerup', pointerType: 'touch', button: 0});
+ go.click({type: 'click', detail: 1});
+ assert.equal(decodes, 1);
+ assert.equal(context.decodeIconGuideVisible, false);
+ assert.equal(context.isIconGuideAutoShowSkipped(), true);
 });

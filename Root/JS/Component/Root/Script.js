@@ -229,7 +229,10 @@ function setupControls() {
 	bindControl('locate_right_message_no', 'click', locateRight_deny);
 	bindControl('invalid_code_message_close', 'click', hideInvalidCodeDialog);
 	bindControl('invalid_code_correct', 'click', invalidCodeCorrect);
-	bindControl('invalid_code_search', 'click', invalidCodeSearchMap);
+	addLongpressListener(document.getElementById('invalid_code_search'), invalidCodeSearchMap, function() {
+		skipIconGuideAutoShow();
+		invalidCodeSearchMap();
+	});
 	bindControl('no_city_submit_yes', 'click', noCity_add);
 	bindControl('no_city_new_request', 'click', newCityProposal);
 	bindControl('no_city_submit_no', 'click', noCity_cancel);

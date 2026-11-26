@@ -128,11 +128,13 @@ function loadMapDecode(api) {
 	api.getAddress = point => { api.addressLookup = point; };
 }
 
-test('holding Go after an IP city warning opens the normal map result with a reusable regional code', () => {
+test('holding Go after an IP city warning opens the decoded city and preserves the entered words', () => {
 	const { api, input, status, remembered, requests, result, loaderDepth } = setupIpCityLookup();
 	loadMapDecode(api);
 	const codeWords = ['judge', 'task', 'tsunami'];
 	input.value = codeWords.join(' ');
+	const entry = {};
+	api.getMapPlace = () => entry;
 	let hold;
 	api.setTimeout = callback => { hold = callback; return 1; };
 	api.clearTimeout = () => {};
@@ -158,16 +160,21 @@ test('holding Go after an IP city warning opens the normal map result with a reu
 	assert.equal(api.openedMap, true);
 	assert.equal(api.addressLookup, api.pin);
 	assert.ok(Math.abs(api.pin.lat - expected.lat) < 1e-10 && Math.abs(api.pin.lng - expected.lng) < 1e-10);
-	assert.match(api.code_city.id, /^region:v1:/);
-	assert.deepEqual(api.label, { cityName: api.code_city.name, code: api.code_wcode.join(' ') });
+	assert.equal(api.code_city.name, 'Barsain');
+	assert.equal(api.code_city.id, undefined);
+	assert.equal(api.code_city.detected, true);
+	assert.deepEqual(api.label, { cityName: 'Barsain', code: codeWords.join(' ') });
+	assert.equal(api.getCodeFull_text(), 'Barsain ' + codeWords.join(' '));
+	assert.equal(api.getWoloMapLinkPath(), null);
+	assert.equal(api.getMapPlaceWoloCode(entry), null);
 	assert.equal(status.textContent, '');
 	assert.deepEqual(remembered, []);
 	assert.equal(api.selected_decode_city, null);
 	assert.equal(api.detectedDecodeCity.name, 'Barsain');
 
-	const link = api.parseWoloLinkPath(api.getWoloMapLinkPath());
-	api.decode(link.words, null, null, true);
-	assert.ok(Math.abs(api.pin.lat - expected.lat) < 0.00001 && Math.abs(api.pin.lng - expected.lng) < 0.000012);
+	api.showNotification = message => { api.notice = message; };
+	api.copyWcodeJumpLink();
+	assert.match(api.notice, /published Wolo reference/);
 	assert.equal(loaderDepth(), 0);
 });
 
@@ -304,7 +311,7 @@ test('Go dims after reference feedback and only a hold can decode the same input
 	assert.deepEqual(attempts, [true, undefined]);
 });
 
-test('decode with a detected city preserves precision when sharing the regional code', () => {
+test('decode with a detected city preserves the entered precision on the map', () => {
 	const { api } = setup();
 	loadMapDecode(api);
 	const unregistered = { name: 'Barsain', center: { lat: 26.56, lng: 86.65 } };
@@ -316,10 +323,8 @@ test('decode with a detected city preserves precision when sharing the regional 
 	const precision = api.encodePrecisionWolo(unregistered, begin, indices, decimals);
 	api.decode_(unregistered, baseWords, precision, true);
 
-	const url = new URL(api.getWoloMapLinkPath(), 'https://example.test');
-	const link = api.parseWoloLinkPath(url.pathname);
-	const sharedPrecision = api.getWoloLinkPrecision(url.search);
-	assert.ok(sharedPrecision.length);
-	api.decode(link.words, null, null, true, sharedPrecision);
 	assert.deepEqual(Array.from(api.pin.precisionDecimals), decimals);
+	assert.deepEqual(Array.from(api.getActivePrecisionWoloWords()), Array.from(precision));
+	assert.equal(api.label.cityName, 'Barsain');
+	assert.equal(api.label.code, baseWords.join(' ') + ' . ' + precision.join(' '));
 });

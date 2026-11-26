@@ -18,7 +18,10 @@ function setCode(city, wcode, latLng, locating_encode) {
 		addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
 	setInfoWindowText(getProperCityAccent(city), city.name_id, getCodeWithPrecision(wcode), latLng, city);
 	var entry = typeof getMapPlace === 'function' ? getMapPlace(marker) : null;
-	if(entry) entry.routeCode = getCanonicalWoloPathFromWords(getCodeComplete()).slice(1);
+	if(entry) {
+		entry.detectedCity = city.detected === true;
+		entry.routeCode = entry.detectedCity ? null : getCanonicalWoloPathFromWords(getCodeComplete()).slice(1);
+	}
 	if(typeof syncRegionChoices === 'function') syncRegionChoices();
 }
 
@@ -34,7 +37,7 @@ function getCodeComplete() {
 }
 
 function getCodeFull() {
-	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+	if(code_city.detected || (typeof isRegionAnchor === 'function' && isRegionAnchor(code_city)))
 		return [code_city.name_id].concat(code_wcode);
 	var codeFull_city_part = [code_city.name_id].concat(code_wcode);
 	var prefix;
@@ -53,7 +56,7 @@ function getCodeFull() {
 }
 
 function getCodeFull_capitalized() {
-	if(typeof isRegionAnchor === 'function' && isRegionAnchor(code_city))
+	if(code_city.detected || (typeof isRegionAnchor === 'function' && isRegionAnchor(code_city)))
 		return [code_city.name].concat(code_wcode);
 	var codeFull_city_part = [code_city.name].concat(code_wcode);
 	var prefix;

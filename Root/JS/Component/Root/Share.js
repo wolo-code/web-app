@@ -9,6 +9,8 @@ function handleShareWCode() {
 }
 
 function shareWCode() {
+	if(!requirePublishedWoloCode())
+		return;
 	var share_address;
 	if(current_address)
 		share_address = current_address;
@@ -77,11 +79,23 @@ function copyWcodeCode() {
 }
 
 function getWoloMapLinkPath() {
+	if(code_city && code_city.detected)
+		return null;
 	var zoom = typeof map !== 'undefined' && map ? map.getZoom() : undefined;
 	return getPrecisionWoloLinkPath(getCodeComplete(), '', getActivePrecisionWoloWords(), zoom);
 }
 
+function requirePublishedWoloCode() {
+	if(code_city && code_city.detected) {
+		showNotification('This city needs a published Wolo reference for links and labels.');
+		return false;
+	}
+	return true;
+}
+
 function copyWcodeLink() {
+	if(!requirePublishedWoloCode())
+		return;
 	var code_url = location.hostname + getWoloMapLinkPath();
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
@@ -89,6 +103,8 @@ function copyWcodeLink() {
 }
 
 function copyWcodeJumpLink() {
+	if(!requirePublishedWoloCode())
+		return;
 	var code_url = location.hostname + getPrecisionWoloLinkPath(getCodeComplete(), '/', getActivePrecisionWoloWords());
 	showAndCopy(code_url);
 	showNotification(WCODE_LINK_COPIED_MESSAGE);
@@ -120,7 +136,9 @@ function gotoCoordinate() {
 	var mapUrl = getIntentURL(code_postition, code_city.name_id + ' ' + getCodeWithPrecision(code_wcode));
 	if(mapUrl.startsWith('https:')) {
 		// Restore the selected location even when Back reloads the page.
-		window.history.replaceState(window.history.state, '', getWoloMapLinkPath());
+		var path = getWoloMapLinkPath();
+		if(path)
+			window.history.replaceState(window.history.state, '', path);
 	}
 	window.location.assign(mapUrl);
 }

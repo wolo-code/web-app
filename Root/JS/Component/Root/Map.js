@@ -1485,6 +1485,7 @@ function getMapPlaceLabel(index) {
 
 function getMapPlaceWoloCode(entry) {
 	if(entry.routeCode) return entry.routeCode;
+	if(entry.detectedCity) return null;
 	// Search results without an opened card still have a globally resolvable regional code.
 	var position = resolveLatLng(entry.marker.getPosition());
 	var choices = regionAnchorsForPosition(position);
@@ -1516,6 +1517,10 @@ function getMapRouteURL(coordinateBased) {
 }
 
 function shareMapRoute(coordinateBased) {
+	if(!coordinateBased && mapPlaces.some(function(entry) { return entry.detectedCity; })) {
+		showNotification('Hold Route to share coordinates for this route.');
+		return;
+	}
 	var url = getMapRouteURL(coordinateBased);
 	if(!url) { showNotification('Route codes are still loading. Please try again.'); return; }
 	function copy() { copyPlainText(url); showNotification('Route link copied'); }

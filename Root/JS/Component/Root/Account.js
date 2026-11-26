@@ -309,7 +309,7 @@ function saveAddress(title, segment, savedAddress, callback, location, notify) {
 	var code = normalizeSavedWcode(location ? location.code : (typeof getCodeWCode == 'function' ? getCodeWCode() : null));
 	var basePayload = buildSaveAddressPayload(title, segment, savedAddress, city, code);
 	if(!basePayload) {
-		notify('Locate or decode a Wolo Code first');
+		notify(city && city.detected ? 'This city needs a published Wolo reference before it can be saved.' : 'Locate or decode a Wolo Code first');
 		return;
 	}
 	var payload = {

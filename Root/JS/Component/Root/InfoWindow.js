@@ -122,8 +122,6 @@ function extractPlusCodeFromGeocode(results) {
 
 function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	initInfoWindow();
-	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city))
-		city_accent = getRegionReferenceHTML(city, city_accent);
 	if(latLng) {
 		latLng_p = latLng;
 	}
@@ -132,7 +130,12 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 	var card = infoWindow;
 	var content = document.createElement('div');
 	content.className = 'map_card_content';
-	content.innerHTML = "<div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'>" + city_accent + "</span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
+	content.innerHTML = "<div class='map_card_code'><div class='map_card_code_left'><span class='slash'>\\</span> <span class='infowindow_code map_card_city'><span class='control'></span></span></div><div class='map_card_code_right'><span class='infowindow_code map_card_words'>" + code_string + "</span> <span class='slash'>/</span></div></div><div class='map_card_actions center'><img class='map_card_address control' src=" + svg_address + " ><div class='map_card_launch control'><img src=" + svg_launch + " ></div><div class='map_card_label control'><div class='shield'></div><img src=" + svg_label + " ></div></div>";
+	var cityControl = content.querySelector('.map_card_city > .control');
+	if(typeof isRegionAnchor === 'function' && isRegionAnchor(city))
+		cityControl.innerHTML = getRegionReferenceHTML(city, city_accent);
+	else
+		cityControl.textContent = city_accent;
 	content.addEventListener('pointerdown', function() { activateMapCard(card); });
 	function forThisCard(action) {
 		return function() {
@@ -140,7 +143,7 @@ function setInfoWindowText(city_accent, city_name, code_string, latLng, city) {
 				action();
 		};
 	}
-	content.querySelector('.map_card_city > .control').addEventListener('click', forThisCard(showChooseCity_by_periphery_Message));
+	cityControl.addEventListener('click', forThisCard(showChooseCity_by_periphery_Message));
 	addLongpressListener(content.querySelector('.map_card_words'), forThisCard(copyWcodeFull), forThisCard(copyWcodeCode));
 	addLongpressListener(content.querySelector('.map_card_address'), forThisCard(toggleAddress), forThisCard(handleShareWCode));
 	addLongpressListener(content.querySelector('.map_card_launch'), forThisCard(gotoCoordinate), forThisCard(copyWcodeJumpLink));

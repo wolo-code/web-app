@@ -1,4 +1,6 @@
 function showQR() {
+	if(code_city && code_city.detected && !requirePublishedWoloCode())
+		return;
 	if(typeof applyPoiPlaceLabelPrefill === 'function')
 		applyPoiPlaceLabelPrefill();
 	hideOverlay(document.getElementById('copy_wcode_message'));
@@ -249,6 +251,8 @@ function downloadQR() {
 }
 
 function downloadQR_minimal() {
+	if(code_city && code_city.detected && !requirePublishedWoloCode())
+		return;
 	
 	if(!mode_preview) {
 		toggleQRpreview();

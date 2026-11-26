@@ -127,7 +127,7 @@ function decode_(city, code, precisionWords, useDetectedCity) {
 		}
 	}
 	if(useDetectedCity) {
-		openDetectedCityDecode(position);
+		openDetectedCityDecode(city, position, code);
 		return;
 	}
 	code_city = city;
@@ -137,29 +137,21 @@ function decode_(city, code, precisionWords, useDetectedCity) {
 	openDecodedLocation(city, position, code);
 }
 
-function openDetectedCityDecode(position) {
-	// The detected center gives a position, but saving and sharing require a published reference.
+function openDetectedCityDecode(city, position, code) {
 	var point = regionPosition({lat: position.lat, lng: wrapRegionLongitude(position.lng)});
-	var choice = point && regionAnchorsForPosition(point)[0];
-	var city = choice && choice.anchor;
-	var begin = city && getWoloAnchorBegin(city);
-	var gridPosition = begin && regionGridPosition(city, point);
-	var indices = gridPosition && encode__(begin, gridPosition);
-	if(!isValidWoloIndexCode(indices)) {
+	if(!point) {
 		showDecodeReferenceRequired('Couldn’t decode with the detected city.');
 		return;
 	}
-	if(position.precisionDecimals) {
-		point.precisionDecimals = position.precisionDecimals;
-		point.precisionWords = encodePrecisionWolo(city, begin, indices, point.precisionDecimals);
-		if(!point.precisionWords) {
-			showDecodeReferenceRequired('Couldn’t preserve the precision of this Wolo Code.');
-			return;
-		}
-	}
-	code_city = city;
+	code_city = {
+		name: city.name,
+		name_id: normalizeCityLookupToken(city.name),
+		country: city.country || '',
+		center: city.center,
+		detected: true
+	};
 	setDecodeCityStatus('');
-	openDecodedLocation(city, point, indices.map(index => wordList.getWord(index)));
+	openDecodedLocation(code_city, Object.assign({}, position, point), code);
 }
 
 function openDecodedLocation(city, position, code) {

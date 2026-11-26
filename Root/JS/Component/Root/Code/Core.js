@@ -175,7 +175,7 @@ function getCityGpId(address_components) {
 	return fallback;
 }
 
-function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowPreview) {
+function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowDetectedCity) {
 	pushLoader();
 	function finish(city, wcode) {
 		if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
@@ -216,8 +216,8 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 		return;
 	}
 	if(decodeCityIssue) {
-		if(allowPreview && decodeCityPreview)
-			decodeDetectedCityPreview(codeWords, precisionWords, selectionVersion);
+		if(allowDetectedCity && detectedDecodeCity)
+			decodeWithDetectedCity(codeWords, precisionWords, selectionVersion);
 		else {
 			popLoader();
 			showDecodeReferenceRequired(decodeCityIssue);
@@ -231,7 +231,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 		var submittedValue = input && input.value;
 		decodeCityLookup.onComplete = function() {
 			if((selectionVersion == null || selectionVersion === mapSelectionVersion) && (!input || input.value === submittedValue))
-				decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowPreview);
+				decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowDetectedCity);
 		};
 		return;
 	}
@@ -250,21 +250,21 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 	finish(null, codeWords);
 }
 
-function decodeDetectedCityPreview(words, precisionWords, selectionVersion) {
-	var preview = decodeCityPreview;
+function decodeWithDetectedCity(words, precisionWords, selectionVersion) {
+	var detectedCity = detectedDecodeCity;
 	var input = document.getElementById('decode_input');
 	var submittedValue = input && input.value;
-	resolveDecodeCityPreview(preview, function(center) {
+	resolveDetectedDecodeCity(detectedCity, function(center) {
 		popLoader();
-		if(preview !== decodeCityPreview || (selectionVersion != null && selectionVersion !== mapSelectionVersion) ||
+		if(detectedCity !== detectedDecodeCity || (selectionVersion != null && selectionVersion !== mapSelectionVersion) ||
 			(input && input.value !== submittedValue) || !document.body.classList.contains('decode'))
 			return;
 		if(!center) {
-			showDecodeReferenceRequired('Couldn’t preview this location.');
+			showDecodeReferenceRequired('Couldn’t resolve the detected city.');
 			return;
 		}
-		preview.center = center;
-		decode_(preview, words, precisionWords, true);
+		detectedCity.center = center;
+		decode_(detectedCity, words, precisionWords, true);
 	});
 }
 

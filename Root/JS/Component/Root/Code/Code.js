@@ -94,7 +94,7 @@ function setCodeWords(code, city, position, locating_encode) {
 	setCode(city, message, position, locating_encode);
 }
 
-function decode_(city, code, precisionWords, preview) {
+function decode_(city, code, precisionWords, useDetectedCity) {
 	if(typeof normalizeSavedWcode == 'function')
 		code = normalizeSavedWcode(code);
 	else if(code && code.length > 3)
@@ -126,14 +126,43 @@ function decode_(city, code, precisionWords, preview) {
 			return;
 		}
 	}
-	if(preview) {
-		showDecodePreview(city.name, position);
+	if(useDetectedCity) {
+		openDetectedCityDecode(position);
 		return;
 	}
 	code_city = city;
 	var sameReference = typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.id === city.id;
 	var source = sameReference ? selected_decode_city_source : 'history';
 	setDecodeCity(city, source, true);
+	openDecodedLocation(city, position, code);
+}
+
+function openDetectedCityDecode(position) {
+	// The detected center gives a position, but saving and sharing require a published reference.
+	var point = regionPosition({lat: position.lat, lng: wrapRegionLongitude(position.lng)});
+	var choice = point && regionAnchorsForPosition(point)[0];
+	var city = choice && choice.anchor;
+	var begin = city && getWoloAnchorBegin(city);
+	var gridPosition = begin && regionGridPosition(city, point);
+	var indices = gridPosition && encode__(begin, gridPosition);
+	if(!isValidWoloIndexCode(indices)) {
+		showDecodeReferenceRequired('Couldn’t decode with the detected city.');
+		return;
+	}
+	if(position.precisionDecimals) {
+		point.precisionDecimals = position.precisionDecimals;
+		point.precisionWords = encodePrecisionWolo(city, begin, indices, point.precisionDecimals);
+		if(!point.precisionWords) {
+			showDecodeReferenceRequired('Couldn’t preserve the precision of this Wolo Code.');
+			return;
+		}
+	}
+	code_city = city;
+	setDecodeCityStatus('');
+	openDecodedLocation(city, point, indices.map(index => wordList.getWord(index)));
+}
+
+function openDecodedLocation(city, position, code) {
 	setCodeCoord(city, position, code);
 	addClassIfPresent(document.getElementById('notification_top'), 'hide');
 	addClassIfPresent(document.getElementById('wait_loader'), 'hide');

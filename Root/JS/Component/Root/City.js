@@ -6,7 +6,7 @@ var multiple_country;
 var multiple_group;
 var decodeCityLookup;
 var decodeCityIssue = '';
-var decodeCityPreview = null;
+var detectedDecodeCity = null;
 var decodeCityBlockedInput = null;
 
 function getCityAccent(city) {
@@ -68,21 +68,21 @@ function verifyDecodeIpCity(lookup, name) {
 		if(city)
 			acceptDetectedDecodeCity(lookup, city, 'ip');
 		else {
-			var preview = /^[a-z]{2}$/i.test(country) ? {country: country} : null;
-			setDecodeCityIssue(detectedCityIssue(missing), name, preview);
+			var detectedCity = /^[a-z]{2}$/i.test(country) ? {country: country} : null;
+			setDecodeCityIssue(detectedCityIssue(missing), name, detectedCity);
 		}
 	});
 }
 
-function resolveDecodeCityPreview(preview, callback) {
-	if(preview.center || typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
-		callback(preview.center);
+function resolveDetectedDecodeCity(detectedCity, callback) {
+	if(detectedCity.center || typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
+		callback(detectedCity.center);
 		return;
 	}
-	var name = normalizeCityLookupToken(preview.name);
+	var name = normalizeCityLookupToken(detectedCity.name);
 	new google.maps.Geocoder().geocode({
-		address: preview.name,
-		componentRestrictions: {country: preview.country}
+		address: detectedCity.name,
+		componentRestrictions: {country: detectedCity.country}
 	}, function(results, status) {
 		var matches = status === 'OK' && (results || []).filter(function(result) {
 			return !result.partial_match && (result.address_components || []).some(function(component) {
@@ -178,9 +178,9 @@ function setDecodeCityStatus(message) {
 		syncProceedButtons();
 }
 
-function setDecodeCityIssue(message, name, preview) {
+function setDecodeCityIssue(message, name, detectedCity) {
 	decodeCityIssue = message;
-	decodeCityPreview = name && preview ? Object.assign({name: name}, preview) : null;
+	detectedDecodeCity = name && detectedCity ? Object.assign({name: name}, detectedCity) : null;
 	setDecodeCityStatus('');
 	if(message) {
 		var lookup = decodeCityLookup;

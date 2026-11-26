@@ -87,7 +87,7 @@ test('an IP lookup failure preserves valid words and a stale result cannot repla
 	assert.deepEqual(decoded, [[city, words, undefined]]);
 });
 
-function setupIpCityPreview() {
+function setupIpCityLookup() {
 	const state = setup();
 	const { api } = state;
 	const requests = [];
@@ -106,24 +106,33 @@ function setupIpCityPreview() {
 	return { ...state, requests, result };
 }
 
-test('holding Go after an IP city warning opens a temporary preview without selecting the city', () => {
-	const { api, status, remembered, requests, result, loaderDepth } = setupIpCityPreview();
+function loadMapDecode(api) {
 	const sourceRoot = path.join(__dirname, '../../Root/JS');
-	for(const file of ['Component/Root/Map.js', 'Component/Root/Code/Precision.js', 'Component/Root/Code/Code.js',
-		'Component/Root/RegionAnchors.js', 'Base/LongPress.js'])
+	for(const name of ['Map.js', 'Focus.js', 'Share.js', 'Code/Precision.js', 'Code/Code.js', 'Code/WordList.js',
+		'Code/Model.js', 'RegionRegistry.js', 'CountryRegistry.js', 'RegionAnchors.js'])
+		vm.runInContext(fs.readFileSync(path.join(sourceRoot, 'Component/Root', name), 'utf8'), api);
+	for(const file of ['Base/Base.js', 'Base/LongPress.js'])
 		vm.runInContext(fs.readFileSync(path.join(sourceRoot, file), 'utf8'), api);
-	api.map = {};
+	const list = JSON.parse(fs.readFileSync(path.join(sourceRoot, '../offline-data/WordList.json'), 'utf8'));
+	api.wordList = new api.WordList(list);
+	api.URLSearchParams = URLSearchParams;
+	api.map = { getZoom() {} };
 	api.document.activeElement = { blur() {} };
-	api.document.createElement = () => ({});
 	api.skipIconGuideAutoShow = () => false;
 	api.cleanUp = () => { api.mapSelectionVersion++; };
-	api.addClassIfPresent = () => {};
-	api.clearCode = () => {};
-	let label, pin;
-	api.infoWindow_setContent = content => { label = content.textContent; };
-	api.focus___ = point => { pin = point; };
-	let openedMap = false;
-	api.ensureMapViewForLocation = () => { openedMap = true; };
+	api.addClassIfPresent = api.removeClassIfPresent = () => {};
+	api.initWCode_jumpToMap = api.initWCode_jump_ask = api.keepAddressPanelOpen = false;
+	api.setInfoWindowText = (cityName, _nameId, code) => { api.label = { cityName, code }; };
+	api.focus___ = point => { api.pin = point; };
+	api.ensureMapViewForLocation = () => { api.openedMap = true; };
+	api.getAddress = point => { api.addressLookup = point; };
+}
+
+test('holding Go after an IP city warning opens the normal map result with a reusable regional code', () => {
+	const { api, input, status, remembered, requests, result, loaderDepth } = setupIpCityLookup();
+	loadMapDecode(api);
+	const codeWords = ['judge', 'task', 'tsunami'];
+	input.value = codeWords.join(' ');
 	let hold;
 	api.setTimeout = callback => { hold = callback; return 1; };
 	api.clearTimeout = () => {};
@@ -144,20 +153,29 @@ test('holding Go after an IP city warning opens a temporary preview without sele
 	assert.equal(requests[0].request.address, 'Barsain');
 	assert.equal(requests[0].request.componentRestrictions.country, 'NP');
 	requests[0].resolve([result], 'OK');
-	assert.equal(openedMap, true);
-	assert.equal(label, 'Preview · Barsain');
-	assert.ok(Math.abs(pin.lat - 26.56) < 1 && Math.abs(pin.lng - 86.65) < 1);
+	const detectedBegin = api.getCityBegin({ lat: 26.56, lng: 86.65 });
+	const expected = api.decode__(detectedBegin, codeWords.map(word => api.wordList.indexOf(word)));
+	assert.equal(api.openedMap, true);
+	assert.equal(api.addressLookup, api.pin);
+	assert.ok(Math.abs(api.pin.lat - expected.lat) < 1e-10 && Math.abs(api.pin.lng - expected.lng) < 1e-10);
+	assert.match(api.code_city.id, /^region:v1:/);
+	assert.deepEqual(api.label, { cityName: api.code_city.name, code: api.code_wcode.join(' ') });
 	assert.equal(status.textContent, '');
 	assert.deepEqual(remembered, []);
 	assert.equal(api.selected_decode_city, null);
+	assert.equal(api.detectedDecodeCity.name, 'Barsain');
+
+	const link = api.parseWoloLinkPath(api.getWoloMapLinkPath());
+	api.decode(link.words, null, null, true);
+	assert.ok(Math.abs(api.pin.lat - expected.lat) < 0.00001 && Math.abs(api.pin.lng - expected.lng) < 0.000012);
 	assert.equal(loaderDepth(), 0);
 });
 
-test('an ambiguous or outdated IP city preview cannot open a pin', () => {
-	const { api, input, status, decoded, requests, result, loaderDepth } = setupIpCityPreview();
+test('an ambiguous or outdated IP city lookup cannot open a decoded location', () => {
+	const { api, input, status, decoded, requests, result, loaderDepth } = setupIpCityLookup();
 	api.decode(words, null, null, false, undefined, true);
 	requests[0].resolve([result, result], 'OK');
-	assert.match(status.textContent, /^Couldn’t preview this location\./);
+	assert.match(status.textContent, /^Couldn’t resolve the detected city\./);
 
 	api.decode(words, null, null, false, undefined, true);
 	input.value = 'kathmandu ' + words.join(' ');
@@ -240,7 +258,7 @@ test('geolocation distinguishes a missing registry entry from a directory failur
 	assert.deepEqual(failure.decoded, []);
 });
 
-test('Go dims after reference feedback and only a hold can preview the same input', () => {
+test('Go dims after reference feedback and only a hold can decode the same input using the detected city', () => {
 	const { api, input, status } = setup();
 	const sourceRoot = path.join(__dirname, '../../Root/JS/Component/Root');
 	for(const file of ['Util.js', 'Map.js'])
@@ -258,7 +276,7 @@ test('Go dims after reference feedback and only a hold can preview the same inpu
 	api.map = {};
 	api.skipIconGuideAutoShow = () => false;
 	const attempts = [];
-	api.decode_input_from_form = allowPreview => attempts.push(allowPreview);
+	api.decode_input_from_form = allowDetectedCity => attempts.push(allowDetectedCity);
 	api.setDecodeCityIssue('Check that the city matches your Wolo Code.', 'Barsain', {center: city.center});
 	assert.equal(classes.has('active'), true);
 
@@ -266,7 +284,7 @@ test('Go dims after reference feedback and only a hold can preview the same inpu
 	assert.equal(status.textContent, referenceRequired);
 	assert.equal(classes.has('active'), false);
 	assert.equal(attributes.has('aria-disabled'), false);
-	assert.equal(button.title, 'Hold Go to preview');
+	assert.equal(button.title, 'Hold Go to decode with the detected city');
 	api.decode_input_from_form_external();
 	assert.deepEqual(attempts, []);
 	api.decode_input_from_form_hold();
@@ -286,19 +304,22 @@ test('Go dims after reference feedback and only a hold can preview the same inpu
 	assert.deepEqual(attempts, [true, undefined]);
 });
 
-test('preview uses the city grid without selecting or storing the reference', () => {
-	const { api, remembered } = setup();
-	const code = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/Code/Code.js'), 'utf8');
-	vm.runInContext(code, api);
-	api.getWoloAnchorBegin = reference => api.getCityBegin(reference.center);
-	const previews = [];
-	api.showDecodePreview = (name, position) => previews.push({ name, position });
+test('decode with a detected city preserves precision when sharing the regional code', () => {
+	const { api } = setup();
+	loadMapDecode(api);
 	const unregistered = { name: 'Barsain', center: { lat: 26.56, lng: 86.65 } };
-	api.decode_(unregistered, words, undefined, true);
-	assert.equal(previews.length, 1);
-	assert.equal(previews[0].name, 'Barsain');
-	assert.equal(Math.abs(previews[0].position.lat - unregistered.center.lat) < 1, true);
-	assert.equal(Math.abs(previews[0].position.lng - unregistered.center.lng) < 1, true);
-	assert.deepEqual(remembered, []);
-	assert.equal(api.selected_decode_city, null);
+	const decimals = ['26.5601234', '86.6502345'];
+	const position = api.parseWoloDecimalPosition(decimals.join(','));
+	const begin = api.getCityBegin(unregistered.center);
+	const indices = api.encode__(begin, position);
+	const baseWords = indices.map(index => api.wordList.getWord(index));
+	const precision = api.encodePrecisionWolo(unregistered, begin, indices, decimals);
+	api.decode_(unregistered, baseWords, precision, true);
+
+	const url = new URL(api.getWoloMapLinkPath(), 'https://example.test');
+	const link = api.parseWoloLinkPath(url.pathname);
+	const sharedPrecision = api.getWoloLinkPrecision(url.search);
+	assert.ok(sharedPrecision.length);
+	api.decode(link.words, null, null, true, sharedPrecision);
+	assert.deepEqual(Array.from(api.pin.precisionDecimals), decimals);
 });

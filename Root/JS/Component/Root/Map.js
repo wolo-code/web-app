@@ -759,13 +759,16 @@ function decode_input_from_map_add() {
 function decode_input_from_form_hold() {
 	if(skipIconGuideAutoShow() || !map)
 		return;
-	if(decodeCityPreview || !isDecodeCityRetryBlocked(document.getElementById('decode_input')))
+	if(detectedDecodeCity || !isDecodeCityRetryBlocked(document.getElementById('decode_input'))) {
+		initWCode_jump_ask = false;
+		initWCode_jumpToMap = false;
 		decode_input_from_form(true);
+	}
 }
 
-function decode_input_from_form(allowPreview) {
+function decode_input_from_form(allowDetectedCity) {
 	document.activeElement.blur();
-	beginDecode(document.getElementById('decode_input').value, null, {allowPreview: allowPreview === true});
+	beginDecode(document.getElementById('decode_input').value, null, {allowDetectedCity: allowDetectedCity === true});
 }
 
 function decode_input_from_form_external() {
@@ -790,7 +793,7 @@ function beginDecode(code, scannedMetadata, options) {
 	keepAddressPanelOpen = !!(options && options.showAddress);
 	if(keepAddressPanelOpen) address = current_address || '';
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
-	execDecode(code, decodeMarker, options && options.allowPreview);
+	execDecode(code, decodeMarker, options && options.allowDetectedCity);
 }
 
 function resolveLatLng(latLng) {
@@ -812,7 +815,7 @@ function hideDecodeInputAltTip() {
 	}
 }
 
-function execDecode(code, decodeMarker, allowPreview) {
+function execDecode(code, decodeMarker, allowDetectedCity) {
 	var trimmed = code.replace(/(\\|\/)/gm, '').trim();
 	if(trimmed.length === 0) {
 		showNotification(INCORRECT_WCODE);
@@ -838,7 +841,7 @@ function execDecode(code, decodeMarker, allowPreview) {
 	code = trimmed.toLowerCase();
 	var precision = splitPrecisionWoloText(code);
 	if(precision) {
-		decode(precision.base.split(/\s+/), decodeMarker, mapSelectionVersion, false, precision.words, allowPreview);
+		decode(precision.base.split(/\s+/), decodeMarker, mapSelectionVersion, false, precision.words, allowDetectedCity);
 		return;
 	}
 	var valid = true;
@@ -850,31 +853,13 @@ function execDecode(code, decodeMarker, allowPreview) {
 	var words = code.split(splitChar);
 	if(words.length < 3)
 		valid = false;
-	else if(allowPreview)
+	else if(allowDetectedCity)
 		decode(words, decodeMarker, mapSelectionVersion, false, undefined, true);
 	else
 		decode(words, decodeMarker, mapSelectionVersion);
 
 	if(!valid)
 		showInvalidCodeDialog(trimmed);
-}
-
-function showDecodePreview(cityName, position) {
-	initWCode_jump_ask = false;
-	initWCode_jumpToMap = false;
-	var point = regionPosition({lat: position.lat, lng: wrapRegionLongitude(position.lng)});
-	if(!point) {
-		setDecodeCityStatus('Couldn’t preview this location. Check that the city matches your Wolo Code');
-		return;
-	}
-	clearCode();
-	setDecodeCityStatus('');
-	ensureMapViewForLocation();
-	var label = document.createElement('div');
-	label.className = 'map_card_content';
-	label.textContent = 'Preview · ' + cityName;
-	infoWindow_setContent(label);
-	focus___(point);
 }
 
 function execDecodePlusCode(code) {

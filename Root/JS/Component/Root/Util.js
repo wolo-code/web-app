@@ -115,14 +115,14 @@ function syncProceedButtons() {
 		decodeButton.classList.toggle('active', hasProceedInput(pacInput.value));
 	if(decodeInputButton && decodeInput) {
 		var blocked = isDecodeCityRetryBlocked(decodeInput);
-		var canPreview = blocked && decodeCityPreview;
+		var canUseDetectedCity = blocked && detectedDecodeCity;
 		decodeInputButton.classList.toggle('active', !blocked && hasProceedInput(decodeInput.value));
 		decodeInputButton.toggleAttribute('data-tap-blocked', blocked);
-		if(blocked && !canPreview)
+		if(blocked && !canUseDetectedCity)
 			decodeInputButton.setAttribute('aria-disabled', 'true');
 		else
 			decodeInputButton.removeAttribute('aria-disabled');
-		decodeInputButton.title = canPreview ? 'Hold Go to preview' : 'Go';
+		decodeInputButton.title = canUseDetectedCity ? 'Hold Go to decode with the detected city' : 'Go';
 		decodeInputButton.setAttribute('aria-label', decodeInputButton.title);
 	}
 	syncDecodeInputCaseSource();

@@ -1153,7 +1153,6 @@ function syncMapChromeTooltips() {
 	setControlTooltip(document.getElementById('location_button'), 'Locate');
 	setControlTooltip(document.getElementById('account'), 'Account');
 	setControlTooltip(document.getElementById('decode_button'), 'Go');
-	setControlTooltip(document.getElementById('decode_input_button'), 'Go');
 	setControlTooltip(document.getElementById('decode_city_ip'), 'Use IP city');
 	setControlTooltip(document.getElementById('decode_city_geolocation'), 'Use geolocation city');
 	setControlTooltip(document.getElementById('decode_city_history_toggle'), 'Choose previous city');

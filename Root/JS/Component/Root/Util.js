@@ -113,7 +113,17 @@ function syncProceedButtons() {
 
 	if(decodeButton && pacInput)
 		decodeButton.classList.toggle('active', hasProceedInput(pacInput.value));
-	if(decodeInputButton && decodeInput)
-		decodeInputButton.classList.toggle('active', hasProceedInput(decodeInput.value));
+	if(decodeInputButton && decodeInput) {
+		var blocked = isDecodeCityRetryBlocked(decodeInput);
+		var canPreview = blocked && decodeCityPreview;
+		decodeInputButton.classList.toggle('active', !blocked && hasProceedInput(decodeInput.value));
+		decodeInputButton.toggleAttribute('data-tap-blocked', blocked);
+		if(blocked && !canPreview)
+			decodeInputButton.setAttribute('aria-disabled', 'true');
+		else
+			decodeInputButton.removeAttribute('aria-disabled');
+		decodeInputButton.title = canPreview ? 'Hold Go to preview' : 'Go';
+		decodeInputButton.setAttribute('aria-label', decodeInputButton.title);
+	}
 	syncDecodeInputCaseSource();
 }

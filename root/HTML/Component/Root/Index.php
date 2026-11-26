@@ -87,10 +87,10 @@
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>
 		<textarea id='decode_input' data-suggest='decode_input_suggestion_result' rows='1' placeholder="\ Wolo Code /" autocomplete='off'></textarea>
-		<div id='decode_input_button' class='control' tabindex='4' title='Go' aria-label='Go'>
+		<button id='decode_input_button' class='control' type='button' tabindex='4' title='Go' aria-label='Go' aria-describedby='decode_city_status'>
 			<span class='image'><?php includeSVG('', 'Proceed'); ?></span>
 			<span class='decode_icon_caption' aria-hidden='true'>Go</span>
-		</div>
+		</button>
 		<input id='decode_input_case' type='text' tabindex='-1' aria-hidden='true' autocomplete='off' required pattern='[23456789CFJKLMPTcfjklmpt]([\s\-]*[23456789CFJKLMPTcfjklmpt]){9}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{8}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}|[23456789CFGHJMPQRVWXcfghjmpqrvwx]{4,6}\+[23456789CFGHJMPQRVWXcfghjmpqrvwx]{2,3}( .+)?'>
 	</div>
 

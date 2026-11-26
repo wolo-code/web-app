@@ -557,6 +557,7 @@ test('holding decode Go skips the guide and only decodes if the guide was closed
 	assert.match(source, /addLongpressListener\(document.getElementById\('decode_input_button'\), decode_input_from_form_external, decode_input_from_form_hold\)/);
 	vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Base/LongPress.js'), 'utf8'), context);
 	vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/DecodeIconGuide.js'), 'utf8'), context);
+	vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/City.js'), 'utf8'), context);
 	let hold;
 	const previewsAllowed = [];
 	context.setTimeout = fn => { hold = fn; return 1; };

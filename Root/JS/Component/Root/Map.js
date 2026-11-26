@@ -757,7 +757,9 @@ function decode_input_from_map_add() {
 }
 
 function decode_input_from_form_hold() {
-	if(!skipIconGuideAutoShow() && map)
+	if(skipIconGuideAutoShow() || !map)
+		return;
+	if(decodeCityPreview || !isDecodeCityRetryBlocked(document.getElementById('decode_input')))
 		decode_input_from_form(true);
 }
 
@@ -767,7 +769,7 @@ function decode_input_from_form(allowPreview) {
 }
 
 function decode_input_from_form_external() {
-	if(!map)
+	if(!map || isDecodeCityRetryBlocked(document.getElementById('decode_input')))
 		return;
 	initWCode_jump_ask = true;
 	decode_input_from_form();

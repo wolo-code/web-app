@@ -7,6 +7,7 @@ var multiple_group;
 var decodeCityLookup;
 var decodeCityIssue = '';
 var decodeCityPreview = null;
+var decodeCityBlockedInput = null;
 
 function getCityAccent(city) {
 	if(typeof city.accent != 'undefined')
@@ -139,10 +140,18 @@ function detectedCityIssue(missing) {
 	return missing ? 'Check that the city matches your Wolo Code.' : 'Couldn’t verify the detected city.';
 }
 
+function isDecodeCityRetryBlocked(input) {
+	return input && input.value === decodeCityBlockedInput;
+}
+
 function setDecodeCityStatus(message) {
 	var status = document.getElementById('decode_city_status');
 	if(status)
 		status.textContent = message || '';
+	var input = document.getElementById('decode_input');
+	decodeCityBlockedInput = message && input ? input.value : null;
+	if(typeof syncProceedButtons === 'function')
+		syncProceedButtons();
 }
 
 function setDecodeCityIssue(message, name, center) {

@@ -8,6 +8,7 @@ const vm = require('node:vm');
 
 const words = ['tub', 'plate', 'chain'];
 const city = { id: 'katmandu', name: 'Kathmandu', center: { lat: 27.717, lng: 85.324 } };
+const referenceRequired = 'Check that the city matches your Wolo Code.\nChoose a city or region, or enter the full Wolo Code';
 
 function setup() {
 	const status = {};
@@ -53,7 +54,7 @@ test('an unavailable GPS city keeps the words and allows recovery with a verifie
 	assert.equal(hint.innerText, 'Barsain');
 	assert.equal(hint['data-unavailable'], 'true');
 	api.decode(words);
-	assert.equal(status.textContent, 'Check that the city matches your Wolo Code. Enter full Wolo Code');
+	assert.equal(status.textContent, referenceRequired);
 	assert.equal(input.value, words.join(' '));
 	assert.deepEqual(dialogs, []);
 	assert.deepEqual(decoded, []);
@@ -149,13 +150,59 @@ test('geolocation distinguishes a missing registry entry from a directory failur
 		return { message, decoded };
 	};
 	const missing = await resolve(false);
-	assert.match(missing.message, /^Check that the city matches your Wolo Code\. Hold Go/);
+	assert.equal(missing.message, referenceRequired);
 	assert.deepEqual(JSON.parse(JSON.stringify(missing.decoded)), [[
 		{ name: 'Barsain', center: { lat: 26.56, lng: 86.65 } }, words, null, true
 	]]);
 	const failure = await resolve(true);
 	assert.match(failure.message, /^Couldn.t verify the detected city\./);
 	assert.deepEqual(failure.decoded, []);
+});
+
+test('Go dims after reference feedback and only a hold can preview the same input', () => {
+	const { api, input, status } = setup();
+	const sourceRoot = path.join(__dirname, '../../Root/JS/Component/Root');
+	for(const file of ['Util.js', 'Map.js'])
+		vm.runInContext(fs.readFileSync(path.join(sourceRoot, file), 'utf8'), api);
+	const classes = new Set();
+	const attributes = new Map();
+	const button = {
+		classList: { toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); } },
+		toggleAttribute(name, enabled) { enabled ? attributes.set(name, '') : attributes.delete(name); },
+		setAttribute(name, value) { attributes.set(name, value); },
+		removeAttribute(name) { attributes.delete(name); }
+	};
+	const getElementById = api.document.getElementById;
+	api.document.getElementById = id => id === 'decode_input_button' ? button : getElementById(id);
+	api.map = {};
+	api.skipIconGuideAutoShow = () => false;
+	const attempts = [];
+	api.decode_input_from_form = allowPreview => attempts.push(allowPreview);
+	api.setDecodeCityIssue('Check that the city matches your Wolo Code.', 'Barsain', city.center);
+	assert.equal(classes.has('active'), true);
+
+	api.decode(words);
+	assert.equal(status.textContent, referenceRequired);
+	assert.equal(classes.has('active'), false);
+	assert.equal(attributes.has('aria-disabled'), false);
+	assert.equal(button.title, 'Hold Go to preview');
+	api.decode_input_from_form_external();
+	assert.deepEqual(attempts, []);
+	api.decode_input_from_form_hold();
+	assert.deepEqual(attempts, [true]);
+
+	api.setDecodeCityIssue('Couldn’t verify the detected city.');
+	api.decode(words);
+	assert.equal(attributes.get('aria-disabled'), 'true');
+	api.decode_input_from_form_hold();
+	assert.deepEqual(attempts, [true]);
+
+	input.value = 'kathmandu ' + words.join(' ');
+	api.setDecodeCityStatus('');
+	assert.equal(classes.has('active'), true);
+	assert.equal(attributes.has('aria-disabled'), false);
+	api.decode_input_from_form_external();
+	assert.deepEqual(attempts, [true, undefined]);
 });
 
 test('preview uses the city grid without selecting or storing the reference', () => {

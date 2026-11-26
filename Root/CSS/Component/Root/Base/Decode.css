@@ -1,3 +1,11 @@
+.decode {
+	caret-color: transparent;
+}
+
+.decode :is(input:not([aria-hidden='true']), textarea, [contenteditable]:not([contenteditable='false'])) {
+	caret-color: auto;
+}
+
 #decode_interface_overlay {
 	top: 0;
 	left: 0;
@@ -542,6 +550,8 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 
 #decode_input_button {
 	z-index: 1;
+	background: transparent;
+	box-sizing: content-box;
 	display: inline-block;
 	height: 26px;
 	color: #7f7f7f;
@@ -567,6 +577,16 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 
 #decode_input_button.active .proceed_button_shape {
 	opacity: 1;
+}
+
+#decode_input_button[aria-disabled='true'] {
+	cursor: default;
+}
+
+#decode_input_button:focus-visible > .image {
+	border-radius: 50%;
+	outline: 2px solid currentColor;
+	outline-offset: 4px;
 }
 
 #decode_input_button > svg {
@@ -675,7 +695,14 @@ body.map-source-single #action_menu_map {
 	text-wrap: balance;
 	top: calc(100% + 6px);
 	transform: translateX(-50%);
+	white-space: pre-line;
 	width: min(340px, calc(100vw - 32px));
+}
+
+@media (max-width: 319px) {
+	.decode #decode_input_suggestion_result {
+		min-height: 4em;
+	}
 }
 
 #decode_input_city {
@@ -946,7 +973,7 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
 @media (hover: hover) and (pointer: fine) {
  :is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
      #decode_map_view_button, #map_type_button, #action_menu_info,
-     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button, #map_city_history_toggle, #decode_city_history_toggle):hover:not(:disabled) > .image,
+     #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button, #map_city_history_toggle, #decode_city_history_toggle):hover:not(:disabled, [data-tap-blocked]) > .image,
  :is(#map_city_history_toggle, #decode_city_history_toggle, #map_places_toggle, #map_places_share):hover:not(:disabled) > svg,
  #map_places_directions a:hover > img, .map_card_launch:hover > img, img.map_card_address:hover {
   transform: translateZ(0) scale(1.08);
@@ -954,7 +981,7 @@ body:not(.decode) #map .gm-bundled-control.gm-bundled-control-on-bottom {
 }
 :is(#map_code_scan_button, #decode_code_scan_button, #saved_button, #account, #location_button,
     #decode_map_view_button, #map_type_button, #action_menu_info,
-    #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button, #map_city_history_toggle, #decode_city_history_toggle):focus-visible:not(:disabled) > .image,
+    #action_menu_decode, #action_menu_map, #decode_input_button, #decode_button, #map_city_history_toggle, #decode_city_history_toggle):focus-visible:not(:disabled, [data-tap-blocked]) > .image,
 :is(#map_city_history_toggle, #decode_city_history_toggle, #map_places_toggle, #map_places_share):focus-visible:not(:disabled) > svg,
 #map_places_directions a:focus-visible > img, .map_card_launch:focus-visible > img, img.map_card_address:focus-visible {
  transform: translateZ(0) scale(1.08);

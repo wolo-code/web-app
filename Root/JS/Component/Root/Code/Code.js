@@ -94,7 +94,7 @@ function setCodeWords(code, city, position, locating_encode) {
 	setCode(city, message, position, locating_encode);
 }
 
-function decode_(city, code, precisionWords) {
+function decode_(city, code, precisionWords, preview) {
 	if(typeof normalizeSavedWcode == 'function')
 		code = normalizeSavedWcode(code);
 	else if(code && code.length > 3)
@@ -125,6 +125,10 @@ function decode_(city, code, precisionWords) {
 			showNotification('This code is outside the supported coordinate range');
 			return;
 		}
+	}
+	if(preview) {
+		showDecodePreview(city.name, position);
+		return;
 	}
 	code_city = city;
 	var sameReference = typeof selected_decode_city !== 'undefined' && selected_decode_city && selected_decode_city.id === city.id;

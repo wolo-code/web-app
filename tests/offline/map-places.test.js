@@ -558,9 +558,9 @@ test('holding decode Go skips the guide and only decodes if the guide was closed
 	vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Base/LongPress.js'), 'utf8'), context);
 	vm.runInContext(fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/DecodeIconGuide.js'), 'utf8'), context);
 	let hold;
-	let decodes = 0;
+	const previewsAllowed = [];
 	context.setTimeout = fn => { hold = fn; return 1; };
-	context.decode_input_from_form = () => { decodes++; };
+	context.decode_input_from_form = allowPreview => { previewsAllowed.push(allowPreview); };
 	context.fadeDecodeIconGuide = () => { context.decodeIconGuideVisible = false; };
 	const go = document.getElementById('decode_input_button');
 	context.addLongpressListener(go, context.decode_input_from_form_external, context.decode_input_from_form_hold);
@@ -574,10 +574,10 @@ test('holding decode Go skips the guide and only decodes if the guide was closed
 	const map = context.map;
 	context.map = null;
 	holdGo();
-	assert.equal(decodes, 0);
+	assert.deepEqual(previewsAllowed, []);
 	assert.equal(context.decodeIconGuideVisible, false);
 	assert.equal(context.isIconGuideAutoShowSkipped(), true);
 	context.map = map;
 	holdGo();
-	assert.equal(decodes, 1);
+	assert.deepEqual(previewsAllowed, [true]);
 });

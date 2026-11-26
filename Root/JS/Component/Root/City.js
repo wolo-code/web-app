@@ -6,6 +6,7 @@ var multiple_country;
 var multiple_group;
 var decodeCityLookup;
 var decodeCityIssue = '';
+var decodeCityPreview = null;
 
 function getCityAccent(city) {
 	if(typeof city.accent != 'undefined')
@@ -39,7 +40,9 @@ function initDecodeCityContext() {
 
 function setDecodeCityFromIp(city_name) {
 	geoIp_city_name = city_name;
-	if(selected_decode_city_source == 'ip' || !selected_decode_city_source)
+	if(selected_decode_city_source === 'ip' && decodeCityLookup)
+		verifyDecodeIpCity(decodeCityLookup, city_name);
+	else if(selected_decode_city_source == 'ip' || !selected_decode_city_source)
 		selectIpDecodeCity();
 }
 
@@ -53,14 +56,17 @@ function selectIpDecodeCity() {
 		return;
 	}
 
-	var name = geoIp_city_name;
+	verifyDecodeIpCity(lookup, geoIp_city_name);
+}
+
+function verifyDecodeIpCity(lookup, name) {
 	getDecodeIpCity(name, function(city, missing) {
 		if(decodeCityLookup !== lookup)
 			return;
 		if(city)
 			acceptDetectedDecodeCity(lookup, city, 'ip');
 		else
-			setDecodeCityIssue(detectedCityIssue(name, missing));
+			setDecodeCityIssue(detectedCityIssue(missing), name);
 	});
 }
 
@@ -75,8 +81,8 @@ function startDecodeCityLookup(source) {
 
 function acceptDetectedDecodeCity(lookup, city, source) {
 	setDecodeCity(city, source, source === 'geolocation');
-	if(lookup.onResolved)
-		lookup.onResolved(city);
+	if(lookup.onComplete)
+		lookup.onComplete();
 }
 
 function getDecodeIpCity(name, callback) {
@@ -115,9 +121,9 @@ function requestDecodeCityGeolocation() {
 					else
 						setDecodeCityIssue(detectedCityIssue());
 				});
-			}, function(name, missing) {
+			}, function(name, missing, center) {
 				if(decodeCityLookup === lookup)
-					setDecodeCityIssue(detectedCityIssue(name, missing));
+					setDecodeCityIssue(detectedCityIssue(missing), name, center);
 			});
 		}, function() {
 			if(decodeCityLookup !== lookup)
@@ -129,19 +135,26 @@ function requestDecodeCityGeolocation() {
 	});
 }
 
-function detectedCityIssue(name, missing) {
-	return missing ? (name ? 'Wolo has no city reference for ' + name + '.' : 'Wolo has no city reference for this location.')
-		: 'Couldn’t verify the detected city.';
+function detectedCityIssue(missing) {
+	return missing ? 'Check that the city matches your Wolo Code.' : 'Couldn’t verify the detected city.';
 }
 
-function setDecodeCityIssue(message) {
-	decodeCityIssue = message;
+function setDecodeCityStatus(message) {
 	var status = document.getElementById('decode_city_status');
 	if(status)
-		status.textContent = message ? message + ' Choose the reference used in the code or paste the full Wolo Code.' : '';
+		status.textContent = message || '';
+}
+
+function setDecodeCityIssue(message, name, center) {
+	decodeCityIssue = message;
+	decodeCityPreview = name && center ? {name: name, center: center} : null;
+	setDecodeCityStatus('');
 	if(message) {
+		var lookup = decodeCityLookup;
 		decodeCityLookup = null;
-		setDecodeCityLabel('Choose city or region');
+		setDecodeCityLabel(name || 'Choose city or region', !!name);
+		if(lookup && lookup.onComplete)
+			lookup.onComplete();
 	}
 }
 
@@ -163,10 +176,11 @@ function setDecodeCity(city, source, save_history) {
 	syncDecodeCitySourceButtons();
 }
 
-function setDecodeCityLabel(label) {
+function setDecodeCityLabel(label, unavailable) {
 	var city_label = document.getElementById('decode_input_city');
 	if(city_label) {
 		city_label.innerText = label || '\u00a0';
+		city_label.setAttribute('data-unavailable', unavailable ? 'true' : 'false');
 		city_label.setAttribute('aria-label', label ? label + '. Choose city or region' : 'Choose city or region');
 	}
 }

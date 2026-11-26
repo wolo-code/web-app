@@ -673,20 +673,19 @@ body.map-source-single #action_menu_map {
 	margin-bottom: 8px;
 }
 
-#decode_city_status:not(:empty) + #decode_input_city {
-	color: inherit;
-	text-decoration: underline;
-}
-
 #decode_input_city {
 	background: transparent;
 	border: 0;
-	color: #7f7f7f;
+	color: inherit;
 	cursor: pointer;
 	font: inherit;
 	margin: -5px 0;
 	padding: 5px 10px;
 	transition: text-shadow 180ms ease, transform 180ms ease;
+}
+
+#decode_input_city[data-unavailable='true'] {
+	color: #7f7f7f;
 }
 
 #decode_input_city:hover {

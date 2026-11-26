@@ -12,7 +12,7 @@ const city = { id: 'katmandu', name: 'Kathmandu', center: { lat: 27.717, lng: 85
 function setup() {
 	const status = {};
 	const input = { value: words.join(' ') };
-	const hint = { setAttribute() {} };
+	const hint = { setAttribute(name, value) { this[name] = value; } };
 	const dialogs = [];
 	const decoded = [];
 	const remembered = [];
@@ -49,9 +49,11 @@ test('an unavailable GPS city keeps the words and allows recovery with a verifie
 	api.getCityFromPositionViaGMap = (_position, _success, failure) => failure('Barsain', true);
 
 	api.requestDecodeCityGeolocation();
+	assert.equal(status.textContent, '');
+	assert.equal(hint.innerText, 'Barsain');
+	assert.equal(hint['data-unavailable'], 'true');
 	api.decode(words);
-	assert.match(status.textContent, /^Wolo has no city reference for Barsain\./);
-	assert.equal(hint.innerText, 'Choose city or region');
+	assert.match(status.textContent, /^Check that the city matches your Wolo Code\./);
 	assert.equal(input.value, words.join(' '));
 	assert.deepEqual(dialogs, []);
 	assert.deepEqual(decoded, []);
@@ -60,6 +62,7 @@ test('an unavailable GPS city keeps the words and allows recovery with a verifie
 	api.setDecodeCity(city, 'history', false);
 	api.decode(words);
 	assert.equal(status.textContent, '');
+	assert.equal(hint['data-unavailable'], 'false');
 	assert.deepEqual(decoded, [[city, words, undefined]]);
 	assert.deepEqual(remembered, [city]);
 	assert.equal(loaderDepth(), 0);
@@ -112,12 +115,13 @@ test('submitting three words during IP verification decodes after the reference 
 
 test('geolocation distinguishes a missing registry entry from a directory failure', async () => {
 	const resolve = async (queryFails) => {
-		const { api, status } = setup();
+		const { api, status, decoded } = setup();
 		api.isOfflineMode = () => false;
 		api.google = { maps: { Geocoder: function() {
 			this.geocode = (_request, callback) => callback([{
 				place_id: 'barsain', types: ['locality'],
-				address_components: [{ long_name: 'Barsain', types: ['locality'] }]
+				address_components: [{ long_name: 'Barsain', types: ['locality'] }],
+				geometry: { location: { lat: () => 26.56, lng: () => 86.65 } }
 			}], 'OK');
 		} } };
 		api.database = { ref() { return {
@@ -135,10 +139,38 @@ test('geolocation distinguishes a missing registry entry from a directory failur
 		vm.runInContext(locate, api);
 		api.initLocate = (_override, callback) => callback();
 		api.getCoarseLocation = getLocation;
+		api.regionPosition = center => ({ lat: center.lat(), lng: center.lng() });
 		api.requestDecodeCityGeolocation();
 		await Promise.resolve();
-		return status.textContent;
+		assert.equal(status.textContent, '');
+		api.decode(words);
+		const message = status.textContent;
+		api.decode(words, null, null, false, undefined, true);
+		return { message, decoded };
 	};
-	assert.match(await resolve(false), /^Wolo has no city reference for Barsain\./);
-	assert.match(await resolve(true), /^Couldn.t verify the detected city\./);
+	const missing = await resolve(false);
+	assert.match(missing.message, /^Check that the city matches your Wolo Code\. Hold Go/);
+	assert.deepEqual(JSON.parse(JSON.stringify(missing.decoded)), [[
+		{ name: 'Barsain', center: { lat: 26.56, lng: 86.65 } }, words, null, true
+	]]);
+	const failure = await resolve(true);
+	assert.match(failure.message, /^Couldn.t verify the detected city\./);
+	assert.deepEqual(failure.decoded, []);
+});
+
+test('preview uses the city grid without selecting or storing the reference', () => {
+	const { api, remembered } = setup();
+	const code = fs.readFileSync(path.join(__dirname, '../../Root/JS/Component/Root/Code/Code.js'), 'utf8');
+	vm.runInContext(code, api);
+	api.getWoloAnchorBegin = reference => api.getCityBegin(reference.center);
+	const previews = [];
+	api.showDecodePreview = (name, position) => previews.push({ name, position });
+	const unregistered = { name: 'Barsain', center: { lat: 26.56, lng: 86.65 } };
+	api.decode_(unregistered, words, undefined, true);
+	assert.equal(previews.length, 1);
+	assert.equal(previews[0].name, 'Barsain');
+	assert.equal(Math.abs(previews[0].position.lat - unregistered.center.lat) < 1, true);
+	assert.equal(Math.abs(previews[0].position.lng - unregistered.center.lng) < 1, true);
+	assert.deepEqual(remembered, []);
+	assert.equal(api.selected_decode_city, null);
 });

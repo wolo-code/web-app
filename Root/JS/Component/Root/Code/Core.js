@@ -175,7 +175,7 @@ function getCityGpId(address_components) {
 	return fallback;
 }
 
-function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) {
+function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowPreview) {
 	pushLoader();
 	function finish(city, wcode) {
 		if(selectionVersion != null && selectionVersion !== mapSelectionVersion) {
@@ -217,7 +217,10 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) 
 	}
 	if(decodeCityIssue) {
 		popLoader();
-		showDecodeReferenceRequired(decodeCityIssue);
+		if(allowPreview && decodeCityPreview)
+			decode_(decodeCityPreview, codeWords, precisionWords, true);
+		else
+			showDecodeReferenceRequired(decodeCityIssue);
 		return;
 	}
 	if(decodeCityLookup) {
@@ -225,9 +228,9 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) 
 		var inputId = document.body.classList.contains('decode') ? 'decode_input' : 'pac-input';
 		var input = document.getElementById(inputId);
 		var submittedValue = input && input.value;
-		decodeCityLookup.onResolved = function(city) {
+		decodeCityLookup.onComplete = function() {
 			if((selectionVersion == null || selectionVersion === mapSelectionVersion) && (!input || input.value === submittedValue))
-				decode_(city, codeWords, precisionWords);
+				decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, allowPreview);
 		};
 		return;
 	}
@@ -247,9 +250,10 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords) 
 }
 
 function showDecodeReferenceRequired(message) {
-	if(document.body.classList.contains('decode'))
-		setDecodeCityIssue(message || 'A city or region is needed to decode these words.');
-	else
+	if(document.body.classList.contains('decode')) {
+		var nextStep = decodeCityPreview ? ' Hold Go to try with this city' : ' Choose a city or region, or paste the full Wolo Code';
+		setDecodeCityStatus((message || 'These words need a city or region.') + nextStep);
+	} else
 		showNotification('Enter the full Wolo Code or choose the reference used in the code');
 }
 
@@ -271,6 +275,6 @@ function decodeWithIpCity(words, selectionVersion, precisionWords) {
 		if(city)
 			decode_(city, words, precisionWords);
 		else
-			showDecodeReferenceRequired(detectedCityIssue(geoIp_city_name, missing));
+			showDecodeReferenceRequired(detectedCityIssue(missing));
 	});
 }

@@ -758,12 +758,12 @@ function decode_input_from_map_add() {
 
 function decode_input_from_form_hold() {
 	if(!skipIconGuideAutoShow() && map)
-		decode_input_from_form();
+		decode_input_from_form(true);
 }
 
-function decode_input_from_form() {
+function decode_input_from_form(allowPreview) {
 	document.activeElement.blur();
-	beginDecode(document.getElementById('decode_input').value);
+	beginDecode(document.getElementById('decode_input').value, null, {allowPreview: allowPreview === true});
 }
 
 function decode_input_from_form_external() {
@@ -788,7 +788,7 @@ function beginDecode(code, scannedMetadata, options) {
 	keepAddressPanelOpen = !!(options && options.showAddress);
 	if(keepAddressPanelOpen) address = current_address || '';
 	addClassIfPresent(document.getElementById('accuracy_container'), 'hide');
-	execDecode(code, decodeMarker);
+	execDecode(code, decodeMarker, options && options.allowPreview);
 }
 
 function resolveLatLng(latLng) {
@@ -810,7 +810,7 @@ function hideDecodeInputAltTip() {
 	}
 }
 
-function execDecode(code, decodeMarker) {
+function execDecode(code, decodeMarker, allowPreview) {
 	var trimmed = code.replace(/(\\|\/)/gm, '').trim();
 	if(trimmed.length === 0) {
 		showNotification(INCORRECT_WCODE);
@@ -836,7 +836,7 @@ function execDecode(code, decodeMarker) {
 	code = trimmed.toLowerCase();
 	var precision = splitPrecisionWoloText(code);
 	if(precision) {
-		decode(precision.base.split(/\s+/), decodeMarker, mapSelectionVersion, false, precision.words);
+		decode(precision.base.split(/\s+/), decodeMarker, mapSelectionVersion, false, precision.words, allowPreview);
 		return;
 	}
 	var valid = true;
@@ -848,11 +848,31 @@ function execDecode(code, decodeMarker) {
 	var words = code.split(splitChar);
 	if(words.length < 3)
 		valid = false;
+	else if(allowPreview)
+		decode(words, decodeMarker, mapSelectionVersion, false, undefined, true);
 	else
 		decode(words, decodeMarker, mapSelectionVersion);
 
 	if(!valid)
 		showInvalidCodeDialog(trimmed);
+}
+
+function showDecodePreview(cityName, position) {
+	initWCode_jump_ask = false;
+	initWCode_jumpToMap = false;
+	var point = regionPosition({lat: position.lat, lng: wrapRegionLongitude(position.lng)});
+	if(!point) {
+		setDecodeCityStatus('Couldn’t preview this location. Check that the city matches your Wolo Code');
+		return;
+	}
+	clearCode();
+	setDecodeCityStatus('');
+	ensureMapViewForLocation();
+	var label = document.createElement('div');
+	label.className = 'map_card_content';
+	label.textContent = 'Preview · ' + cityName;
+	infoWindow_setContent(label);
+	focus___(point);
 }
 
 function execDecodePlusCode(code) {

@@ -477,7 +477,8 @@ function getCityFromPositionViaGMap(position, callback_success, callback_failure
 		var result = results.find(item => item.place_id === cityGpId);
 		var component = (result.address_components || []).find(item => item.types.includes(result.types[0]));
 		getCityFromCityGp_id(cityGpId, callback_success, function(missing) {
-			callback_failure(component && component.long_name, missing);
+			var center = missing && result.geometry ? regionPosition(result.geometry.location) : null;
+			callback_failure(component && component.long_name, missing, center);
 		});
 	});
 }

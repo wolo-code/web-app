@@ -251,7 +251,7 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 
 function showDecodeReferenceRequired(message) {
 	if(document.body.classList.contains('decode')) {
-		var nextStep = decodeCityPreview ? ' Hold Go to try with this city' : ' Choose a city or region, or paste the full Wolo Code';
+		var nextStep = decodeCityPreview ? ' Hold Go to try with this city' : ' Enter full Wolo Code';
 		setDecodeCityStatus((message || 'These words need a city or region.') + nextStep);
 	} else
 		showNotification('Enter the full Wolo Code or choose the reference used in the code');

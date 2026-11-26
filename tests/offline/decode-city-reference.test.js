@@ -53,7 +53,7 @@ test('an unavailable GPS city keeps the words and allows recovery with a verifie
 	assert.equal(hint.innerText, 'Barsain');
 	assert.equal(hint['data-unavailable'], 'true');
 	api.decode(words);
-	assert.match(status.textContent, /^Check that the city matches your Wolo Code\./);
+	assert.equal(status.textContent, 'Check that the city matches your Wolo Code. Enter full Wolo Code');
 	assert.equal(input.value, words.join(' '));
 	assert.deepEqual(dialogs, []);
 	assert.deepEqual(decoded, []);

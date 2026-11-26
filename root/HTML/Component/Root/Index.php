@@ -81,8 +81,8 @@
 				</button>
 			</div>
 			<div id='decode_city_hint'>
-				<p id='decode_city_status' role='status'></p>
 				<button id='decode_input_city' type='button' title='Choose city or region' aria-label='Choose city or region' aria-controls='decode_city_history_message' aria-expanded='false'>&nbsp;</button>
+				<p id='decode_city_status' role='status'></p>
 			</div>
 		</div>
 		<div id='decode_input_suggestion_result' class='suggestion_result' data-input='decode_input' data-resize_input='true'></div>

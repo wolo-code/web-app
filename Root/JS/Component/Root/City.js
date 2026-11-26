@@ -61,13 +61,37 @@ function selectIpDecodeCity() {
 }
 
 function verifyDecodeIpCity(lookup, name) {
+	var country = typeof geoIp_country_code === 'string' ? geoIp_country_code : '';
 	getDecodeIpCity(name, function(city, missing) {
 		if(decodeCityLookup !== lookup)
 			return;
 		if(city)
 			acceptDetectedDecodeCity(lookup, city, 'ip');
-		else
-			setDecodeCityIssue(detectedCityIssue(missing), name);
+		else {
+			var preview = /^[a-z]{2}$/i.test(country) ? {country: country} : null;
+			setDecodeCityIssue(detectedCityIssue(missing), name, preview);
+		}
+	});
+}
+
+function resolveDecodeCityPreview(preview, callback) {
+	if(preview.center || typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
+		callback(preview.center);
+		return;
+	}
+	var name = normalizeCityLookupToken(preview.name);
+	new google.maps.Geocoder().geocode({
+		address: preview.name,
+		componentRestrictions: {country: preview.country}
+	}, function(results, status) {
+		var matches = status === 'OK' && (results || []).filter(function(result) {
+			return !result.partial_match && (result.address_components || []).some(function(component) {
+				return normalizeCityLookupToken(component.long_name) === name && result.types.some(function(type) {
+					return /^(locality|postal_town|sublocality(?:_level_\d+)?|administrative_area_level_\d+)$/.test(type) && component.types.includes(type);
+				});
+			});
+		});
+		callback(matches && matches.length === 1 && regionPosition(matches[0].geometry && matches[0].geometry.location));
 	});
 }
 
@@ -124,7 +148,7 @@ function requestDecodeCityGeolocation() {
 				});
 			}, function(name, missing, center) {
 				if(decodeCityLookup === lookup)
-					setDecodeCityIssue(detectedCityIssue(missing), name, center);
+					setDecodeCityIssue(detectedCityIssue(missing), name, center && {center: center});
 			});
 		}, function() {
 			if(decodeCityLookup !== lookup)
@@ -154,9 +178,9 @@ function setDecodeCityStatus(message) {
 		syncProceedButtons();
 }
 
-function setDecodeCityIssue(message, name, center) {
+function setDecodeCityIssue(message, name, preview) {
 	decodeCityIssue = message;
-	decodeCityPreview = name && center ? {name: name, center: center} : null;
+	decodeCityPreview = name && preview ? Object.assign({name: name}, preview) : null;
 	setDecodeCityStatus('');
 	if(message) {
 		var lookup = decodeCityLookup;

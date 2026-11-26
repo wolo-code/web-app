@@ -216,11 +216,12 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 		return;
 	}
 	if(decodeCityIssue) {
-		popLoader();
 		if(allowPreview && decodeCityPreview)
-			decode_(decodeCityPreview, codeWords, precisionWords, true);
-		else
+			decodeDetectedCityPreview(codeWords, precisionWords, selectionVersion);
+		else {
+			popLoader();
 			showDecodeReferenceRequired(decodeCityIssue);
+		}
 		return;
 	}
 	if(decodeCityLookup) {
@@ -247,6 +248,24 @@ function decode(words, decodeMarker, selectionVersion, fromUrl, precisionWords, 
 		return;
 	}
 	finish(null, codeWords);
+}
+
+function decodeDetectedCityPreview(words, precisionWords, selectionVersion) {
+	var preview = decodeCityPreview;
+	var input = document.getElementById('decode_input');
+	var submittedValue = input && input.value;
+	resolveDecodeCityPreview(preview, function(center) {
+		popLoader();
+		if(preview !== decodeCityPreview || (selectionVersion != null && selectionVersion !== mapSelectionVersion) ||
+			(input && input.value !== submittedValue) || !document.body.classList.contains('decode'))
+			return;
+		if(!center) {
+			showDecodeReferenceRequired('Couldn’t preview this location.');
+			return;
+		}
+		preview.center = center;
+		decode_(preview, words, precisionWords, true);
+	});
 }
 
 function showDecodeReferenceRequired(message) {

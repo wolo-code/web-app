@@ -87,6 +87,87 @@ test('an IP lookup failure preserves valid words and a stale result cannot repla
 	assert.deepEqual(decoded, [[city, words, undefined]]);
 });
 
+function setupIpCityPreview() {
+	const state = setup();
+	const { api } = state;
+	const requests = [];
+	api.geoIp_country_code = 'NP';
+	api.getDecodeIpCity = (_name, resolve) => resolve(null, true);
+	api.google = { maps: { Geocoder: function() {
+		this.geocode = (request, resolve) => requests.push({ request, resolve });
+	} } };
+	api.regionPosition = position => ({ lat: position.lat(), lng: position.lng() });
+	api.selectIpDecodeCity();
+	const result = {
+		types: ['locality', 'political'],
+		address_components: [{ long_name: 'Barsain', types: ['locality', 'political'] }],
+		geometry: { location: { lat: () => 26.56, lng: () => 86.65 } }
+	};
+	return { ...state, requests, result };
+}
+
+test('holding Go after an IP city warning opens a temporary preview without selecting the city', () => {
+	const { api, status, remembered, requests, result, loaderDepth } = setupIpCityPreview();
+	const sourceRoot = path.join(__dirname, '../../Root/JS');
+	for(const file of ['Component/Root/Map.js', 'Component/Root/Code/Precision.js', 'Component/Root/Code/Code.js',
+		'Component/Root/RegionAnchors.js', 'Base/LongPress.js'])
+		vm.runInContext(fs.readFileSync(path.join(sourceRoot, file), 'utf8'), api);
+	api.map = {};
+	api.document.activeElement = { blur() {} };
+	api.document.createElement = () => ({});
+	api.skipIconGuideAutoShow = () => false;
+	api.cleanUp = () => { api.mapSelectionVersion++; };
+	api.addClassIfPresent = () => {};
+	api.clearCode = () => {};
+	let label, pin;
+	api.infoWindow_setContent = content => { label = content.textContent; };
+	api.focus___ = point => { pin = point; };
+	let openedMap = false;
+	api.ensureMapViewForLocation = () => { openedMap = true; };
+	let hold;
+	api.setTimeout = callback => { hold = callback; return 1; };
+	api.clearTimeout = () => {};
+	const events = {};
+	const go = { addEventListener: (type, listener) => { events[type] = listener; } };
+	api.addLongpressListener(go, api.decode_input_from_form_external, api.decode_input_from_form_hold);
+
+	events.click.call(go, { detail: 1 });
+	assert.equal(status.textContent, referenceRequired);
+	events.click.call(go, { detail: 1 });
+	assert.equal(requests.length, 0);
+
+	events.pointerdown.call(go, { button: 0, pointerType: 'touch', isPrimary: true });
+	hold();
+	events.pointerup.call(go, {});
+	events.click.call(go, { detail: 1 });
+	assert.equal(requests.length, 1);
+	assert.equal(requests[0].request.address, 'Barsain');
+	assert.equal(requests[0].request.componentRestrictions.country, 'NP');
+	requests[0].resolve([result], 'OK');
+	assert.equal(openedMap, true);
+	assert.equal(label, 'Preview · Barsain');
+	assert.ok(Math.abs(pin.lat - 26.56) < 1 && Math.abs(pin.lng - 86.65) < 1);
+	assert.equal(status.textContent, '');
+	assert.deepEqual(remembered, []);
+	assert.equal(api.selected_decode_city, null);
+	assert.equal(loaderDepth(), 0);
+});
+
+test('an ambiguous or outdated IP city preview cannot open a pin', () => {
+	const { api, input, status, decoded, requests, result, loaderDepth } = setupIpCityPreview();
+	api.decode(words, null, null, false, undefined, true);
+	requests[0].resolve([result, result], 'OK');
+	assert.match(status.textContent, /^Couldn’t preview this location\./);
+
+	api.decode(words, null, null, false, undefined, true);
+	input.value = 'kathmandu ' + words.join(' ');
+	api.setDecodeCityStatus('');
+	requests[1].resolve([result], 'OK');
+	assert.equal(status.textContent, '');
+	assert.deepEqual(decoded, []);
+	assert.equal(loaderDepth(), 0);
+});
+
 test('full codes bypass detected-city issues and invalid words still get the code dialog', () => {
 	const { api, dialogs, decoded, loaderDepth } = setup();
 	api.getCityFromPositionViaGMap = (_position, _success, failure) => failure('Barsain', true);
@@ -178,7 +259,7 @@ test('Go dims after reference feedback and only a hold can preview the same inpu
 	api.skipIconGuideAutoShow = () => false;
 	const attempts = [];
 	api.decode_input_from_form = allowPreview => attempts.push(allowPreview);
-	api.setDecodeCityIssue('Check that the city matches your Wolo Code.', 'Barsain', city.center);
+	api.setDecodeCityIssue('Check that the city matches your Wolo Code.', 'Barsain', {center: city.center});
 	assert.equal(classes.has('active'), true);
 
 	api.decode(words);

@@ -564,6 +564,10 @@ body:not(.decode).decode-icon-guide #map_camera_label {
 	margin-left: -18px;
 	vertical-align: bottom;
 	transition: color 160ms ease;
+	touch-action: manipulation;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 #decode_input_button .proceed_button_shape {
